@@ -1,0 +1,4 @@
+Script started on Mon Jun 15 20:03:43 2020
+[?1034h[bs:~/workspace/Exported/Tcl] git init
+Initialized empty Git repository in /Users/sandy/workspace/Exported/Tcl/.git/
+[bs:~/workspace/Exported/Tcl] 

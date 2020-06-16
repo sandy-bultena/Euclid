@@ -1,0 +1,67 @@
+=Include Angle.pm
+=Include Point.pm
+=Include Lines.pm
+=Include Circles.pm
+
+=head1 OVERVIEW
+
+This package is designed to provide the tools required to
+play with Euclidean geometry.  
+
+Circles, lines and points are the basic building tools.
+
+Using these basic building tools, all kinds of triangles can
+be constructed, parallelograms that are equal in area to a triangle
+can be drawn, and so forth.
+
+In this release, all of Euclid's book I propositions are demonstrated
+within the Postulates sub-directory.
+
+=head2 Gui interface
+
+This package was designed to work with Tk, however, if desired,
+it can be replaced with another GUI, as long as the interface
+mimics the Tk::Canvas interface.
+
+=head1 SYNOPSIS
+
+Circle
+
+=Include Circle->synopsis
+
+Angle
+
+=Include Angle->synopsis
+
+
+=head1 BUILDING BLOCKS
+
+=head2 Methods inherited from Geometry::Shape
+
+=head2 Angle
+
+=Include Angle->Name
+=Include Angle->Synopsis
+
+
+=head2 Circle
+
+=head1 POLYGONS
+
+=head1 HELPER FUNCTIONS
+
+=head2 CalculatePoints
+
+=head1 AUTHOR
+
+Sandy Bultena
+
+=head1 COPYRIGHT
+
+This module is copyright (c) 2014 Sandy Bultena. All rights reserved.
+
+This library is free software; you may redistribute and/or modify it under
+the terms of either the GNU General Public License
+or the Perl Artistic License, as specified in the Perl 5.10.0 README file.
+
+=cut
