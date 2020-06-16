@@ -18,5 +18,6 @@ use Geometry::Gnomon;
 use Geometry::Arc;
 use Geometry::RegularPolygons;
 use Geometry::Oval;
+use Geometry::Numbers;
 
 1;
