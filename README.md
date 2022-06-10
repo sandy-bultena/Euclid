@@ -19,6 +19,12 @@ So, I decided, we live in a modern age, let me check youtube.  I could not find 
 
 So that is how I came upon the idea of creating my own videos.
 
+## Caveats
+
+These videos/pdfs are not for advance mathematicians or purists.  I am *loosely* translating the Elements. I gloss over the finer details.  For example, Euclid makes a distinction between a `measure` and a `number`.  I do not.
+
+Some comments on my youtube channel have been written by people who are obviously very upset with me over this issue.  I do not plan to change my approach.
+
 ## Tools
 
 I am a coder by profession and hobby.  I did not like the tools that were available, so I created my own.
