@@ -1,1412 +1,0 @@
-Script started on Mon Jun 15 20:03:43 2020
-[?1034h[bs:~/workspace/Exported/Tcl] git init
-Initialized empty Git repository in /Users/sandy/workspace/Exported/Tcl/.git/
-[bs:~/workspace/Exported/Tcl] git status
-On branch master
-
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-
-	[31mPropositions/[m
-	[31mgittext.txt[m
-	[31mlib/[m
-	[31mperldoc.css[m
-	[31mt/[m
-
-nothing added to commit but untracked files present (use "git add" to track)
-[bs:~/workspace/Exported/Tcl] git add -A
-[bs:~/workspace/Exported/Tcl] git status
-On branch master
-
-No commits yet
-
-Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
-
-	[32mnew file:   Propositions/Book1/Prop00_intro.pl[m
-	[32mnew file:   Propositions/Book1/Prop01_equilateral_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop02_copy_line.pl[m
-	[32mnew file:   Propositions/Book1/Prop03_subtract_line.pl[m
-	[32mnew file:   Propositions/Book1/Prop04_triangle_equal_SAS2.pl[m
-	[32mnew file:   Propositions/Book1/Prop05_isoceles_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop06_isoceles_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop07_unique_apex.pl[m
-	[32mnew file:   Propositions/Book1/Prop08_triangle_equal_SSS.pl[m
-	[32mnew file:   Propositions/Book1/Prop09_bisect_angle.pl[m
-	[32mnew file:   Propositions/Book1/Prop10_bisect_line.pl[m
-	[32mnew file:   Propositions/Book1/Prop11_push_perpendicular.pl[m
-	[32mnew file:   Propositions/Book1/Prop12_drop_perpendicular.pl[m
-	[32mnew file:   Propositions/Book1/Prop13_straight_line_180.pl[m
-	[32mnew file:   Propositions/Book1/Prop14_180_straight_line.pl[m
-	[32mnew file:   Propositions/Book1/Prop15_vertical_angles.pl[m
-	[32mnew file:   Propositions/Book1/Prop16_exterior_angle_larger.pl[m
-	[32mnew file:   Propositions/Book1/Prop17_two_angles_less_than_180.pl[m
-	[32mnew file:   Propositions/Book1/Prop18_greater_side_greater_angle.pl[m
-	[32mnew file:   Propositions/Book1/Prop19_greater_angle_greater_side.pl[m
-	[32mnew file:   Propositions/Book1/Prop20_two_sides_greater_than_one.pl[m
-	[32mnew file:   Propositions/Book1/Prop21_triangle_within_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop22_construct_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop23_copy_angle.pl[m
-	[32mnew file:   Propositions/Book1/Prop24_larger_angle_larger_base.pl[m
-	[32mnew file:   Propositions/Book1/Prop25_larger_base_larger_angle.pl[m
-	[32mnew file:   Propositions/Book1/Prop26_equal_triangles_ASA.pl[m
-	[32mnew file:   Propositions/Book1/Prop27_alternate_angles_equal_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop28_sum_angles_180_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop29_parallel_unique_postulate5.pl[m
-	[32mnew file:   Propositions/Book1/Prop30_parallel_to_parallel_equals_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop31_construct_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop32_triangle_180.pl[m
-	[32mnew file:   Propositions/Book1/Prop33_parallelogram.pl[m
-	[32mnew file:   Propositions/Book1/Prop34_parallelogram_bisect.pl[m
-	[32mnew file:   Propositions/Book1/Prop35_parallelogram_same_base.pl[m
-	[32mnew file:   Propositions/Book1/Prop36_parallelogram_equal_base.pl[m
-	[32mnew file:   Propositions/Book1/Prop37_triangle_same_base_height.pl[m
-	[32mnew file:   Propositions/Book1/Prop38_triangle_equal_base_height.pl[m
-	[32mnew file:   Propositions/Book1/Prop39_same_base_same_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop40_equal_base_same_parallel.pl[m
-	[32mnew file:   Propositions/Book1/Prop41_triangle_equals_half_parallelogram.pl[m
-	[32mnew file:   Propositions/Book1/Prop42_construct_parallelogram_equal_triangle.pl[m
-	[32mnew file:   Propositions/Book1/Prop43_parallelograms_complements_equal.pl[m
-	[32mnew file:   Propositions/Book1/Prop44_parallelogram_equal_triangle_on_line.pl[m
-	[32mnew file:   Propositions/Book1/Prop45_create_parallelogram_from_polygon.pl[m
-	[32mnew file:   Propositions/Book1/Prop46_draw_square.pl[m
-	[32mnew file:   Propositions/Book1/Prop47_pythagoras.pl[m
-	[32mnew file:   Propositions/Book1/Prop48_inverse_pythagoras.pl[m
-	[32mnew file:   Propositions/Book1/truetypeFonts.txt[m
-	[32mnew file:   Propositions/Book2/Prop00_toc.pl[m
-	[32mnew file:   Propositions/Book2/Prop01_distributive_law.pl[m
-	[32mnew file:   Propositions/Book2/Prop02_square_distributive_law.pl[m
-	[32mnew file:   Propositions/Book2/Prop03_square_plus_residual_distributive_law.pl[m
-	[32mnew file:   Propositions/Book2/Prop04_a_plus_b_all_squared.pl[m
-	[32mnew file:   Propositions/Book2/Prop05_equal_and_unequal.pl[m
-	[32mnew file:   Propositions/Book2/Prop06_equal_and_added_unequal.pl[m
-	[32mnew file:   Propositions/Book2/Prop07_square_of_whole_plus_square_of_segment.pl[m
-	[32mnew file:   Propositions/Book2/Prop08_four.pl[m
-	[32mnew file:   Propositions/Book2/Prop09_square_of_equal_non_equal.pl[m
-	[32mnew file:   Propositions/Book2/Prop10_square_of_extension.pl[m
-	[32mnew file:   Propositions/Book2/Prop11_find_golden_ratio.pl[m
-	[32mnew file:   Propositions/Book2/Prop12_cosine_law_obtuse.pl[m
-	[32mnew file:   Propositions/Book2/Prop13_cosine_law_acute.pl[m
-	[32mnew file:   Propositions/Book2/Prop14_square_polygon.pl[m
-	[32mnew file:   Propositions/Book3/Prop01_find_center_circle.pl[m
-	[32mnew file:   Propositions/Book3/Prop02_chord_inside_circle.pl[m
-	[32mnew file:   Propositions/Book3/Prop03_bisect_chord.pl[m
-	[32mnew file:   Propositions/Book3/Prop04_non_bisecting_chords.pl[m
-	[32mnew file:   Propositions/Book3/Prop05_circle_intersect.pl[m
-	[32mnew file:   Propositions/Book3/Prop06_two_circles_touch.pl[m
-	[32mnew file:   Propositions/Book3/Prop07_inside_circle_longer_lines.pl[m
-	[32mnew file:   Propositions/Book3/Prop08_outside_circles_longer.pl[m
-	[32mnew file:   Propositions/Book3/Prop09_three_equal_lines_from_point_to_circle.pl[m
-	[32mnew file:   Propositions/Book3/Prop10_intersects_two_points.pl[m
-	[32mnew file:   Propositions/Book3/Prop11_touching_circles_centres_lineup.pl[m
-	[32mnew file:   Propositions/Book3/Prop12_touching_circles_centres_lineup.pl[m
-	[32mnew file:   Propositions/Book3/Prop13_touch_more_than_once.pl[m
-	[32mnew file:   Propositions/Book3/Prop14_equidistant_lines.pl[m
-	[32mnew file:   Propositions/Book3/Prop15_diameter_largest_line.pl[m
-	[32mnew file:   Propositions/Book3/Prop16_tangent_at_right_angles_diameter.pl[m
-	[32mnew file:   Propositions/Book3/Prop17_draw_from_point_touch_circle.pl[m
-	[32mnew file:   Propositions/Book3/Prop18_line_touch_circle_is_perp_radius.pl[m
-	[32mnew file:   Propositions/Book3/Prop19_perp_to_touch_line_goes_centre.pl[m
-	[32mnew file:   Propositions/Book3/Prop20_angle_centre_twice_angle_circumference.pl[m
-	[32mnew file:   Propositions/Book3/Prop21_angle_segments_equal.pl[m
-	[32mnew file:   Propositions/Book3/Prop22_opposite_angles_180.pl[m
-	[32mnew file:   Propositions/Book3/Prop23_similar_but_not_unequal.pl[m
-	[32mnew file:   Propositions/Book3/Prop24_similar_segments_are_equal.pl[m
-	[32mnew file:   Propositions/Book3/Prop25_draw_circle_from_segment.pl[m
-	[32mnew file:   Propositions/Book3/Prop26_equal_circles_equal_angles_equal_circumferences.pl[m
-	[32mnew file:   Propositions/Book3/Prop27_equal_circles_equal_circumferences_equal_angles.pl[m
-	[32mnew file:   Propositions/Book3/Prop28_equal_circles_equal_lines_equal_circumference.pl[m
-	[32mnew file:   Propositions/Book3/Prop29_equal_circles_equal_circumference_equal_lines.pl[m
-	[32mnew file:   Propositions/Book3/Prop30_bisect_circumference.pl[m
-	[32mnew file:   Propositions/Book3/Prop31_semi_circle_right_angle.pl[m
-	[32mnew file:   Propositions/Book3/Prop32_angle_tangent_equals_angle_segment.pl[m
-	[32mnew file:   Propositions/Book3/Prop33_construct_segment.pl[m
-	[32mnew file:   Propositions/Book3/Prop34_construct_segment2.pl[m
-	[32mnew file:   Propositions/Book3/Prop35_intersecting_chords.pl[m
-	[32mnew file:   Propositions/Book3/Prop36_secant_law.pl[m
-	[32mnew file:   Propositions/Book3/Prop37_inverse_secant_law.pl[m
-	[32mnew file:   Propositions/Book4/Prop01_fit_a_line.pl[m
-	[32mnew file:   Propositions/Book4/Prop02.pl[m
-	[32mnew file:   Propositions/Book4/Prop03.pl[m
-	[32mnew file:   Propositions/Book4/Prop04.pl[m
-	[32mnew file:   Propositions/Book4/Prop05.pl[m
-	[32mnew file:   Propositions/Book4/Prop06.pl[m
-	[32mnew file:   Propositions/Book4/Prop07.pl[m
-	[32mnew file:   Propositions/Book4/Prop08.pl[m
-	[32mnew file:   Propositions/Book4/Prop09.pl[m
-	[32mnew file:   Propositions/Book4/Prop10.pl[m
-	[32mnew file:   Propositions/Book4/Prop11.pl[m
-	[32mnew file:   Propositions/Book4/Prop12.pl[m
-	[32mnew file:   Propositions/Book4/Prop13.pl[m
-	[32mnew file:   Propositions/Book4/Prop14.pl[m
-	[32mnew file:   Propositions/Book4/Prop15.pl[m
-	[32mnew file:   Propositions/Book4/Prop16.pl[m
-	[32mnew file:   Propositions/Book5/Prop01.pl[m
-	[32mnew file:   Propositions/Book5/Prop02.pl[m
-	[32mnew file:   Propositions/Book5/Prop03.pl[m
-	[32mnew file:   Propositions/Book5/Prop04.pl[m
-	[32mnew file:   Propositions/Book5/Prop05.pl[m
-	[32mnew file:   Propositions/Book5/Prop06.pl[m
-	[32mnew file:   Propositions/Book5/Prop07.pl[m
-	[32mnew file:   Propositions/Book5/Prop08.pl[m
-	[32mnew file:   Propositions/Book5/Prop09.pl[m
-	[32mnew file:   Propositions/Book5/Prop10.pl[m
-	[32mnew file:   Propositions/Book5/Prop11.pl[m
-	[32mnew file:   Propositions/Book5/Prop12.pl[m
-	[32mnew file:   Propositions/Book5/Prop13.pl[m
-	[32mnew file:   Propositions/Book5/Prop14.pl[m
-	[32mnew file:   Propositions/Book5/Prop15.pl[m
-	[32mnew file:   Propositions/Book5/Prop16.pl[m
-	[32mnew file:   Propositions/Book5/Prop17.pl[m
-	[32mnew file:   Propositions/Book5/Prop18.pl[m
-	[32mnew file:   Propositions/Book5/Prop19.pl[m
-	[32mnew file:   Propositions/Book5/Prop20.pl[m
-	[32mnew file:   Propositions/Book5/Prop21.pl[m
-	[32mnew file:   Propositions/Book5/Prop22.pl[m
-	[32mnew file:   Propositions/Book5/Prop23.pl[m
-	[32mnew file:   Propositions/Book5/Prop24.pl[m
-	[32mnew file:   Propositions/Book5/Prop25.pl[m
-	[32mnew file:   Propositions/Book5/summary.pl[m
-	[32mnew file:   Propositions/Book6/Prop01.pl[m
-	[32mnew file:   Propositions/Book6/Prop02.pl[m
-	[32mnew file:   Propositions/Book6/Prop03.pl[m
-	[32mnew file:   Propositions/Book6/Prop04.pl[m
-	[32mnew file:   Propositions/Book6/Prop05.pl[m
-	[32mnew file:   Propositions/Book6/Prop06.pl[m
-	[32mnew file:   Propositions/Book6/Prop07.pl[m
-	[32mnew file:   Propositions/Book6/Prop08.pl[m
-	[32mnew file:   Propositions/Book6/Prop09.pl[m
-	[32mnew file:   Propositions/Book6/Prop10.pl[m
-	[32mnew file:   Propositions/Book6/Prop11.pl[m
-	[32mnew file:   Propositions/Book6/Prop12.pl[m
-	[32mnew file:   Propositions/Book6/Prop13.pl[m
-	[32mnew file:   Propositions/Book6/Prop14.pl[m
-	[32mnew file:   Propositions/Book6/Prop15.pl[m
-	[32mnew file:   Propositions/Book6/Prop16.pl[m
-	[32mnew file:   Propositions/Book6/Prop17.pl[m
-	[32mnew file:   Propositions/Book6/Prop18.pl[m
-	[32mnew file:   Propositions/Book6/Prop19.pl[m
-	[32mnew file:   Propositions/Book6/Prop20.pl[m
-	[32mnew file:   Propositions/Book6/Prop21.pl[m
-	[32mnew file:   Propositions/Book6/Prop22.pl[m
-	[32mnew file:   Propositions/Book6/Prop23.pl[m
-	[32mnew file:   Propositions/Book6/Prop24.pl[m
-	[32mnew file:   Propositions/Book6/Prop25.pl[m
-	[32mnew file:   Propositions/Book6/Prop26.pl[m
-	[32mnew file:   Propositions/Book6/Prop27.pl[m
-	[32mnew file:   Propositions/Book6/Prop28.pl[m
-	[32mnew file:   Propositions/Book6/Prop29.pl[m
-	[32mnew file:   Propositions/Book6/Prop30.pl[m
-	[32mnew file:   Propositions/Book6/Prop31.pl[m
-	[32mnew file:   Propositions/Book6/Prop32.pl[m
-	[32mnew file:   Propositions/Book6/Prop33.pl[m
-	[32mnew file:   Propositions/Book6/VI_05.pdf[m
-	[32mnew file:   Propositions/Book6/VI_23.pdf[m
-	[32mnew file:   Propositions/Book6/atesting.pl[m
-	[32mnew file:   Propositions/Book7/Chalkboard_ttc/Chalkboard-Bold.ttf[m
-	[32mnew file:   Propositions/Book7/Chalkboard_ttc/Chalkboard.ttf[m
-	[32mnew file:   Propositions/Book7/Prop01.pl[m
-	[32mnew file:   Propositions/Book7/Prop02.pl[m
-	[32mnew file:   Propositions/Book7/Prop03.pl[m
-	[32mnew file:   Propositions/Book7/Prop04.pl[m
-	[32mnew file:   Propositions/Book7/Prop05.pl[m
-	[32mnew file:   Propositions/Book7/Prop06.pl[m
-	[32mnew file:   Propositions/Book7/Prop07.pl[m
-	[32mnew file:   Propositions/Book7/Prop08.pl[m
-	[32mnew file:   Propositions/Book7/Prop09.pl[m
-	[32mnew file:   Propositions/Book7/Prop10.pl[m
-	[32mnew file:   Propositions/Book7/Prop11.pl[m
-	[32mnew file:   Propositions/Book7/Prop12.pl[m
-	[32mnew file:   Propositions/Book7/Prop13.pl[m
-	[32mnew file:   Propositions/Book7/Prop14.pl[m
-	[32mnew file:   Propositions/Book7/Prop15.pl[m
-	[32mnew file:   Propositions/Book7/Prop16.pl[m
-	[32mnew file:   Propositions/Book7/Prop17.pl[m
-	[32mnew file:   Propositions/Book7/Prop18.pl[m
-	[32mnew file:   Propositions/Book7/Prop19.pl[m
-	[32mnew file:   Propositions/Book7/Prop20.pl[m
-	[32mnew file:   Propositions/Book7/Prop21.pl[m
-	[32mnew file:   Propositions/Book7/Prop22.pl[m
-	[32mnew file:   Propositions/Book7/Prop23.pl[m
-	[32mnew file:   Propositions/Book7/Prop24.pl[m
-	[32mnew file:   Propositions/Book7/Prop25.pl[m
-	[32mnew file:   Propositions/Book7/Prop26.pl[m
-	[32mnew file:   Propositions/Book7/Prop27.pl[m
-	[32mnew file:   Propositions/Book7/Prop28.pl[m
-	[32mnew file:   Propositions/Book7/Prop29.pl[m
-	[32mnew file:   Propositions/Book7/Prop30.pl[m
-	[32mnew file:   Propositions/Book7/Prop31.pl[m
-	[32mnew file:   Propositions/Book7/Prop32.pl[m
-	[32mnew file:   Propositions/Book7/Prop33.pl[m
-	[32mnew file:   Propositions/Book7/Prop34.pl[m
-	[32mnew file:   Propositions/Book7/Prop35.pl[m
-	[32mnew file:   Propositions/Book7/Prop36.pl[m
-	[32mnew file:   Propositions/Book7/Prop37.pl[m
-	[32mnew file:   Propositions/Book7/Prop38.pl[m
-	[32mnew file:   Propositions/Book7/Prop39.pl[m
-	[32mnew file:   Propositions/Book7/zipfiles.zip[m
-	[32mnew file:   Propositions/Book8/Prop01.pl[m
-	[32mnew file:   Propositions/ColourTest.pl[m
-	[32mnew file:   Propositions/Euclidea/Euclidea_1_6.pl[m
-	[32mnew file:   Propositions/Euclidea/Euclidea_1_7.pl[m
-	[32mnew file:   Propositions/Other/bathroom.pl[m
-	[32mnew file:   Propositions/PDFs/Book3.zip[m
-	[32mnew file:   Propositions/PDFs/Book4.zip[m
-	[32mnew file:   Propositions/PDFs/Book6.zip[m
-	[32mnew file:   Propositions/PDFs/III_01.pdf[m
-	[32mnew file:   Propositions/PDFs/III_02.pdf[m
-	[32mnew file:   Propositions/PDFs/III_03.pdf[m
-	[32mnew file:   Propositions/PDFs/III_04.pdf[m
-	[32mnew file:   Propositions/PDFs/III_05.pdf[m
-	[32mnew file:   Propositions/PDFs/III_06.pdf[m
-	[32mnew file:   Propositions/PDFs/III_07.pdf[m
-	[32mnew file:   Propositions/PDFs/III_08.pdf[m
-	[32mnew file:   Propositions/PDFs/III_09.pdf[m
-	[32mnew file:   Propositions/PDFs/III_10.pdf[m
-	[32mnew file:   Propositions/PDFs/III_11.pdf[m
-	[32mnew file:   Propositions/PDFs/III_12.pdf[m
-	[32mnew file:   Propositions/PDFs/III_13.pdf[m
-	[32mnew file:   Propositions/PDFs/III_14.pdf[m
-	[32mnew file:   Propositions/PDFs/III_15.pdf[m
-	[32mnew file:   Propositions/PDFs/III_16.pdf[m
-	[32mnew file:   Propositions/PDFs/III_17.pdf[m
-	[32mnew file:   Propositions/PDFs/III_18.pdf[m
-	[32mnew file:   Propositions/PDFs/III_19.pdf[m
-	[32mnew file:   Propositions/PDFs/III_20.pdf[m
-	[32mnew file:   Propositions/PDFs/III_21.pdf[m
-	[32mnew file:   Propositions/PDFs/III_22.pdf[m
-	[32mnew file:   Propositions/PDFs/III_23.pdf[m
-	[32mnew file:   Propositions/PDFs/III_24.pdf[m
-	[32mnew file:   Propositions/PDFs/III_25.pdf[m
-	[32mnew file:   Propositions/PDFs/III_26.pdf[m
-	[32mnew file:   Propositions/PDFs/III_27.pdf[m
-	[32mnew file:   Propositions/PDFs/III_28.pdf[m
-	[32mnew file:   Propositions/PDFs/III_29.pdf[m
-	[32mnew file:   Propositions/PDFs/III_30.pdf[m
-	[32mnew file:   Propositions/PDFs/III_31.pdf[m
-	[32mnew file:   Propositions/PDFs/III_32.pdf[m
-	[32mnew file:   Propositions/PDFs/III_33.pdf[m
-	[32mnew file:   Propositions/PDFs/III_34.pdf[m
-	[32mnew file:   Propositions/PDFs/III_35.pdf[m
-	[32mnew file:   Propositions/PDFs/III_36.pdf[m
-	[32mnew file:   Propositions/PDFs/III_37.pdf[m
-	[32mnew file:   Propositions/PDFs/II_00.pdf[m
-	[32mnew file:   Propositions/PDFs/II_01.pdf[m
-	[32mnew file:   Propositions/PDFs/II_02.pdf[m
-	[32mnew file:   Propositions/PDFs/II_03.pdf[m
-	[32mnew file:   Propositions/PDFs/II_04.pdf[m
-	[32mnew file:   Propositions/PDFs/II_05.pdf[m
-	[32mnew file:   Propositions/PDFs/II_06.pdf[m
-	[32mnew file:   Propositions/PDFs/II_07.pdf[m
-	[32mnew file:   Propositions/PDFs/II_08.pdf[m
-	[32mnew file:   Propositions/PDFs/II_09.pdf[m
-	[32mnew file:   Propositions/PDFs/II_10.pdf[m
-	[32mnew file:   Propositions/PDFs/II_11.pdf[m
-	[32mnew file:   Propositions/PDFs/II_12.pdf[m
-	[32mnew file:   Propositions/PDFs/II_13.pdf[m
-	[32mnew file:   Propositions/PDFs/II_14.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_01.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_02.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_03.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_04.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_05.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_06.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_07.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_08.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_09.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_10.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_11.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_12.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_13.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_14.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_15.pdf[m
-	[32mnew file:   Propositions/PDFs/IV_16.pdf[m
-	[32mnew file:   Propositions/PDFs/I_01.pdf[m
-	[32mnew file:   Propositions/PDFs/I_02.pdf[m
-	[32mnew file:   Propositions/PDFs/I_03.pdf[m
-	[32mnew file:   Propositions/PDFs/I_04.pdf[m
-	[32mnew file:   Propositions/PDFs/I_05.pdf[m
-	[32mnew file:   Propositions/PDFs/I_06.pdf[m
-	[32mnew file:   Propositions/PDFs/I_07.pdf[m
-	[32mnew file:   Propositions/PDFs/I_08.pdf[m
-	[32mnew file:   Propositions/PDFs/I_09.pdf[m
-	[32mnew file:   Propositions/PDFs/I_10.pdf[m
-	[32mnew file:   Propositions/PDFs/I_11.pdf[m
-	[32mnew file:   Propositions/PDFs/I_12.pdf[m
-	[32mnew file:   Propositions/PDFs/I_13.pdf[m
-	[32mnew file:   Propositions/PDFs/I_14.pdf[m
-	[32mnew file:   Propositions/PDFs/I_15.pdf[m
-	[32mnew file:   Propositions/PDFs/I_16.pdf[m
-	[32mnew file:   Propositions/PDFs/I_17.pdf[m
-	[32mnew file:   Propositions/PDFs/I_18.pdf[m
-	[32mnew file:   Propositions/PDFs/I_19.pdf[m
-	[32mnew file:   Propositions/PDFs/I_20.pdf[m
-	[32mnew file:   Propositions/PDFs/I_21.pdf[m
-	[32mnew file:   Propositions/PDFs/I_22.pdf[m
-	[32mnew file:   Propositions/PDFs/I_23.pdf[m
-	[32mnew file:   Propositions/PDFs/I_24.pdf[m
-	[32mnew file:   Propositions/PDFs/I_25.pdf[m
-	[32mnew file:   Propositions/PDFs/I_26.pdf[m
-	[32mnew file:   Propositions/PDFs/I_27.pdf[m
-	[32mnew file:   Propositions/PDFs/I_28.pdf[m
-	[32mnew file:   Propositions/PDFs/I_29.pdf[m
-	[32mnew file:   Propositions/PDFs/I_30.pdf[m
-	[32mnew file:   Propositions/PDFs/I_31.pdf[m
-	[32mnew file:   Propositions/PDFs/I_32.pdf[m
-	[32mnew file:   Propositions/PDFs/I_33.pdf[m
-	[32mnew file:   Propositions/PDFs/I_34.pdf[m
-	[32mnew file:   Propositions/PDFs/I_35.pdf[m
-	[32mnew file:   Propositions/PDFs/I_36.pdf[m
-	[32mnew file:   Propositions/PDFs/I_37.pdf[m
-	[32mnew file:   Propositions/PDFs/I_38.pdf[m
-	[32mnew file:   Propositions/PDFs/I_39.pdf[m
-	[32mnew file:   Propositions/PDFs/I_40.pdf[m
-	[32mnew file:   Propositions/PDFs/I_41.pdf[m
-	[32mnew file:   Propositions/PDFs/I_42.pdf[m
-	[32mnew file:   Propositions/PDFs/I_43.pdf[m
-	[32mnew file:   Propositions/PDFs/I_44.pdf[m
-	[32mnew file:   Propositions/PDFs/I_45.pdf[m
-	[32mnew file:   Propositions/PDFs/I_46.pdf[m
-	[32mnew file:   Propositions/PDFs/I_47.pdf[m
-	[32mnew file:   Propositions/PDFs/I_48.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_01.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_02.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_03.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_04.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_05.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_06.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_07.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_08.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_09.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_10.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_11.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_12.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_13.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_14.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_15.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_16.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_17.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_18.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_19.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_20.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_21.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_22.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_23.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_24.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_25.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_26.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_27.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_28.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_29.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_30.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_31.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_32.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_33.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_34.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_35.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_36.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_37.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_38.pdf[m
-	[32mnew file:   Propositions/PDFs/VII_39.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_01.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_02.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_03.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_04.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_05.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_06.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_07.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_08.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_09.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_10.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_11.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_12.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_13.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_14.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_15.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_16.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_17.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_18.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_19.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_20.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_21.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_22.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_23.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_24.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_25.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_26.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_27.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_28.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_29.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_30.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_31.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_32.pdf[m
-	[32mnew file:   Propositions/PDFs/VI_33.pdf[m
-	[32mnew file:   Propositions/PDFs/V_01.pdf[m
-	[32mnew file:   Propositions/PDFs/V_02.pdf[m
-	[32mnew file:   Propositions/PDFs/V_03.pdf[m
-	[32mnew file:   Propositions/PDFs/V_04.pdf[m
-	[32mnew file:   Propositions/PDFs/V_05.pdf[m
-	[32mnew file:   Propositions/PDFs/V_06.pdf[m
-	[32mnew file:   Propositions/PDFs/V_07.pdf[m
-	[32mnew file:   Propositions/PDFs/V_08.pdf[m
-	[32mnew file:   Propositions/PDFs/V_09.pdf[m
-	[32mnew file:   Propositions/PDFs/V_10.pdf[m
-	[32mnew file:   Propositions/PDFs/V_11.pdf[m
-	[32mnew file:   Propositions/PDFs/V_12.pdf[m
-	[32mnew file:   Propositions/PDFs/V_13.pdf[m
-	[32mnew file:   Propositions/PDFs/V_14.pdf[m
-	[32mnew file:   Propositions/PDFs/V_15.pdf[m
-	[32mnew file:   Propositions/PDFs/V_16.pdf[m
-	[32mnew file:   Propositions/PDFs/V_17.pdf[m
-	[32mnew file:   Propositions/PDFs/V_18.pdf[m
-	[32mnew file:   Propositions/PDFs/V_19.pdf[m
-	[32mnew file:   Propositions/PDFs/V_20.pdf[m
-	[32mnew file:   Propositions/PDFs/V_21.pdf[m
-	[32mnew file:   Propositions/PDFs/V_22.pdf[m
-	[32mnew file:   Propositions/PDFs/V_23.pdf[m
-	[32mnew file:   Propositions/PDFs/V_24.pdf[m
-	[32mnew file:   Propositions/PDFs/V_25.pdf[m
-	[32mnew file:   Propositions/Proposition.pm[m
-	[32mnew file:   Propositions/Proposition_tocs.pm[m
-	[32mnew file:   Propositions/cc.gif[m
-	[32mnew file:   Propositions/cc.jpg[m
-	[32mnew file:   Propositions/cc_large.gif[m
-	[32mnew file:   Propositions/cc_large.jpg[m
-	[32mnew file:   Propositions/cctext.gif[m
-	[32mnew file:   Propositions/cctext.jpg[m
-	[32mnew file:   Propositions/clean_up.pl[m
-	[32mnew file:   Propositions/hand.gif[m
-	[32mnew file:   gittext.txt[m
-	[32mnew file:   lib/Colour.pm[m
-	[32mnew file:   lib/Colours.pm[m
-	[32mnew file:   lib/Geometry/Angle.pm[m
-	[32mnew file:   lib/Geometry/Arc.pm[m
-	[32mnew file:   lib/Geometry/Bitmap/BitmapText.pm[m
-	[32mnew file:   lib/Geometry/Bitmap/NormalText.pm[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/(.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/).gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/0.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/1.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/2.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/3.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/4.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/5.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/6.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/7.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/8.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/9.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/=.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/a.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/apostrophe.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/b.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/c.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/A.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/B.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/C.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/D.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/E.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/F.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/G.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/H.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/I.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/J.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/K.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/L.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/M.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/N.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/O.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/P.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/Q.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/R.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/S.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/T.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/U.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/V.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/W.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/X.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/Y.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/Z.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/comma.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/caps/period.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/close.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/d.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/e.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/f.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/g.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/greater.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/h.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/i.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/j.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/k.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/l.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/less.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/m.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/minus.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/n.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/o.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/open.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/p.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/q.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/question.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/r.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/s.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/slash.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/squared.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/t.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/u.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/v.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/w.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/x.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/y.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/chalkboard/z.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/=.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/a.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/apostrophe.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/b.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/c.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/0.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/1.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/2.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/3.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/4.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/5.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/6.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/7.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/8.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/9.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/A.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/B.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/C.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/D.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/E.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/F.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/G.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/H.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/I.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/J.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/K.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/L.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/M.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/N.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/O.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/P.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/Q.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/R.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/S.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/T.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/U.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/V.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/W.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/X.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/Y.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/caps/Z.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/close.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/comma.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/d.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/e.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/f.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/g.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/greater.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/h.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/i.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/j.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/k.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/l.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/less.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/m.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/minus.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/n.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/o.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/open.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/p.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/period.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/period.xcf[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/q.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/question.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/r.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/s.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/squared.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/t.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/u.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/v.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/w.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/x.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/y.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/explain/z.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/alpha.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/angle.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/angle2.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/beta.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/correct.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/delta.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/dot.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/epsilon.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/gamma.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/gnomon.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/half.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/kappa.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/lambda.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/mu.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/notpara.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/parallel.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/parallelogram.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/parallelogram.xcf[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/perp.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/perp.xcf[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/phi.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/pi.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/plus.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/rho.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/right.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/right2.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/sigma.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/square.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/therefore.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/theta.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/triangle.gif[m
-	[32mnew file:   lib/Geometry/Bitmap/fonts/greek/wrong.gif[m
-	[32mnew file:   lib/Geometry/CalculatePoints.pm[m
-	[32mnew file:   lib/Geometry/Canvas/PDFDocument.pm[m
-	[32mnew file:   lib/Geometry/Canvas/PropositionCanvas.pm[m
-	[32mnew file:   lib/Geometry/Canvas/draw-mask.xbm[m
-	[32mnew file:   lib/Geometry/Canvas/draw.xbm[m
-	[32mnew file:   lib/Geometry/Canvas/hand-mask.xbm[m
-	[32mnew file:   lib/Geometry/Canvas/hand.gif[m
-	[32mnew file:   lib/Geometry/Canvas/hand.xbm[m
-	[32mnew file:   lib/Geometry/Circle.pm[m
-	[32mnew file:   lib/Geometry/Dictionary.pm[m
-	[32mnew file:   lib/Geometry/EquilateralTriangle.pm[m
-	[32mnew file:   lib/Geometry/Geometry.pm[m
-	[32mnew file:   lib/Geometry/Geometry.pod[m
-	[32mnew file:   lib/Geometry/Gnomon.pm[m
-	[32mnew file:   lib/Geometry/Line.pm[m
-	[32mnew file:   lib/Geometry/Oval.pm[m
-	[32mnew file:   lib/Geometry/Parallelogram.pm[m
-	[32mnew file:   lib/Geometry/Point.pm[m
-	[32mnew file:   lib/Geometry/Polygon.pm[m
-	[32mnew file:   lib/Geometry/RegularPolygons.pm[m
-	[32mnew file:   lib/Geometry/Shape.pm[m
-	[32mnew file:   lib/Geometry/Square.pm[m
-	[32mnew file:   lib/Geometry/Triangle.pm[m
-	[32mnew file:   lib/Geometry/Validate.pm[m
-	[32mnew file:   lib/Geometry/auto_gen_pdfs.pl[m
-	[32mnew file:   perldoc.css[m
-	[32mnew file:   t/angle.t[m
-	[32mnew file:   t/arc.t[m
-	[32mnew file:   t/calculate_points.t[m
-	[32mnew file:   t/circle.t[m
-	[32mnew file:   t/equilateraltriangle.t[m
-	[32mnew file:   t/flash.pl[m
-	[32mnew file:   t/line.t[m
-	[32mnew file:   t/parallel.t[m
-	[32mnew file:   t/parallelogram.t[m
-	[32mnew file:   t/point.t[m
-	[32mnew file:   t/polygon.t[m
-	[32mnew file:   t/triangle.t[m
-
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-  (use "git checkout -- <file>..." to discard changes in working directory)
-
-	[31mmodified:   gittext.txt[m
-
-[bs:~/workspace/Exported/Tcl] git commit -a [K[Km Summer of 2020[1@t[1@a[1@r[1@t[1@ [1@o[1@f[1@ [1@S[C[C[C[C[C[C[C[C[C[C[C[C[C"[1@"[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"[1P"B"o"o"k" "8"
-[master (root-commit) 1608915] Start of Book 8
- 680 files changed, 83000 insertions(+)
- create mode 100644 Propositions/Book1/Prop00_intro.pl
- create mode 100644 Propositions/Book1/Prop01_equilateral_triangle.pl
- create mode 100644 Propositions/Book1/Prop02_copy_line.pl
- create mode 100644 Propositions/Book1/Prop03_subtract_line.pl
- create mode 100644 Propositions/Book1/Prop04_triangle_equal_SAS2.pl
- create mode 100644 Propositions/Book1/Prop05_isoceles_triangle.pl
- create mode 100644 Propositions/Book1/Prop06_isoceles_triangle.pl
- create mode 100644 Propositions/Book1/Prop07_unique_apex.pl
- create mode 100644 Propositions/Book1/Prop08_triangle_equal_SSS.pl
- create mode 100644 Propositions/Book1/Prop09_bisect_angle.pl
- create mode 100644 Propositions/Book1/Prop10_bisect_line.pl
- create mode 100644 Propositions/Book1/Prop11_push_perpendicular.pl
- create mode 100644 Propositions/Book1/Prop12_drop_perpendicular.pl
- create mode 100644 Propositions/Book1/Prop13_straight_line_180.pl
- create mode 100644 Propositions/Book1/Prop14_180_straight_line.pl
- create mode 100644 Propositions/Book1/Prop15_vertical_angles.pl
- create mode 100644 Propositions/Book1/Prop16_exterior_angle_larger.pl
- create mode 100644 Propositions/Book1/Prop17_two_angles_less_than_180.pl
- create mode 100644 Propositions/Book1/Prop18_greater_side_greater_angle.pl
- create mode 100644 Propositions/Book1/Prop19_greater_angle_greater_side.pl
- create mode 100644 Propositions/Book1/Prop20_two_sides_greater_than_one.pl
- create mode 100644 Propositions/Book1/Prop21_triangle_within_triangle.pl
- create mode 100644 Propositions/Book1/Prop22_construct_triangle.pl
- create mode 100644 Propositions/Book1/Prop23_copy_angle.pl
- create mode 100644 Propositions/Book1/Prop24_larger_angle_larger_base.pl
- create mode 100644 Propositions/Book1/Prop25_larger_base_larger_angle.pl
- create mode 100644 Propositions/Book1/Prop26_equal_triangles_ASA.pl
- create mode 100644 Propositions/Book1/Prop27_alternate_angles_equal_parallel.pl
- create mode 100644 Propositions/Book1/Prop28_sum_angles_180_parallel.pl
- create mode 100644 Propositions/Book1/Prop29_parallel_unique_postulate5.pl
- create mode 100644 Propositions/Book1/Prop30_parallel_to_parallel_equals_parallel.pl
- create mode 100644 Propositions/Book1/Prop31_construct_parallel.pl
- create mode 100644 Propositions/Book1/Prop32_triangle_180.pl
- create mode 100644 Propositions/Book1/Prop33_parallelogram.pl
- create mode 100644 Propositions/Book1/Prop34_parallelogram_bisect.pl
- create mode 100644 Propositions/Book1/Prop35_parallelogram_same_base.pl
- create mode 100644 Propositions/Book1/Prop36_parallelogram_equal_base.pl
- create mode 100644 Propositions/Book1/Prop37_triangle_same_base_height.pl
- create mode 100644 Propositions/Book1/Prop38_triangle_equal_base_height.pl
- create mode 100644 Propositions/Book1/Prop39_same_base_same_parallel.pl
- create mode 100644 Propositions/Book1/Prop40_equal_base_same_parallel.pl
- create mode 100644 Propositions/Book1/Prop41_triangle_equals_half_parallelogram.pl
- create mode 100644 Propositions/Book1/Prop42_construct_parallelogram_equal_triangle.pl
- create mode 100644 Propositions/Book1/Prop43_parallelograms_complements_equal.pl
- create mode 100644 Propositions/Book1/Prop44_parallelogram_equal_triangle_on_line.pl
- create mode 100644 Propositions/Book1/Prop45_create_parallelogram_from_polygon.pl
- create mode 100644 Propositions/Book1/Prop46_draw_square.pl
- create mode 100644 Propositions/Book1/Prop47_pythagoras.pl
- create mode 100644 Propositions/Book1/Prop48_inverse_pythagoras.pl
- create mode 100644 Propositions/Book1/truetypeFonts.txt
- create mode 100644 Propositions/Book2/Prop00_toc.pl
- create mode 100644 Propositions/Book2/Prop01_distributive_law.pl
- create mode 100644 Propositions/Book2/Prop02_square_distributive_law.pl
- create mode 100644 Propositions/Book2/Prop03_square_plus_residual_distributive_law.pl
- create mode 100644 Propositions/Book2/Prop04_a_plus_b_all_squared.pl
- create mode 100644 Propositions/Book2/Prop05_equal_and_unequal.pl
- create mode 100644 Propositions/Book2/Prop06_equal_and_added_unequal.pl
- create mode 100644 Propositions/Book2/Prop07_square_of_whole_plus_square_of_segment.pl
- create mode 100644 Propositions/Book2/Prop08_four.pl
- create mode 100644 Propositions/Book2/Prop09_square_of_equal_non_equal.pl
- create mode 100644 Propositions/Book2/Prop10_square_of_extension.pl
- create mode 100644 Propositions/Book2/Prop11_find_golden_ratio.pl
- create mode 100644 Propositions/Book2/Prop12_cosine_law_obtuse.pl
- create mode 100644 Propositions/Book2/Prop13_cosine_law_acute.pl
- create mode 100644 Propositions/Book2/Prop14_square_polygon.pl
- create mode 100644 Propositions/Book3/Prop01_find_center_circle.pl
- create mode 100644 Propositions/Book3/Prop02_chord_inside_circle.pl
- create mode 100644 Propositions/Book3/Prop03_bisect_chord.pl
- create mode 100644 Propositions/Book3/Prop04_non_bisecting_chords.pl
- create mode 100644 Propositions/Book3/Prop05_circle_intersect.pl
- create mode 100644 Propositions/Book3/Prop06_two_circles_touch.pl
- create mode 100644 Propositions/Book3/Prop07_inside_circle_longer_lines.pl
- create mode 100644 Propositions/Book3/Prop08_outside_circles_longer.pl
- create mode 100644 Propositions/Book3/Prop09_three_equal_lines_from_point_to_circle.pl
- create mode 100644 Propositions/Book3/Prop10_intersects_two_points.pl
- create mode 100644 Propositions/Book3/Prop11_touching_circles_centres_lineup.pl
- create mode 100644 Propositions/Book3/Prop12_touching_circles_centres_lineup.pl
- create mode 100644 Propositions/Book3/Prop13_touch_more_than_once.pl
- create mode 100644 Propositions/Book3/Prop14_equidistant_lines.pl
- create mode 100644 Propositions/Book3/Prop15_diameter_largest_line.pl
- create mode 100644 Propositions/Book3/Prop16_tangent_at_right_angles_diameter.pl
- create mode 100644 Propositions/Book3/Prop17_draw_from_point_touch_circle.pl
- create mode 100644 Propositions/Book3/Prop18_line_touch_circle_is_perp_radius.pl
- create mode 100644 Propositions/Book3/Prop19_perp_to_touch_line_goes_centre.pl
- create mode 100644 Propositions/Book3/Prop20_angle_centre_twice_angle_circumference.pl
- create mode 100644 Propositions/Book3/Prop21_angle_segments_equal.pl
- create mode 100644 Propositions/Book3/Prop22_opposite_angles_180.pl
- create mode 100644 Propositions/Book3/Prop23_similar_but_not_unequal.pl
- create mode 100644 Propositions/Book3/Prop24_similar_segments_are_equal.pl
- create mode 100644 Propositions/Book3/Prop25_draw_circle_from_segment.pl
- create mode 100644 Propositions/Book3/Prop26_equal_circles_equal_angles_equal_circumferences.pl
- create mode 100644 Propositions/Book3/Prop27_equal_circles_equal_circumferences_equal_angles.pl
- create mode 100644 Propositions/Book3/Prop28_equal_circles_equal_lines_equal_circumference.pl
- create mode 100644 Propositions/Book3/Prop29_equal_circles_equal_circumference_equal_lines.pl
- create mode 100644 Propositions/Book3/Prop30_bisect_circumference.pl
- create mode 100644 Propositions/Book3/Prop31_semi_circle_right_angle.pl
- create mode 100644 Propositions/Book3/Prop32_angle_tangent_equals_angle_segment.pl
- create mode 100644 Propositions/Book3/Prop33_construct_segment.pl
- create mode 100644 Propositions/Book3/Prop34_construct_segment2.pl
- create mode 100644 Propositions/Book3/Prop35_intersecting_chords.pl
- create mode 100644 Propositions/Book3/Prop36_secant_law.pl
- create mode 100644 Propositions/Book3/Prop37_inverse_secant_law.pl
- create mode 100644 Propositions/Book4/Prop01_fit_a_line.pl
- create mode 100644 Propositions/Book4/Prop02.pl
- create mode 100644 Propositions/Book4/Prop03.pl
- create mode 100644 Propositions/Book4/Prop04.pl
- create mode 100644 Propositions/Book4/Prop05.pl
- create mode 100644 Propositions/Book4/Prop06.pl
- create mode 100644 Propositions/Book4/Prop07.pl
- create mode 100644 Propositions/Book4/Prop08.pl
- create mode 100644 Propositions/Book4/Prop09.pl
- create mode 100644 Propositions/Book4/Prop10.pl
- create mode 100644 Propositions/Book4/Prop11.pl
- create mode 100644 Propositions/Book4/Prop12.pl
- create mode 100644 Propositions/Book4/Prop13.pl
- create mode 100644 Propositions/Book4/Prop14.pl
- create mode 100644 Propositions/Book4/Prop15.pl
- create mode 100644 Propositions/Book4/Prop16.pl
- create mode 100644 Propositions/Book5/Prop01.pl
- create mode 100644 Propositions/Book5/Prop02.pl
- create mode 100644 Propositions/Book5/Prop03.pl
- create mode 100644 Propositions/Book5/Prop04.pl
- create mode 100644 Propositions/Book5/Prop05.pl
- create mode 100644 Propositions/Book5/Prop06.pl
- create mode 100644 Propositions/Book5/Prop07.pl
- create mode 100644 Propositions/Book5/Prop08.pl
- create mode 100644 Propositions/Book5/Prop09.pl
- create mode 100644 Propositions/Book5/Prop10.pl
- create mode 100644 Propositions/Book5/Prop11.pl
- create mode 100644 Propositions/Book5/Prop12.pl
- create mode 100644 Propositions/Book5/Prop13.pl
- create mode 100644 Propositions/Book5/Prop14.pl
- create mode 100644 Propositions/Book5/Prop15.pl
- create mode 100644 Propositions/Book5/Prop16.pl
- create mode 100644 Propositions/Book5/Prop17.pl
- create mode 100644 Propositions/Book5/Prop18.pl
- create mode 100644 Propositions/Book5/Prop19.pl
- create mode 100644 Propositions/Book5/Prop20.pl
- create mode 100644 Propositions/Book5/Prop21.pl
- create mode 100644 Propositions/Book5/Prop22.pl
- create mode 100644 Propositions/Book5/Prop23.pl
- create mode 100644 Propositions/Book5/Prop24.pl
- create mode 100644 Propositions/Book5/Prop25.pl
- create mode 100644 Propositions/Book5/summary.pl
- create mode 100644 Propositions/Book6/Prop01.pl
- create mode 100644 Propositions/Book6/Prop02.pl
- create mode 100644 Propositions/Book6/Prop03.pl
- create mode 100644 Propositions/Book6/Prop04.pl
- create mode 100644 Propositions/Book6/Prop05.pl
- create mode 100644 Propositions/Book6/Prop06.pl
- create mode 100644 Propositions/Book6/Prop07.pl
- create mode 100644 Propositions/Book6/Prop08.pl
- create mode 100644 Propositions/Book6/Prop09.pl
- create mode 100644 Propositions/Book6/Prop10.pl
- create mode 100644 Propositions/Book6/Prop11.pl
- create mode 100644 Propositions/Book6/Prop12.pl
- create mode 100644 Propositions/Book6/Prop13.pl
- create mode 100644 Propositions/Book6/Prop14.pl
- create mode 100644 Propositions/Book6/Prop15.pl
- create mode 100644 Propositions/Book6/Prop16.pl
- create mode 100644 Propositions/Book6/Prop17.pl
- create mode 100644 Propositions/Book6/Prop18.pl
- create mode 100644 Propositions/Book6/Prop19.pl
- create mode 100644 Propositions/Book6/Prop20.pl
- create mode 100644 Propositions/Book6/Prop21.pl
- create mode 100644 Propositions/Book6/Prop22.pl
- create mode 100644 Propositions/Book6/Prop23.pl
- create mode 100644 Propositions/Book6/Prop24.pl
- create mode 100644 Propositions/Book6/Prop25.pl
- create mode 100644 Propositions/Book6/Prop26.pl
- create mode 100644 Propositions/Book6/Prop27.pl
- create mode 100644 Propositions/Book6/Prop28.pl
- create mode 100644 Propositions/Book6/Prop29.pl
- create mode 100644 Propositions/Book6/Prop30.pl
- create mode 100644 Propositions/Book6/Prop31.pl
- create mode 100644 Propositions/Book6/Prop32.pl
- create mode 100644 Propositions/Book6/Prop33.pl
- create mode 100644 Propositions/Book6/VI_05.pdf
- create mode 100644 Propositions/Book6/VI_23.pdf
- create mode 100644 Propositions/Book6/atesting.pl
- create mode 100644 Propositions/Book7/Chalkboard_ttc/Chalkboard-Bold.ttf
- create mode 100644 Propositions/Book7/Chalkboard_ttc/Chalkboard.ttf
- create mode 100644 Propositions/Book7/Prop01.pl
- create mode 100644 Propositions/Book7/Prop02.pl
- create mode 100644 Propositions/Book7/Prop03.pl
- create mode 100644 Propositions/Book7/Prop04.pl
- create mode 100644 Propositions/Book7/Prop05.pl
- create mode 100644 Propositions/Book7/Prop06.pl
- create mode 100644 Propositions/Book7/Prop07.pl
- create mode 100644 Propositions/Book7/Prop08.pl
- create mode 100644 Propositions/Book7/Prop09.pl
- create mode 100644 Propositions/Book7/Prop10.pl
- create mode 100644 Propositions/Book7/Prop11.pl
- create mode 100644 Propositions/Book7/Prop12.pl
- create mode 100644 Propositions/Book7/Prop13.pl
- create mode 100644 Propositions/Book7/Prop14.pl
- create mode 100644 Propositions/Book7/Prop15.pl
- create mode 100644 Propositions/Book7/Prop16.pl
- create mode 100644 Propositions/Book7/Prop17.pl
- create mode 100644 Propositions/Book7/Prop18.pl
- create mode 100644 Propositions/Book7/Prop19.pl
- create mode 100644 Propositions/Book7/Prop20.pl
- create mode 100644 Propositions/Book7/Prop21.pl
- create mode 100644 Propositions/Book7/Prop22.pl
- create mode 100644 Propositions/Book7/Prop23.pl
- create mode 100644 Propositions/Book7/Prop24.pl
- create mode 100644 Propositions/Book7/Prop25.pl
- create mode 100644 Propositions/Book7/Prop26.pl
- create mode 100644 Propositions/Book7/Prop27.pl
- create mode 100644 Propositions/Book7/Prop28.pl
- create mode 100644 Propositions/Book7/Prop29.pl
- create mode 100644 Propositions/Book7/Prop30.pl
- create mode 100644 Propositions/Book7/Prop31.pl
- create mode 100644 Propositions/Book7/Prop32.pl
- create mode 100644 Propositions/Book7/Prop33.pl
- create mode 100644 Propositions/Book7/Prop34.pl
- create mode 100644 Propositions/Book7/Prop35.pl
- create mode 100644 Propositions/Book7/Prop36.pl
- create mode 100644 Propositions/Book7/Prop37.pl
- create mode 100644 Propositions/Book7/Prop38.pl
- create mode 100644 Propositions/Book7/Prop39.pl
- create mode 100644 Propositions/Book7/zipfiles.zip
- create mode 100644 Propositions/Book8/Prop01.pl
- create mode 100644 Propositions/ColourTest.pl
- create mode 100644 Propositions/Euclidea/Euclidea_1_6.pl
- create mode 100644 Propositions/Euclidea/Euclidea_1_7.pl
- create mode 100644 Propositions/Other/bathroom.pl
- create mode 100644 Propositions/PDFs/Book3.zip
- create mode 100644 Propositions/PDFs/Book4.zip
- create mode 100644 Propositions/PDFs/Book6.zip
- create mode 100644 Propositions/PDFs/III_01.pdf
- create mode 100644 Propositions/PDFs/III_02.pdf
- create mode 100644 Propositions/PDFs/III_03.pdf
- create mode 100644 Propositions/PDFs/III_04.pdf
- create mode 100644 Propositions/PDFs/III_05.pdf
- create mode 100644 Propositions/PDFs/III_06.pdf
- create mode 100644 Propositions/PDFs/III_07.pdf
- create mode 100644 Propositions/PDFs/III_08.pdf
- create mode 100644 Propositions/PDFs/III_09.pdf
- create mode 100644 Propositions/PDFs/III_10.pdf
- create mode 100644 Propositions/PDFs/III_11.pdf
- create mode 100644 Propositions/PDFs/III_12.pdf
- create mode 100644 Propositions/PDFs/III_13.pdf
- create mode 100644 Propositions/PDFs/III_14.pdf
- create mode 100644 Propositions/PDFs/III_15.pdf
- create mode 100644 Propositions/PDFs/III_16.pdf
- create mode 100644 Propositions/PDFs/III_17.pdf
- create mode 100644 Propositions/PDFs/III_18.pdf
- create mode 100644 Propositions/PDFs/III_19.pdf
- create mode 100644 Propositions/PDFs/III_20.pdf
- create mode 100644 Propositions/PDFs/III_21.pdf
- create mode 100644 Propositions/PDFs/III_22.pdf
- create mode 100644 Propositions/PDFs/III_23.pdf
- create mode 100644 Propositions/PDFs/III_24.pdf
- create mode 100644 Propositions/PDFs/III_25.pdf
- create mode 100644 Propositions/PDFs/III_26.pdf
- create mode 100644 Propositions/PDFs/III_27.pdf
- create mode 100644 Propositions/PDFs/III_28.pdf
- create mode 100644 Propositions/PDFs/III_29.pdf
- create mode 100644 Propositions/PDFs/III_30.pdf
- create mode 100644 Propositions/PDFs/III_31.pdf
- create mode 100644 Propositions/PDFs/III_32.pdf
- create mode 100644 Propositions/PDFs/III_33.pdf
- create mode 100644 Propositions/PDFs/III_34.pdf
- create mode 100644 Propositions/PDFs/III_35.pdf
- create mode 100644 Propositions/PDFs/III_36.pdf
- create mode 100644 Propositions/PDFs/III_37.pdf
- create mode 100644 Propositions/PDFs/II_00.pdf
- create mode 100644 Propositions/PDFs/II_01.pdf
- create mode 100644 Propositions/PDFs/II_02.pdf
- create mode 100644 Propositions/PDFs/II_03.pdf
- create mode 100644 Propositions/PDFs/II_04.pdf
- create mode 100644 Propositions/PDFs/II_05.pdf
- create mode 100644 Propositions/PDFs/II_06.pdf
- create mode 100644 Propositions/PDFs/II_07.pdf
- create mode 100644 Propositions/PDFs/II_08.pdf
- create mode 100644 Propositions/PDFs/II_09.pdf
- create mode 100644 Propositions/PDFs/II_10.pdf
- create mode 100644 Propositions/PDFs/II_11.pdf
- create mode 100644 Propositions/PDFs/II_12.pdf
- create mode 100644 Propositions/PDFs/II_13.pdf
- create mode 100644 Propositions/PDFs/II_14.pdf
- create mode 100644 Propositions/PDFs/IV_01.pdf
- create mode 100644 Propositions/PDFs/IV_02.pdf
- create mode 100644 Propositions/PDFs/IV_03.pdf
- create mode 100644 Propositions/PDFs/IV_04.pdf
- create mode 100644 Propositions/PDFs/IV_05.pdf
- create mode 100644 Propositions/PDFs/IV_06.pdf
- create mode 100644 Propositions/PDFs/IV_07.pdf
- create mode 100644 Propositions/PDFs/IV_08.pdf
- create mode 100644 Propositions/PDFs/IV_09.pdf
- create mode 100644 Propositions/PDFs/IV_10.pdf
- create mode 100644 Propositions/PDFs/IV_11.pdf
- create mode 100644 Propositions/PDFs/IV_12.pdf
- create mode 100644 Propositions/PDFs/IV_13.pdf
- create mode 100644 Propositions/PDFs/IV_14.pdf
- create mode 100644 Propositions/PDFs/IV_15.pdf
- create mode 100644 Propositions/PDFs/IV_16.pdf
- create mode 100644 Propositions/PDFs/I_01.pdf
- create mode 100644 Propositions/PDFs/I_02.pdf
- create mode 100644 Propositions/PDFs/I_03.pdf
- create mode 100644 Propositions/PDFs/I_04.pdf
- create mode 100644 Propositions/PDFs/I_05.pdf
- create mode 100644 Propositions/PDFs/I_06.pdf
- create mode 100644 Propositions/PDFs/I_07.pdf
- create mode 100644 Propositions/PDFs/I_08.pdf
- create mode 100644 Propositions/PDFs/I_09.pdf
- create mode 100644 Propositions/PDFs/I_10.pdf
- create mode 100644 Propositions/PDFs/I_11.pdf
- create mode 100644 Propositions/PDFs/I_12.pdf
- create mode 100644 Propositions/PDFs/I_13.pdf
- create mode 100644 Propositions/PDFs/I_14.pdf
- create mode 100644 Propositions/PDFs/I_15.pdf
- create mode 100644 Propositions/PDFs/I_16.pdf
- create mode 100644 Propositions/PDFs/I_17.pdf
- create mode 100644 Propositions/PDFs/I_18.pdf
- create mode 100644 Propositions/PDFs/I_19.pdf
- create mode 100644 Propositions/PDFs/I_20.pdf
- create mode 100644 Propositions/PDFs/I_21.pdf
- create mode 100644 Propositions/PDFs/I_22.pdf
- create mode 100644 Propositions/PDFs/I_23.pdf
- create mode 100644 Propositions/PDFs/I_24.pdf
- create mode 100644 Propositions/PDFs/I_25.pdf
- create mode 100644 Propositions/PDFs/I_26.pdf
- create mode 100644 Propositions/PDFs/I_27.pdf
- create mode 100644 Propositions/PDFs/I_28.pdf
- create mode 100644 Propositions/PDFs/I_29.pdf
- create mode 100644 Propositions/PDFs/I_30.pdf
- create mode 100644 Propositions/PDFs/I_31.pdf
- create mode 100644 Propositions/PDFs/I_32.pdf
- create mode 100644 Propositions/PDFs/I_33.pdf
- create mode 100644 Propositions/PDFs/I_34.pdf
- create mode 100644 Propositions/PDFs/I_35.pdf
- create mode 100644 Propositions/PDFs/I_36.pdf
- create mode 100644 Propositions/PDFs/I_37.pdf
- create mode 100644 Propositions/PDFs/I_38.pdf
- create mode 100644 Propositions/PDFs/I_39.pdf
- create mode 100644 Propositions/PDFs/I_40.pdf
- create mode 100644 Propositions/PDFs/I_41.pdf
- create mode 100644 Propositions/PDFs/I_42.pdf
- create mode 100644 Propositions/PDFs/I_43.pdf
- create mode 100644 Propositions/PDFs/I_44.pdf
- create mode 100644 Propositions/PDFs/I_45.pdf
- create mode 100644 Propositions/PDFs/I_46.pdf
- create mode 100644 Propositions/PDFs/I_47.pdf
- create mode 100644 Propositions/PDFs/I_48.pdf
- create mode 100644 Propositions/PDFs/VII_01.pdf
- create mode 100644 Propositions/PDFs/VII_02.pdf
- create mode 100644 Propositions/PDFs/VII_03.pdf
- create mode 100644 Propositions/PDFs/VII_04.pdf
- create mode 100644 Propositions/PDFs/VII_05.pdf
- create mode 100644 Propositions/PDFs/VII_06.pdf
- create mode 100644 Propositions/PDFs/VII_07.pdf
- create mode 100644 Propositions/PDFs/VII_08.pdf
- create mode 100644 Propositions/PDFs/VII_09.pdf
- create mode 100644 Propositions/PDFs/VII_10.pdf
- create mode 100644 Propositions/PDFs/VII_11.pdf
- create mode 100644 Propositions/PDFs/VII_12.pdf
- create mode 100644 Propositions/PDFs/VII_13.pdf
- create mode 100644 Propositions/PDFs/VII_14.pdf
- create mode 100644 Propositions/PDFs/VII_15.pdf
- create mode 100644 Propositions/PDFs/VII_16.pdf
- create mode 100644 Propositions/PDFs/VII_17.pdf
- create mode 100644 Propositions/PDFs/VII_18.pdf
- create mode 100644 Propositions/PDFs/VII_19.pdf
- create mode 100644 Propositions/PDFs/VII_20.pdf
- create mode 100644 Propositions/PDFs/VII_21.pdf
- create mode 100644 Propositions/PDFs/VII_22.pdf
- create mode 100644 Propositions/PDFs/VII_23.pdf
- create mode 100644 Propositions/PDFs/VII_24.pdf
- create mode 100644 Propositions/PDFs/VII_25.pdf
- create mode 100644 Propositions/PDFs/VII_26.pdf
- create mode 100644 Propositions/PDFs/VII_27.pdf
- create mode 100644 Propositions/PDFs/VII_28.pdf
- create mode 100644 Propositions/PDFs/VII_29.pdf
- create mode 100644 Propositions/PDFs/VII_30.pdf
- create mode 100644 Propositions/PDFs/VII_31.pdf
- create mode 100644 Propositions/PDFs/VII_32.pdf
- create mode 100644 Propositions/PDFs/VII_33.pdf
- create mode 100644 Propositions/PDFs/VII_34.pdf
- create mode 100644 Propositions/PDFs/VII_35.pdf
- create mode 100644 Propositions/PDFs/VII_36.pdf
- create mode 100644 Propositions/PDFs/VII_37.pdf
- create mode 100644 Propositions/PDFs/VII_38.pdf
- create mode 100644 Propositions/PDFs/VII_39.pdf
- create mode 100644 Propositions/PDFs/VI_01.pdf
- create mode 100644 Propositions/PDFs/VI_02.pdf
- create mode 100644 Propositions/PDFs/VI_03.pdf
- create mode 100644 Propositions/PDFs/VI_04.pdf
- create mode 100644 Propositions/PDFs/VI_05.pdf
- create mode 100644 Propositions/PDFs/VI_06.pdf
- create mode 100644 Propositions/PDFs/VI_07.pdf
- create mode 100644 Propositions/PDFs/VI_08.pdf
- create mode 100644 Propositions/PDFs/VI_09.pdf
- create mode 100644 Propositions/PDFs/VI_10.pdf
- create mode 100644 Propositions/PDFs/VI_11.pdf
- create mode 100644 Propositions/PDFs/VI_12.pdf
- create mode 100644 Propositions/PDFs/VI_13.pdf
- create mode 100644 Propositions/PDFs/VI_14.pdf
- create mode 100644 Propositions/PDFs/VI_15.pdf
- create mode 100644 Propositions/PDFs/VI_16.pdf
- create mode 100644 Propositions/PDFs/VI_17.pdf
- create mode 100644 Propositions/PDFs/VI_18.pdf
- create mode 100644 Propositions/PDFs/VI_19.pdf
- create mode 100644 Propositions/PDFs/VI_20.pdf
- create mode 100644 Propositions/PDFs/VI_21.pdf
- create mode 100644 Propositions/PDFs/VI_22.pdf
- create mode 100644 Propositions/PDFs/VI_23.pdf
- create mode 100644 Propositions/PDFs/VI_24.pdf
- create mode 100644 Propositions/PDFs/VI_25.pdf
- create mode 100644 Propositions/PDFs/VI_26.pdf
- create mode 100644 Propositions/PDFs/VI_27.pdf
- create mode 100644 Propositions/PDFs/VI_28.pdf
- create mode 100644 Propositions/PDFs/VI_29.pdf
- create mode 100644 Propositions/PDFs/VI_30.pdf
- create mode 100644 Propositions/PDFs/VI_31.pdf
- create mode 100644 Propositions/PDFs/VI_32.pdf
- create mode 100644 Propositions/PDFs/VI_33.pdf
- create mode 100644 Propositions/PDFs/V_01.pdf
- create mode 100644 Propositions/PDFs/V_02.pdf
- create mode 100644 Propositions/PDFs/V_03.pdf
- create mode 100644 Propositions/PDFs/V_04.pdf
- create mode 100644 Propositions/PDFs/V_05.pdf
- create mode 100644 Propositions/PDFs/V_06.pdf
- create mode 100644 Propositions/PDFs/V_07.pdf
- create mode 100644 Propositions/PDFs/V_08.pdf
- create mode 100644 Propositions/PDFs/V_09.pdf
- create mode 100644 Propositions/PDFs/V_10.pdf
- create mode 100644 Propositions/PDFs/V_11.pdf
- create mode 100644 Propositions/PDFs/V_12.pdf
- create mode 100644 Propositions/PDFs/V_13.pdf
- create mode 100644 Propositions/PDFs/V_14.pdf
- create mode 100644 Propositions/PDFs/V_15.pdf
- create mode 100644 Propositions/PDFs/V_16.pdf
- create mode 100644 Propositions/PDFs/V_17.pdf
- create mode 100644 Propositions/PDFs/V_18.pdf
- create mode 100644 Propositions/PDFs/V_19.pdf
- create mode 100644 Propositions/PDFs/V_20.pdf
- create mode 100644 Propositions/PDFs/V_21.pdf
- create mode 100644 Propositions/PDFs/V_22.pdf
- create mode 100644 Propositions/PDFs/V_23.pdf
- create mode 100644 Propositions/PDFs/V_24.pdf
- create mode 100644 Propositions/PDFs/V_25.pdf
- create mode 100644 Propositions/Proposition.pm
- create mode 100644 Propositions/Proposition_tocs.pm
- create mode 100644 Propositions/cc.gif
- create mode 100644 Propositions/cc.jpg
- create mode 100644 Propositions/cc_large.gif
- create mode 100644 Propositions/cc_large.jpg
- create mode 100644 Propositions/cctext.gif
- create mode 100644 Propositions/cctext.jpg
- create mode 100644 Propositions/clean_up.pl
- create mode 100644 Propositions/hand.gif
- create mode 100644 gittext.txt
- create mode 100755 lib/Colour.pm
- create mode 100755 lib/Colours.pm
- create mode 100644 lib/Geometry/Angle.pm
- create mode 100644 lib/Geometry/Arc.pm
- create mode 100644 lib/Geometry/Bitmap/BitmapText.pm
- create mode 100644 lib/Geometry/Bitmap/NormalText.pm
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/(.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/).gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/0.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/1.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/2.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/3.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/4.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/5.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/6.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/7.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/8.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/9.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/=.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/a.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/apostrophe.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/b.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/c.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/A.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/B.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/C.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/D.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/E.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/F.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/G.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/H.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/I.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/J.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/K.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/L.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/M.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/N.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/O.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/P.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/Q.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/R.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/S.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/T.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/U.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/V.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/W.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/X.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/Y.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/Z.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/comma.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/caps/period.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/close.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/d.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/e.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/f.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/g.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/greater.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/h.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/i.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/j.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/k.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/l.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/less.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/m.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/minus.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/n.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/o.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/open.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/p.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/q.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/question.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/r.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/s.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/slash.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/squared.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/t.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/u.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/v.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/w.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/x.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/y.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/chalkboard/z.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/=.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/a.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/apostrophe.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/b.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/c.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/0.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/1.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/2.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/3.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/4.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/5.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/6.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/7.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/8.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/9.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/A.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/B.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/C.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/D.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/E.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/F.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/G.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/H.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/I.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/J.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/K.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/L.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/M.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/N.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/O.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/P.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/Q.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/R.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/S.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/T.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/U.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/V.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/W.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/X.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/Y.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/caps/Z.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/close.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/comma.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/d.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/e.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/f.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/g.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/greater.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/h.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/i.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/j.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/k.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/l.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/less.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/m.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/minus.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/n.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/o.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/open.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/p.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/period.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/period.xcf
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/q.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/question.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/r.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/s.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/squared.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/t.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/u.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/v.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/w.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/x.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/y.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/explain/z.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/alpha.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/angle.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/angle2.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/beta.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/correct.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/delta.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/dot.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/epsilon.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/gamma.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/gnomon.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/half.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/kappa.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/lambda.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/mu.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/notpara.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/parallel.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/parallelogram.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/parallelogram.xcf
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/perp.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/perp.xcf
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/phi.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/pi.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/plus.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/rho.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/right.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/right2.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/sigma.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/square.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/therefore.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/theta.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/triangle.gif
- create mode 100644 lib/Geometry/Bitmap/fonts/greek/wrong.gif
- create mode 100644 lib/Geometry/CalculatePoints.pm
- create mode 100644 lib/Geometry/Canvas/PDFDocument.pm
- create mode 100644 lib/Geometry/Canvas/PropositionCanvas.pm
- create mode 100644 lib/Geometry/Canvas/draw-mask.xbm
- create mode 100644 lib/Geometry/Canvas/draw.xbm
- create mode 100644 lib/Geometry/Canvas/hand-mask.xbm
- create mode 100644 lib/Geometry/Canvas/hand.gif
- create mode 100644 lib/Geometry/Canvas/hand.xbm
- create mode 100644 lib/Geometry/Circle.pm
- create mode 100644 lib/Geometry/Dictionary.pm
- create mode 100644 lib/Geometry/EquilateralTriangle.pm
- create mode 100644 lib/Geometry/Geometry.pm
- create mode 100644 lib/Geometry/Geometry.pod
- create mode 100644 lib/Geometry/Gnomon.pm
- create mode 100644 lib/Geometry/Line.pm
- create mode 100644 lib/Geometry/Oval.pm
- create mode 100644 lib/Geometry/Parallelogram.pm
- create mode 100644 lib/Geometry/Point.pm
- create mode 100644 lib/Geometry/Polygon.pm
- create mode 100644 lib/Geometry/RegularPolygons.pm
- create mode 100644 lib/Geometry/Shape.pm
- create mode 100644 lib/Geometry/Square.pm
- create mode 100644 lib/Geometry/Triangle.pm
- create mode 100644 lib/Geometry/Validate.pm
- create mode 100755 lib/Geometry/auto_gen_pdfs.pl
- create mode 100644 perldoc.css
- create mode 100644 t/angle.t
- create mode 100644 t/arc.t
- create mode 100644 t/calculate_points.t
- create mode 100644 t/circle.t
- create mode 100644 t/equilateraltriangle.t
- create mode 100644 t/flash.pl
- create mode 100644 t/line.t
- create mode 100644 t/parallel.t
- create mode 100644 t/parallelogram.t
- create mode 100644 t/point.t
- create mode 100644 t/polygon.t
- create mode 100644 t/triangle.t
-[bs:~/workspace/Exported/Tcl] git remote add origin https://github.com/sandy-bultena/Euclid.git
-[bs:~/workspace/Exported/Tcl] git push -u origin master
-Counting objects: 701, done.
-Delta compression using up to 8 threads.
-Compressing objects:   0% (1/699)   Compressing objects:   1% (7/699)   Compressing objects:   2% (14/699)   Compressing objects:   3% (21/699)   Compressing objects:   4% (28/699)   Compressing objects:   5% (35/699)   Compressing objects:   6% (42/699)   Compressing objects:   7% (49/699)   Compressing objects:   8% (56/699)   Compressing objects:   9% (63/699)   Compressing objects:  10% (70/699)   Compressing objects:  11% (77/699)   Compressing objects:  12% (84/699)   Compressing objects:  13% (91/699)   Compressing objects:  14% (98/699)   Compressing objects:  15% (105/699)   Compressing objects:  16% (112/699)   Compressing objects:  17% (119/699)   Compressing objects:  18% (126/699)   Compressing objects:  19% (133/699)   Compressing objects:  20% (140/699)   Compressing objects:  21% (147/699)   Compressing objects:  22% (154/699)   Compressing objects:  23% (161/699)   Compressing objects:  24% (168/699)   Compressing objects:  25% (175/699)   Compressing objects:  26% (182/699)   Compressing objects:  27% (189/699)   Compressing objects:  28% (196/699)   Compressing objects:  29% (203/699)   Compressing objects:  30% (210/699)   Compressing objects:  31% (217/699)   Compressing objects:  32% (224/699)   Compressing objects:  33% (231/699)   Compressing objects:  34% (238/699)   Compressing objects:  35% (245/699)   Compressing objects:  36% (252/699)   Compressing objects:  37% (259/699)   Compressing objects:  38% (266/699)   Compressing objects:  39% (273/699)   Compressing objects:  40% (280/699)   Compressing objects:  41% (287/699)   Compressing objects:  42% (294/699)   Compressing objects:  43% (301/699)   Compressing objects:  44% (308/699)   Compressing objects:  45% (315/699)   Compressing objects:  46% (322/699)   Compressing objects:  47% (329/699)   Compressing objects:  48% (336/699)   Compressing objects:  49% (343/699)   Compressing objects:  50% (350/699)   Compressing objects:  51% (357/699)   Compressing objects:  52% (364/699)   Compressing objects:  53% (371/699)   Compressing objects:  54% (378/699)   Compressing objects:  55% (385/699)   Compressing objects:  56% (392/699)   Compressing objects:  57% (399/699)   Compressing objects:  58% (406/699)   Compressing objects:  59% (413/699)   Compressing objects:  60% (420/699)   Compressing objects:  61% (427/699)   Compressing objects:  62% (434/699)   Compressing objects:  63% (441/699)   Compressing objects:  64% (448/699)   Compressing objects:  65% (455/699)   Compressing objects:  66% (462/699)   Compressing objects:  67% (469/699)   Compressing objects:  68% (476/699)   Compressing objects:  69% (483/699)   Compressing objects:  70% (490/699)   Compressing objects:  70% (495/699)   Compressing objects:  71% (497/699)   Compressing objects:  72% (504/699)   Compressing objects:  73% (511/699)   Compressing objects:  74% (518/699)   Compressing objects:  75% (525/699)   Compressing objects:  75% (528/699)   Compressing objects:  76% (532/699)   Compressing objects:  77% (539/699)   Compressing objects:  78% (546/699)   Compressing objects:  79% (553/699)   Compressing objects:  80% (560/699)   Compressing objects:  81% (567/699)   Compressing objects:  82% (574/699)   Compressing objects:  83% (581/699)   Compressing objects:  83% (584/699)   Compressing objects:  84% (588/699)   Compressing objects:  85% (595/699)   Compressing objects:  86% (602/699)   Compressing objects:  87% (609/699)   Compressing objects:  88% (616/699)   Compressing objects:  89% (623/699)   Compressing objects:  90% (630/699)   Compressing objects:  91% (637/699)   Compressing objects:  92% (644/699)   Compressing objects:  92% (649/699)   Compressing objects:  93% (651/699)   Compressing objects:  94% (658/699)   Compressing objects:  95% (665/699)   Compressing objects:  96% (672/699)   Compressing objects:  97% (679/699)   Compressing objects:  97% (680/699)   Compressing objects:  98% (686/699)   Compressing objects:  99% (693/699)   Compressing objects: 100% (699/699)   Compressing objects: 100% (699/699), done.
-Writing objects:   0% (1/701)   Writing objects:   1% (8/701)   Writing objects:   2% (15/701)   Writing objects:   3% (22/701)   Writing objects:   4% (29/701)   Writing objects:   5% (38/701)   Writing objects:   6% (44/701)   Writing objects:   7% (51/701)   Writing objects:   8% (57/701)   Writing objects:   9% (64/701)   Writing objects:  10% (71/701)   Writing objects:  11% (78/701)   Writing objects:  12% (85/701)   Writing objects:  13% (92/701)   Writing objects:  14% (99/701)   Writing objects:  15% (106/701)   Writing objects:  16% (113/701)   Writing objects:  17% (120/701)   Writing objects:  18% (127/701)   Writing objects:  19% (136/701)   Writing objects:  20% (142/701)   Writing objects:  21% (148/701)   Writing objects:  22% (155/701)   Writing objects:  23% (162/701)   Writing objects:  24% (170/701)   Writing objects:  25% (176/701)   Writing objects:  26% (183/701)   Writing objects:  27% (192/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  28% (197/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  29% (204/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  30% (211/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  31% (218/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  32% (225/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  33% (232/701), 1.10 MiB | 1.23 MiB/s   Writing objects:  33% (237/701), 2.67 MiB | 1.24 MiB/s   Writing objects:  33% (237/701), 4.05 MiB | 1.25 MiB/s   Writing objects:  33% (237/701), 5.48 MiB | 1.24 MiB/s   Writing objects:  33% (237/701), 6.80 MiB | 1.25 MiB/s   Writing objects:  33% (237/701), 8.05 MiB | 1.32 MiB/s   Writing objects:  33% (237/701), 8.55 MiB | 1.21 MiB/s   Writing objects:  33% (237/701), 9.98 MiB | 1.24 MiB/s   Writing objects:  34% (239/701), 10.61 MiB | 1.27 MiB/s   Writing objects:  35% (246/701), 10.61 MiB | 1.27 MiB/s   Writing objects:  35% (246/701), 11.13 MiB | 1.17 MiB/s   Writing objects:  35% (246/701), 12.63 MiB | 1.21 MiB/s   Writing objects:  35% (246/701), 14.07 MiB | 1.23 MiB/s   Writing objects:  35% (246/701), 15.38 MiB | 1.25 MiB/s   Writing objects:  35% (246/701), 16.57 MiB | 1.23 MiB/s   Writing objects:  35% (246/701), 17.95 MiB | 1.23 MiB/s   Writing objects:  35% (246/701), 19.26 MiB | 1.25 MiB/s   Writing objects:  35% (247/701), 19.26 MiB | 1.25 MiB/s   Writing objects:  35% (247/701), 21.33 MiB | 1.23 MiB/s   Writing objects:  35% (247/701), 22.70 MiB | 1.25 MiB/s   Writing objects:  35% (248/701), 23.33 MiB | 1.24 MiB/s   Writing objects:  35% (248/701), 24.95 MiB | 1.23 MiB/s   Writing objects:  35% (248/701), 26.33 MiB | 1.26 MiB/s   Writing objects:  35% (248/701), 27.64 MiB | 1.25 MiB/s   Writing objects:  35% (248/701), 28.95 MiB | 1.24 MiB/s   Writing objects:  35% (248/701), 30.27 MiB | 1.31 MiB/s   Writing objects:  35% (248/701), 31.52 MiB | 1.25 MiB/s   Writing objects:  35% (248/701), 32.83 MiB | 1.23 MiB/s   Writing objects:  35% (248/701), 33.52 MiB | 1.23 MiB/s   Writing objects:  36% (255/701), 34.20 MiB | 1.24 MiB/s   Writing objects:  36% (255/701), 34.83 MiB | 1.24 MiB/s   Writing objects:  37% (260/701), 35.48 MiB | 1.24 MiB/s   Writing objects:  37% (262/701), 35.48 MiB | 1.24 MiB/s   Writing objects:  38% (267/701), 36.77 MiB | 1.23 MiB/s   Writing objects:  38% (267/701), 37.45 MiB | 1.23 MiB/s   Writing objects:  39% (275/701), 38.08 MiB | 1.25 MiB/s   Writing objects:  40% (281/701), 39.39 MiB | 1.24 MiB/s   Writing objects:  40% (283/701), 39.39 MiB | 1.24 MiB/s   Writing objects:  41% (288/701), 39.89 MiB | 1.21 MiB/s   Writing objects:  41% (290/701), 40.66 MiB | 1.23 MiB/s   Writing objects:  42% (296/701), 42.05 MiB | 1.24 MiB/s   Writing objects:  43% (302/701), 42.72 MiB | 1.25 MiB/s   Writing objects:  43% (304/701), 43.37 MiB | 1.24 MiB/s   Writing objects:  44% (309/701), 43.93 MiB | 1.21 MiB/s   Writing objects:  44% (315/701), 45.99 MiB | 1.27 MiB/s   Writing objects:  45% (316/701), 45.99 MiB | 1.27 MiB/s   Writing objects:  46% (324/701), 46.63 MiB | 1.24 MiB/s   Writing objects:  46% (329/701), 48.12 MiB | 1.23 MiB/s   Writing objects:  47% (330/701), 48.74 MiB | 1.23 MiB/s   Writing objects:  47% (335/701), 49.43 MiB | 1.24 MiB/s   Writing objects:  48% (337/701), 49.43 MiB | 1.24 MiB/s   Writing objects:  48% (343/701), 50.63 MiB | 1.23 MiB/s   Writing objects:  49% (346/701), 51.37 MiB | 1.25 MiB/s   Writing objects:  49% (349/701), 51.87 MiB | 1.21 MiB/s   Writing objects:  50% (351/701), 51.87 MiB | 1.21 MiB/s   Writing objects:  50% (357/701), 53.24 MiB | 1.27 MiB/s   Writing objects:  51% (359/701), 53.24 MiB | 1.27 MiB/s   Writing objects:  52% (365/701), 53.93 MiB | 1.24 MiB/s   Writing objects:  52% (368/701), 54.55 MiB | 1.24 MiB/s   Writing objects:  53% (373/701), 55.17 MiB | 1.22 MiB/s   Writing objects:  53% (377/701), 55.17 MiB | 1.22 MiB/s   Writing objects:  54% (381/701), 56.48 MiB | 1.24 MiB/s   Writing objects:  54% (383/701), 56.48 MiB | 1.24 MiB/s   Writing objects:  55% (388/701), 57.80 MiB | 1.27 MiB/s   Writing objects:  55% (390/701), 58.48 MiB | 1.25 MiB/s   Writing objects:  56% (393/701), 58.48 MiB | 1.25 MiB/s   Writing objects:  57% (400/701), 59.17 MiB | 1.25 MiB/s   Writing objects:  58% (407/701), 60.36 MiB | 1.23 MiB/s   Writing objects:  59% (415/701), 61.73 MiB | 1.25 MiB/s   Writing objects:  60% (421/701), 63.05 MiB | 1.24 MiB/s   Writing objects:  60% (422/701), 63.05 MiB | 1.24 MiB/s   Writing objects:  61% (428/701), 63.42 MiB | 1.15 MiB/s   Writing objects:  62% (435/701), 64.86 MiB | 1.16 MiB/s   Writing objects:  62% (437/701), 64.86 MiB | 1.16 MiB/s   Writing objects:  63% (443/701), 66.17 MiB | 1.18 MiB/s   Writing objects:  63% (445/701), 66.17 MiB | 1.18 MiB/s   Writing objects:  64% (450/701), 67.36 MiB | 1.14 MiB/s   Writing objects:  64% (453/701), 67.36 MiB | 1.14 MiB/s   Writing objects:  65% (456/701), 68.13 MiB | 1.17 MiB/s   Writing objects:  66% (463/701), 68.13 MiB | 1.17 MiB/s   Writing objects:  67% (470/701), 68.13 MiB | 1.17 MiB/s   Writing objects:  68% (477/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  69% (484/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  70% (491/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  71% (498/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  72% (505/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  73% (512/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  74% (519/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  75% (526/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  76% (533/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  77% (540/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  78% (547/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  79% (554/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  80% (561/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  81% (568/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  82% (575/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  83% (582/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  84% (589/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  85% (596/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  86% (603/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  87% (610/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  88% (617/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  89% (624/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  90% (631/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  91% (638/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  92% (645/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  93% (652/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  94% (659/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  95% (666/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  96% (673/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  97% (680/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  98% (687/701), 68.77 MiB | 1.17 MiB/s   Writing objects:  99% (694/701), 68.77 MiB | 1.17 MiB/s   Writing objects: 100% (701/701), 68.77 MiB | 1.17 MiB/s   Writing objects: 100% (701/701), 68.91 MiB | 1.23 MiB/s, done.
-Total 701 (delta 320), reused 0 (delta 0)
-remote: Resolving deltas:   0% (0/320)[Kremote: Resolving deltas:   1% (6/320)[Kremote: Resolving deltas:   2% (7/320)[Kremote: Resolving deltas:   3% (10/320)[Kremote: Resolving deltas:   5% (19/320)[Kremote: Resolving deltas:   6% (21/320)[Kremote: Resolving deltas:   7% (23/320)[Kremote: Resolving deltas:   8% (28/320)[Kremote: Resolving deltas:  10% (34/320)[Kremote: Resolving deltas:  11% (36/320)[Kremote: Resolving deltas:  12% (39/320)[Kremote: Resolving deltas:  14% (46/320)[Kremote: Resolving deltas:  15% (48/320)[Kremote: Resolving deltas:  16% (52/320)[Kremote: Resolving deltas:  17% (56/320)[Kremote: Resolving deltas:  18% (60/320)[Kremote: Resolving deltas:  19% (61/320)[Kremote: Resolving deltas:  22% (71/320)[Kremote: Resolving deltas:  24% (77/320)[Kremote: Resolving deltas:  25% (81/320)[Kremote: Resolving deltas:  26% (84/320)[Kremote: Resolving deltas:  28% (91/320)[Kremote: Resolving deltas:  37% (120/320)[Kremote: Resolving deltas:  41% (133/320)[Kremote: Resolving deltas:  42% (136/320)[Kremote: Resolving deltas:  43% (138/320)[Kremote: Resolving deltas:  44% (141/320)[Kremote: Resolving deltas:  45% (147/320)[Kremote: Resolving deltas:  46% (148/320)[Kremote: Resolving deltas:  50% (161/320)[Kremote: Resolving deltas:  55% (176/320)[Kremote: Resolving deltas:  58% (187/320)[Kremote: Resolving deltas:  60% (195/320)[Kremote: Resolving deltas:  70% (225/320)[Kremote: Resolving deltas:  79% (253/320)[Kremote: Resolving deltas:  83% (266/320)[Kremote: Resolving deltas:  86% (278/320)[Kremote: Resolving deltas:  87% (281/320)[Kremote: Resolving deltas:  90% (291/320)[Kremote: Resolving deltas:  92% (296/320)[Kremote: Resolving deltas:  96% (309/320)[Kremote: Resolving deltas:  98% (314/320)[Kremote: Resolving deltas:  99% (317/320)[Kremote: Resolving deltas: 100% (320/320)[Kremote: Resolving deltas: 100% (320/320), done.[K
-To https://github.com/sandy-bultena/Euclid.git
- * [new branch]      master -> master
-Branch 'master' set up to track remote branch 'master' from 'origin'.
-[bs:~/workspace/Exported/Tcl] exit
-exit
-
-Script done on Mon Jun 15 20:11:19 2020
