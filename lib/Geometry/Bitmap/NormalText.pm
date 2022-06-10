@@ -654,7 +654,7 @@ sub _write_text {
             # adjust y according to super or sub script
             my $base             = $1;
             my $sub_super_script = $3;
-            my $yoffset          = $yinit + 12;
+            my $yoffset          = $yinit + 10;
             my $base_width       = $math_char_width * length($base);
 
             if ( $2 eq '^' ) {

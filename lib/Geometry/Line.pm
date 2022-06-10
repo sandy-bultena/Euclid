@@ -147,7 +147,7 @@ sub join {
 # label
 # ============================================================================
 
-=head2 label ([$text, [$where]] )
+=head2 label ([$text] )
 
 Create a label for the line.  If no label defined, remove existing label.
 
@@ -156,9 +156,6 @@ B<Parameters>
 =over 
 
 =item * C<$text> - label text
-
-=item * C<$where> - [OPTIONAL] where to draw the label, (default='right') 
-top, bottom, left, right, topright, topleft, bottomright, bottomleft
 
 =back
 
@@ -178,6 +175,9 @@ sub label {
     Validate::Inputs( \@_, [], [qw(text where)] );
     my $what  = shift;
     my $where = shift;
+    if ($where && $where eq "exactly") {
+        return $self->label_edge($what);
+    }
 
     my $cn = $self->canvas;
     my ( $x1, $y1, $x2, $y2 ) = $self->endpoints();
@@ -188,6 +188,56 @@ sub label {
 
     # draw it
     $self->_draw_label( $cn, $x, $y, $what, $where );
+    return $self;
+}
+
+# ============================================================================
+# label
+# ============================================================================
+
+=head2 label_edge ([$text] )
+
+Create a label for the line.  If no label defined, remove existing label.
+
+Location of label will be "left" of the starting line (assuming line is
+drawn right to left).  It will be rotated depending on the angle of the line)
+... if drawn left to right, the label will be on the right)
+
+B<Parameters>
+
+=over 
+
+=item * C<$text> - label text
+
+=back
+
+B<Returns>
+
+=over
+
+=item * Line object
+
+=back
+
+=cut
+
+# ----------------------------------------------------------------------------
+sub label_edge {
+    my $self = shift;
+    Validate::Inputs( \@_, [], [qw(text)] );
+    my $what  = shift;
+    my $where = shift;
+
+    my $cn = $self->canvas;
+    my ( $x1, $y1, $x2, $y2 ) = $self->endpoints();
+
+    # define location where to draw label
+    my $theta = deg2rad( $self->angle());
+    my $x = $x1 - 16*cos($theta);
+    my $y = $y1 + 16*sin($theta);
+    
+    # draw it
+    $self->_draw_label( $cn, $x, $y, $what, "exactly" );
     return $self;
 }
 
@@ -2258,7 +2308,7 @@ sub draw {
     # ------------------------------------------------------------------------
     # write the label
     # ------------------------------------------------------------------------
-    $self->label( $self->label_is );
+    $self->label( $self->label_is, $self->label_where );
 
     $cn->update();
     return $self;

@@ -10,7 +10,9 @@ use FindBin;
 use lib "$FindBin::Bin/..";
 use Colour;
 
-my $year = 2019;
+my $year = "2021";
+my $copyright_msg = "Copyright © $year by Sandy Bultena";
+
 
 require Exporter;
 our @ISA    = qw(Exporter);
@@ -71,7 +73,7 @@ sub init {
         $cn->createImage( 25, 710, -image => $self->{-cc}, -anchor => 'nw' );
         $cn->createText(
                          25, 750,
-                         -text   => "Copyright © $year by Sandy Bultena",
+                         -text   => $copyright_msg,
                          -anchor => 'nw'
         );
     };
@@ -287,7 +289,7 @@ sub last_page {
     );
     $cn->createText(
                      700, 600,
-                     -text => "Copyright © $year by Sandy Bultena.",
+                     -text => $copyright_msg,
                      -font => 'signature'
     );
     $cn->createText(
@@ -1139,55 +1141,55 @@ sub prev_next {
 
 __DATA__
 
-Philosophy [nature] is written in that great book which ever is before our eyes -- 
-I mean the universe -- but we cannot understand it if we do not first learn the 
-language and grasp the symbols in which it is written. The book is written in 
-mathematical language, and the symbols are triangles, circles and other 
-geometrical figures, without whose help it is impossible to comprehend a single 
-word of it; without which one wanders in vain through a dark labyrinth. 
+Philosophy [nature] is written in that great book which ever is before our eyes --
+I mean the universe -- but we cannot understand it if we do not first learn the
+language and grasp the symbols in which it is written. The book is written in
+mathematical language, and the symbols are triangles, circles and other
+geometrical figures, without whose help it is impossible to comprehend a single
+word of it; without which one wanders in vain through a dark labyrinth.
 
 - Galileo Galilei
 
 "Obvious" is the most dangerous word in mathematics
 
-The description of right lines and circles, upon which geometry is founded, 
-belongs to mechanics. Geometry does not teach us to draw these lines, but requires 
-them to be drawn. 
+The description of right lines and circles, upon which geometry is founded,
+belongs to mechanics. Geometry does not teach us to draw these lines, but requires
+them to be drawn.
 Sir Isaac Newton - Principia Mathematica
 
 
-As long as algebra and geometry have been separated, their progress have been 
-slow and their uses limited; but when these two sciences have been united, 
+As long as algebra and geometry have been separated, their progress have been
+slow and their uses limited; but when these two sciences have been united,
 they have lent each mutual forces, and have marched together towards perfection.
 Joseph-Louis Lagrange (1736 to 1813)
 
-There is geometry in the humming of the strings. There is music in the spacing 
-of the spheres. 
-Ñ Pythagoras
+There is geometry in the humming of the strings. There is music in the spacing
+of the spheres.
+ï¿½ Pythagoras
 
-He is unworthy of the name of man who is ignorant of the fact that the 
+He is unworthy of the name of man who is ignorant of the fact that the
 diagonal of a square is incommensurable with its side.
 Plato
 
-According to most accounts, geometry was first discovered among the Egyptians, 
-taking its origin from the measurement of areas. For they found it necessary 
-by reason of the flooding of the Nile, which wiped out everybodyÕs proper 
-boundaries. Nor is there anything surprising in that the discovery both of 
-this and of the other sciences should have had its origin in a practical need, 
-since everything which is in process of becoming progresses from the imperfect 
+According to most accounts, geometry was first discovered among the Egyptians,
+taking its origin from the measurement of areas. For they found it necessary
+by reason of the flooding of the Nile, which wiped out everybodyï¿½s proper
+boundaries. Nor is there anything surprising in that the discovery both of
+this and of the other sciences should have had its origin in a practical need,
+since everything which is in process of becoming progresses from the imperfect
 to the perfect.
-Proclus Wikipedia: Proclus  
-Ñ On Euclid
+Proclus Wikipedia: Proclus
+ï¿½ On Euclid
 
-ÒDon't be inscribed by circumstances, circumscribe the circumstancesÓ 
+ï¿½Don't be inscribed by circumstances, circumscribe the circumstancesï¿½
 - Constance Chuks Friday
 
-Proportions are what makes the old Greek temples classic in their beauty. 
-They are like huge blocks, from which the air has been literally hewn 
+Proportions are what makes the old Greek temples classic in their beauty.
+They are like huge blocks, from which the air has been literally hewn
 out between the columns. Arne Jacobsen
 
-"Pick up a sunflower and count the florets running into its centre, 
-or count the spiral scales of a pine cone or a pineapple, running from 
-its bottom up its sides to the top, and you will find an extraordinary truth: 
+"Pick up a sunflower and count the florets running into its centre,
+or count the spiral scales of a pine cone or a pineapple, running from
+its bottom up its sides to the top, and you will find an extraordinary truth:
 recurring numbers, ratios and proportions."
 Author: Charles Jencks

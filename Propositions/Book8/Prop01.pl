@@ -18,6 +18,14 @@ my $tp = $pn->text_box( 300, 200 );
 my $t3 = $pn->text_box( 400, 160 );
 my $t4 = $pn->text_box( 700, 160 );
 
+our ( %p, %c, %s, %t, %l );
+
+my $ds  = 30;
+my $unit = 10;
+use Geometry::Shortcuts;
+    my ($make_lines, $line_coords, $current_xy ) = 
+            Shortcuts::make_some_line_subs($pn,$ds,$unit,\%p,\%l);
+
 # ============================================================================
 # Definitions
 # ============================================================================
@@ -38,11 +46,8 @@ Proposition::play(
 # Explanation
 # ============================================================================
 sub explanation {
-    my ( %p, %c, %s, %t, %l );
-    my $ds  = 30;
     my $dxs  = 100;
     my $dys = 200;
-    my $unit = 10;
     
     my $p = 1.5;
     my $A = 4;
@@ -54,24 +59,14 @@ sub explanation {
     my $G = $B*$p;
     my $H = $C*$p;
     
-    my @A   = ($dxs,$dys,$dxs+$A*$unit,$dys);
-    $dys = $dys + $ds;
-    my @B   = ($dxs,$dys,$dxs+$B*$unit,$dys);
-    $dys = $dys + $ds;
-    my @C   = ($dxs,$dys,$dxs+$C*$unit,$dys);
-    $dys = $dys + $ds;
-    my @D   = ($dxs,$dys,$dxs+$D*$unit,$dys);
-    $dys = $dys + $ds;
-    
-    $dys = $dys + $ds;
-    my @E   = ($dxs,$dys,$dxs+$E*$unit,$dys);
-    $dys = $dys + $ds;
-    my @F   = ($dxs,$dys,$dxs+$F*$unit,$dys);
-    $dys = $dys + $ds;
-    my @G   = ($dxs,$dys,$dxs+$G*$unit,$dys);
-    $dys = $dys + $ds;
-    my @H   = ($dxs,$dys,$dxs+$H*$unit,$dys);
-    $dys = $dys + $ds;
+    our @A = $line_coords->( -xorig  => $dxs, -yorig => $dys, -length => $A );
+    our @B = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $B );
+    our @C = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $C );
+    our @D = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $D );
+    our @E = $line_coords->( -xorig  => $dxs, -yskip => 2, -length => $E );
+    our @F = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $F );
+    our @G = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $G );
+    our @H = $line_coords->( -xorig  => $dxs, -yskip => 1, -length => $H );
 
     my $steps;
     # -------------------------------------------------------------------------
@@ -79,32 +74,30 @@ sub explanation {
     # -------------------------------------------------------------------------
     push @$steps, sub {
         $t1->title("In other words");
-        $t1->explain( "If we have a group of numbers in continued proportion, "
+        $t1->explain( "If we have a series of numbers in continued proportion, "
         ."and the first and last are prime to one another," );
        
-        $p{A} = Point->new( $pn, @A[0,1])->label( "A", "left" );
-        $p{B} = Point->new( $pn, @B[0,1] )->label( "B", "left" );
-        $p{C} = Point->new( $pn, @C[0,1] )->label( "C", "left" );
-        $p{D} = Point->new( $pn, @D[0,1] )->label( "D", "left" );
-        $l{A} = Line->new($pn,@A);
-        $l{B} = Line->new($pn,@B);
-        $l{C} = Line->new($pn,@C);
-        $l{D} = Line->new($pn,@D);
-        
+        $make_lines->(qw(A B C D ));
         $t2->math("A:B = B:C = C:D");
         $t2->math("gcd(A,D) = 1");
+        $t2->allblue;
 
     };
 
     push @$steps, sub {
-        $t1->explain( "Then the numbers are the lowest possible numbers "
+        $t1->explain( "Then the series of numbers are the lowest possible numbers "
         ."that have the ratio of the first to the second" );
        
         $t2->down();
         $t2->mathsmall("S={(i,j,k,l)|i,j,k,l\\{elementof}\\{natural}, i:j=j:k=k:l=A:B}");
         $t2->mathsmall("(A,B,C,D)\\{elementof}S \nsuch that A\\{lessthanorequal}i, ".
         "B\\{lessthanorequal}j, C\\{lessthanorequal}k, D\\{lessthanorequal}l ".
-        "\\{forall}(i,j,k,l)\\{elementof}S"); 
+        "\\{forall}(i,j,k,l)\\{elementof}S");
+    };
+
+    push @$steps, sub {
+        $t2->down;
+        $t2->math("A,B,C,D are least numbers in the ratio of A:B"); 
     };
 
 
@@ -124,14 +117,7 @@ sub explanation {
     push @$steps, sub {
         $t1->explain("Let E,F,G,H be numbers smaller than A,B,C,D, but with ".
         "the same ratio");
-        $p{E} = Point->new( $pn, @E[0,1])->label( "E", "left" );
-        $p{F} = Point->new( $pn, @F[0,1] )->label( "F", "left" );
-        $p{G} = Point->new( $pn, @G[0,1] )->label( "G", "left" );
-        $p{H} = Point->new( $pn, @H[0,1] )->label( "H", "left" );
-        $l{E} = Line->new($pn,@E);
-        $l{F} = Line->new($pn,@F);
-        $l{G} = Line->new($pn,@G);
-        $l{H} = Line->new($pn,@H);
+        $make_lines->(qw(E F G H ));
         
         $t2->down;
         $t2->math("E:F = F:G = G:H");
@@ -155,9 +141,7 @@ sub explanation {
         $t2->down;
         $t2->allgrey();
         $t2->blue(1);
-        $t2->mathsmall("T={(x,y)|x,y\\{elementof}\\{natural}, x:y=A:D}");
-        $t2->mathsmall("(A,D)\\{elementof}T such that A\\{lessthanorequal}x, ".
-        "B\\{lessthanorequal}y \\{forall}(x,y)\\{elementof}T");
+        $t2->math("A,D are least numbers");
         $t2->down; 
     };
 
@@ -166,7 +150,7 @@ sub explanation {
         "the ratio A:D and E:H, A measures\\{nb}E, and ".
         "D measures\\{nb}H\\{nb}(VII.20)");
         $t2->allgrey();
-        $t2->black([-1,-2,-3]);
+        $t2->black([-1,-2]);
         $t2->math("E = n\\{dot}A");
         $t2->math("H = m\\{dot}D");
     };
@@ -183,14 +167,11 @@ sub explanation {
         $t2->allgrey();
         $t2->blue([0,1]);
         $t2->down;
-        $t2->mathsmall("S={(i,j,k,l)|i,j,k,l\\{elementof}\\{natural}, i:j=j:k=k:l=A:B}");
-        $t2->mathsmall("(A,B,C,D)\\{elementof}S \nsuch that A\\{lessthanorequal}i, ".
-        "B\\{lessthanorequal}j, C\\{lessthanorequal}k, D\\{lessthanorequal}l ".
-        "\\{forall}(i,j,k,l)\\{elementof}S"); 
+        $t2->math("A,B,C,D are least numbers in the ratio of A:B"); 
     };
 
     push @$steps, sub {
-        $t2->blue([-1,-2]);
+        $t2->blue([-1]);
     };
     
 

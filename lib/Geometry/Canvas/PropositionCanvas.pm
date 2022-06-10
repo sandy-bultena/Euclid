@@ -2,13 +2,6 @@
 use strict;
 use warnings;
 
-=head1 KNOWN BUGS
-
-If creating PDFs, and there are curly braces in a text field, than the conversion
-of the parameters in _save_state do not work properly
-
-=cut
-
 package PropositionCanvas;
 
 =head1 NAME
@@ -46,16 +39,66 @@ special tweaks.
 
 =head2 Bindings
 
+Moving through pages
+
+=over
+
+=item * C<< <KeyPress-Return> >> go to next page
+
+=item * C<< <KeyPress-Right> >> go to next page
+
+=item * C<< <KeyPress-Left> >> go to previous page
+
+=back
+
+Free-hand drawing
+
+=over
+
+=item * C<< <KeyPress-d> >> enable free hand drawing
+
+=item * C<< <KeyPress-l> >> enable line drawing
+
+=item * C<< <KeyPress-x> >> disable drawing
+
+=item * C<< <KeyPress-e> >> erase drawing
+
+=item * C<< <ButtonPress-3> >> erase drawing
+
+=item * While drawing is enabled:
+
+=over
+
+=item * C<< <ButtonPress-1> >> hold button and move mouse while drawing
+
+=item * C<< <ButtonRelease-1> >> stops drawing while mouse is moving
+
+=back
+
+=back
+
+PDF - only works if EUCLID_CREATE_PDF environment variable was set
+
+=over
+
+=item * C<< <KeyPress-s> >> save to PDF
+
+=back
+
 =head2 Fonts
 
-=head2 FreeHand Drawing
-
-=head2 Tk methods
-
-=head2 NormalText
+see documentation in C<Geometry::Bitmap::NormalText>
 
 =head2 Package Variables
 
+C<@CARP_NOT> See "Carp" module for its use 
+
+C<$PDF = $ENV{EUCLID_CREATE_PDF}> to create the PDF, or not;
+
+C<$ENV{EUCLID_AUTO}> automatically cycles through each page, good for autogenerating
+pdf versions of propositions
+
+C<$CopyRight> subroutine that when executed, creates the copyright info;
 
 =cut
 
@@ -63,7 +106,6 @@ use Tcl::Tk;
 my $int = new Tcl::Tk;
 
 use Geometry::Geometry;
-use Geometry::Bitmap::BitmapText;
 use Geometry::Bitmap::NormalText;
 use Geometry::Canvas::PDFDocument;
 
@@ -626,7 +668,9 @@ sub _save_state {
 }
 
 # ==================================================================
-# parse_optons
+# parse_options
+# take the options of the canvas options, and convert it into 
+# something useful
 # ==================================================================
 sub parse_options {
     my $txt = shift;

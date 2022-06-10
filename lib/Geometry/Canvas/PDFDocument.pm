@@ -701,6 +701,7 @@ sub save {
     $self->PDF_doc->end;
 }
 
+# WTF???
 sub open {
     my $self = shift;
     $self->PDF_doc->saveas( $self->filename );

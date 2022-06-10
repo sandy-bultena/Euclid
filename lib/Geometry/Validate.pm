@@ -78,7 +78,7 @@ my $side = sub {
 my $where = sub {
     my $input = shift;
     return 1
-      unless $input =~ /^(|left|right|top|bottom|topright|topleft|bottomleft|bottomright)$/;
+      unless $input =~ /^(|left|right|top|bottom|topright|topleft|bottomleft|bottomright|exactly)$/;
     return;
 };
 

@@ -558,7 +558,7 @@ sub toc7 {
     my @descr1 = (
         "Determine if two numbers are relatively prime",
         "Find the greatest common divisor for two numbers",
-        "Find the largest common divisor for three numbers",
+        "Find the greatest common divisor for three numbers",
         "Given two natural numbers, A and B, either B is part of A, "
           . "or there exists a natural "
           . "number (a part) that can measure both A and B",
@@ -651,13 +651,83 @@ sub toc8 {
     my $pn      = shift;
     my $current = shift;
     my @descr1 = (
-            "If there be as many numbers as we please in continued proportion, "
-          . "and the extremes of them be prime to one another, the numbers are "
-          . "the least of those which have the same ratio with them",
+        "If A:B = B:C = C:D ... X:Z, and A,Z are relatively prime, then "
+          . "these are the least numbers with the ratio A:B",
+        "Given a ratio of A:B, create a list of the least N numbers such that "
+          . "X1:X2 = X2:X3 = ... = X(n-1):Xn = A:B",
+        "If A:B = B:C = C:D ... X:Z, and these are the least numbers "
+          . "with the ratio A:B, then A,Z are relatively prime",
+        "Given A1:A2, B1:B2, C1:C2 ..., where each ratio is the least, "
+          . "find the least numbers in "
+          . "continued proportion such that X1:X2 = A1:A2, X2:X3 = B1:B2, "
+          . "X3:X4 = C1:C2, etc",
+        "If A\\{nb}=\\{nb}C\\{nb}x\\{nb}D and\\{nb}B\\{nb}="
+          . "\\{nb}E\\{nb}x\\{nb}F, then\\{nb}A:B\\{nb}=\\{nb}CxD:ExF",
+        "If S1, S2, S3 ... Sn is a series of numbers in continuous proportion "
+          . "where S2 > S1, and S2 \\{notequal} p\\{dot}S1, then "
+          . "Sj\\{nb}\\{notequal}\\{nb}q\\{dot}Si for any integer\\{nb}i,j",
+        "If S1, S2, S3 ... Sn is a series of numbers in continuous proportion "
+          . "where S2 > S1, and Sn = p\\{dot}S1, then "
+          . "S2\\{nb}=\\{nb}q\\{dot}S1",
+        "If A:B = C:D, then the length of the proportional series "
+          . "A,S1,S2\\{nb}...\\{nb}"
+          . "Sn,B, will be equal to length of the proportional series "
+          . "C,T1,T2\\{nb}...\\{nb}Tn,D",
+        "Prove that there are as many "
+          . "proportional numbers between 1 and p^(n-1) as there proportional "
+          . "numbers between p^(n-1) and\\{nb}q^(n-1)",
+        "If there are two series of equal length, of type 1 to p^(n-1) and "
+          . "1 to q^(n-1), then there will exist another series of equal length of "
+          . "the form p^(n-1) and\\{nb}q^(n-1)",
+        "If A = C^2 and B\\{nb}=\\{nb}D^2, then there exists "
+          . "one number\\{nb}E "
+          . "such that A:E\\{nb}=\\{nb}E:B, and\\{nb}A:B is the "
+          . "duplicate ratio of\\{nb}C:D",
+        "If A = C^3 and B\\{nb}=\\{nb}D^3, then "
+          . "there exists two numbers\\{nb}H and\\{nb}K "
+          . "such that\\{nb}A:H\\{nb}=\\{nb}H:K\\{nb}=\\{nb}K:B, "
+          . "and\\{nb}A:B is the triplicate ratio of\\{nb}C:D",
+        "If A:B = B:C then A^2:B^2\\{nb}=\\{nb}B^2:C^2, and "
+          . "A^3:B^3\\{nb}=\\{nb}B^3:C^3",
+        "If A\\{nb}=\\{nb}C^2, B\\{nb}=\\{nb}D^2 and if B\\{nb}"
+          . "=\\{nb}iA, then D\\{nb}=\\{nb}jC, and vice versa",
+        "If A\\{nb}=\\{nb}C^3, B\\{nb}=\\{nb}D^3 and if B\\{nb}"
+          . "=\\{nb}iA, then D\\{nb}=\\{nb}jC, and vice versa",
+        "If A\\{nb}=\\{nb}C^2, B\\{nb}=\\{nb}D^2 and if B\\{nb}"
+          . "\\{notequal}\\{nb}iA, then D\\{nb}\\{notequal}\\{nb}jC, "
+          . "and vice versa",
+        "If A\\{nb}=\\{nb}C^3, B\\{nb}=\\{nb}D^3 and if B\\{nb}"
+          . "\\{notequal}\\{nb}iA, then D\\{nb}\\{notequal}\\{nb}jC, "
+          . "and vice versa",
+        "If A,B are similar plane numbers, A\\{nb}=\\{nb}CD, "
+          . "B\\{nb}=\\{nb}EF and C:D=E:F, then A:B is the duplicate "
+          . "ratio of C:E and D:F, and there is one mean number "
+          . "between A and B",
+        "If A,B are similar solid numbers, A\\{nb}=\\{nb}CDE, "
+          . "B\\{nb}=\\{nb}FGH and C:D=F:G and D:E=G:H, then "
+          . "A:B is the triplicate "
+          . "ratio of C:F, D:G, E:H, and there are two mean numbers "
+          . "between A and B",
     );
-    my @descr2 = ();
+
+    my @descr2 = (
+        "If A:C\\{nb}=\\{nb}C:B, then A and B are similar plane "
+          . "numbers, A\\{nb}=\\{nb}ij, "
+          . "B\\{nb}=\\{nb}pq and i:p\\{nb}=\\{nb}j:q,",
+        "If A:C\\{nb}=\\{nb}C:D\\{nb}=\\{nb}D:B, then A and B are similar solid "
+          . "numbers, A\\{nb}=\\{nb}ijk, "
+          . "B\\{nb}=\\{nb}pqr and i:p = j:q = r:k",
+        "If A,B,C are in continued proportion, and A is square, then C is also square",
+        "If A,B,C,D are in continued proportion, and A is cube, then D is also cube",
+        "If A:B\\{nb}=\\{nb}C:D, and C,D and A are square, then B is also square",
+        "If A:B\\{nb}=\\{nb}C:D, and C,D and A are cube, then B is also cube",
+        "If A and B are similar plane numbers, then the ratio of A:B can ".
+        "be expressed as a ratio of two square numbers",
+        "If A and B are similar solid numbers, then the ratio of A:B can ".
+        "be expressed as a ratio of two cube numbers",
+    );
     return ( toc_sub( $pn, 8, $current, 0, \@descr1 ),
-             toc_sub( $pn, 8, $current, 27, \@descr2 ), );
+             toc_sub( $pn, 8, $current, 19, \@descr2 ) );
 
 }
 
