@@ -8,8 +8,12 @@ from typing import Callable
 def to_manim_coord(x, y):
     return (
         (x - 700) * (8.0 * 16 / 1400 / 9),
-        (400 - y) * (8.0 / 800)
+        (400 - y) * (8.0 / 800),
+        0
     )
+
+def to_manim_h_scale(x):
+    return x * (8.0 * 16 / 1400 / 9)
 
 
 class AnimState(Enum):
@@ -24,11 +28,19 @@ class PropScene(InteractiveScene):
     def __init__(self, *args, **kwargs):
         self.animateState: AnimState = AnimState.NORMAL
         self.animationsStored = []
+        self.animationSpeedStack: List[float] = []
         super().__init__(*args, **kwargs)
 
-    def play(self, *anims: AnimationType, **kwargs):
+    def update_runtime(self, anim: AnimationType, speed: float):
+        if not isinstance(anim, Animation):
+            anim = anim.build()
+        anim.run_time /= speed
+        return anim
+
+    def play(self, *anims: AnimationType, run_time: float = None, **kwargs):
         if self.animateState == AnimState.NORMAL:
-            super().play(*anims, **kwargs)
+            speed = reduce(op.mul, self.animationSpeedStack, 1.0)
+            super().play(*(self.update_runtime(anim, speed) for anim in anims),**kwargs)
         elif self.animateState == AnimState.STORING:
             self.animationsStored.extend(anims)
         elif self.animateState == AnimState.PAUSED:
@@ -52,6 +64,12 @@ class PropScene(InteractiveScene):
         yield
         self.animateState = AnimState.NORMAL
 
+    @contextmanager
+    def animation_speed(self, run_time: float):
+        self.animationSpeedStack.append(run_time)
+        yield
+        self.animationSpeedStack.pop()
+
     def animations_off(self):
         self.animateState = AnimState.PAUSED
 
@@ -65,7 +83,6 @@ class PropScene(InteractiveScene):
         self.steps.append(func)
 
     def runFull(self):
-        print(self.steps)
         for step in self.steps:
             step()
             self.wait()

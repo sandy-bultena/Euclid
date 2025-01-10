@@ -7,6 +7,7 @@ camera_resolutions:
   medium: 1280x720
 directories:
   mirror_module_path: false
+  output: .
 fps: 30
 full_screen: false
 style:

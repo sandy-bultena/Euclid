@@ -7,20 +7,22 @@ from euclidlib.Propositions.PropScene import PropScene
 
 class TextBox(VGroup[Text]):
     fonts = defaultdict(
-        lambda: (Text, dict(font_size=30)),
-        title=(Text, dict(font_size=30)),
-        explain=(Text, dict(font_size=20)),
+        lambda: (MarkupText, dict(font_size=30)),
+        title=(MarkupText, dict(font_size=30)),
+        explain=(MarkupText, dict(font_size=18)),
         math=(Tex, dict(font_size=20)),
     )
 
     def __init__(self,
                  scene: PropScene,
                  *args,
-                 absolute_position: Tuple[int, int] | None = None,
+                 absolute_position: Tuple[float, float, float] | None = None,
                  relative_position: Tuple[Mobject, Vect3] | None = None,
+                 line_width: float = None,
                  **kwargs):
         if not absolute_position and not relative_position:
             raise Exception("Must define starting position")
+        self.line_width = line_width
         self.scene = scene
         self.abs_position = absolute_position
         self.rel_position = relative_position
@@ -30,7 +32,7 @@ class TextBox(VGroup[Text]):
         if self:
             return super().compute_bounding_box()
         if self.abs_position:
-            x, y = self.abs_position
+            x, y, _ = self.abs_position
             return np.array([[x, y, 0]] * 3)
         if self.rel_position:
             ref, direction = self.rel_position
@@ -44,6 +46,8 @@ class TextBox(VGroup[Text]):
 
     def generate_text(self, text: str, style: str = ''):
         cls, kwargs = self.fonts[style]
+        if issubclass(cls, MarkupText) and self.line_width is not None:
+            kwargs['line_width'] = self.line_width
         newline = cls(text, **kwargs)
         newline.next_to(self.get_bottom(), DOWN, buff=self.buff_size)
         newline.align_to(self.get_left(), LEFT)
