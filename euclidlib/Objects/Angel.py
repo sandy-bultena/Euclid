@@ -14,4 +14,4 @@ def calculateAngle(l1: EuclidLine, l2: EuclidLine):
     )
 
     th_diff = th2 - th1
-    return th_diff % (2 * TAU)
+    return th_diff % TAU

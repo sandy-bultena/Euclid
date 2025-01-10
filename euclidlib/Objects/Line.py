@@ -22,6 +22,16 @@ class EuclidLine(EMObject, Line):
         y = r / math.sqrt(dy**2 + dx**2) * dy + ys
         return x, y
 
+    def extend(self, r: float):
+        x2, y2 = self.point(r + self.get_length())
+        self.e_end = (x2, y2, 0)
+        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.e_end))
+
+    def prepend(self, r: float):
+        x2, y2 = self.point(-r)
+        self.e_start = (x2, y2, 0)
+        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.e_end))
+
 
 class VirtualLine(EuclidLine):
     Virtual = True

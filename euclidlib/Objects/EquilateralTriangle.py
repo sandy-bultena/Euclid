@@ -13,7 +13,7 @@ def build(scene: PropScene, p1, p2, speed = 1.0):
         l2 = VirtualLine(p2, pts[0], scene=scene)
 
         th = calculateAngle(l1, l2)
-        if th < TAU:
+        if th < PI:
             C = pts[0]
         else:
             C = pts[1]

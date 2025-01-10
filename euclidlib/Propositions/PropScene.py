@@ -15,6 +15,9 @@ def to_manim_coord(x, y):
 def to_manim_h_scale(x):
     return x * (8.0 * 16 / 1400 / 9)
 
+def to_manim_v_scale(x):
+    return x * (8.0 / 800)
+
 
 class AnimState(Enum):
     NORMAL = 0

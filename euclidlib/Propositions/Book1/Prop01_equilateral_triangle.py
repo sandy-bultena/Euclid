@@ -6,7 +6,7 @@ sys.path.append(os.getcwd())
 
 from manimlib import *
 from euclidlib.Propositions.PropScene import PropScene, to_manim_coord, to_manim_h_scale
-from euclidlib.Objects.TextBox import TextBox
+from typing import Dict
 from euclidlib.Objects import *
 
 
@@ -27,43 +27,47 @@ class Book1Prop1(PropScene):
         A = to_manim_coord(200, 500)
         B = to_manim_coord(450, 500)
 
+        l: Dict[str | int, EuclidLine] = {}
+        p: Dict[str | int, EuclidPoint] = {}
+        c: Dict[str | int, EuclidCircle] = {}
+
         @self.push_step
         def _1():
             t1.title("Construction:")
             t1.explain("Start with line segment AB")
-            self.pA = EuclidPoint(A, scene=self, label='A', label_dir=LEFT)
-            self.pB = EuclidPoint(B, scene=self, label='B', label_dir=RIGHT)
-            self.lAB = EuclidLine(self.pA, self.pB, scene=self)
+            p['A'] = EuclidPoint(A, scene=self, label='A', label_dir=LEFT)
+            p['B'] = EuclidPoint(B, scene=self, label='B', label_dir=RIGHT)
+            l['AB'] = EuclidLine(p['A'], p['B'], scene=self)
 
         @self.push_step
         def _2():
             t1.explain("Create a circle with center A and radius AB")
-            self.cA = EuclidCircle(self.pA, self.pB, scene=self)
+            c['A'] = EuclidCircle(p['A'], p['B'], scene=self)
 
         @self.push_step
         def _3():
             t1.explain("Create a circle with center B and radius AB")
-            self.cB = EuclidCircle(self.pB, self.pA, scene=self)
+            c['B'] = EuclidCircle(p['B'], p['A'], scene=self)
 
         @self.push_step
         def _4():
             t1.explain("Label the intersection point C")
-            pts = self.cA.intersect(self.cB)
-            self.pC = EuclidPoint(pts[0], scene=self, label='C', label_dir=UP)
+            pts = c['A'].intersect(c['B'])
+            p['C'] = EuclidPoint(pts[0], scene=self, label='C', label_dir=UP)
 
         @self.push_step
         def _5():
             t1.explain("Create line AC and CB")
             with self.simultaneous():
-                self.lAC = EuclidLine(self.pA, self.pC, scene=self)
-                self.lBC = EuclidLine(self.pB, self.pC, scene=self)
+                l['AC'] = EuclidLine(p['A'], p['C'], scene=self)
+                l['BC'] = EuclidLine(p['B'], p['C'], scene=self)
 
         @self.push_step
         def _6():
             t1.explain("Triangle ABC is an equilateral triangle")
             with self.simultaneous():
-                self.cA.e_fade()
-                self.cB.e_fade()
+                c['A'].e_fade()
+                c['B'].e_fade()
 
         # ----------------------------------------------
         # Proof
@@ -73,42 +77,42 @@ class Book1Prop1(PropScene):
             t1.down()
             t1.title("Proof:")
             with self.simultaneous():
-                self.lAC.e_fade()
-                self.cA.e_fade()
-                self.cB.e_normal()
+                l['AC'].e_fade()
+                c['A'].e_fade()
+                c['B'].e_normal()
 
             t1.explain("AB and CB are radii of the same circle - hence they are equal")
-            self.lAB.add_label("r", DOWN)
-            self.lBC.add_label("r", RIGHT)
+            l['AB'].add_label("r", DOWN)
+            l['BC'].add_label("r", RIGHT)
             t2.math("AB = CB = r")
 
         @self.push_step
         def _8():
             with self.simultaneous():
-                self.lBC.e_fade()
-                self.cB.e_fade()
-                self.lAB.e_normal()
-                self.lAC.e_normal()
-                self.cA.e_normal()
+                l['BC'].e_fade()
+                c['B'].e_fade()
+                l['AB'].e_normal()
+                l['AC'].e_normal()
+                c['A'].e_normal()
 
             t1.explain("AB and AC are radii of the same circle - hence they are equal")
-            self.lAC.add_label("r", LEFT)
+            l['AC'].add_label("r", LEFT)
             t2.math("AB = AC = r")
 
         @self.push_step
         def _9():
             with self.simultaneous():
-                self.cB.e_fade()
-                self.cA.e_fade()
-                self.lAB.e_normal()
-                self.lAC.e_normal()
-                self.lBC.e_normal()
+                c['B'].e_fade()
+                c['A'].e_fade()
+                l['AB'].e_normal()
+                l['AC'].e_normal()
+                l['BC'].e_normal()
 
             t1.explain(
                 "If AB equals AC and AB equals CB, "
                 "then AC equals CB"
             )
-            self.lBC.add_label("r", RIGHT)
+            l['BC'].add_label("r", RIGHT)
             t2.math("AB = CB = CA = r")
 
         @self.push_step

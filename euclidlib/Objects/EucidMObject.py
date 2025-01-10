@@ -3,7 +3,6 @@ from functools import partial
 from manimlib import *
 import euclidlib.Propositions.PropScene as ps
 
-
 class Label(Text):
     def CreationOf(self, *args, **kwargs):
         return [Write(self, *args, **kwargs)]
@@ -67,19 +66,21 @@ class EMObjectPlayer:
     def red(self):
         return self.e_color(RED)
 
-    def _build_anim(self, anim, **kwargs):
+    def _build_anim(self, anim, obj: VMobject, **kwargs):
+        if obj is None:
+            return None
         kwargs['run_time'] = kwargs.get('run_time', 1.0) * 0.5
         anim_built = anim(**kwargs).build()
         if self.fade_in_flag and not self.eobj.in_scene():
-            anim_built = FadeTransform(self.eobj, self.eobj.target, **kwargs)
-        if self.fade_out_flag and self.eobj.in_scene():
-            anim_built = FadeOut(self.eobj, **kwargs)
+            obj.become(obj.target)
+            anim_built = FadeIn(obj, **kwargs)
+        elif self.fade_out_flag and self.eobj.in_scene():
+            anim_built = FadeOut(obj, **kwargs)
         return anim_built
 
     def __call__(self, *args, **kwargs):
-        anim_built = self._build_anim(self.anim, **kwargs)
-        label_built = self._build_anim(self.label_anim, **kwargs) if not isinstance(self.label_anim,
-                                                                              NullAnimationBuilder) else None
+        anim_built = self._build_anim(self.anim, self.eobj, **kwargs)
+        label_built = self._build_anim(self.label_anim, self.eobj.e_label, **kwargs)
         if label_built is not None:
             self.eobj.scene.play(anim_built, label_built)
         else:
@@ -100,7 +101,7 @@ class EMObject(VMobject):
     if TYPE_CHECKING:
         blue: EMObjectPlayer
         green: EMObjectPlayer
-        redd: EMObjectPlayer
+        red: EMObjectPlayer
         e_fade: EMObjectPlayer
         e_normal: EMObjectPlayer
         e_draw: EMObjectPlayer
@@ -131,7 +132,6 @@ def {name}(self):
         self.old_fill_opacity = 0.0
         self.scene = scene
         self.animation_objects: List[Mobject] = []
-        self.e_removed = False
         kwargs['stroke_width'] = stroke_width
 
         if self.Virtual:

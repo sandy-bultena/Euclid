@@ -28,6 +28,9 @@ class TextBox(VGroup[Text]):
         self.rel_position = relative_position
         super().__init__(*args, **kwargs)
 
+    def delete(self):
+        self.scene.play(FadeOut(self))
+
     def compute_bounding_box(self):
         if self:
             return super().compute_bounding_box()
