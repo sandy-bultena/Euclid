@@ -3,7 +3,6 @@ import os
 
 sys.path.append(os.getcwd())
 
-from euclidlib.Propositions.PropScene import to_manim_coord, to_manim_h_scale, to_manim_v_scale
 from euclidlib.Objects import *
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict

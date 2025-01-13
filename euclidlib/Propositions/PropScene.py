@@ -5,20 +5,6 @@ from enum import Enum
 from manimlib import *
 from typing import Callable
 
-def to_manim_coord(x, y):
-    return (
-        (x - 700) * (8.0 * 16 / 1400 / 9),
-        (400 - y) * (8.0 / 800),
-        0
-    )
-
-def to_manim_h_scale(x):
-    return x * (8.0 * 16 / 1400 / 9)
-
-def to_manim_v_scale(x):
-    return x * (8.0 / 800)
-
-
 class AnimState(Enum):
     NORMAL = 0
     STORING = 1

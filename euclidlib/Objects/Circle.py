@@ -3,23 +3,26 @@ from __future__ import annotations
 import math
 
 from euclidlib.Objects.EucidMObject import *
-from euclidlib.Objects.Line import VirtualLine, EuclidLine
-from manimlib import Line
+from euclidlib.Objects import Line as L
+import manimlib as mn
 
-class EuclidCircle(EMObject, Circle):
+class EuclidCircle(EMObject, mn.Circle):
+    CONSTRUCTION_TIME=0.75
+    AUX_CONSTRUCTION_TIME = 0.25
+
     def CreationOf(self, *args, **kwargs):
-        tmpLine = Line(self.e_center, self.get_end(), stroke_color=RED)
+        tmpLine = mn.Line(self.e_center, self.get_end(), stroke_color=mn.RED)
         self.animation_objects.append(tmpLine)
-        self.scene.play(ShowCreation(tmpLine, run_time=0.5))
+        self.scene.play(mn.ShowCreation(tmpLine, run_time=self.AUX_CONSTRUCTION_TIME))
         tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
         return super().CreationOf(*args, **kwargs)
 
-    def e_label_point(self, direction: Vect3):
+    def e_label_point(self, direction: mn.Vect3):
         return self.get_edge_center(direction)
 
     def __init__(self, center, point, *args, **kwargs):
-        self.e_center = center.get_center() if isinstance(center, Mobject) else center
-        self.e_point = point.get_center() if isinstance(point, Mobject) else point
+        self.e_center = center.get_center() if isinstance(center, mn.Mobject) else center
+        self.e_point = point.get_center() if isinstance(point, mn.Mobject) else point
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]
@@ -30,14 +33,14 @@ class EuclidCircle(EMObject, Circle):
             start_angle=angle,
             arc_center=self.e_center,
             radius=self.radius,
-            stroke_color=WHITE,
+            stroke_color=mn.WHITE,
             *args,
             **kwargs
         )
 
-    def intersect_circle(self, other: EuclidCircle):
+    def intersect_circle(self, other: EuclidCircle) -> Vect3 | None:
         p2, r2 = other.e_center, other.radius
-        base = VirtualLine(self.e_center, p2, scene=self.scene)
+        base = L.VirtualLine(self.e_center, p2, scene=self.scene)
         d = base.get_length()
 
         d1 = 1 / (2 * d) * (d ** 2 + self.radius ** 2 - r2 ** 2)
@@ -62,18 +65,18 @@ class EuclidCircle(EMObject, Circle):
         p1x = px - py + sy
         p1y = py + px - sx
 
-        hline1 = VirtualLine((px, py), (p4x, p4y), scene=self.scene)
-        hline2 = VirtualLine((px, py), (p1x, p1y), scene=self.scene)
+        hline1 = L.VirtualLine((px, py), (p4x, p4y), scene=self.scene)
+        hline2 = L.VirtualLine((px, py), (p1x, p1y), scene=self.scene)
 
         h1 = hline1.point(h)
         h2 = hline2.point(h)
 
         if h1[1] < h2[1]:
-            return h2, h1
+            return h2, h1, 0
         else:
-            return h1, h2
+            return h1, h2, 0
 
-    def intersect_line(self, other: EuclidLine):
+    def intersect_line(self, other: L.EuclidLine) -> Vect3 | None:
         x, y, _ = self.e_center
         r = self.radius
 
@@ -130,20 +133,20 @@ class EuclidCircle(EMObject, Circle):
         min_y = min(y1, y0)
 
         if min_x - 1 <= x3 <= max_x + 1 and min_y - 1 <= y3 < max_y + 1:
-            results.append((x3, y3))
+            results.append((x3, y3, 0))
         if min_x - 1 <= x4 <= max_x + 1 and min_y - 1 <= y4 < max_y + 1:
-            results.append((x4, y4))
+            results.append((x4, y4, 0))
 
         return results
 
 
 
 
-    def intersect(self, other: EMObject):
+    def intersect(self, other: EMObject) -> Vect3 | None:
         match other:
             case EuclidCircle():
                 return self.intersect_circle(other)
-            case EuclidLine():
+            case L.EuclidLine():
                 return self.intersect_line(other)
 
 

@@ -1,3 +1,4 @@
+from euclidlib.Propositions import PropScene as ps
 from .EucidMObject import *
 from .Angel import *
 from .Circle import *

@@ -3,10 +3,6 @@ import os
 from pprint import pprint
 
 sys.path.append(os.getcwd())
-
-from manimlib import *
-from euclidlib.Propositions.PropScene import PropScene, to_manim_coord, to_manim_h_scale
-from typing import Dict
 from euclidlib.Objects import *
 
 
