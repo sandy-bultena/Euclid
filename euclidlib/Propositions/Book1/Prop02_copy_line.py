@@ -2,27 +2,31 @@ import sys
 import os
 
 sys.path.append(os.getcwd())
+from euclidlib.Propositions.BookScene import Book1Scene
 
 from euclidlib.Objects import *
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict
 
 
-class Book1Prop2(PropScene):
+class Book1Prop2(Book1Scene):
     steps = []
+    title = ("To place a straight line equal to a given straight line "
+             "with one end at a given point.")
+
     def define_steps(self):
         t1 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(550))
         t2 = TextBox(self, absolute_position=to_manim_coord(580, 430), line_width=to_manim_h_scale(500))
         t3 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(500))
         A = to_manim_coord(200, 500)
         B = to_manim_coord(300, 500)
-        C = to_manim_coord(450, 400)
+        C = to_manim_coord(440, 400)
         D = to_manim_coord(250, 400)
-        
-        l: Dict[str|int, EuclidLine] = {}
-        p: Dict[str|int, EuclidPoint] = {}
-        c: Dict[str|int, EuclidCircle] = {}
-        t: Dict[str|int, EuclidTriangle] = {}
+
+        l: Dict[str | int, EuclidLine] = {}
+        p: Dict[str | int, EuclidPoint] = {}
+        c: Dict[str | int, EuclidCircle] = {}
+        t: Dict[str | int, EuclidTriangle] = {}
 
         # ------------------------------------------------------------------------
         # Construction
@@ -45,11 +49,11 @@ class Book1Prop2(PropScene):
         @self.push_step
         def _3():
             t1.explain("Construct an equilateral triangle on line AC <sub>(I.1)</sub>")
-            t[1], p['D'] = EquilateralTriangle.build(self, A, C, 3)
-            with self.animation_speed(3):
-                with self.simultaneous():
-                    l['AD'] = t[1].l[2]
-                    l['CD'] = t[1].l[1]
+            t[1], p['D'] = EquilateralTriangle.build(self, A, C, 1)
+            self.remove(l['AC'])
+            l['AC'] = t[1].l[0]
+            l['CD'] = t[1].l[1]
+            l['AD'] = t[1].l[2]
             p['D'].add_label('D', UP)
 
         @self.push_step
@@ -122,6 +126,7 @@ class Book1Prop2(PropScene):
             with self.simultaneous():
                 p['E'].e_draw()
                 p['F'].e_draw()
+            with self.simultaneous():
                 l['DE'] = EuclidLine(p['D'], p['E'], label='y', label_dir=LEFT, scene=self)
                 l['DF'] = EuclidLine(p['D'], p['F'], label='y', label_dir=RIGHT, scene=self)
             t2.math("DE = DF = y")
@@ -201,10 +206,9 @@ class Book1Prop2(PropScene):
         # ------------------------------------------------------------------------
         @self.push_step
         def _17():
-            with self.simultaneous():
-                t1.delete()
-                t2.delete()
-            with self.simultaneous():
+            with self.simultaneous(run_time=1):
+                t1.e_remove()
+                t2.e_remove()
                 for group in (p, l, c, t):
                     for obj in group.values():
                         obj.e_remove()
@@ -293,15 +297,9 @@ class Book1Prop2(PropScene):
         @self.push_step
         def _29():
             with self.simultaneous():
-                t3.delete()
+                t3.e_remove()
             with self.simultaneous():
                 for group in (p, l, c, t):
                     for obj in group.values():
                         obj.e_remove()
                     group.clear()
-
-
-
-
-
-

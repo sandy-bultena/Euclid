@@ -2,13 +2,16 @@ import sys
 import os
 
 sys.path.append(os.getcwd())
-
+from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
 from typing import Dict
 
 
-class Book1Prop2(PropScene):
+class Book1Prop3(Book1Scene):
     steps = []
+    title = ("To cut off from the greater of two "
+             "given unequal straight lines a straight line equal to the less.")
+
     def define_steps(self):
         t1 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(550))
         t2 = TextBox(self, absolute_position=to_manim_coord(600, 430))
@@ -16,11 +19,11 @@ class Book1Prop2(PropScene):
         B = to_manim_coord(250, 450)
         C = to_manim_coord(350, 350)
         D = to_manim_coord(600, 350)
-        
-        l: Dict[str|int, EuclidLine] = {}
-        p: Dict[str|int, EuclidPoint] = {}
-        c: Dict[str|int, EuclidCircle] = {}
-        t: Dict[str|int, EuclidTriangle] = {}
+
+        l: Dict[str | int, EuclidLine] = {}
+        p: Dict[str | int, EuclidPoint] = {}
+        c: Dict[str | int, EuclidCircle] = {}
+        t: Dict[str | int, EuclidTriangle] = {}
 
         rAB = math.sqrt(
             (A[0] - B[0]) ** 2 +
@@ -144,11 +147,3 @@ class Book1Prop2(PropScene):
                 l['DF'].red.lift()
             t1.explain("Line DF is the difference between CD and AB")
             t2.math("DF = CD - AB")
-
-
-
-
-
-
-
-

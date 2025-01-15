@@ -21,8 +21,8 @@ class EuclidCircle(EMObject, mn.Circle):
         return self.get_edge_center(direction)
 
     def __init__(self, center, point, *args, **kwargs):
-        self.e_center = center.get_center() if isinstance(center, mn.Mobject) else center
-        self.e_point = point.get_center() if isinstance(point, mn.Mobject) else point
+        self.e_center = convert_to_coord(center)
+        self.e_point = convert_to_coord(point)
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]

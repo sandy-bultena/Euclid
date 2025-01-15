@@ -7,3 +7,4 @@ from .Point import *
 from .Polygon import *
 from .TextBox import *
 from .Triangle import *
+from .Text import *

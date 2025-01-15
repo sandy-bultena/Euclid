@@ -1,21 +1,14 @@
 import sys
 import os
-from pprint import pprint
-
 sys.path.append(os.getcwd())
+
+from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
 
 
-class Book1Prop1(PropScene):
+class Book1Prop1(Book1Scene):
+    title = "To construct an equilateral triangle on a given finite straight line."
     steps = []
-    pA: EuclidPoint
-    pB: EuclidPoint
-    pC: EuclidPoint
-    lAB: EuclidLine
-    lAC: EuclidLine
-    lBC: EuclidLine
-    cA: EuclidCircle
-    cB: EuclidCircle
 
     def define_steps(self):
         t1 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(500))

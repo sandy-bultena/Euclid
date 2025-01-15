@@ -13,12 +13,12 @@ class EuclidLine(EMObject, mn.Line):
     LabelBuff = mn.SMALL_BUFF
 
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3, *args, **kwargs):
-        self.e_start = start.get_center() if isinstance(start, EMObject) else start
-        self.e_end = end.get_center() if isinstance(end, EMObject) else end
+        self.e_start = convert_to_coord(start)
+        self.e_end = convert_to_coord(end)
         super().__init__(start, end, *args, **kwargs)
 
     def e_label_point(self, direction: mn.Vect3):
-        return mn.midpoint(self.e_start, self.e_end)
+        return mn.midpoint(self.get_start(), self.get_end())
 
     def point(self, r: float):
         p3x, p3y, *_ = self.get_end()
