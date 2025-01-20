@@ -208,7 +208,7 @@ class EMObject(mn.VMobject):
         e_fade: EMObjectPlayer
         e_normal: EMObjectPlayer
         lift: EMObjectPlayer
-        def move(self, vev: Vect3) -> EMObjectPlayer: ...
+        def e_move(self, vev: Vect3) -> EMObjectPlayer: ...
         def e_rotate(self, about: Vect3, angle: float) -> EMObjectPlayer: ...
 
     for name in EMObjectPlayer._properties():
@@ -254,8 +254,8 @@ def {name}(self, *args):
         if label:
             return T.Label(label, ref=self, direction=label_dir)
 
-    def e_draw(self):
-        if not self.Virtual:
+    def e_draw(self, skip_anim=False):
+        if not skip_anim and not self.Virtual:
             anims = [
                 anim
                 for x in (self, self.e_label)
@@ -305,6 +305,7 @@ def {name}(self, *args):
                  stroke_width: float = 2,
                  animate_part=None,
                  delay_anim=False,
+                 skip_anim=False,
                  scene: ps.PropScene = None,
                  **kwargs):
 
@@ -318,10 +319,10 @@ def {name}(self, *args):
         kwargs['stroke_width'] = stroke_width
 
         if self.Virtual:
-            kwargs['stroke_opacity'] = 0
+            kwargs['stroke_opacity'] = 0.2 if self.scene.debug else 0.0
             kwargs['stroke_color'] = mn.RED
 
         super().__init__(*args, **kwargs)
         self.e_label = self.init_label(label, label_dir)
         if not delay_anim:
-            self.e_draw()
+            self.e_draw(skip_anim)

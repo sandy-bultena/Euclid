@@ -5,7 +5,7 @@ from enum import Enum
 from manimlib import *
 from typing import Callable
 from euclidlib.Objects import *
-import roman
+from os import getenv
 
 
 class AnimState(Enum):
@@ -17,23 +17,38 @@ class AnimState(Enum):
 class PropScene(InteractiveScene):
     title: str = ''
     steps: List[Callable[[], None]] = []
+    animationCountObject: DecimalNumber
 
     def __init__(self, *args, **kwargs):
         self.animateState: List[AnimState] = [AnimState.NORMAL]
         self.animationsStored = []
         self.animationSpeedStack: List[float] = []
+        self.debug = bool(getenv('DEBUG'))
         super().__init__(*args, **kwargs)
+
+
+    def post_play(self):
+        super().post_play()
+        self.animationCountObject.increment_value().to_corner(DR)
+
 
     def update_runtime(self, anim: AnimationType, speed: float):
         if not isinstance(anim, Animation):
             anim = anim.build()
-        anim.run_time /= speed
+        anim.set_run_time(anim.get_run_time() / speed)
         return anim
+
+    def wait(self, *args, **kwargs):
+        super().wait(*args, **kwargs)
 
     def play(self, *anims: AnimationType, **kwargs):
         if self.animateState[-1] == AnimState.NORMAL:
             speed = reduce(op.mul, self.animationSpeedStack, 1.0)
-            super().play(*(self.update_runtime(anim, speed) for anim in anims), **kwargs)
+            if 'run_time' in kwargs:
+                kwargs['run_time'] /= speed
+            else:
+                anims = [self.update_runtime(anim, speed) for anim in anims]
+            super().play(*anims, **kwargs)
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
         elif self.animateState[-1] == AnimState.PAUSED:
@@ -54,7 +69,7 @@ class PropScene(InteractiveScene):
         self.animationsStored.pop()
 
     @contextmanager
-    def pause_animations_for(self):
+    def skip_animations_for(self):
         self.animateState.append(AnimState.PAUSED)
         yield
         self.animateState.pop()
@@ -100,6 +115,8 @@ class PropScene(InteractiveScene):
         self.reset()
         self.wait()
         for step in self.steps:
+            if self.debug:
+                print(f" Running func={step.__name__} | anim={self.num_plays}")
             step()
             self.wait()
 
@@ -108,6 +125,8 @@ class PropScene(InteractiveScene):
         pass
 
     def construct(self) -> None:
-
+        self.animationCountObject = DecimalNumber(num_decimal_places=0).to_corner(DR)
+        if self.debug:
+            self.add(self.animationCountObject)
         self.define_steps()
         self.runFull()

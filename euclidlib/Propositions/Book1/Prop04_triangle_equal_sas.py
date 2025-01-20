@@ -116,7 +116,7 @@ class Book1Prop4(Book1Scene):
             with self.simultaneous():
                 t['DEF'].remove_labels()
 
-            with self.simultaneous(lag_ratio=0.5):
+            with self.simultaneous():
                 t['ABC'].e_rotate(D, PI)(run_time=2)
 
             with self.simultaneous():

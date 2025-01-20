@@ -12,10 +12,10 @@ def build(scene: ps.PropScene, p1, p2, speed = 1.0):
 
         pts = c1.intersect(c2)
 
-        l2 = L.VirtualLine(p2, p1, scene=scene)
-        l1 = L.VirtualLine(p2, pts[0], scene=scene)
+        l1 = L.VirtualLine(p1, p2)
+        l2 = L.VirtualLine(p2, pts[0])
 
-        th = Angel.calculateAngle(l1, l2)
+        th = Angel.calculateAngle(l2, l1)
         if th < mn.PI:
             C = pts[0]
         else:
@@ -26,4 +26,6 @@ def build(scene: ps.PropScene, p1, p2, speed = 1.0):
         with scene.simultaneous():
             c1.e_remove()
             c2.e_remove()
+            l1.e_remove()
+            l2.e_remove()
         return t, p

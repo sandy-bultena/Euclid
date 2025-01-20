@@ -1,13 +1,14 @@
 from __future__ import annotations
 from collections import defaultdict
-from typing import Tuple, Mapping
+from typing import Tuple, Mapping, TYPE_CHECKING, Dict
 import manimlib as mn
 import numpy as np
 from .EucidMObject import EMObject
-from .EucidGroupMObject import EGroup
+from .EucidGroupMObject import EGroup, PsuedoGroup
 from . import Text as T
 from . import CustomAnimation as CA
 import sys
+
 
 from euclidlib.Propositions.PropScene import PropScene
 
@@ -23,15 +24,20 @@ class TextBuffer(EMObject, mn.Square):
 
 class TextBox(EGroup[T.EStringObj]):
     AUX_CONSTRUCTION_TIME = 0.1
-    ALIGNMENT = defaultdict(
-        lambda: (mn.Mobject.get_left, mn.LEFT),
-        w=(mn.Mobject.get_right, mn.RIGHT),
-        n=None
-    )
+    ALIGNMENT = {
+        None: (mn.Mobject.get_left, mn.LEFT),
+        'e': (mn.Mobject.get_left, mn.LEFT),
+        'w': (mn.Mobject.get_right, mn.RIGHT),
+        'n': None,
+    }
+
+    def get_group(self):
+        return [x for x in self if isinstance(x, T.EStringObj)]
+
+    fonts: Dict[str, Tuple[T.EStringObj, dict]]
 
     if sys.platform == 'darwin': # MAC CHECK
-        fonts = defaultdict(
-            lambda: (T.EMarkupText, dict(font_size=30)),
+        fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Arial Rounded MT Bold')),
             explain=(T.EMarkupText, dict(font_size=18, font='Arial')),
             normal=(T.EText, dict(font_size=16, font='Arial')),
@@ -40,14 +46,22 @@ class TextBox(EGroup[T.EStringObj]):
             title_screen=(T.EText, dict(font_size=48, font='Chalkduster')),
         )
     elif sys.platform == 'linux':
-        fonts = defaultdict(
-            lambda: (T.EMarkupText, dict(font_size=30)),
+        fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Armino', weight=mn.BOLD)),
             explain=(T.EMarkupText, dict(font_size=18, font='Armino')),
             normal=(T.EText, dict(font_size=16, font='Armino')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=36, font='Z003')),
             title_screen=(T.EText, dict(font_size=128, font='Karumbi'))
+        )
+    else:
+        fonts = dict(
+            title=(T.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
+            explain=(T.EMarkupText, dict(font_size=18)),
+            normal=(T.EText, dict(font_size=16)),
+            math=(T.ETex, dict(font_size=20)),
+            fancy=(T.EText, dict(font_size=36)),
+            title_screen=(T.EText, dict(font_size=128))
         )
 
 
@@ -93,8 +107,9 @@ class TextBox(EGroup[T.EStringObj]):
         return self._buff_size if self else 0
 
 
-    def generate_text(self, text: str, style: str = ''):
+    def generate_text(self, text: str, style: str = '', **other_options):
         cls, kwargs = self.fonts[style]
+        kwargs = kwargs | other_options
         if issubclass(cls, mn.MarkupText) and self.line_width is not None:
             kwargs['line_width'] = self.line_width
         with self.scene.simultaneous():
@@ -109,26 +124,22 @@ class TextBox(EGroup[T.EStringObj]):
         return newline
 
     def e_remove(self):
-        super(EGroup, self).e_remove()
+        super(PsuedoGroup, self).e_remove()
         self.clear()
 
-    def title(self, title: str):
-        self.generate_text(title, 'title')
+    if TYPE_CHECKING:
+        def title(self, text: str, **kwargs) -> None: ...
+        def explain(self, text: str, **kwargs) -> None: ...
+        def normal(self, text: str, **kwargs) -> None: ...
+        def math(self, text: str, **kwargs) -> None: ...
+        def fancy(self, text: str, **kwargs) -> None: ...
+        def title_screen(self, text: str, **kwargs) -> None: ...
 
-    def title_screen(self, title: str):
-        self.generate_text(title, 'title_screen')
-
-    def normal(self, title: str):
-        self.generate_text(title, 'normal')
-
-    def explain(self, title: str):
-        self.generate_text(title, 'explain')
-
-    def fancy(self, title: str):
-        self.generate_text(title, 'fancy')
-
-    def math(self, title: str):
-        self.generate_text(title, 'math')
+    for style in fonts:
+        exec(f"""
+def {style}(self, text: str, **kwargs):
+    self.generate_text(text, '{style}', **kwargs)
+""")
 
     def down(self, buff=mn.SMALL_BUFF):
         sq = TextBuffer(buff, self.scene)

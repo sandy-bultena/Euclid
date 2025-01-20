@@ -33,7 +33,7 @@ class BookScene(PropScene):
 
     def reset(self):
         with self.simultaneous(run_time=1):
-            gg = EGroup((sub for sub in self.mobjects if isinstance(sub, VMobject)), scene=self)
+            gg = EGroup((sub for sub in self.mobjects if isinstance(sub, EMObject)), scene=self)
             gg.e_remove()
 
         line_options = dict(

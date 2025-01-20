@@ -7,9 +7,11 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
 class EGroupPlayer:
-    def __init__(self, group: EGroup[EMObject]):
-        self.group = group
-        self.players = [EMObjectPlayer(sub) for sub in group]
+    def __init__(self, group: PsuedoGroup[EMObject]):
+        self.obj = group
+        self.group = group.get_group()
+        self.manager = group.get_manager()
+        self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, EMObject)]
 
     for name in EMObjectPlayer._properties():
         exec(f'''
@@ -36,13 +38,10 @@ def {name}(self, *args):
 
         for player in to_exec:
             player(**kwargs)
-        return self.group
+        return self.obj
 
 
-class EGroup[T](EMObject, mn.VGroup[T]):
-    def CreationOf(self, *args, **kwargs):
-        return []
-
+class PsuedoGroup(EMObject):
     if TYPE_CHECKING:
         blue: EGroupPlayer
         green: EGroupPlayer
@@ -55,29 +54,57 @@ class EGroup[T](EMObject, mn.VGroup[T]):
         def e_move(self, vev: Vect3) -> EGroupPlayer: ...
         def e_rotate(self, about: Vect3, angle: float) -> EGroupPlayer: ...
 
+    def get_group(self):
+        raise NotImplemented()
+
+    def get_manager(self):
+        return self,
+
+    def except_index(self, *indices):
+        exceptions = set(indices)
+        full = set(range(len(self.get_group())))
+        return full - exceptions
+
+    def e_remove(self):
+        for obj in self.get_group():
+            if obj.in_scene():
+                obj.e_remove()
+        super().e_remove()
+        return self
+
+    def remove_labels(self):
+        for x in self.get_group():
+            x.remove_label()
+        return self
+
+    def e_draw(self, skip_anim=False):
+        for obj in self.get_group():
+            if not obj.in_scene():
+                obj.e_draw(skip_anim)
+        super().e_draw(skip_anim)
+        return self
+
     for name in EMObjectPlayer._properties():
         exec(f'''
 @property
 def {name}(self, *args):
-    return EGroupPlayer(self).{name}
-'''.strip())
+    return EGroupPlayer(self).{name}'''.strip())
 
     for name in EMObjectPlayer._methods():
         exec(f'''
 def {name}(self, *args):
-    return EGroupPlayer(self).{name}(*args)
-'''.strip())
+    return EGroupPlayer(self).{name}(*args)'''.strip())
 
-    def e_draw(self):
-        for obj in self:
-            if not obj.in_scene():
-                obj.e_draw()
 
-    def e_remove(self):
-        for obj in self:
-            if obj.in_scene():
-                obj.e_remove()
+class EGroup[T](PsuedoGroup, EMObject, mn.VGroup[T]):
+    def CreationOf(self, *args, **kwargs):
+        return []
+    def RemovalOf(self, *args, **kwargs):
+        return []
 
-    def remove_labels(self):
-        for x in self:
-            x.remove_label()
+    def get_group(self):
+        return self
+
+    def get_manager(self):
+        return ()
+

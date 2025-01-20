@@ -13,9 +13,9 @@ class EuclidLine(EMObject, mn.Line):
     LabelBuff = mn.SMALL_BUFF
 
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3, *args, **kwargs):
-        self.e_start = convert_to_coord(start)
-        self.e_end = convert_to_coord(end)
-        super().__init__(start, end, *args, **kwargs)
+        self.e_start = self.pointify(start)
+        self.e_end = self.pointify(end)
+        super().__init__(self.e_start, self.e_end, *args, **kwargs)
 
     def e_label_point(self, direction: mn.Vect3):
         return mn.midpoint(self.get_start(), self.get_end())
@@ -32,19 +32,60 @@ class EuclidLine(EMObject, mn.Line):
         y = r / math.sqrt(dy**2 + dx**2) * dy + ys
         return x, y
 
+
+    def intersect(self, l2: EuclidLine):
+        (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
+        (x10, y10, _), (x11, y11, _) = l2.get_start_and_end()
+        m1 = self.get_slope()
+        m2 = l2.get_slope()
+
+        if abs(m1 - m2) < 0.1:
+            return
+
+        if abs(m1) > 1e10:
+            x = x00
+            y = m2 * (x - x10) + y10
+        elif abs(m2) > 1e10:
+            x = x10
+            y = m1 * (x - x00) + y00
+        else:
+            x = (y11 - y00 + m1 * x00 - m2 * x11) / (m1 - m2)
+            y = m1 * (x - x00) + y00
+
+        return x, y, 0
+
+
+    def length_from_end(self, p: P.EuclidPoint):
+        p.distance_to(self.get_end())
+
+    def length_from_start(self, p: P.EuclidPoint):
+        p.distance_to(self.get_start())
+
     def extend(self, r: float):
+        if r < 0:
+            return self.prepend(-r)
         x2, y2 = self.point(r + self.get_length())
         self.e_end = (x2, y2, 0)
-        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.e_end))
+        self.scene.play(self.animate.set_points_by_ends(self.get_start(), self.e_end))
 
     def prepend(self, r: float):
         x2, y2 = self.point(-r)
         self.e_start = (x2, y2, 0)
-        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.e_end))
+        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.get_end()))
+
+    def extend_cpy(self, r: float):
+        if r < 0:
+            return self.prepend_cpy(-r)
+        x2, y2 = self.point(r + self.get_length())
+        return EuclidLine(self.get_end(), (x2, y2, 0))
+
+    def prepend_cpy(self, r: float):
+        x2, y2 = self.point(-r)
+        return EuclidLine(self.get_start(), (x2, y2, 0))
 
     def copy_to_point(self, target: P.EuclidPoint, speed=1) -> Tuple[EuclidLine, P.EuclidPoint]:
-        A = self.e_start
-        B = self.e_end
+        A = self.get_start()
+        B = self.get_end()
         C = target.get_center()
 
         l: Dict[str | int, EuclidLine] = {}
@@ -95,13 +136,13 @@ class EuclidLine(EMObject, mn.Line):
             p['E'] = P.EuclidPoint(pts[0], scene=self.scene)
             p['B'] = P.EuclidPoint(B, scene=self.scene)
 
-            if p['D'].distance_to(pts[0]) > 1:
+            if p['D'].distance_to(pts[0]) > to_manim_v_scale(1):
                 F = find_extended_intersection(p['D'], p['E'], 'D', 'CD')
             else:
-                F = p['E'].get_center()
+                F = [p['E'].get_center()]
 
-            pF = P.EuclidPoint(F[0], scene=self.scene)
-            lCF = EuclidLine(C, F[0], scene=self.scene)
+            pF = P.EuclidPoint(F[0])
+            lCF = EuclidLine(C, F[0])
 
             with self.scene.simultaneous():
                 for group in (p, l, c, t):
@@ -109,6 +150,54 @@ class EuclidLine(EMObject, mn.Line):
                         obj.e_remove()
 
             return lCF, pF
+
+    def copy_to_line(self, target: P.EuclidPoint, target_line: EuclidLine, speed=1):
+        lx, px = self.copy_to_point(target, speed=speed)
+        if lx is None or px is None:
+            return
+
+        with self.scene.animation_speed(speed):
+            c = Circle.EuclidCircle(target, lx.get_end())
+
+            clone = target_line.copy()
+            for _ in range(1000):
+                p = c.intersect(clone)
+                if p is not None:
+                    break
+                if target_line.length_from_end(target) > target_line.length_from_start(target):
+                    clone.extend(to_manim_v_scale(10))
+                else:
+                    clone.prepend(to_manim_v_scale(10))
+            else:
+                print("Circle didn't intercept!!!\n")
+                with self.scene.simultaneous():
+                    px.e_remove()
+                    lx.blue()
+                    c.e_remove()
+                    clone.e_remove()
+                return lx, px
+
+
+            np = P.EuclidPoint(p[0])
+            nl = EuclidLine(target, np)
+
+            if abs(self.get_length() - nl.get_length()) > to_manim_v_scale(0.1):
+                np.e_remove()
+                nl.extend(self.get_length() - nl.get_length())
+                np = P.EuclidPoint(nl.get_end())
+
+
+            with self.scene.simultaneous():
+                px.e_remove()
+                lx.e_remove()
+                c.e_remove()
+                if clone.in_scene():
+                    clone.e_remove()
+
+            return nl, np
+
+
+
 
 
 

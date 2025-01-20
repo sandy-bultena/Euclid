@@ -52,7 +52,7 @@ class ETex(EStringObj, mn.Tex):
 class Label(ETex):
     def CreationOf(self, *args, **kwargs):
         kwargs['run_time'] = self.ref.CONSTRUCTION_TIME
-        return super().CreationOf(*args, **kwargs, stroke_color=mn.GREY)
+        return super().CreationOf(*args, **kwargs, stroke_color=mn.GREY, rate_func=mn.squish_rate_func(mn.smooth, 0.1, 1))
 
     def RemovalOf(self, *args, **kwargs):
         kwargs['run_time'] = self.ref.AUX_CONSTRUCTION_TIME

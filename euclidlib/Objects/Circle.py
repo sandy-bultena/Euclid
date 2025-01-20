@@ -51,6 +51,7 @@ class EuclidCircle(EMObject, mn.Circle):
             hsqr = 0
 
         if hsqr < 0:
+            base.e_remove()
             return None
 
         h = math.sqrt(hsqr)
@@ -70,6 +71,10 @@ class EuclidCircle(EMObject, mn.Circle):
 
         h1 = hline1.point(h)
         h2 = hline2.point(h)
+
+        hline1.e_remove()
+        hline2.e_remove()
+        base.e_remove()
 
         if h1[1] < h2[1]:
             return h2, h1, 0
@@ -131,10 +136,12 @@ class EuclidCircle(EMObject, mn.Circle):
         min_x = min(x1, x0)
         max_y = max(y1, y0)
         min_y = min(y1, y0)
+        
+        epsilon = to_manim_v_scale(1)
 
-        if min_x - 1 <= x3 <= max_x + 1 and min_y - 1 <= y3 < max_y + 1:
+        if min_x - epsilon <= x3 <= max_x + epsilon and min_y - epsilon <= y3 < max_y + epsilon:
             results.append((x3, y3, 0))
-        if min_x - 1 <= x4 <= max_x + 1 and min_y - 1 <= y4 < max_y + 1:
+        if min_x - epsilon <= x4 <= max_x + epsilon and min_y - epsilon <= y4 < max_y + epsilon:
             results.append((x4, y4, 0))
 
         return results
