@@ -40,6 +40,7 @@ class TextBox(EGroup[T.EStringObj]):
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Arial Rounded MT Bold')),
             explain=(T.EMarkupText, dict(font_size=18, font='Arial')),
+            explainM=(T.ETexText, dict(font_size=18, font='Arial')),
             normal=(T.EText, dict(font_size=16, font='Arial')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=24, font='Apple Chancery')),
@@ -47,9 +48,10 @@ class TextBox(EGroup[T.EStringObj]):
         )
     elif sys.platform == 'linux':
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, font='Armino', weight=mn.BOLD)),
-            explain=(T.EMarkupText, dict(font_size=18, font='Armino')),
-            normal=(T.EText, dict(font_size=16, font='Armino')),
+            title=(T.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
+            explain=(T.EMarkupText, dict(font_size=18, font='Arimo')),
+            explainM=(T.ETexText, dict(font_size=18, font='Arimo')),
+            normal=(T.EText, dict(font_size=16, font='Arimo')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=36, font='Z003')),
             title_screen=(T.EText, dict(font_size=128, font='Karumbi'))
@@ -58,6 +60,7 @@ class TextBox(EGroup[T.EStringObj]):
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
             explain=(T.EMarkupText, dict(font_size=18)),
+            explainM=(T.ETexText, dict(font_size=18)),
             normal=(T.EText, dict(font_size=16)),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=36)),
@@ -72,7 +75,7 @@ class TextBox(EGroup[T.EStringObj]):
         return [CA.UnWrite(x, *args, **kwargs, stroke_color=mn.RED, stroke_width=1) for x in self]
 
     def __init__(self,
-                 scene: PropScene,
+                 scene: PropScene | None = None,
                  *args,
                  absolute_position: Tuple[float, float, float] | None = None,
                  relative_position: Tuple[mn.Mobject, mn.Vect3] | None = None,
@@ -83,6 +86,7 @@ class TextBox(EGroup[T.EStringObj]):
                  **kwargs):
         if not absolute_position and not relative_position:
             raise Exception("Must define starting position")
+        self.next_buff = 0
         self.line_width = line_width
         self._buff_size = buff_size
         self.abs_position = absolute_position
@@ -107,14 +111,26 @@ class TextBox(EGroup[T.EStringObj]):
         return self._buff_size if self else 0
 
 
+    def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, **other_options):
+        cls, kwargs = self.fonts[style]
+        kwargs = kwargs | other_options
+        kwargs['style'] = style
+        if issubclass(cls, mn.MarkupText) and self.line_width is not None:
+            kwargs['line_width'] = self.line_width
+        newline = cls(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
+        return newline
+
+
     def generate_text(self, text: str, style: str = '', **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
+        kwargs['style'] = style
         if issubclass(cls, mn.MarkupText) and self.line_width is not None:
             kwargs['line_width'] = self.line_width
         with self.scene.simultaneous():
             newline = cls(text, **kwargs, scene=self.scene)
-            newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size)
+            newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
+            self.next_buff = 0
             if self.alignment:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
@@ -128,25 +144,42 @@ class TextBox(EGroup[T.EStringObj]):
         self.clear()
 
     if TYPE_CHECKING:
-        def title(self, text: str, **kwargs) -> None: ...
-        def explain(self, text: str, **kwargs) -> None: ...
-        def normal(self, text: str, **kwargs) -> None: ...
-        def math(self, text: str, **kwargs) -> None: ...
-        def fancy(self, text: str, **kwargs) -> None: ...
-        def title_screen(self, text: str, **kwargs) -> None: ...
+        def title(self, text: str, **kwargs) -> T.EStringObj: ...
+        def explain(self, text: str, **kwargs) -> T.EStringObj: ...
+        def explainM(self, text: str, **kwargs) -> T.EStringObj: ...
+        def normal(self, text: str, **kwargs) -> T.EStringObj: ...
+        def math(self, text: str, **kwargs) -> T.EStringObj: ...
+        def fancy(self, text: str, **kwargs) -> T.EStringObj: ...
+        def title_screen(self, text: str, **kwargs) -> T.EStringObj: ...
 
     for style in fonts:
         exec(f"""
 def {style}(self, text: str, **kwargs):
-    self.generate_text(text, '{style}', **kwargs)
+    return self.generate_text(text, '{style}', **kwargs)
 """)
 
-    def down(self, buff=mn.SMALL_BUFF):
-        sq = TextBuffer(buff, self.scene)
-        sq.next_to(self.get_bottom(), mn.DOWN, buff=0)
-        self.add(sq)
+    def e_update(self, index, text: str, transformArgs=None, **kwargs):
+        old = self[index]
+        transformArgs = transformArgs or {}
+        assert isinstance(old, T.EStringObj)
+        new = self._generate_text_no_anim(text, old.style, **kwargs)
+        new.next_to(old.get_corner(mn.UL), mn.DR, buff=0)
+        self.scene.play(mn.TransformMatchingTex(old, new, **transformArgs))
+        self.replace_submobject(index, new)
+
+    def e_append(self, index, text: str, **kwargs):
+        old = self[index]
+        assert isinstance(old, T.EStringObj)
+        new = self._generate_text_no_anim(text, old.style, **kwargs)
+        new.next_to(old.get_right(), mn.RIGHT, buff=mn.SMALL_BUFF)
+        new.e_draw()
+        old.add(*new.submobjects)
+
+
+
+    def down(self, buff=mn.MED_SMALL_BUFF):
+        self.next_buff = buff
         if self.rel_position:
             self.rel_position[0].refresh_bounding_box()
-        self.scene.add(sq)
 
 

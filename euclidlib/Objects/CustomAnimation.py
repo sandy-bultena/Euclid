@@ -33,5 +33,7 @@ class UnWrite(mn.Write):
     ) -> float:
         return super().get_sub_alpha(alpha, num_submobjects-index-1, num_submobjects)
 
-    # def get_all_mobjects(self) -> list[mn.Mobject]:
-    #     return [*reversed(super(mn.DrawBorderThenFill, self).get_all_mobjects()), self.get_outline()]
+
+class WriteUnWrite(mn.AnimationGroup):
+    def __init__(self, source, target, **kwargs):
+        super().__init__(UnWrite(source), mn.Write(target), **kwargs)

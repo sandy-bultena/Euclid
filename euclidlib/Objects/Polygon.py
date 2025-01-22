@@ -12,7 +12,7 @@ from . import Angel as A
 
 class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def __init__(
-            self, *points: mn.Vect3,
+            self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
             point_labels: List[Tuple[str, Vect3]] | None = None,
             labels: List[Tuple[str, Vect3]] | None = None,
@@ -22,6 +22,19 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             z_index=-1,
             **kwargs
     ):
+        if isinstance(points[0], str):
+            from inspect import currentframe
+            point_names = list(points[0])
+            f = currentframe()
+            while (f := f.f_back) is not None:
+                if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
+                    break
+            if f is None:
+                raise Exception("Can't Find Scene")
+            points = [f.f_locals.get(p, f.f_locals.get('p', {}).get(p)) for p in point_names]
+
+        assert all(p is not None for p in points)
+
         self.options = {
             k: locals()[k]
             for k in ('point_labels', 'labels', 'angles', 'fill')
@@ -39,7 +52,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.define_sub_objs()
 
     def get_group(self):
-        return self._sub_group
+        return mn.VGroup(*self._sub_group)
 
     def define_sub_objs(self):
         with self.scene.simultaneous_speed(self.speed):
@@ -112,6 +125,32 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     @property
     def a(self):
         return self.angles
+
+    def replace_line(self, index, newline: L.EuclidLine):
+        self.lines[index].e_delete()
+        self.lines[index] = newline
+        self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
+
+    def move_point_to(self, index: int, dest: P.EuclidPoint):
+        self.vertices[index] = dest.get_center()
+        self.vertices[-1] = self.vertices[0]
+
+        with self.scene.simultaneous():
+            self.scene.play(self.p[index].animate.move_to(dest))
+            self.scene.play(self.l[index].animate.put_start_and_end_on(dest.get_center(), self.l[index].get_end()))
+            self.scene.play(self.l[(index-1)%self.sides].animate.put_start_and_end_on(self.l[(index-1)%self.sides].get_start(), dest.get_center()))
+
+            for i in range(self.sides):
+                if self.angles[i] is not None:
+                    old_angle = self.angles[i]
+                    l1 = L.VirtualLine(self.vertices[i-1], self.vertices[i])
+                    l2 = L.VirtualLine(self.vertices[i], self.vertices[i+1])
+                    new_angle = A.EuclidAngle(l1, l2, size=old_angle.size)
+                    self.scene.play(mn.Transform(old_angle, new_angle))
+            self.vertices[index] = dest.get_center()
+            self.vertices[-1] = self.vertices[0]
+            self.scene.play(self.animate.set_points_as_corners(self.vertices))
+        pass
 
     def CreationOf(self, *args, **kwargs):
         return [mn.FadeIn(self)]

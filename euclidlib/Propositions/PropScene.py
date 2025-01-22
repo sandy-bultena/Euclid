@@ -64,9 +64,9 @@ class PropScene(InteractiveScene):
         self.animationsStored.append([])
         yield
         self.animateState.pop()
-        if self.animationsStored[-1]:
-            self.play(*self.animationsStored[-1], **kwargs)
-        self.animationsStored.pop()
+        stored_anims = self.animationsStored.pop()
+        if stored_anims:
+            self.play(*stored_anims, **kwargs)
 
     @contextmanager
     def skip_animations_for(self):
@@ -110,10 +110,11 @@ class PropScene(InteractiveScene):
         raise NotImplemented()
 
     def runFull(self):
-        self.title_page()
-        self.wait(3)
-        self.reset()
-        self.wait()
+        if not self.debug:
+            self.title_page()
+            self.wait(3)
+            self.reset()
+            self.wait()
         for step in self.steps:
             if self.debug:
                 print(f" Running func={step.__name__} | anim={self.num_plays}")

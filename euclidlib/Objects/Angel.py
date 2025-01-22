@@ -4,7 +4,7 @@ from .Line import EuclidLine
 from manimlib import TAU
 from . import Text as T
 import math
-from typing import Tuple, Any
+from typing import Tuple, Any, Self, Callable
 
 EPSILON = to_manim_v_scale(1)
 ANGLE_DATA = tuple[
@@ -102,6 +102,32 @@ class ArcAngle(EMObject, mn.Arc):
             **kwargs
         )
 
+
+    def get_arc_center(self) -> Vect3:
+        return np.array([self.vx, self.vy, 0])
+
+
+    def pointwise_become_partial(self, start: mn.VMobject, a: float, b: float) -> Self:
+        if isinstance(start, ArcAngle):
+            self.vx, self.vy, _ = mn.interpolate(start.get_arc_center(), self.get_arc_center(), b)
+            self.e_start_angle = mn.interpolate(start.e_start_angle, self.e_start_angle, b)
+        else:
+            print(start)
+        return super().pointwise_become_partial(start, a, b)
+
+
+    def interpolate(
+        self,
+        mobject1: ArcAngle,
+        mobject2: ArcAngle,
+        alpha: float,
+        path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    ) -> Self:
+        self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
+        self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
+        return super().interpolate(mobject1, mobject2, alpha, path_func)
+
+
     def shift(self, vector: Vect3) -> Self:
         self.vx += vector[0]
         self.vy += vector[1]
@@ -111,10 +137,9 @@ class ArcAngle(EMObject, mn.Arc):
         self.e_start_angle += angle
         return super().rotate(angle, *args, **kwargs)
 
-
     def proportion_angle(self, alpha: float):
         try:
-            angle = mn.angle_of_vector(self.point_from_proportion(alpha) - np.array([self.vx, self.vy, 0]))
+            angle = mn.angle_of_vector(self.point_from_proportion(alpha) - self.get_arc_center())
             return angle % TAU
         except AssertionError as e:
             return self.e_start_angle
@@ -134,7 +159,7 @@ class ArcAngle(EMObject, mn.Arc):
 
 
     def e_label_point(self, direction):
-        x, y = self.vx, self.vy
+        x, y, _ = self.get_arc_center()
         bisect_dir = self.get_bisect_dir()
         return (
             bisect_dir[0] * self.size + x,
@@ -198,10 +223,7 @@ class EuclidAngle(EMObject):
             f = currentframe()
             while f.f_back:
                 f = f.f_back
-                if 'self' not in f.f_locals:
-                    continue
-                f_self = f.f_locals['self']
-                if isinstance(f_self, ps.PropScene) and 'l' in f.f_locals:
+                if 'l' in f.f_locals:
                     break
             if f.f_back is None:
                 raise Exception("Can't Find Scene")

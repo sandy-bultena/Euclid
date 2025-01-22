@@ -86,7 +86,7 @@ class EuclidLine(EMObject, mn.Line):
     def copy_to_point(self, target: P.EuclidPoint, speed=1) -> Tuple[EuclidLine, P.EuclidPoint]:
         A = self.get_start()
         B = self.get_end()
-        C = target.get_center()
+        C = self.pointify(target)
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, P.EuclidPoint] = {}

@@ -6,20 +6,51 @@ from . import EucidMObject as E
 from . import CustomAnimation as CA
 import re
 import manimlib as mn
+from functools import reduce
 
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
 
+MARKUP_REPLACE = (
+    (re.compile(r'\{nb:(.*?)}'), r'<span allow_breaks="false">\g<1></span>'),
+    (re.compile(r'(\S+)\{nb}(\S+)'), r'<span allow_breaks="false">\g<1> \g<2></span>')
+)
+
+MATH_PREAMBLE = (
+    r'\newcommand{\ecrossmark}{\textrm{\ding{55}}}',
+    r'\newcommand{\echeckmark}{\textrm{\ding{51}}}'
+)
+
+TEX_REPLACE = (
+    (re.compile(r'\{txt:(.*?)}'), r'\\text{\1}'),
+)
+
 
 class EStringObj(E.EMObject, mn.StringMobject, ABC):
-    def __init__(self, *args, animate_part=None, **kwargs):
+    style = str | None
+    REPLACEMENT_RULES = ()
+
+    def __init__(self, txt, *args, style=None | str, animate_part=None, **kwargs):
+        self.style = style
         super().__init__(
+            self.apply_rules(txt),
             *args,
             stroke_width=0,
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
+
+    def apply_rules(self, txt):
+        return reduce(lambda part, rule: rule[0].sub(rule[1], part), self.REPLACEMENT_RULES, txt)
+
+    def set_parts_color(self, selector: mn.Selector, color: mn.ManimColor):
+        if isinstance(selector, str):
+            selector = self.apply_rules(selector)
+        elif hasattr(selector, '__iter__'):
+            selector = [self.apply_rules(sel) if isinstance(selector, str) else sel for sel in selector]
+        self.select_parts(selector).set_color(color)
+        return self
 
     @property
     def CONSTRUCTION_TIME(self):
@@ -36,23 +67,49 @@ class EText(EStringObj, mn.Text):
     pass
 
 
+class ETexText(EStringObj, mn.TexText):
+    REPLACEMENT_RULES = TEX_REPLACE
+    tex_environment: str = ""
+
+    def __init__(self, text, *args, alignment='', font='', **kwargs):
+        super().__init__(
+            text,
+            *args,
+            additional_preamble=rf'''
+            \usepackage[no-math]{{fontspec}}
+            \setmainfont[Mapping=tex-text]{{{font}}}
+            ''' + '\n'.join(MATH_PREAMBLE),
+            template='empty_ctex',
+            alignment=alignment,
+            **kwargs)
+
+
 class EMarkupText(EStringObj, mn.MarkupText):
+    REPLACEMENT_RULES = MARKUP_REPLACE
     MARKUP_TAGS = {**mn.MarkupText.MARKUP_TAGS, 'nb': {"allow_breaks": 'false'}}
 
-    def markup_to_svg(self, markup_str: str, file_name: str) -> str:
-        temp = re.sub(r'\{nb:(.*?)}', r'<span allow_breaks="false">\g<1></span>', markup_str)
-        temp = re.sub(r'(\S+)\{nb}(\S+)', r'<span allow_breaks="false">\g<1> \g<2></span>', temp)
-        return super().markup_to_svg(temp, file_name)
 
+# CHECKMARKS AND CROSSES
+# https://tex.stackexchange.com/questions/641080/different-checkmarks-and-crossmarks-xmarks-matched-very-well-with-each-other
 
 class ETex(EStringObj, mn.Tex):
+    REPLACEMENT_RULES = TEX_REPLACE
+
+    def __init__(self, text, *args, **kwargs):
+        super().__init__(
+            text,
+            *args,
+            additional_preamble='\n'.join(MATH_PREAMBLE),
+            **kwargs)
+
     pass
 
 
 class Label(ETex):
     def CreationOf(self, *args, **kwargs):
         kwargs['run_time'] = self.ref.CONSTRUCTION_TIME
-        return super().CreationOf(*args, **kwargs, stroke_color=mn.GREY, rate_func=mn.squish_rate_func(mn.smooth, 0.1, 1))
+        return super().CreationOf(*args, **kwargs, stroke_color=mn.GREY,
+                                  rate_func=mn.squish_rate_func(mn.smooth, 0.1, 1))
 
     def RemovalOf(self, *args, **kwargs):
         kwargs['run_time'] = self.ref.AUX_CONSTRUCTION_TIME

@@ -7,18 +7,21 @@ import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 from .CustomAnimation import UncreatePreserve
 from typing import Sized, Self
+
 # from . import Text as T
 
 DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
+
 def to_manim_coord(x: int, y: int, z: int = 0):
     return (
-        (x-700) * (8.0 / 800),# (x - 700) * (8.0 * 16 / 1400 / 9),
+        (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (400 - y) * (8.0 / 800),
         z * (8.0 / 800)
     )
+
 
 def to_manim_scale(x: int, y: int, z: int = 0):
     return (
@@ -27,8 +30,10 @@ def to_manim_scale(x: int, y: int, z: int = 0):
         z * (8.0 / 800)
     )
 
+
 def to_manim_h_scale(x):
     return x * (8.0 * 16 / 1400 / 9)
+
 
 def to_manim_v_scale(x):
     return x * (8.0 / 800)
@@ -38,17 +43,16 @@ def un_create_version(anim: mn.Animation):
     anim.remover = True
     anim.should_match_start = True
     curr_rate = anim.rate_func
-    anim.rate_func = lambda t: curr_rate(1-t)
+    anim.rate_func = lambda t: curr_rate(1 - t)
     return anim
-
 
 
 class NullAnimationBuilder:
     def __getattr__(self, item):
         return self
+
     def __call__(self, *args, **kwargs):
         return self
-
 
 
 class EMObjectPlayer:
@@ -135,9 +139,31 @@ class EMObjectPlayer:
         self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED))
         return self
 
+    def e_move_to(self,
+                  point_or_mobject: mn.Mobject | Vect3,
+                  aligned_edge: Vect3 = ORIGIN,
+                  coor_mask: Vect3 = np.array([1, 1, 1])):
+        self.main_animate = True
+        self.anim.move_to(point_or_mobject, aligned_edge, coor_mask)
+        return self
+
     def e_move(self, vector: Vect3):
         self.main_animate = True
         self.anim.shift(vector)
+        return self
+
+    def e_to_edge(self,
+                  edge: Vect3 = LEFT,
+                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        self.main_animate = True
+        self.anim.to_edge(edge, buff)
+        return self
+
+    def e_to_corner(self,
+                    corner: Vect3 = DL,
+                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        self.main_animate = True
+        self.anim.to_to_corner(corner, buff)
         return self
 
     def e_rotate(self, about: Vect3, angle: float):
@@ -187,7 +213,7 @@ class EMObject(mn.VMobject):
 
     @property
     def AUX_CONSTRUCTION_TIME(self):
-        return self.CONSTRUCTION_TIME/2
+        return self.CONSTRUCTION_TIME / 2
 
     Virtual = False
 
@@ -208,7 +234,9 @@ class EMObject(mn.VMobject):
         e_fade: EMObjectPlayer
         e_normal: EMObjectPlayer
         lift: EMObjectPlayer
+
         def e_move(self, vev: Vect3) -> EMObjectPlayer: ...
+
         def e_rotate(self, about: Vect3, angle: float) -> EMObjectPlayer: ...
 
     for name in EMObjectPlayer._properties():
@@ -284,6 +312,11 @@ def {name}(self, *args):
                 self.scene.play(*anims, run_time=self.CONSTRUCTION_TIME)
         else:
             self.scene.remove(self)
+
+    def e_delete(self):
+        self.scene.remove(self)
+        if self.e_label:
+            self.scene.remove(self.e_label)
 
     def __find_scene(self):
         from inspect import currentframe
