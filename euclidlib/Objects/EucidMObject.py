@@ -15,7 +15,7 @@ DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
-def to_manim_coord(x: int, y: int, z: int = 0):
+def mn_coord(x: int, y: int, z: int = 0):
     return (
         (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (400 - y) * (8.0 / 800),
@@ -23,20 +23,14 @@ def to_manim_coord(x: int, y: int, z: int = 0):
     )
 
 
-def to_manim_scale(x: int, y: int, z: int = 0):
-    return (
-        x * (8.0 / 800),
-        y * (8.0 / 800),
-        z * (8.0 / 800)
-    )
+def mn_scale(f, *rest):
+    if rest:
+        return tuple(i * (8.0/800) for i in (f, *rest))
+    return f * (8.0/800)
 
 
 def to_manim_h_scale(x):
     return x * (8.0 * 16 / 1400 / 9)
-
-
-def to_manim_v_scale(x):
-    return x * (8.0 / 800)
 
 
 def un_create_version(anim: mn.Animation):
@@ -302,12 +296,8 @@ def {name}(self, *args):
 
     def e_remove(self):
         if not self.Virtual:
-            anims = [
-                anim
-                for x in (self, self.e_label)
-                if x is not None
-                for anim in x.RemovalOf()
-            ]
+            anims = self.RemovalOf()
+            self.remove_label()
             if anims:
                 self.scene.play(*anims, run_time=self.CONSTRUCTION_TIME)
         else:

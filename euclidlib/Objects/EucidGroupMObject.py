@@ -79,7 +79,7 @@ class PsuedoGroup(EMObject):
 
     def e_draw(self, skip_anim=False):
         for obj in self.get_group():
-            if not obj.in_scene():
+            if not obj.visible():
                 obj.e_draw(skip_anim)
         super().e_draw(skip_anim)
         return self

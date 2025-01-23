@@ -12,7 +12,21 @@ class EuclidLine(EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = mn.SMALL_BUFF
 
-    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3, *args, **kwargs):
+    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+        if isinstance(start, str):
+            from inspect import currentframe
+            point_names = list(start)
+            f = currentframe()
+            while (f := f.f_back) is not None:
+                if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
+                    break
+            if f is None:
+                raise Exception("Can't Find Scene")
+            s, e = start
+            start = f.f_locals.get(s, f.f_locals.get('p', {}).get(s))
+            end = f.f_locals.get(e, f.f_locals.get('p', {}).get(e))
+
+
         self.e_start = self.pointify(start)
         self.e_end = self.pointify(end)
         super().__init__(self.e_start, self.e_end, *args, **kwargs)
@@ -123,7 +137,7 @@ class EuclidLine(EMObject, mn.Line):
                 for _ in range(100):
                     if pts:
                         break
-                    l[line].extend(to_manim_v_scale(100))
+                    l[line].extend(mn_scale(100))
                     pts = c[circle].intersect(l[line])
                 else:
                     raise Exception("Infinite Loop")
@@ -136,7 +150,7 @@ class EuclidLine(EMObject, mn.Line):
             p['E'] = P.EuclidPoint(pts[0], scene=self.scene)
             p['B'] = P.EuclidPoint(B, scene=self.scene)
 
-            if p['D'].distance_to(pts[0]) > to_manim_v_scale(1):
+            if p['D'].distance_to(pts[0]) > mn_scale(1):
                 F = find_extended_intersection(p['D'], p['E'], 'D', 'CD')
             else:
                 F = [p['E'].get_center()]
@@ -165,9 +179,9 @@ class EuclidLine(EMObject, mn.Line):
                 if p is not None:
                     break
                 if target_line.length_from_end(target) > target_line.length_from_start(target):
-                    clone.extend(to_manim_v_scale(10))
+                    clone.extend(mn_scale(10))
                 else:
-                    clone.prepend(to_manim_v_scale(10))
+                    clone.prepend(mn_scale(10))
             else:
                 print("Circle didn't intercept!!!\n")
                 with self.scene.simultaneous():
@@ -181,7 +195,7 @@ class EuclidLine(EMObject, mn.Line):
             np = P.EuclidPoint(p[0])
             nl = EuclidLine(target, np)
 
-            if abs(self.get_length() - nl.get_length()) > to_manim_v_scale(0.1):
+            if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
                 np.e_remove()
                 nl.extend(self.get_length() - nl.get_length())
                 np = P.EuclidPoint(nl.get_end())

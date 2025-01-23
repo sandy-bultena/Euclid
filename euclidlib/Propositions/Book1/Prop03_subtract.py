@@ -13,12 +13,12 @@ class Book1Prop3(Book1Scene):
              "given unequal straight lines a straight line equal to the less.")
 
     def define_steps(self):
-        t1 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(550))
-        t2 = TextBox(self, absolute_position=to_manim_coord(600, 430))
-        A = to_manim_coord(150, 450)
-        B = to_manim_coord(250, 450)
-        C = to_manim_coord(350, 350)
-        D = to_manim_coord(600, 350)
+        t1 = TextBox(self, absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t2 = TextBox(self, absolute_position=mn_coord(600, 430))
+        A = mn_coord(150, 450)
+        B = mn_coord(250, 450)
+        C = mn_coord(350, 350)
+        D = mn_coord(600, 350)
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}

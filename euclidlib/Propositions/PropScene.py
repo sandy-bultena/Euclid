@@ -52,11 +52,9 @@ class PropScene(InteractiveScene):
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
         elif self.animateState[-1] == AnimState.PAUSED:
-            for anim in anims:
-                if anim.remover:
-                    self.remove(anim.mobject)
-                else:
-                    self.add(anim.mobject)
+            self.force_skipping()
+            super().play(*anims, **kwargs)
+            self.revert_to_original_skipping_status()
 
     @contextmanager
     def simultaneous(self, **kwargs):
@@ -113,13 +111,14 @@ class PropScene(InteractiveScene):
         if not self.debug:
             self.title_page()
             self.wait(3)
-            self.reset()
-            self.wait()
+        self.reset()
+        self.wait()
         for step in self.steps:
             if self.debug:
                 print(f" Running func={step.__name__} | anim={self.num_plays}")
             step()
             self.wait()
+        print(f" DONE | anim={self.num_plays}")
 
     @abstractmethod
     def define_steps(self) -> None:

@@ -23,13 +23,13 @@ class BookScene(PropScene):
 
     def title_page(self):
         t = TextBox(self,
-                    absolute_position=(0, to_manim_v_scale(350), 0),
+                    absolute_position=(0, mn_scale(350), 0),
                     buff_size=MED_LARGE_BUFF,
                     alignment='n'
                     )
 
-        t.title_screen("Euclid's Elements")
-        t.title_screen(f"Book {roman.toRoman(self.book)}")
+        t.title_screen("Euclid's Elements", write_simultaneous=True)
+        t.title_screen(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
 
     def reset(self):
         with self.simultaneous(run_time=1):
@@ -47,11 +47,12 @@ class BookScene(PropScene):
             axis_config=line_options,
             faded_line_style=line_options,
         )
+        grid.fix_in_frame()
         self.play(FadeIn(grid))
 
         if self.title and self.prop:
             t = TextBox(self,
-                        absolute_position=to_manim_coord(700, 50),
+                        absolute_position=mn_coord(700, 50),
                         line_width=to_manim_h_scale(1000),
                         alignment='n'
                         )
@@ -74,11 +75,10 @@ class Book1Scene(BookScene):
         super().title_page()
 
         title_box = TextBox(self,
-                            absolute_position=to_manim_scale(0, 100),
+                            absolute_position=mn_scale(0, 100, 0),
                             line_width=to_manim_h_scale(550),
                             alignment='w'
                             )
         title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
-                        "you were not born to be a scientific thinker.")
+                        "you were not born to be a scientific thinker.", write_simultaneous=True)
         title_box.explain("-Albert Einstein")
-

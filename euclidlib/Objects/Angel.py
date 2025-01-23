@@ -6,7 +6,7 @@ from . import Text as T
 import math
 from typing import Tuple, Any, Self, Callable
 
-EPSILON = to_manim_v_scale(1)
+EPSILON = mn_scale(1)
 ANGLE_DATA = tuple[
     float | None,
     float | None,
@@ -213,7 +213,7 @@ class EuclidAngle(EMObject):
     def __new__(cls,
                 l1: EuclidLine | str,
                 l2: EuclidLine = None,
-                size: float = to_manim_v_scale(40),
+                size: float = mn_scale(40),
                 no_right: bool = False,
                 **kwargs):
 

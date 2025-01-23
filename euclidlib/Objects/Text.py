@@ -6,11 +6,16 @@ from . import EucidMObject as E
 from . import CustomAnimation as CA
 import re
 import manimlib as mn
-from functools import reduce
+from functools import reduce, partial
 
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
+
+# ==============================================================
+# LATEX SYMBOLS
+# https://tug.ctan.org/info/symbols/comprehensive/symbols-a4.pdf
+# ==============================================================
 
 MARKUP_REPLACE = (
     (re.compile(r'\{nb:(.*?)}'), r'<span allow_breaks="false">\g<1></span>'),
@@ -31,8 +36,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
     style = str | None
     REPLACEMENT_RULES = ()
 
-    def __init__(self, txt, *args, style=None | str, animate_part=None, **kwargs):
+    def __init__(self, txt, *args, write_simultaneous=False, style=None | str, animate_part=None, **kwargs):
         self.style = style
+        self.write_simultaneous = write_simultaneous
         super().__init__(
             self.apply_rules(txt),
             *args,
@@ -56,11 +62,19 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
     def CONSTRUCTION_TIME(self):
         return INIT_TEXT_RUN_TIME + INCREASE_PER_CHARACTER * max(0, len(self.string) - DELAYED_INCREASE)
 
-    def CreationOf(self, *args, stroke_color=mn.BLUE, stroke_width=1, **kwargs):
-        return [mn.Write(self, *args, **kwargs, stroke_color=stroke_color, stroke_width=stroke_width)]
+    def CreationOf(self, *args, stroke_color=mn.WHITE, stroke_width=0.5, **kwargs):
+        return [mn.Write(self,
+                         stroke_color=stroke_color,
+                         stroke_width=stroke_width,
+                         lag_ratio=(0.02 if self.write_simultaneous else -1),
+                         **kwargs, )]
 
-    def RemovalOf(self, *args, stroke_color=mn.RED, stroke_width=1, **kwargs):
-        return [CA.UnWrite(self, *args, **kwargs, stroke_color=stroke_color, stroke_width=stroke_width)]
+    def RemovalOf(self, *args, stroke_color=mn.RED_A, stroke_width=0.5, lag_ratio=0, **kwargs):
+        return [CA.UnWrite(self,
+                         stroke_color=stroke_color,
+                         stroke_width=stroke_width,
+                         lag_ratio=lag_ratio,
+                         **kwargs)]
 
 
 class EText(EStringObj, mn.Text):
@@ -71,14 +85,24 @@ class ETexText(EStringObj, mn.TexText):
     REPLACEMENT_RULES = TEX_REPLACE
     tex_environment: str = ""
 
-    def __init__(self, text, *args, alignment='', font='', **kwargs):
+    def __init__(self, text, *args, alignment='', font='', line_width=None, **kwargs):
+        packages = r'''
+            \usepackage[no-math]{{fontspec}}
+        '''
+        preamble = rf'''
+            \setmainfont[Mapping=tex-text]{{{font}}}
+        ''' + '\n'.join(MATH_PREAMBLE)
+
+        if line_width:
+            px = line_width / mn.FRAME_WIDTH * mn.DEFAULT_PIXEL_WIDTH / 2.5
+            packages += fr'''
+                \usepackage[margin=0in,paperwidth={px}pt,verbose,marginparwidth=0pt,marginparsep=0pt]{{geometry}}
+            '''
+
         super().__init__(
             text,
             *args,
-            additional_preamble=rf'''
-            \usepackage[no-math]{{fontspec}}
-            \setmainfont[Mapping=tex-text]{{{font}}}
-            ''' + '\n'.join(MATH_PREAMBLE),
+            additional_preamble=packages + preamble,
             template='empty_ctex',
             alignment=alignment,
             **kwargs)

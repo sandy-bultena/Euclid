@@ -137,7 +137,7 @@ class EuclidCircle(EMObject, mn.Circle):
         max_y = max(y1, y0)
         min_y = min(y1, y0)
         
-        epsilon = to_manim_v_scale(1)
+        epsilon = mn_scale(1)
 
         if min_x - epsilon <= x3 <= max_x + epsilon and min_y - epsilon <= y3 < max_y + epsilon:
             results.append((x3, y3, 0))

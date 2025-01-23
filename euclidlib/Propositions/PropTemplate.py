@@ -11,11 +11,13 @@ class PROP_NAME(BookScene):
     title = ""
 
     def define_steps(self):
-        t1 = TextBox(self, absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(self, absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}
         c: Dict[str | int, EuclidCircle] = {}
+        t: Dict[str | int, EuclidTriangle] = {}
+        a: Dict[str | int, EuclidAngle] = {}
 
         # ----------------------------------------------
         # In Other Words

@@ -3,18 +3,18 @@ import os
 
 sys.path.append(os.getcwd())
 
-from euclidlib.Propositions.BookScene import BookScene
+from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
 
 
-class Prop06(BookScene):
+class Prop06(Book1Scene):
     steps = []
     title = "If two angles of a triangle are equal, then the sides opposite them will be equal."
 
     def define_steps(self):
-        t1 = TextBox(absolute_position=to_manim_coord(800, 150), line_width=to_manim_h_scale(550))
-        t2 = TextBox(absolute_position=to_manim_coord(450, 330))
-        t4 = TextBox(absolute_position=to_manim_coord(450, 330))
+        t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t2 = TextBox(absolute_position=mn_coord(450, 330))
+        t4 = TextBox(absolute_position=mn_coord(450, 330))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}
@@ -22,9 +22,9 @@ class Prop06(BookScene):
         t: Dict[str | int, EuclidTriangle] = {}
         a: Dict[str | int, EuclidAngle] = {}
 
-        A = to_manim_coord(225, 250)
-        B = to_manim_coord(425, 450)
-        C = to_manim_coord(75, 450)
+        A = mn_coord(225, 250)
+        B = mn_coord(425, 450)
+        C = mn_coord(75, 450)
         mid = (B[0] + C[0]) / 2
 
         # ----------------------------------------------
@@ -94,7 +94,7 @@ class Prop06(BookScene):
                 t['BCD'].set_labels(('r3', DOWN), (None, None), ('r1', RIGHT))
 
             with self.simultaneous(run_time=1):
-                t['BCD'].e_move(to_manim_scale(150, -250))()
+                t['BCD'].e_move(mn_scale(150, -250, 0))()
 
             with self.simultaneous():
                 t['BCD'].set_angles(r'\alpha', None, None)
@@ -123,7 +123,7 @@ class Prop06(BookScene):
             with self.simultaneous():
                 t['ABC'].l[0].e_normal()
                 t['BCD'].l[1].e_normal()
-            t['BCD'].set_angles(None, r'\alpha', None, 0, to_manim_v_scale(70), 0)
+            t['BCD'].set_angles(None, r'\alpha', None, 0, mn_scale(70), 0)
 
             with self.simultaneous():
                 t2.math(r"\therefore \angle DCB = \angle ABC = \alpha").shift(RIGHT / 2)
@@ -131,7 +131,7 @@ class Prop06(BookScene):
         @self.push_step
         def _p7():
             with self.simultaneous(run_time=1):
-                t['BCD'].e_move(to_manim_scale(-150, 250))()
+                t['BCD'].e_move(mn_scale(-150, 250, 0))()
             t['BCD'].e_fill(TEAL_D)
 
             with self.simultaneous():
@@ -143,7 +143,7 @@ class Prop06(BookScene):
 
         @self.push_step
         def _p8():
-            a['ACD'] = EuclidAngle(t['BCD'].l[1], t['ABC'].l[2], size=to_manim_v_scale(120), label=r'\beta')
+            a['ACD'] = EuclidAngle(t['BCD'].l[1], t['ABC'].l[2], size=mn_scale(120), label=r'\beta')
             t2.e_fade()
             with self.simultaneous():
                 t2.explainM(r'let $\angle ACD = \beta$')

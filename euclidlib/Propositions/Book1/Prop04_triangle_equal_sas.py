@@ -16,9 +16,9 @@ class Book1Prop4(Book1Scene):
     )
 
     def define_steps(self):
-        t1 = TextBox(self, absolute_position=to_manim_coord(800, 200), line_width=to_manim_h_scale(550))
-        t2 = TextBox(self, absolute_position=to_manim_coord(40, 400), line_width=to_manim_h_scale(550))
-        t3 = TextBox(self, absolute_position=to_manim_coord(100, 500), line_width=to_manim_h_scale(800))
+        t1 = TextBox(self, absolute_position=mn_coord(800, 200), line_width=to_manim_h_scale(550))
+        t2 = TextBox(self, absolute_position=mn_coord(40, 400), line_width=to_manim_h_scale(550))
+        t3 = TextBox(self, absolute_position=mn_coord(100, 500), line_width=to_manim_h_scale(800))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}
@@ -26,13 +26,13 @@ class Book1Prop4(Book1Scene):
         t: Dict[str | int, EuclidTriangle] = {}
         a: Dict[str | int, Angel] = {}
 
-        A = to_manim_coord(300, 250)
-        B = to_manim_coord(100, 250)
-        C = to_manim_coord(250, 450)
+        A = mn_coord(300, 250)
+        B = mn_coord(100, 250)
+        C = mn_coord(250, 450)
 
-        D = to_manim_coord(400, 400)
-        E = to_manim_coord(600, 400)
-        F = to_manim_coord(450, 200)
+        D = mn_coord(400, 400)
+        E = mn_coord(600, 400)
+        F = mn_coord(450, 200)
 
         # ----------------------------------------------
         # In Other Words
@@ -54,7 +54,7 @@ class Book1Prop4(Book1Scene):
                                       scene=self,
                                       point_labels=[('A', UP), ('B', LEFT), ('C', DOWN)],
                                       labels=[('x', UP), (None, None), ('y', RIGHT)],
-                                      angles=[r'\alpha', None, None, to_manim_v_scale(20)]
+                                      angles=[r'\alpha', None, None, mn_scale(20)]
                                       )
 
             t['DEF'] = EuclidTriangle(D, E, F,
@@ -120,7 +120,7 @@ class Book1Prop4(Book1Scene):
                 t['ABC'].e_rotate(D, PI)(run_time=2)
 
             with self.simultaneous():
-                t['ABC'].e_move(to_manim_scale(20, -10))(run_time=1)
+                t['ABC'].e_move(mn_scale(20, -10, 0))(run_time=1)
 
             t['ABC'].l[0].red()
             with self.simultaneous():
@@ -163,7 +163,7 @@ class Book1Prop4(Book1Scene):
                        "BAC and EDF are equal ")
 
             t['DEF'].a[0].e_draw()
-            a['ABC'] = EuclidAngle(t['ABC'].l[0], t['ABC'].l[2], label=r'\alpha', size=to_manim_v_scale(20), scene=self)
+            a['ABC'] = EuclidAngle(t['ABC'].l[0], t['ABC'].l[2], label=r'\alpha', size=mn_scale(20), scene=self)
             with self.simultaneous():
                 t['ABC'].l[2].e_normal()
                 t['DEF'].l[2].e_normal()

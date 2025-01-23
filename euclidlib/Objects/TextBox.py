@@ -68,12 +68,6 @@ class TextBox(EGroup[T.EStringObj]):
         )
 
 
-    def RemovalOf(self, *args, **kwargs):
-        to_remove = [sub for sub in self if isinstance(sub, TextBuffer)]
-        self.remove(*to_remove)
-        self.scene.remove(*to_remove)
-        return [CA.UnWrite(x, *args, **kwargs, stroke_color=mn.RED, stroke_width=1) for x in self]
-
     def __init__(self,
                  scene: PropScene | None = None,
                  *args,
@@ -115,23 +109,35 @@ class TextBox(EGroup[T.EStringObj]):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
         kwargs['style'] = style
-        if issubclass(cls, mn.MarkupText) and self.line_width is not None:
+        if ((cls is T.ETexText or issubclass(cls, (mn.MarkupText, T.ETexText))) and
+                self.line_width is not None):
             kwargs['line_width'] = self.line_width
         newline = cls(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
+        newline.fix_in_frame()
         return newline
 
 
-    def generate_text(self, text: str, style: str = '', **other_options):
+    def generate_text(self, text: str, style: str = '', align_str: mn.SingleSelector|None=None, **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
         kwargs['style'] = style
-        if issubclass(cls, mn.MarkupText) and self.line_width is not None:
+        if ((cls is T.ETexText or issubclass(cls, (mn.MarkupText, T.ETexText))) and
+                self.line_width is not None):
             kwargs['line_width'] = self.line_width
         with self.scene.simultaneous():
             newline = cls(text, **kwargs, scene=self.scene)
-            newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
+            newline.fix_in_frame()
+            if align_str:
+                newline.next_to(
+                    self[-1][align_str].get_bottom(),
+                    mn.DOWN,
+                    buff=self.buff_size + self.next_buff,
+                    index_of_submobject_to_align=align_str
+                )
+            else:
+                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
             self.next_buff = 0
-            if self.alignment:
+            if self.alignment and not align_str:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
         self.add(newline)
@@ -140,7 +146,7 @@ class TextBox(EGroup[T.EStringObj]):
         return newline
 
     def e_remove(self):
-        super(PsuedoGroup, self).e_remove()
+        super().e_remove()
         self.clear()
 
     if TYPE_CHECKING:
@@ -174,7 +180,6 @@ def {style}(self, text: str, **kwargs):
         new.next_to(old.get_right(), mn.RIGHT, buff=mn.SMALL_BUFF)
         new.e_draw()
         old.add(*new.submobjects)
-
 
 
     def down(self, buff=mn.MED_SMALL_BUFF):
