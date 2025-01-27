@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from enum import EnumType, Enum
+
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
+from euclidlib.Objects import Text as Tx
 import math
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple
@@ -10,7 +13,15 @@ from euclidlib.Objects.EucidMObject import *
 
 class EuclidLine(EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
-    LabelBuff = mn.SMALL_BUFF
+    LabelBuff = 0.15
+
+    def IN(self):
+        vec = self.get_unit_vector()
+        return mn.rotate_vector(vec, PI/2)
+
+    def OUT(self):
+        vec = self.get_unit_vector()
+        return mn.rotate_vector(vec, -PI/2)
 
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
         if isinstance(start, str):
@@ -26,15 +37,28 @@ class EuclidLine(EMObject, mn.Line):
             start = f.f_locals.get(s, f.f_locals.get('p', {}).get(s))
             end = f.f_locals.get(e, f.f_locals.get('p', {}).get(e))
 
-
         self.e_start = self.pointify(start)
         self.e_end = self.pointify(end)
         super().__init__(self.e_start, self.e_end, *args, **kwargs)
 
-    def e_label_point(self, direction: mn.Vect3):
-        return mn.midpoint(self.get_start(), self.get_end())
+
+    def e_label_point(self, direction: mn.Vect3=None, inside=None, outside=None, alpha=0.5, buff=None):
+        try:
+            point = self.point_from_proportion(alpha)
+        except AssertionError:
+            point = self.get_start()
+        if inside:
+            direction = self.IN()
+        elif outside:
+            direction = self.OUT()
+        return point + (buff or self.LabelBuff) * direction
+
 
     def point(self, r: float):
+        vec = self.get_unit_vector()
+        return self.get_start() + r * vec
+
+    def old_point(self, r: float):
         p3x, p3y, *_ = self.get_end()
         xs, ys, *_ = self.get_start()
         dx = p3x - xs
@@ -68,33 +92,32 @@ class EuclidLine(EMObject, mn.Line):
 
         return x, y, 0
 
-
     def length_from_end(self, p: P.EuclidPoint):
         p.distance_to(self.get_end())
 
     def length_from_start(self, p: P.EuclidPoint):
         p.distance_to(self.get_start())
 
-    def extend(self, r: float):
+    def extend(self, r: float, rate_func=mn.smooth):
         if r < 0:
             return self.prepend(-r)
-        x2, y2 = self.point(r + self.get_length())
+        x2, y2, _ = self.point(r + self.get_length())
         self.e_end = (x2, y2, 0)
-        self.scene.play(self.animate.set_points_by_ends(self.get_start(), self.e_end))
+        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.get_start(), self.e_end))
 
-    def prepend(self, r: float):
-        x2, y2 = self.point(-r)
+    def prepend(self, r: float, rate_func=mn.smooth):
+        x2, y2, _ = self.point(-r)
         self.e_start = (x2, y2, 0)
-        self.scene.play(self.animate.set_points_by_ends(self.e_start, self.get_end()))
+        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.get_end()))
 
     def extend_cpy(self, r: float):
         if r < 0:
             return self.prepend_cpy(-r)
-        x2, y2 = self.point(r + self.get_length())
+        x2, y2, _ = self.point(r + self.get_length())
         return EuclidLine(self.get_end(), (x2, y2, 0))
 
     def prepend_cpy(self, r: float):
-        x2, y2 = self.point(-r)
+        x2, y2, _ = self.point(-r)
         return EuclidLine(self.get_start(), (x2, y2, 0))
 
     def copy_to_point(self, target: P.EuclidPoint, speed=1) -> Tuple[EuclidLine, P.EuclidPoint]:
@@ -124,28 +147,27 @@ class EuclidLine(EMObject, mn.Line):
             l['AC'] = EuclidLine(A, C, scene=self.scene).e_fade()
 
             # construct equilateral on above line (D = apex of triangle)
-            t[1], p['D'] = EquilateralTriangle.build(self.scene, A, C)
+            t[1], p['D'] = EquilateralTriangle.build(A, C)
             with self.scene.simultaneous():
                 l['AD'] = t[1].l[2]
                 l['CD'] = t[1].l[1]
             with self.scene.simultaneous():
                 t[1].e_fade()
 
-            def find_extended_intersection(p1, p2, circle, line):
+            def find_extended_intersection(p1, p2, circle, line, extend_dir=1):
                 c[circle] = Circle.EuclidCircle(p1, p2, scene=self.scene).e_fade()
                 pts = c[circle].intersect(l[line])
                 for _ in range(100):
                     if pts:
                         break
-                    l[line].extend(mn_scale(100))
+                    l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
                     pts = c[circle].intersect(l[line])
                 else:
                     raise Exception("Infinite Loop")
                 l[line].e_fade()
                 return pts
 
-
-            pts = find_extended_intersection(A, B, 'C', 'AD')
+            pts = find_extended_intersection(A, B, 'C', 'AD', -1)
 
             p['E'] = P.EuclidPoint(pts[0], scene=self.scene)
             p['B'] = P.EuclidPoint(B, scene=self.scene)
@@ -191,7 +213,6 @@ class EuclidLine(EMObject, mn.Line):
                     clone.e_remove()
                 return lx, px
 
-
             np = P.EuclidPoint(p[0])
             nl = EuclidLine(target, np)
 
@@ -199,7 +220,6 @@ class EuclidLine(EMObject, mn.Line):
                 np.e_remove()
                 nl.extend(self.get_length() - nl.get_length())
                 np = P.EuclidPoint(nl.get_end())
-
 
             with self.scene.simultaneous():
                 px.e_remove()
@@ -210,10 +230,11 @@ class EuclidLine(EMObject, mn.Line):
 
             return nl, np
 
-
-
-
-
+    def e_rotate_to(self, angle: float):
+        theta = angle - self.get_angle()
+        if theta > PI:
+            theta -= TAU
+        return self.e_rotate(self.get_start(), theta)
 
 
 class VirtualLine(EuclidLine):

@@ -44,19 +44,19 @@ class Book1Prop3(Book1Scene):
             t1.explain("Start with line AB and line CD, where CD is larger than AB")
 
             with self.simultaneous():
-                p['A'] = EuclidPoint(A, scene=self, label='A', label_dir=LEFT)
-                p['B'] = EuclidPoint(B, scene=self, label='B', label_dir=RIGHT)
+                p['A'] = EuclidPoint(A, scene=self, label_args=('A', LEFT))
+                p['B'] = EuclidPoint(B, scene=self, label_args=('B', RIGHT))
                 l['AB'] = EuclidLine(p['A'], p['B'], scene=self)
 
-                p['C'] = EuclidPoint(C, scene=self, label='C', label_dir=DOWN)
-                p['D'] = EuclidPoint(D, scene=self, label='D', label_dir=DOWN)
+                p['C'] = EuclidPoint(C, scene=self, label_args=('C', DOWN))
+                p['D'] = EuclidPoint(D, scene=self, label_args=('D', DOWN))
                 l['CD'] = EuclidLine(p['C'], p['D'], scene=self)
 
         @self.push_step
         def _2():
             t1.explain("Construct a line that is equal to CD minus AB")
 
-            p['F'] = EuclidPoint(F, scene=self, label='F', label_dir=RIGHT)
+            p['F'] = EuclidPoint(F, scene=self, label_args=('F', RIGHT))
             l['DF'] = EuclidLine(D, F, scene=self, stroke_color=BLUE)
 
         # ------------------------------------------------------------------------
@@ -76,19 +76,18 @@ class Book1Prop3(Book1Scene):
         def _4():
             t1.explain("Construct line segment CE equal to <sub>(I.2)</sub>")
             l['CE'], p['E'] = l['AB'].copy_to_point(p['C'], speed=1)
-            p['E'].add_label('E', UP)
+            p['E'].add_label('E', away_from=C)
 
         @self.push_step
         def _5():
             t1.explain("Draw a circle with C as the center and CE as the radius")
             c['E'] = EuclidCircle(p['C'], p['E'], scene=self)
-            p['E'].add_label('E', UP)
 
         @self.push_step
         def _6():
             t1.explain("Define the intersection of the circle and CD as F")
             pts = c['E'].intersect(l['CD'])
-            p['F'] = EuclidPoint(pts[0], scene=self, label='F', label_dir=UR)
+            p['F'] = EuclidPoint(pts[0], scene=self, label_args=('F', UR))
             l['CF'] = EuclidLine(C, p['F'], scene=self)
 
         @self.push_step

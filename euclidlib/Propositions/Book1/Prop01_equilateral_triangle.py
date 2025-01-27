@@ -24,8 +24,8 @@ class Book1Prop1(Book1Scene):
         def _1():
             t1.title("Construction:")
             t1.explain("Start with line segment AB")
-            p['A'] = EuclidPoint(A, scene=self, label='A', label_dir=LEFT)
-            p['B'] = EuclidPoint(B, scene=self, label='B', label_dir=RIGHT)
+            p['A'] = EuclidPoint(A, scene=self, label_args=('A', LEFT))
+            p['B'] = EuclidPoint(B, scene=self, label_args=('B', RIGHT))
             l['AB'] = EuclidLine(p['A'], p['B'], scene=self)
 
         @self.push_step
@@ -42,7 +42,7 @@ class Book1Prop1(Book1Scene):
         def _4():
             t1.explain("Label the intersection point C")
             pts = c['A'].intersect(c['B'])
-            p['C'] = EuclidPoint(pts[0], scene=self, label='C', label_dir=UP)
+            p['C'] = EuclidPoint(pts[0], scene=self, label_args=('C', UP))
 
         @self.push_step
         def _5():

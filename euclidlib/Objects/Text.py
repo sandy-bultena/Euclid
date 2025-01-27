@@ -139,11 +139,13 @@ class Label(ETex):
         kwargs['run_time'] = self.ref.AUX_CONSTRUCTION_TIME
         return super().RemovalOf(*args, **kwargs)
 
-    def __init__(self, text, *args, ref: E.EMObject, direction: mn.Vect3, **kwargs):
+    def __init__(self, text, ref: E.EMObject, *args, align=mn.ORIGIN, **extra_args):
         self.ref = ref
-        super().__init__(text, *args, font_size=20, **kwargs, scene=ref.scene, delay_anim=True)
-        self.f_always.next_to(
-            lambda: ref.e_label_point(direction),
-            direction if callable(direction) else lambda: direction,
-            lambda: ref.LabelBuff
+        self.args = args
+        self.extra_args = extra_args
+        self.align=align
+        super().__init__(text, font_size=20, scene=ref.scene, delay_anim=True)
+        self.f_always.move_to(
+            lambda: ref.e_label_point(*self.args, **self.extra_args),
+            aligned_edge=lambda: self.align
         )

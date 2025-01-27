@@ -3,7 +3,6 @@ from __future__ import annotations
 from enum import Enum
 
 from manimlib import *
-from typing import Callable
 from euclidlib.Objects import *
 from os import getenv
 
@@ -12,6 +11,7 @@ class AnimState(Enum):
     NORMAL = 0
     STORING = 1
     PAUSED = 2
+    SKIP = 3
 
 
 class PropScene(InteractiveScene):
@@ -24,6 +24,7 @@ class PropScene(InteractiveScene):
         self.animationsStored = []
         self.animationSpeedStack: List[float] = []
         self.debug = bool(getenv('DEBUG'))
+        self._speed = float(getenv('SPEED', 1))
         super().__init__(*args, **kwargs)
 
 
@@ -38,12 +39,17 @@ class PropScene(InteractiveScene):
         anim.set_run_time(anim.get_run_time() / speed)
         return anim
 
-    def wait(self, *args, **kwargs):
-        super().wait(*args, **kwargs)
+    def get_current_speed(self):
+        return reduce(op.mul, self.animationSpeedStack, 1.0)
+
+    def wait(self, duration: float = None, *args, **kwargs):
+        if not duration:
+            duration = self.default_wait_time
+        super().wait(duration/self.get_current_speed(), *args, **kwargs)
 
     def play(self, *anims: AnimationType, **kwargs):
         if self.animateState[-1] == AnimState.NORMAL:
-            speed = reduce(op.mul, self.animationSpeedStack, 1.0)
+            speed = self.get_current_speed()
             if 'run_time' in kwargs:
                 kwargs['run_time'] /= speed
             else:
@@ -51,10 +57,19 @@ class PropScene(InteractiveScene):
             super().play(*anims, **kwargs)
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
-        elif self.animateState[-1] == AnimState.PAUSED:
-            self.force_skipping()
+        elif self.animateState[-1] == AnimState.SKIP:
+            if not self.skip_animations:
+                self.force_skipping()
             super().play(*anims, **kwargs)
-            self.revert_to_original_skipping_status()
+            if not self.skip_animations:
+                self.revert_to_original_skipping_status()
+        elif self.animateState[-1] == AnimState.PAUSED:
+            pass
+
+    def add(self, *mobjects: mn.Mobject):
+        if self.animateState[-1] != AnimState.PAUSED:
+            super().add(*mobjects)
+        return self
 
     @contextmanager
     def simultaneous(self, **kwargs):
@@ -67,10 +82,22 @@ class PropScene(InteractiveScene):
             self.play(*stored_anims, **kwargs)
 
     @contextmanager
-    def skip_animations_for(self):
-        self.animateState.append(AnimState.PAUSED)
-        yield
-        self.animateState.pop()
+    def skip_animations_for(self, stop=True):
+        if stop:
+            self.animateState.append(AnimState.SKIP)
+            yield
+            self.animateState.pop()
+        else:
+            yield
+
+    @contextmanager
+    def pause_animations_for(self, stop=True):
+        if stop:
+            self.animateState.append(AnimState.PAUSED)
+            yield
+            self.animateState.pop()
+        else:
+            yield
 
     @contextmanager
     def run_animations_for(self):
@@ -108,17 +135,18 @@ class PropScene(InteractiveScene):
         raise NotImplemented()
 
     def runFull(self):
-        if not self.debug:
-            self.title_page()
-            self.wait(3)
-        self.reset()
-        self.wait()
-        for step in self.steps:
-            if self.debug:
-                print(f" Running func={step.__name__} | anim={self.num_plays}")
-            step()
+        with self.animation_speed(self._speed or 1):
+            if not self.debug:
+                self.title_page()
+                self.wait(3)
+            self.reset()
             self.wait()
-        print(f" DONE | anim={self.num_plays}")
+            for step in self.steps:
+                if self.debug:
+                    print(f" Running func={step.__name__} | anim={self.num_plays}")
+                step()
+                self.wait()
+            print(f" DONE | anim={self.num_plays}")
 
     @abstractmethod
     def define_steps(self) -> None:

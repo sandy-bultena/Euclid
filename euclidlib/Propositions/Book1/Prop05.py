@@ -65,8 +65,8 @@ class Prop05(Book1Scene):
                 a['YBC'] = EuclidAngle(l['BC'], l['BY'], label=r'\beta')
                 a['ZCB'] = EuclidAngle(l['BC'], l['CZ'], label=r'\beta')
             with self.simultaneous():
-                p['D'] = EuclidPoint(D, label='D', label_dir=RIGHT)
-                p['E'] = EuclidPoint(E, label='E', label_dir=LEFT)
+                p['D'] = EuclidPoint(D, label_args=('D', dict(away_from=E)))
+                p['E'] = EuclidPoint(E, label_args=('E', dict(away_from=D)))
             t2.math(r"\angle BCE = \angle CBD")
 
         @self.push_step
@@ -95,7 +95,7 @@ class Prop05(Book1Scene):
         def _p2():
             t1.explain("Define a point along the extension of AB")
             D = l['BY'].point(mn_scale(100))
-            p['D'] = EuclidPoint(D, label='D', label_dir=RIGHT)
+            p['D'] = EuclidPoint(D, label_args=('D', dict(away_from=C)))
             # TODO: ARROW?
             l['BD'] = EuclidLine(B, D)
 
@@ -104,7 +104,7 @@ class Prop05(Book1Scene):
             t1.explain("Construct a line starting at C, with length BD, "
                        "on the line segment of {nb:<sub>(I.2)</sub>}")
             l['CE'], p['E'] = l['BD'].copy_to_line(p['C'], l['CZ'], speed=2)
-            p['E'].add_label('E', LEFT)
+            p['E'].add_label('E', away_from=B)
             t2.math("BD = CE", fill_color=BLUE)
 
         @self.push_step

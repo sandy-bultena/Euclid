@@ -37,7 +37,7 @@ class Prop06(Book1Scene):
             t1.explain("Start with a triangle with equal base angles")
             # with self.simultaneous():
             t['ABC'] = EuclidTriangle('ABC',
-                                      point_labels=[('A', UP), ('B', RIGHT), ('C', LEFT)],
+                                      point_labels=['A', ('B', RIGHT), ('C', LEFT)],
                                       angles=[None, r'\alpha', r'\alpha']
                                       )
             t2.math(r'\angle ACB = \angle ABC', fill_color=BLUE)
@@ -45,7 +45,7 @@ class Prop06(Book1Scene):
         @self.push_step
         def _i2():
             t1.explain("Then the sides opposite the equal angles are equal")
-            t['ABC'].set_labels(('r', LEFT), (None, None), ('r', RIGHT))
+            t['ABC'].set_labels(('r', dict(outside=True)), (), ('r', dict(outside=True)))
 
         # ----------------------------------------------
         # Proof
@@ -58,10 +58,10 @@ class Prop06(Book1Scene):
             t1.explain("Assume that the sides are not equal, and "
                        "demonstrate that this leads to a logical inconsistency")
 
-            t['ABC'].set_labels(('r2', RIGHT), (None, None), ('r1', LEFT)).e_fill(BLUE_D)
+            t['ABC'].set_labels(('r_2', dict(outside=True)), (), ('r_1', dict(outside=True))).e_fill(BLUE_D)
             t2.math(r'\angle ACB = \angle ABC', fill_color=BLUE)
             t4.set_y(t2[-1].get_top()[1])
-            t2.math(r"AB > AC\ (r2 > r1)")
+            t2.math(r"AB > AC\quad(r_2 > r_1)")
 
         @self.push_step
         def _p2():
@@ -69,29 +69,30 @@ class Prop06(Book1Scene):
                        "point D such that BD equals AC")
             l['BD'], p['D'] = t['ABC'].l[-1].copy_to_line(B, t['ABC'].l[0])
             p['D'].add_label('D', RIGHT)
-            l['BD'].add_label('r1', LEFT)
+            l['BD'].add_label('r_1', outside=True)
             with self.simultaneous():
-                t2.math(r'BD = AC = r1').shift(RIGHT * 0.5)
+                t2.math(r'BD = AC = r_1').shift(RIGHT * 0.5)
 
         @self.push_step
         def _p3():
             nonlocal B, C, p
             t1.explain("Create a triangle DCB")
             t['BCD'] = EuclidTriangle('BCD',
-                                      point_labels=[('B', RIGHT), ('C', LEFT), ('D', RIGHT)]
+                                      point_labels=[('B', RIGHT),
+                                                    ('C', LEFT),
+                                                    ()],
                                       ).e_fill(TEAL_D)
+            t['BCD'].replace_point(-1, p['D'])
+            t['BCD'].replace_line(-1, l['BD'])
+            p['D'].add_label('D', away_from=t['BCD'].get_center)
 
         @self.push_step
         def _p4():
             t1.explain("Let's move DCB to a different spot so we can see more clearly")
-            with self.simultaneous():
-                p['D'].e_remove()
-
-            t['BCD'].replace_line(-1, l['BD'])
 
             with self.simultaneous():
-                t['ABC'].set_labels((None, None), ('r3', DOWN), (None, None))
-                t['BCD'].set_labels(('r3', DOWN), (None, None), ('r1', RIGHT))
+                t['ABC'].set_labels((), 'r_3', ())
+                t['BCD'].set_labels(('r_3', dict(inside=True)), (), ())
 
             with self.simultaneous(run_time=1):
                 t['BCD'].e_move(mn_scale(150, -250, 0))()
@@ -114,9 +115,9 @@ class Prop06(Book1Scene):
             t2.down()
             t2.e_fade(*t2.except_index(2, 3, 5))
             with self.simultaneous():
-                t2.math(r"BD = r1\ \angle DBC=\alpha\ BC=r3").shift(RIGHT / 2)
+                t2.math(r"BD = r_1\ \angle DBC=\alpha\ BC=r_3").shift(RIGHT / 2)
             with self.simultaneous():
-                t2.math(r"AC=r1\ \angle ACB=\alpha\ BC=r3").shift(RIGHT / 2)
+                t2.math(r"AC=r_1\ \angle ACB=\alpha\ BC=r_3").shift(RIGHT / 2)
 
         @self.push_step
         def _p6():
@@ -170,9 +171,12 @@ class Prop06(Book1Scene):
                        "the two sides of the triangle are equal")
 
             a['ACD'].e_remove()
+            with self.simultaneous():
+                t['ABC'].p[0].add_label('A', away_from=B)
+                t['BCD'].p[-1].add_label('D', away_from=C)
+
             t['ABC'].move_point_to(0, t['BCD'].p[-1])
-            t['BCD'].set_labels((None, None), ('r', RIGHT), ('r', LEFT))
-            p['C'] = EuclidPoint(t['BCD'].p[2], label='A', label_dir=UP)
+            t['BCD'].set_labels((), ('r', dict(inside=True)), 'r')
 
             with self.simultaneous():
                 t2.e_fade(*t2.except_index(0))

@@ -43,7 +43,7 @@ class Prop07(Book1Scene):
 
             t['ABC'] = EuclidTriangle('ABC',
                                       point_labels=[('A', DOWN), ('B', DOWN), ('C', UP)],
-                                      labels=[(None, None), ('r_2', RIGHT), ('r_1', LEFT)])
+                                      labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
             p['A'], p['B'], p['C'] = t['ABC'].p
 
         # ----------------------------------------------
@@ -59,8 +59,8 @@ class Prop07(Book1Scene):
 
             nonlocal D
             t['ABD'] = EuclidTriangle('ABD',
-                                      point_labels=[(None, None), (None, None), ('D', UP)],
-                                      labels=[(None, None), ('r_2', RIGHT), ('r_1', LEFT)])
+                                      point_labels=[(), (), ('D', UP)],
+                                      labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
             p['D'] = t['ABD'].p[-1]
             t2.math('AC = AD = r_1')
             t2.math('BC = BD = r_2')

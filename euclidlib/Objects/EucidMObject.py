@@ -1,12 +1,17 @@
 from __future__ import annotations
+
+import math
 from functools import partial
 from math import isinf
 
 import manimlib as mn
+import numpy as np
+from manimlib import Mobject
+
 import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 from .CustomAnimation import UncreatePreserve
-from typing import Sized, Self
+from typing import Sized, Self, Callable, Tuple
 
 # from . import Text as T
 
@@ -16,17 +21,17 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
 def mn_coord(x: int, y: int, z: int = 0):
-    return (
+    return np.array([
         (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (400 - y) * (8.0 / 800),
         z * (8.0 / 800)
-    )
+    ])
 
 
 def mn_scale(f, *rest):
     if rest:
-        return tuple(i * (8.0/800) for i in (f, *rest))
-    return f * (8.0/800)
+        return np.array([i * (8.0 / 800) for i in (f, *rest)])
+    return f * (8.0 / 800)
 
 
 def to_manim_h_scale(x):
@@ -148,14 +153,14 @@ class EMObjectPlayer:
 
     def e_to_edge(self,
                   edge: Vect3 = LEFT,
-                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFF):
         self.main_animate = True
         self.anim.to_edge(edge, buff)
         return self
 
     def e_to_corner(self,
                     corner: Vect3 = DL,
-                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFF):
         self.main_animate = True
         self.anim.to_to_corner(corner, buff)
         return self
@@ -163,7 +168,7 @@ class EMObjectPlayer:
     def e_rotate(self, about: Vect3, angle: float):
         self.main_animate = True
         self.anim.rotate(angle, about_point=about)
-        self.rotating = True
+        self.rotating = angle
         return self
 
     def _build_anim(self, anim, obj: mn.VMobject, flag, **kwargs):
@@ -173,7 +178,7 @@ class EMObjectPlayer:
             kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
 
         if self.rotating:
-            kwargs['path_arc'] = PI
+            kwargs['path_arc'] = self.rotating
 
         anim_built = anim(**kwargs).build()
         return anim_built
@@ -201,8 +206,23 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
         return *obj, *((0.0,) * (3 - len(obj)))
 
 
+
+def find_scene():
+    from inspect import currentframe
+    f = currentframe()
+    while f.f_back:
+        f = f.f_back
+        if 'self' not in f.f_locals:
+            continue
+        f_self = f.f_locals['self']
+        if isinstance(f_self, EMObject) and hasattr(f_self, 'scene'):
+            return f_self.scene
+        if isinstance(f_self, ps.PropScene):
+            return f_self
+
+
 class EMObject(mn.VMobject):
-    LabelBuff = mn.MED_SMALL_BUFF
+    LabelBuff = mn.MED_LARGE_BUFF
     CONSTRUCTION_TIME = 1
 
     @property
@@ -249,13 +269,18 @@ def {name}(self, *args):
     def visible(self):
         return self.in_scene() and (self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0)
 
-    def add_label(self, label: str, label_dir: mn.Vect3):
-        new_label = self.init_label(label, label_dir)
-        if self.e_label is not None:
-            self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
-        else:
-            self.scene.play(*new_label.CreationOf())
+    def add_label(self, *args, **label_args):
+        if isinstance(args[-1], dict) and not label_args:
+            *args, label_args = args
+        new_label = self.init_label(*args, **label_args)
+
+        if self.visible():
+            if self.e_label is not None:
+                self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
+            else:
+                self.scene.play(*new_label.CreationOf())
         self.e_label = new_label
+        return self
 
     def remove_label(self):
         if self.e_label is not None:
@@ -264,17 +289,23 @@ def {name}(self, *args):
             else:
                 self.scene.play(mn.FadeOut(self.e_label))
         self.e_label = None
+        return self
 
-    def e_label_point(self, direction: mn.Vect3):
+    def undraw_label(self):
+        if self.e_label is not None and self.e_label.visible():
+            self.scene.play(mn.FadeOut(self.e_label))
+        return self
+
+    def e_label_point(self, *args, **kwargs):
         raise NotImplementedError()
 
     def intersect(self, other: EMObject):
         raise NotImplementedError()
 
-    def init_label(self, label: str, label_dir: mn.Vect3):
+    def init_label(self, label: str, *args, **extra_args):
         from . import T
         if label:
-            return T.Label(label, ref=self, direction=label_dir)
+            return T.Label(label, self, *args, **extra_args)
 
     def e_draw(self, skip_anim=False):
         if not skip_anim and not self.Virtual:
@@ -293,46 +324,86 @@ def {name}(self, *args):
                 self.scene.play(*map(partial(mn.Uncreate, run_time=self.AUX_CONSTRUCTION_TIME), self.animation_objects))
         else:
             self.scene.add(self)
+        return self
+
+    def interpolate(
+            self,
+            mobject1: EMObject,
+            mobject2: EMObject,
+            alpha: float,
+            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    ) -> Self:
+        if self.get_label() and hasattr(self.e_label, 'direction') and not callable(self.e_label.direction):
+            l0 = self.e_label
+            l1 = mobject1.e_label
+            l2 = mobject2.e_label
+            curr_pos = l0.ref.e_label_point(l1.direction)
+            start_pos = l1.ref.e_label_point(l1.direction)
+            end_pos = l2.ref.e_label_point(l2.direction)
+            self.e_label.direction = path_func(start_pos + l1.direction, end_pos + l2.direction, alpha) - curr_pos
+        return super().interpolate(mobject1, mobject2, alpha, path_func)
+    
+    def rotate(
+        self,
+        angle: float,
+        axis: Vect3 = OUT,
+        about_point: Vect3 | None = None,
+        **kwargs
+    ) -> Self:
+        if self.get_label() and hasattr(self.get_label(), 'direction') and not callable(self.e_label.direction):
+            self.e_label.direction = mn.rotate_vector(self.e_label.direction, angle)
+        return super().rotate(angle, axis, about_point, **kwargs)
+
+    def debug(self, dd=True):
+        self._debug = dd
+
+    def generate_target(self, use_deepcopy: bool = False) -> Self:
+        trgt = super().generate_target(use_deepcopy)
+        if trgt.get_label() is not None:
+            trgt.e_label = trgt.e_label.generate_target()
+        return trgt
 
     def e_remove(self):
-        if not self.Virtual:
+        if not self.Virtual and self.visible():
             anims = self.RemovalOf()
-            self.remove_label()
+            self.undraw_label()
             if anims:
                 self.scene.play(*anims, run_time=self.CONSTRUCTION_TIME)
         else:
             self.scene.remove(self)
+        return self
 
     def e_delete(self):
         self.scene.remove(self)
         if self.e_label:
             self.scene.remove(self.e_label)
+        return self
 
-    def __find_scene(self):
-        from inspect import currentframe
-        f = currentframe()
-        while f.f_back:
-            f = f.f_back
-            if 'self' not in f.f_locals:
-                continue
-            f_self = f.f_locals['self']
-            if isinstance(f_self, EMObject) and hasattr(f_self, 'scene'):
-                return f_self.scene
-            if isinstance(f_self, ps.PropScene):
-                return f_self
+    def copy(self, deep: bool = False) -> Self:
+        cpy = super().copy(deep)
+        if self.get_label() and self.e_label:
+            cpy.e_label = self.e_label.copy()
+        return cpy
+
+    def get_label(self):
+        if hasattr(self, 'e_label'):
+            return self.e_label
+
 
     def __init__(self,
                  *args,
-                 label: str = None,
-                 label_dir: mn.Vect3 = None,
                  stroke_width: float = 2,
                  animate_part=None,
                  delay_anim=False,
                  skip_anim=False,
                  scene: ps.PropScene = None,
+                 debug=False,
+                 label_args: Tuple[str, ...] | str | None = None,
+                 label: str = None,
                  **kwargs):
-
-        scene = scene or self.__find_scene()
+        label_args = label_args or label
+        self._debug = debug
+        scene = scene or find_scene()
         if scene is None:
             raise Exception("Could Not Find Scene Object")
         self.animate_part = ['set_stroke'] if animate_part is None else animate_part
@@ -346,6 +417,19 @@ def {name}(self, *args):
             kwargs['stroke_color'] = mn.RED
 
         super().__init__(*args, **kwargs)
-        self.e_label = self.init_label(label, label_dir)
+        self.e_label = None
+        if label_args:
+            if isinstance(label_args, str):
+                string = label_args
+                label_args = ()
+            else:
+                string, *label_args = label_args
+
+            if label_args and isinstance(label_args[-1], dict):
+                *label_args, l_kwargs = label_args
+            else:
+                l_kwargs = {}
+            self.e_label = self.init_label(string, *label_args, **l_kwargs)
+
         if not delay_anim:
             self.e_draw(skip_anim)

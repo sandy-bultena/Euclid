@@ -4,6 +4,8 @@ import math
 from typing import Iterable
 
 from .EucidMObject import *
+from .utils import call_or_get
+
 
 def darken(colour: ManimColor):
    return [
@@ -13,7 +15,7 @@ def darken(colour: ManimColor):
 
 class EuclidPoint(EMObject, mn.Circle):
     CONSTRUCTION_TIME=0.25
-    LabelBuff = mn.SMALL_BUFF
+    LabelBuff = mn.MED_SMALL_BUFF
 
     def __init__(self, center, animate_part=None, *args, **kwargs):
         super().__init__(
@@ -39,8 +41,19 @@ class EuclidPoint(EMObject, mn.Circle):
         self.set_stroke(darken(color), opacity=opacity, recurse=recurse)
         return self
 
-    def e_label_point(self, direction: mn.Vect3):
-        return self.get_arc_center()
+    def e_label_point(self,
+                      direction: mn.Vect3 = None,
+                      *,
+                      away_from: Callable[[], mn.Vect3] | float = None,
+                      towards: Callable[[], mn.Vect3] | float = None,
+                      buff: float = None
+                      ):
+        center = self.get_arc_center()
+        if away_from is not None:
+            direction = mn.normalize(center - call_or_get(away_from))
+        elif towards is not None:
+            direction = mn.normalize(call_or_get(towards) - center)
+        return center + direction * (buff or self.LabelBuff)
 
     def distance_to(self, position: mn.Vect3):
         x0, y0, *_ = self.get_arc_center()

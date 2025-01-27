@@ -75,7 +75,7 @@ def calculateAngle(l1: EuclidLine, l2: EuclidLine):
 
 
 class ArcAngle(EMObject, mn.Arc):
-    LabelBuff = SMALL_BUFF
+    LabelBuff = 0.15
 
     def __init__(self,
                  l1: EuclidLine,
@@ -90,9 +90,31 @@ class ArcAngle(EMObject, mn.Arc):
         self.l2 = l2
         self.size = size
         self.e_angle = angle
-        self.e_start_angle = angle1
+        self.e_start_angle = 0.0
+        self.e_end_angle = angle
         x, y, self.vec1, self.vec2 = angle_data
         self.vx, self.vy = 0, 0
+
+        if kwargs.get('debug', None):
+            scene = find_scene()
+            self.tmp_start = mn.Line(stroke_color=RED)
+            self.tmp_end = mn.Line(stroke_color=BLUE)
+            self.tmp_mid = mn.Line(stroke_color=GREEN)
+            self.tmp_txt = mn.Line(stroke_color=YELLOW)
+            self.tmp_start.f_always.set_points_by_ends(
+                lambda: (x, y, 0),
+                lambda: (x, y, 0) + size * np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0]))
+            self.tmp_end.f_always.set_points_by_ends(
+                lambda: (x, y, 0),
+                lambda: (x, y, 0) + size * np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0]))
+            self.tmp_mid.f_always.set_points_by_ends(
+                lambda: (x, y, 0),
+                lambda: (x, y, 0) + size * self.get_bisect_dir(self.label_dir))
+            self.tmp_txt.f_always.set_points_by_ends(
+                lambda: (x, y, 0) + size * self.get_bisect_dir(self.label_dir),
+                lambda: (x, y, 0) + size * self.get_bisect_dir(self.label_dir) + self.LabelBuff * (
+                    0 if hasattr(self, 'e_label') and self.e_label is None else self.get_label_dir()))
+            scene.add(self.tmp_start, self.tmp_end, self.tmp_mid, self.tmp_txt)
 
         super().__init__(
             angle1,
@@ -102,31 +124,32 @@ class ArcAngle(EMObject, mn.Arc):
             **kwargs
         )
 
-
     def get_arc_center(self) -> Vect3:
         return np.array([self.vx, self.vy, 0])
 
-
-    def pointwise_become_partial(self, start: mn.VMobject, a: float, b: float) -> Self:
-        if isinstance(start, ArcAngle):
-            self.vx, self.vy, _ = mn.interpolate(start.get_arc_center(), self.get_arc_center(), b)
-            self.e_start_angle = mn.interpolate(start.e_start_angle, self.e_start_angle, b)
+    def pointwise_become_partial(self, start: ArcAngle, a: float, b: float) -> Self:
+        if a <= 0:
+            self.e_start_angle = start.e_start_angle
         else:
-            print(start)
+            self.e_start_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, a)
+
+        if b >= 1:
+            self.e_end_angle = start.e_end_angle
+        else:
+            self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
         return super().pointwise_become_partial(start, a, b)
 
-
     def interpolate(
-        self,
-        mobject1: ArcAngle,
-        mobject2: ArcAngle,
-        alpha: float,
-        path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+            self,
+            mobject1: ArcAngle,
+            mobject2: ArcAngle,
+            alpha: float,
+            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
     ) -> Self:
         self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
         self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
+        self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
         return super().interpolate(mobject1, mobject2, alpha, path_func)
-
 
     def shift(self, vector: Vect3) -> Self:
         self.vx += vector[0]
@@ -135,42 +158,24 @@ class ArcAngle(EMObject, mn.Arc):
 
     def rotate(self, angle: float, *args, **kwargs) -> Self:
         self.e_start_angle += angle
+        self.e_end_angle += angle
         return super().rotate(angle, *args, **kwargs)
 
     def proportion_angle(self, alpha: float):
-        try:
-            angle = mn.angle_of_vector(self.point_from_proportion(alpha) - self.get_arc_center())
-            return angle % TAU
-        except AssertionError as e:
-            return self.e_start_angle
+        interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
+        return interp
 
+    def get_bisect(self, alpha=0.5):
+        return self.proportion_angle(alpha)
 
-    def get_bisect(self):
-        return self.proportion_angle(0.5)
+    def get_bisect_dir(self, alpha=0.5):
+        bisect = self.get_bisect(alpha)
+        return np.array([math.cos(bisect), math.sin(bisect), 0.0])
 
-
-    def get_bisect_dir(self):
-        bisect = self.get_bisect()
-        return math.cos(bisect), math.sin(bisect)
-
-
-    def get_label_dir(self):
-        return np.array([*self.get_bisect_dir(), 0.0])
-
-
-    def e_label_point(self, direction):
-        x, y, _ = self.get_arc_center()
-        bisect_dir = self.get_bisect_dir()
-        return (
-            bisect_dir[0] * self.size + x,
-            bisect_dir[1] * self.size + y,
-            0
-        )
-
-
-    def init_label(self, label: str, label_dir) -> T.Label | None:
-        if label:
-            return T.Label(label, ref=self, direction=self.get_label_dir)
+    def e_label_point(self, alpha=0.5, buff=None):
+        center = self.get_arc_center()
+        bisect_dir = self.get_bisect_dir(alpha)
+        return center + bisect_dir * (self.size + (buff or self.LabelBuff))
 
 
 class RightAngle(EMObject, mn.VMobject):

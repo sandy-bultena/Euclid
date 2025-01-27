@@ -17,8 +17,10 @@ class EuclidCircle(EMObject, mn.Circle):
         tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
         return super().CreationOf(*args, **kwargs)
 
-    def e_label_point(self, direction: mn.Vect3):
-        return self.get_edge_center(direction)
+    def e_label_point(self, angle: float, direction: Vect3 = None, outside=True, buff=None):
+        direction = direction or np.array([np.cos(angle), np.sin(angle), 0.0])
+        edge = self.get_bounding_box_point(direction)
+        return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
 
     def __init__(self, center, point, *args, **kwargs):
         self.e_center = convert_to_coord(center)
@@ -40,7 +42,7 @@ class EuclidCircle(EMObject, mn.Circle):
 
     def intersect_circle(self, other: EuclidCircle) -> Vect3 | None:
         p2, r2 = other.e_center, other.radius
-        base = L.VirtualLine(self.e_center, p2, scene=self.scene)
+        base = L.VirtualLine(self.e_center, p2, scene=self.scene, stroke_color=BLUE)
         d = base.get_length()
 
         d1 = 1 / (2 * d) * (d ** 2 + self.radius ** 2 - r2 ** 2)
@@ -59,7 +61,7 @@ class EuclidCircle(EMObject, mn.Circle):
         sx, sy, *_ = base.get_start()
         if d1 < 1:
             sx, sy, *_ = base.get_end()
-        px, py = base.point(d1)
+        px, py, _ = base.point(d1)
 
         p4x = px + py - sy
         p4y = py - px + sx

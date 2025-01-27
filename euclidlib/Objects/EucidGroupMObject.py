@@ -40,6 +40,14 @@ def {name}(self, *args):
             player(**kwargs)
         return self.obj
 
+    def __getitem__(self, item: int | slice):
+        if isinstance(item, slice):
+            for player in self.players[item]:
+                player()
+        else:
+            self.players[item]()
+        return self.obj
+
 
 class PsuedoGroup(EMObject):
     if TYPE_CHECKING:

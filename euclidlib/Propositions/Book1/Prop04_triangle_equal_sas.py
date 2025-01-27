@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.getcwd())
 from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
@@ -52,15 +53,17 @@ class Book1Prop4(Book1Scene):
 
             t['ABC'] = EuclidTriangle(A, B, C,
                                       scene=self,
-                                      point_labels=[('A', UP), ('B', LEFT), ('C', DOWN)],
-                                      labels=[('x', UP), (None, None), ('y', RIGHT)],
+                                      point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
+                                                    ('C', dict(away_from='center_f'))],
+                                      labels=[('x', dict(outside=True)), (), ('y', dict(inside=True))],
                                       angles=[r'\alpha', None, None, mn_scale(20)]
                                       )
 
             t['DEF'] = EuclidTriangle(D, E, F,
                                       scene=self,
-                                      point_labels=[('D', LEFT), ('E', DOWN), ('F', LEFT)],
-                                      labels=[('x', DOWN), (None, None), ('y', LEFT)],
+                                      point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
+                                                    ('F', dict(away_from='center_f'))],
+                                      labels=[('x', dict(inside=True)), (), ('y', dict(outside=True))],
                                       angles=[r'\alpha', None, None]
                                       )
 
@@ -69,9 +72,9 @@ class Book1Prop4(Book1Scene):
             t1.explain("... then they are equal in all respects")
             t2.math(r"\triangle ABC = \triangle DEF")
             with self.simultaneous():
-                t['ABC'].set_labels((None, None), ('z', RIGHT), (None, None))
+                t['ABC'].set_labels((), ('z', RIGHT), ())
             with self.simultaneous():
-                t['DEF'].set_labels((None, None), ('z', LEFT), (None, None))
+                t['DEF'].set_labels((), ('z', LEFT), ())
             with self.simultaneous():
                 t['ABC'].set_angles(None, r'\gamma', r'\beta')
             with self.simultaneous():
@@ -103,7 +106,6 @@ class Book1Prop4(Book1Scene):
 
             with self.simultaneous():
                 t['ABC'].green()
-                t['ABC'].remove_labels()
             with self.simultaneous():
                 t['ABC'].lift.e_move(np.array([D[0] - A[0], D[1] - A[1], 0]))(run_time=2)
 
@@ -123,8 +125,6 @@ class Book1Prop4(Book1Scene):
                 t['ABC'].e_move(mn_scale(20, -10, 0))(run_time=1)
 
             t['ABC'].l[0].red()
-            with self.simultaneous():
-                t['ABC'].set_point_labels(('A', DOWN), ('B', RIGHT), ('C', RIGHT))
 
         @self.push_step
         def _p4():
@@ -214,7 +214,6 @@ class Book1Prop4(Book1Scene):
                 t['ABC'].l[1].e_normal()
                 t['DEF'].l[1].e_normal()
 
-
             t2.white.e_fade()
             t2.e_normal.blue(1, 2)
             t2.math("C = F")
@@ -222,8 +221,8 @@ class Book1Prop4(Book1Scene):
 
         @self.push_step
         def _p7():
-            t1.explain( "From common notion 4, things which coincide "
-                        "with one another, equal one another")
+            t1.explain("From common notion 4, things which coincide "
+                       "with one another, equal one another")
 
             t2.e_normal.white()
             t2.blue(*range(3))

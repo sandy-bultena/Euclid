@@ -78,7 +78,7 @@ class TextBox(EGroup[T.EStringObj]):
                  alignment=None,
                  buff_size=mn.SMALL_BUFF,
                  **kwargs):
-        if not absolute_position and not relative_position:
+        if absolute_position is None and relative_position is None:
             raise Exception("Must define starting position")
         self.next_buff = 0
         self.line_width = line_width
@@ -91,10 +91,10 @@ class TextBox(EGroup[T.EStringObj]):
     def compute_bounding_box(self):
         if self:
             return super().compute_bounding_box()
-        if self.abs_position:
+        if self.abs_position is not None:
             x, y, _ = self.abs_position
             return np.array([[x, y, 0]] * 3)
-        if self.rel_position:
+        if self.rel_position is not None:
             ref, direction = self.rel_position
             low, _, _ = ref.get_bounding_box()
             return np.array([low - (direction * mn.MED_SMALL_BUFF)] * 3)
@@ -117,7 +117,13 @@ class TextBox(EGroup[T.EStringObj]):
         return newline
 
 
-    def generate_text(self, text: str, style: str = '', align_str: mn.SingleSelector|None=None, **other_options):
+    def generate_text(self,
+                      text: str,
+                      style: str = '',
+                      align_str: mn.SingleSelector|None=None,
+                      transform_from: T.EStringObj | int = None,
+                      transform_args: dict = None,
+                      **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
         kwargs['style'] = style
@@ -125,7 +131,7 @@ class TextBox(EGroup[T.EStringObj]):
                 self.line_width is not None):
             kwargs['line_width'] = self.line_width
         with self.scene.simultaneous():
-            newline = cls(text, **kwargs, scene=self.scene)
+            newline = cls(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
             if align_str:
                 newline.next_to(
@@ -140,6 +146,17 @@ class TextBox(EGroup[T.EStringObj]):
             if self.alignment and not align_str:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
+            if transform_from is None:
+                newline.e_draw()
+            else:
+                transform_args = transform_args or {}
+                if isinstance(transform_from, int):
+                    transform_from = self[transform_from]
+                self.scene.play(mn.TransformMatchingStrings(
+                    transform_from.copy(),
+                    newline,
+                    **transform_args,
+                ))
         self.add(newline)
         if self.rel_position:
             self.rel_position[0].refresh_bounding_box()
