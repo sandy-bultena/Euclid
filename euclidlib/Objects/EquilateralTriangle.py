@@ -28,4 +28,5 @@ def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
             c2.e_remove()
             l1.e_remove()
             l2.e_remove()
+        t.replace_point(-1, p)
     return t, p

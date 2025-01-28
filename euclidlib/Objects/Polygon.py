@@ -22,6 +22,26 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         direction = v - center
         return mn.normalize(direction)
 
+    @classmethod
+    def assemble(cls, lines: None|List[L.EuclidLine] = None, points: None|List[P.EuclidPoint] = None, **kwargs):
+        if points:
+            coords = [p.get_center() for p in points]
+        elif lines:
+            tmp_lines = lines + [lines[0]]
+            coords = []
+            for l1, l2 in pairwise(tmp_lines):
+                common, _, _ = A.angle_coords(l1, l2)
+                if common is None:
+                    mn.log.warning("Your polygon lines should touch each other!")
+                    return
+                coords.append(common)
+        else:
+            mn.log.warning("Need to provide lines or points")
+            return
+
+        return cls(*coords, **kwargs, _assemble_flag=True, _lines=lines, _points=points)
+
+
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
@@ -33,6 +53,9 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             z_index=-1,
             animate_part=('set_e_fill',),
             delay_anim=False,
+            _assemble_flag=False,
+            _lines: List[L.EuclidLine] | None = None,
+            _points: List[P.EuclidPoint] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
@@ -70,9 +93,16 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.speed = speed
         self.vertices = [convert_to_coord(p) for p in points]
         self.sides = len(self.vertices)
-        if not hasattr(self, 'lines'):
+        if _assemble_flag and _lines:
+            self.lines: List[L.EuclidLine] = _lines
+        else:
             self.lines: List[L.EuclidLine] = []
-        self.points: List[P.EuclidPoint] = []
+
+        if _assemble_flag and _points:
+            self.points: List[P.EuclidPoint] = _points
+        else:
+            self.points: List[P.EuclidPoint] = []
+
         self.angles: List[A.EuclidAngle | None] = [None] * self.sides
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part, **kwargs)
         if self.sides:
@@ -117,6 +147,8 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         return args
 
     def define_points(self, delay_anim=False):
+        if self.points:
+            return
         labels = self.options.get('point_labels', [()] * self.sides)
         with self.scene.simultaneous_speed(self.speed):
             self.points = [

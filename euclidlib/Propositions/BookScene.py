@@ -22,8 +22,7 @@ class BookScene(PropScene):
     prop: int
 
     def title_page(self):
-        t = TextBox(self,
-                    absolute_position=(0, mn_scale(350), 0),
+        t = TextBox((0, mn_scale(350), 0),
                     buff_size=MED_LARGE_BUFF,
                     alignment='n'
                     )
@@ -51,8 +50,7 @@ class BookScene(PropScene):
         self.play(FadeIn(grid))
 
         if self.title and self.prop:
-            t = TextBox(self,
-                        absolute_position=mn_coord(700, 50),
+            t = TextBox(mn_coord(700, 50),
                         line_width=to_manim_h_scale(1000),
                         alignment='n'
                         )
@@ -74,8 +72,7 @@ class Book1Scene(BookScene):
     def title_page(self):
         super().title_page()
 
-        title_box = TextBox(self,
-                            absolute_position=mn_scale(0, 100, 0),
+        title_box = TextBox(mn_scale(0, 100, 0),
                             line_width=to_manim_h_scale(550),
                             alignment='w'
                             )

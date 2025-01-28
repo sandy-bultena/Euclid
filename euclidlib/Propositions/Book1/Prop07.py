@@ -16,14 +16,14 @@ class Prop07(Book1Scene):
              "two respectively, namely each equal to that from the same end.")
 
     def define_steps(self):
-        t1 = TextBox(self, absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
-        t2 = TextBox(self, absolute_position=mn_coord(500, 330), line_width=to_manim_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t2 = TextBox(mn_coord(500, 330), line_width=to_manim_h_scale(550))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}
         c: Dict[str | int, EuclidCircle] = {}
         t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngle] = {}
+        a: Dict[str | int, EuclidAngleBase] = {}
 
         A = mn_coord(450, 650)
         B = mn_coord(200, 650)

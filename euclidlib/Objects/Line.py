@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import EnumType, Enum
+from itertools import pairwise
 
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
@@ -235,6 +236,15 @@ class EuclidLine(EMObject, mn.Line):
         if theta > PI:
             theta -= TAU
         return self.e_rotate(self.get_start(), theta)
+
+    def e_split(self, *points: Mobject | Vect3):
+        cls = type(self)
+        coords = [self.get_start(), *map(self.pointify, points), self.get_end()]
+        lines = [cls(p1, p2, skip_anim=True) for p1, p2 in pairwise(coords)]
+        self.e_delete()
+        return lines
+
+
 
 
 class VirtualLine(EuclidLine):

@@ -20,7 +20,7 @@ class Prop06(Book1Scene):
         p: Dict[str | int, EuclidPoint] = {}
         c: Dict[str | int, EuclidCircle] = {}
         t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngle] = {}
+        a: Dict[str | int, EuclidAngleBase] = {}
 
         A = mn_coord(225, 250)
         B = mn_coord(425, 450)

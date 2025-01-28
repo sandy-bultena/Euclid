@@ -15,9 +15,9 @@ class Book1Prop2(Book1Scene):
              "with one end at a given point.")
 
     def define_steps(self):
-        t1 = TextBox(self, absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
-        t2 = TextBox(self, absolute_position=mn_coord(580, 430), line_width=to_manim_h_scale(500))
-        t3 = TextBox(self, absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(500))
+        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t2 = TextBox(mn_coord(580, 430), line_width=to_manim_h_scale(500))
+        t3 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(500))
         A = mn_coord(200, 500)
         B = mn_coord(300, 500)
         C = mn_coord(440, 400)

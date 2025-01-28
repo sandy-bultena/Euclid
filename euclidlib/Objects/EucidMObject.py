@@ -399,7 +399,7 @@ def {name}(self, *args):
                  scene: ps.PropScene = None,
                  debug=False,
                  label_args: Tuple[str, ...] | str | None = None,
-                 label: str = None,
+                 label: Tuple[str, ...] | str | None = None,
                  **kwargs):
         label_args = label_args or label
         self._debug = debug

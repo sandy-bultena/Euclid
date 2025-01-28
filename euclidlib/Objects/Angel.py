@@ -3,16 +3,19 @@ from euclidlib.Objects.EucidMObject import *
 from .Line import EuclidLine
 from manimlib import TAU
 from . import Text as T
+from . import Point as P
+from . import Circle as C
 import math
 from typing import Tuple, Any, Self, Callable
 
 EPSILON = mn_scale(1)
-ANGLE_DATA = tuple[
-    float | None,
-    float | None,
-    tuple[float, float] | None,
-    tuple[float, float] | None,
-]
+if TYPE_CHECKING:
+    from manimlib import Vect3
+    ANGLE_DATA = tuple[
+        Vect3 | None,
+        tuple[float, float] | None,
+        tuple[float, float] | None,
+    ]
 
 
 def angle_coords(l1: EuclidLine, l2: EuclidLine) -> ANGLE_DATA:
@@ -44,13 +47,13 @@ def angle_coords(l1: EuclidLine, l2: EuclidLine) -> ANGLE_DATA:
         end2 = l2.get_start()
 
     else:
-        return None, None, None, None
+        return None, None, None
 
     vx, vy, _ = common
     vx1, vy1, _ = end1
     vx2, vy2, _ = end2
 
-    return vx, vy, (vx1 - vx, vy1 - vy), (vx2 - vx, vy2 - vy)
+    return common, (vx1 - vx, vy1 - vy), (vx2 - vx, vy2 - vy)
 
 
 def angleOf(p0: mn.Vect3, p1: mn.Vect3):
@@ -61,7 +64,7 @@ def angleOf(p0: mn.Vect3, p1: mn.Vect3):
 
 
 def calculateAngle(l1: EuclidLine, l2: EuclidLine):
-    vx, vy, vec1, vec2 = angle_coords(l1, l2)
+    (vx, vy, _), vec1, vec2 = angle_coords(l1, l2)
 
     if vx is None:
         return None
@@ -74,7 +77,107 @@ def calculateAngle(l1: EuclidLine, l2: EuclidLine):
     return th_diff % TAU
 
 
-class ArcAngle(EMObject, mn.Arc):
+class EuclidAngleBase(EMObject):
+    l1: EuclidLine
+    l2: EuclidLine
+    size: float
+    e_angle: float
+    e_start_angle: float
+    e_end_angle: float
+    vx: float
+    vy: float
+    vec1: mn.Vect2
+    vec2: mn.Vect2
+
+    def get_arc_center(self) -> Vect3:
+        return np.array([self.vx, self.vy, 0])
+
+    def shift(self, vector: Vect3) -> Self:
+        self.vx += vector[0]
+        self.vy += vector[1]
+        return super().shift(vector)
+
+    def rotate(self, angle: float, *args, **kwargs) -> Self:
+        self.e_start_angle += angle
+        self.e_end_angle += angle
+        return super().rotate(angle, *args, **kwargs)
+
+    def proportion_angle(self, alpha: float):
+        interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
+        return interp
+
+    def get_bisect(self, alpha=0.5):
+        return self.proportion_angle(alpha)
+
+    def get_bisect_dir(self, alpha=0.5):
+        bisect = self.get_bisect(alpha)
+        return np.array([math.cos(bisect), math.sin(bisect), 0.0])
+
+    def e_label_point(self, alpha=0.5, buff=None):
+        center = self.get_arc_center()
+        bisect_dir = self.get_bisect_dir(alpha)
+        return center + bisect_dir * (self.size + (buff or self.LabelBuff))
+
+    def bisect(self, speed):
+        vx, vy, _ = self.get_arc_center()
+        v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
+        v2 = np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0.0])
+
+        with self.scene.animation_speed(speed):
+            # ------------------------------------------------------------------------
+            # make two temporary lines
+            # ------------------------------------------------------------------------
+            with self.scene.simultaneous():
+                s1 = EuclidLine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
+                s2 = EuclidLine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
+
+            # ------------------------------------------------------------------------
+            # define points B and C on the two lines, equidistance from the vertex
+            # ------------------------------------------------------------------------
+            # pick the shorter of the two lines to find the initial point
+            short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
+            p = s1.point(0.75 * short.get_length())
+            pB = P.EuclidPoint(p)
+            cA = C.EuclidCircle(self.get_arc_center(), pB).e_fade()
+            p = cA.intersect(self.l2)
+            pC = P.EuclidPoint(p[0])
+
+            # ------------------------------------------------------------------------
+            # draw two circles, radius BC, centers: B & C.
+            # - find the intersection points between two circles
+            # ------------------------------------------------------------------------
+            c1 = C.EuclidCircle(pB, pC).e_fade()
+            c2 = C.EuclidCircle(pC, pB).e_fade()
+            ps = c1.intersect(c2)
+            if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
+                p1 = P.EuclidPoint(ps[0])
+            else:
+                p1 = P.EuclidPoint(ps[1])
+
+            # ------------------------------------------------------------------------
+            # draw a line to intersection
+            # ------------------------------------------------------------------------
+            lAD = EuclidLine(self.get_arc_center(), p1)
+
+            # ------------------------------------------------------------------------
+            # cleanup
+            # ------------------------------------------------------------------------
+            with self.scene.simultaneous():
+                c1.e_fade()
+                c2.e_fade()
+                cA.e_fade()
+                s1.e_remove()
+                s2.e_remove()
+                pB.e_remove()
+                pC.e_remove()
+
+            # ------------------------------------------------------------------------
+            # return new line, point, all circles
+            # ------------------------------------------------------------------------
+            return lAD, p1, c1, c2, cA
+
+
+class ArcAngle(EuclidAngleBase, mn.Arc):
     LabelBuff = 0.15
 
     def __init__(self,
@@ -124,8 +227,6 @@ class ArcAngle(EMObject, mn.Arc):
             **kwargs
         )
 
-    def get_arc_center(self) -> Vect3:
-        return np.array([self.vx, self.vy, 0])
 
     def pointwise_become_partial(self, start: ArcAngle, a: float, b: float) -> Self:
         if a <= 0:
@@ -139,6 +240,7 @@ class ArcAngle(EMObject, mn.Arc):
             self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
         return super().pointwise_become_partial(start, a, b)
 
+
     def interpolate(
             self,
             mobject1: ArcAngle,
@@ -151,34 +253,11 @@ class ArcAngle(EMObject, mn.Arc):
         self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
         return super().interpolate(mobject1, mobject2, alpha, path_func)
 
-    def shift(self, vector: Vect3) -> Self:
-        self.vx += vector[0]
-        self.vy += vector[1]
-        return super().shift(vector)
-
-    def rotate(self, angle: float, *args, **kwargs) -> Self:
-        self.e_start_angle += angle
-        self.e_end_angle += angle
-        return super().rotate(angle, *args, **kwargs)
-
-    def proportion_angle(self, alpha: float):
-        interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
-        return interp
-
-    def get_bisect(self, alpha=0.5):
-        return self.proportion_angle(alpha)
-
-    def get_bisect_dir(self, alpha=0.5):
-        bisect = self.get_bisect(alpha)
-        return np.array([math.cos(bisect), math.sin(bisect), 0.0])
-
-    def e_label_point(self, alpha=0.5, buff=None):
-        center = self.get_arc_center()
-        bisect_dir = self.get_bisect_dir(alpha)
-        return center + bisect_dir * (self.size + (buff or self.LabelBuff))
 
 
-class RightAngle(EMObject, mn.VMobject):
+
+
+class RightAngle(EuclidAngleBase, mn.VMobject):
     def CreationOf(self, *args, **kwargs):
         self.add_points_as_corners((
             (self.vx + self.size * math.cos(self.angle1), self.vy + self.size * math.sin(self.angle1)),
@@ -214,51 +293,48 @@ class RightAngle(EMObject, mn.VMobject):
             return T.Label(label, ref=self, direction=self.get_label_dir())
 
 
-class EuclidAngle(EMObject):
-    def __new__(cls,
-                l1: EuclidLine | str,
+def EuclidAngle(l1: EuclidLine | str,
                 l2: EuclidLine = None,
                 size: float = mn_scale(40),
                 no_right: bool = False,
                 **kwargs):
+    if isinstance(l1, str):
+        l1s, l2s = l1[:2], l1[1:]
+        from inspect import currentframe
+        f = currentframe()
+        while f.f_back:
+            f = f.f_back
+            if 'l' in f.f_locals:
+                break
+        if f.f_back is None:
+            raise Exception("Can't Find Scene")
+        lines = f.f_locals.get('l', {})
+        l1 = lines.get(l1s, lines.get(l1s[::-1]))
+        if l1 is None:
+            raise Exception(f"Can't find lines {l1s} or {l1s[::-1]} in {lines}")
+        l2 = lines.get(l2s, lines.get(l2s[::-1]))
+        if l2 is None:
+            raise Exception(f"Can't find lines {l2s} or {l2s[::-1]} in {lines}")
 
-        if isinstance(l1, str):
-            l1s, l2s = l1[:2], l1[1:]
-            from inspect import currentframe
-            f = currentframe()
-            while f.f_back:
-                f = f.f_back
-                if 'l' in f.f_locals:
-                    break
-            if f.f_back is None:
-                raise Exception("Can't Find Scene")
-            lines = f.f_locals.get('l', {})
-            l1 = lines.get(l1s, lines.get(l1s[::-1]))
-            if l1 is None:
-                raise Exception(f"Can't find lines {l1s} or {l1s[::-1]} in {lines}")
-            l2 = lines.get(l2s, lines.get(l2s[::-1]))
-            if l2 is None:
-                raise Exception(f"Can't find lines {l2s} or {l2s[::-1]} in {lines}")
+    assert (l2 is not None)
 
-        assert (l2 is not None)
+    (px, py, _), v1, v2 = angle_coords(l1, l2)
 
-        px, py, v1, v2 = angle_coords(l1, l2)
+    if px is None:
+        raise Exception(f"No Common Midpoint: {l1.get_start(), l1.get_end()} | {l2.get_start(), l2.get_end()}")
 
-        if px is None:
-            raise Exception(f"No Common Midpoint: {l1.get_start(), l1.get_end()} | {l2.get_start(), l2.get_end()}")
+    th1 = math.atan2(v1[1], v1[0])
+    th2 = math.atan2(v2[1], v2[0])
+    th_diff = th2 - th1
 
-        th1 = math.atan2(v1[1], v1[0])
-        th2 = math.atan2(v2[1], v2[0])
-        th_diff = th2 - th1
+    if th_diff > PI:
+        th_diff = th_diff - TAU
+    elif th_diff < -PI:
+        th_diff = TAU + th_diff
 
-        if th_diff > PI:
-            th_diff = th_diff - TAU
-        elif th_diff < -PI:
-            th_diff = TAU + th_diff
+    if abs(abs(th_diff) - PI) < 0.1 and not no_right:
+        return RightAngle(l1, l2, size, (px, py, v1, v2), th1, th2, th_diff, **kwargs)
+    else:
+        return ArcAngle(l1, l2, size, (px, py, v1, v2), th1, th2, th_diff, **kwargs)
 
-        if abs(abs(th_diff) - PI) < 0.1 and not no_right:
-            angle_obj = super().__new__(RightAngle)
-        else:
-            angle_obj = super().__new__(ArcAngle)
-        angle_obj.__init__(l1, l2, size, (px, py, v1, v2), th1, th2, th_diff, **kwargs)
-        return angle_obj
+

@@ -69,35 +69,26 @@ class TextBox(EGroup[T.EStringObj]):
 
 
     def __init__(self,
+                 absolute_position: Tuple[float, float, float],
                  scene: PropScene | None = None,
                  *args,
-                 absolute_position: Tuple[float, float, float] | None = None,
-                 relative_position: Tuple[mn.Mobject, mn.Vect3] | None = None,
                  line_width: float = None,
                  stroke_width=0,
                  alignment=None,
                  buff_size=mn.SMALL_BUFF,
                  **kwargs):
-        if absolute_position is None and relative_position is None:
-            raise Exception("Must define starting position")
         self.next_buff = 0
         self.line_width = line_width
         self._buff_size = buff_size
         self.abs_position = absolute_position
-        self.rel_position = relative_position
         self.alignment=self.ALIGNMENT[alignment]
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def compute_bounding_box(self):
         if self:
             return super().compute_bounding_box()
-        if self.abs_position is not None:
-            x, y, _ = self.abs_position
-            return np.array([[x, y, 0]] * 3)
-        if self.rel_position is not None:
-            ref, direction = self.rel_position
-            low, _, _ = ref.get_bounding_box()
-            return np.array([low - (direction * mn.MED_SMALL_BUFF)] * 3)
+        x, y, _ = self.abs_position
+        return np.array([[x, y, 0]] * 3)
 
 
     @property
@@ -158,8 +149,6 @@ class TextBox(EGroup[T.EStringObj]):
                     **transform_args,
                 ))
         self.add(newline)
-        if self.rel_position:
-            self.rel_position[0].refresh_bounding_box()
         return newline
 
     def e_remove(self):
@@ -201,7 +190,5 @@ def {style}(self, text: str, **kwargs):
 
     def down(self, buff=mn.MED_SMALL_BUFF):
         self.next_buff = buff
-        if self.rel_position:
-            self.rel_position[0].refresh_bounding_box()
 
 
