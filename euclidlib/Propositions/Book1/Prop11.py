@@ -1,6 +1,8 @@
 import sys
 import os
 
+from euclidlib.Objects import EquilateralTriangle
+
 sys.path.append(os.getcwd())
 
 from euclidlib.Propositions.BookScene import Book1Scene

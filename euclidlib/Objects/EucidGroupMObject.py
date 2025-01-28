@@ -74,7 +74,6 @@ class PsuedoGroup(EMObject):
         return full - exceptions
 
     def e_remove(self):
-        print(*self.get_group())
         for obj in self.get_group():
             if obj.in_scene():
                 obj.e_remove()

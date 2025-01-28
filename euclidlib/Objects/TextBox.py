@@ -170,13 +170,13 @@ def {style}(self, text: str, **kwargs):
     return self.generate_text(text, '{style}', **kwargs)
 """)
 
-    def e_update(self, index, text: str, transformArgs=None, **kwargs):
+    def e_update(self, index, text: str, transform_args=None, **kwargs):
         old = self[index]
-        transformArgs = transformArgs or {}
+        transform_args = transform_args or {}
         assert isinstance(old, T.EStringObj)
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_corner(mn.UL), mn.DR, buff=0)
-        self.scene.play(mn.TransformMatchingTex(old, new, **transformArgs))
+        self.scene.play(mn.TransformMatchingTex(old, new, **transform_args))
         self.replace_submobject(index, new)
 
     def e_append(self, index, text: str, **kwargs):

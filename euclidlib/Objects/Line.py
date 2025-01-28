@@ -240,9 +240,28 @@ class EuclidLine(EMObject, mn.Line):
     def e_split(self, *points: Mobject | Vect3):
         cls = type(self)
         coords = [self.get_start(), *map(self.pointify, points), self.get_end()]
-        lines = [cls(p1, p2, skip_anim=True) for p1, p2 in pairwise(coords)]
+        lines = [
+            cls(p1, p2, skip_anim=True).set_stroke(opacity=float(self.get_stroke_opacity()))
+            for p1, p2 in pairwise(coords)
+        ]
         self.e_delete()
         return lines
+
+    def bisect(self, speed=1):
+        cls = type(self)
+        with self.scene.animation_speed(speed):
+            c1 = Circle.EuclidCircle(*self.get_start_and_end()[::-1]).e_fade()
+            c2 = Circle.EuclidCircle(*self.get_start_and_end()).e_fade()
+            pts = c1.intersect(c2)
+            l = cls(*pts).e_fade()
+
+            pt = P.EuclidPoint(l.intersect(self))
+            with self.scene.simultaneous():
+                c1.e_remove()
+                c2.e_remove()
+                l.e_remove()
+
+        return pt
 
 
 
