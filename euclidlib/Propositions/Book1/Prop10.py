@@ -11,7 +11,7 @@ class Prop10(Book1Scene):
     title = "To bisect a given finite straight line."
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(500, 430))
         A = mn_coord(100, 400)
         B = mn_coord(400, 400)

@@ -51,7 +51,7 @@ class BookScene(PropScene):
 
         if self.title and self.prop:
             t = TextBox(mn_coord(700, 50),
-                        line_width=to_manim_h_scale(1000),
+                        line_width=mn_h_scale(1000),
                         alignment='n'
                         )
             t.title(f"Proposition {self.prop} of Book {self.book}")
@@ -73,7 +73,7 @@ class Book1Scene(BookScene):
         super().title_page()
 
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=to_manim_h_scale(550),
+                            line_width=mn_h_scale(550),
                             alignment='w'
                             )
         title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "

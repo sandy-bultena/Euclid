@@ -11,7 +11,7 @@ class Book1Prop1(Book1Scene):
     steps = []
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(500))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(500))
         t2 = TextBox(mn_coord(500, 430))
         A = mn_coord(200, 500)
         B = mn_coord(450, 500)

@@ -16,8 +16,8 @@ class Prop07(Book1Scene):
              "two respectively, namely each equal to that from the same end.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
-        t2 = TextBox(mn_coord(500, 330), line_width=to_manim_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t2 = TextBox(mn_coord(500, 330), line_width=mn_h_scale(550))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}

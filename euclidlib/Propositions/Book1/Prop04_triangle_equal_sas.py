@@ -17,9 +17,9 @@ class Book1Prop4(Book1Scene):
     )
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 200), line_width=to_manim_h_scale(550))
-        t2 = TextBox(mn_coord(40, 400), line_width=to_manim_h_scale(550))
-        t3 = TextBox(mn_coord(100, 500), line_width=to_manim_h_scale(800))
+        t1 = TextBox(mn_coord(800, 200), line_width=mn_h_scale(550))
+        t2 = TextBox(mn_coord(40, 400), line_width=mn_h_scale(550))
+        t3 = TextBox(mn_coord(100, 500), line_width=mn_h_scale(800))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}

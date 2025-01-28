@@ -34,7 +34,7 @@ def mn_scale(f, *rest):
     return f * (8.0 / 800)
 
 
-def to_manim_h_scale(x):
+def mn_h_scale(x):
     return x * (8.0 * 16 / 1400 / 9)
 
 

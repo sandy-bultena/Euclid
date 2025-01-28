@@ -12,7 +12,7 @@ class Prop06(Book1Scene):
     title = "If two angles of a triangle are equal, then the sides opposite them will be equal."
 
     def define_steps(self):
-        t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(absolute_position=mn_coord(450, 330))
         t4 = TextBox(absolute_position=mn_coord(450, 330))
 

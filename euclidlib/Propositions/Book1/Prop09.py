@@ -13,7 +13,7 @@ class Prop09(Book1Scene):
     title = "To bisect a given rectilinear angle."
 
     def define_steps(self):
-        t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(absolute_position=mn_coord(500, 430))
 
         l: Dict[str | int, EuclidLine] = {}

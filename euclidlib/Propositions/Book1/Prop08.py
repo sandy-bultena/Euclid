@@ -14,7 +14,7 @@ class Prop08(Book1Scene):
              "also have the angles equal which are contained by the equal straight lines.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(absolute_position=mn_coord(500, 330))
 
         l: Dict[str | int, EuclidLine] = {}

@@ -11,7 +11,7 @@ class PROP_NAME(BookScene):
     title = ""
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=to_manim_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
 
         l: Dict[str | int, EuclidLine] = {}
         p: Dict[str | int, EuclidPoint] = {}
