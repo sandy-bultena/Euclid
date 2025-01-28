@@ -53,7 +53,8 @@ class Prop10(Book1Scene):
         @self.push_step
         def _c2():
             t1.explain("Construct an equilateral triangle on AB and label the {nb:vertex C <sub>(I.1)</sub>}")
-            t[1], p['C'] = EquilateralTriangle.build(A, B, speed=2)
+            t[1] = EquilateralTriangle.build(A, B, speed=2)
+            p['C'] = t[1].p[-1]
             l['BC'], l['AC'] = t[1].l[1:]
             t[1].l[0].e_remove()
             p['C'].add_label('C', UP)

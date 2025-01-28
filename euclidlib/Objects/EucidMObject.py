@@ -222,7 +222,7 @@ def find_scene():
 
 
 class EMObject(mn.VMobject):
-    LabelBuff = mn.MED_LARGE_BUFF
+    LabelBuff = mn.MED_SMALL_BUFF
     CONSTRUCTION_TIME = 1
 
     @property

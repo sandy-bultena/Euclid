@@ -49,7 +49,8 @@ class Book1Prop2(Book1Scene):
         @self.push_step
         def _3():
             t1.explain("Construct an equilateral triangle on line AC <sub>(I.1)</sub>")
-            t[1], p['D'] = EquilateralTriangle.build(A, C)
+            t[1] = EquilateralTriangle.build(A, C)
+            p['D'] = t[1].p[-1]
             self.remove(l['AC'])
             l['AC'] = t[1].l[0]
             l['CD'] = t[1].l[1]
@@ -228,7 +229,8 @@ class Book1Prop2(Book1Scene):
         @self.push_step
         def _19():
             t3.explain("Construct an equilateral triangle on line AC")
-            t[2], p['D'] = EquilateralTriangle.build(A, D)
+            t[2] = EquilateralTriangle.build(A, D)
+            p['D'] = t[2].p[-1]
             with self.simultaneous():
                 l['AD'] = t[2].l[2]
                 l['CD'] = t[2].l[1]

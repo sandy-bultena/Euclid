@@ -71,7 +71,6 @@ class EuclidLine(EMObject, mn.Line):
         y = r / math.sqrt(dy**2 + dx**2) * dy + ys
         return x, y
 
-
     def intersect(self, l2: EuclidLine):
         (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
         (x10, y10, _), (x11, y11, _) = l2.get_start_and_end()
@@ -148,7 +147,8 @@ class EuclidLine(EMObject, mn.Line):
             l['AC'] = EuclidLine(A, C, scene=self.scene).e_fade()
 
             # construct equilateral on above line (D = apex of triangle)
-            t[1], p['D'] = EquilateralTriangle.build(A, C)
+            t[1] = EquilateralTriangle.build(A, C)
+            p['D'] = t[1].p[-1]
             with self.scene.simultaneous():
                 l['AD'] = t[1].l[2]
                 l['CD'] = t[1].l[1]

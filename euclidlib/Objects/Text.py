@@ -23,6 +23,7 @@ MARKUP_REPLACE = (
 )
 
 MATH_PREAMBLE = (
+    r'\usepackage{unicode-math}'
     r'\newcommand{\ecrossmark}{\textrm{\ding{55}}}',
     r'\newcommand{\echeckmark}{\textrm{\ding{51}}}'
 )
@@ -123,6 +124,7 @@ class ETex(EStringObj, mn.Tex):
         super().__init__(
             text,
             *args,
+            template='basic_ctex',
             additional_preamble='\n'.join(MATH_PREAMBLE),
             **kwargs)
 
@@ -137,7 +139,7 @@ class Label(ETex):
 
     def RemovalOf(self, *args, **kwargs):
         kwargs['run_time'] = self.ref.AUX_CONSTRUCTION_TIME
-        return super().RemovalOf(*args, **kwargs)
+        return super().RemovalOf(*args, **kwargs, rate_func=mn.squish_rate_func(mn.smooth, 1, 0.9))
 
     def __init__(self, text, ref: E.EMObject, *args, align=mn.ORIGIN, **extra_args):
         self.ref = ref

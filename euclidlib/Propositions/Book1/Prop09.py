@@ -50,7 +50,7 @@ class Prop09(Book1Scene):
                 l['AB'] = EuclidLine(A, p['B'])
                 l['AC'] = EuclidLine(A, p['C'])
                 l['BC'] = EuclidLine(p['B'], p['C'])
-                t[1], _ = EquilateralTriangle.build(p['C'], p['B'])
+                t[1] = EquilateralTriangle.build(p['C'], p['B'])
             l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
             l['AD'] = EuclidLine(A, p['D'])
             a['DAC'] = EuclidAngle('DAC', label=r'\alpha')
@@ -89,7 +89,7 @@ class Prop09(Book1Scene):
                        r"and label the vertex {nb:D <sub>(I.1)</sub>}")
             c['A'].e_fade()
             l['BC'].e_draw()
-            t[1], _ = EquilateralTriangle.build(p['C'], p['B'])
+            t[1] = EquilateralTriangle.build(p['C'], p['B'])
             l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
             t[1].l[0].e_delete()
             p['D'].add_label('D', DOWN)
