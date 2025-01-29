@@ -18,6 +18,7 @@ class PROP_NAME(BookScene):
         c: Dict[str | int, EuclidCircle] = {}
         t: Dict[str | int, EuclidTriangle] = {}
         a: Dict[str | int, EuclidAngleBase] = {}
+        eq: Dict[str | int, EStringObj] = {}
 
         # ----------------------------------------------
         # In Other Words

@@ -117,6 +117,7 @@ class TextBox(EGroup[T.EStringObj]):
                       transform_from: T.EStringObj | int = None,
                       transform_args: dict = None,
                       delay_anim=False,
+                      break_into_parts: Tuple[str, ...] | None = None,
                       **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
@@ -144,7 +145,19 @@ class TextBox(EGroup[T.EStringObj]):
             if self.alignment and not align_str:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
-            if transform_from is None and not delay_anim:
+            if break_into_parts:
+                print(break_into_parts)
+                parts = [self.generate_text(part, style, delay_anim=True)
+                         for part in break_into_parts]
+                for p, t in zip(parts, break_into_parts):
+                    print(t)
+                    p.next_to(newline[t], mn.ORIGIN, buff=0)
+                    if not delay_anim:
+                        p.e_draw()
+                self.add(newline)
+                return *parts, newline
+
+            elif transform_from is None and not delay_anim:
                 newline.e_draw()
             elif not delay_anim:
                 transform_args = transform_args or {}
@@ -167,43 +180,64 @@ class TextBox(EGroup[T.EStringObj]):
                   align_index: int | T.EStringObj = -1,
                   align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                   transform_from: T.EStringObj | int = None,
-                  transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                  transform_args: dict = None,
+                  break_into_parts: Tuple[str, ...] | None = None,
+                  **kwargs,
+                  ) -> T.EStringObj: ...
 
         def explain(self, text: str,
                     align_index: int | T.EStringObj = -1,
                     align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                     transform_from: T.EStringObj | int = None,
-                    transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                    transform_args: dict = None,
+                    break_into_parts: Tuple[str, ...] | None = None,
+                    **kwargs,
+                    ) -> T.EStringObj: ...
 
         def explainM(self, text: str,
                      align_index: int | T.EStringObj = -1,
                      align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                      transform_from: T.EStringObj | int = None,
-                     transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                     transform_args: dict = None,
+                     break_into_parts: Tuple[str, ...] | None = None,
+                     **kwargs,
+                     ) -> T.EStringObj: ...
 
         def normal(self, text: str,
                    align_index: int | T.EStringObj = -1,
                    align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                    transform_from: T.EStringObj | int = None,
-                   transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                   transform_args: dict = None,
+                   break_into_parts: Tuple[str, ...] | None = None,
+                   **kwargs,
+                   ) -> T.EStringObj: ...
 
         def math(self, text: str,
                  align_index: int | T.EStringObj = -1,
                  align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                  transform_from: T.EStringObj | int = None,
-                 transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                 transform_args: dict = None,
+                 break_into_parts: Tuple[str, ...] | None = None,
+                 **kwargs,
+                 ) -> T.EStringObj: ...
 
         def fancy(self, text: str,
                   align_index: int | T.EStringObj = -1,
                   align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                   transform_from: T.EStringObj | int = None,
-                  transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                  transform_args: dict = None,
+                  break_into_parts: Tuple[str, ...] | None = None,
+                  **kwargs,
+                  ) -> T.EStringObj: ...
 
         def title_screen(self, text: str,
                          align_index: int | T.EStringObj = -1,
                          align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                          transform_from: T.EStringObj | int = None,
-                         transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+                         transform_args: dict = None,
+                         break_into_parts: Tuple[str, ...] | None = None,
+                         **kwargs,
+                         ) -> T.EStringObj: ...
 
     for style in fonts:
         exec(f"""

@@ -60,6 +60,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         self.select_parts(selector).set_color(color)
         return self
 
+    def transform_from(self, other: EStringObj, **transform_args):
+        self.scene.play(mn.TransformMatchingStrings(other.copy(), self, **transform_args))
+
     @property
     def CONSTRUCTION_TIME(self):
         return INIT_TEXT_RUN_TIME + INCREASE_PER_CHARACTER * max(0, len(self.string) - DELAYED_INCREASE)
