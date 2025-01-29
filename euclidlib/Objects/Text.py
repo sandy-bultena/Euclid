@@ -4,6 +4,7 @@ from abc import ABC
 
 from . import EucidMObject as E
 from . import CustomAnimation as CA
+from . import EucidGroupMObject as G
 import re
 import manimlib as mn
 from functools import reduce, partial

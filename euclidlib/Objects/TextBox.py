@@ -3,12 +3,13 @@ from collections import defaultdict
 from typing import Tuple, Mapping, TYPE_CHECKING, Dict
 import manimlib as mn
 import numpy as np
+
 from .EucidMObject import EMObject
 from .EucidGroupMObject import EGroup, PsuedoGroup
 from . import Text as T
 from . import CustomAnimation as CA
+from contextlib import contextmanager
 import sys
-
 
 from euclidlib.Propositions.PropScene import PropScene
 
@@ -16,11 +17,14 @@ INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
 
+
 class TextBuffer(EMObject, mn.Square):
     def CreationOf(self, *args, **kwargs):
         return []
+
     def __init__(self, size, scene, **kwargs):
         super().__init__(size, stroke_opacity=0, **kwargs, scene=scene)
+
 
 class TextBox(EGroup[T.EStringObj]):
     AUX_CONSTRUCTION_TIME = 0.1
@@ -36,7 +40,7 @@ class TextBox(EGroup[T.EStringObj]):
 
     fonts: Dict[str, Tuple[T.EStringObj, dict]]
 
-    if sys.platform == 'darwin': # MAC CHECK
+    if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Arial Rounded MT Bold')),
             explain=(T.EMarkupText, dict(font_size=18, font='Arial')),
@@ -67,7 +71,6 @@ class TextBox(EGroup[T.EStringObj]):
             title_screen=(T.EText, dict(font_size=128))
         )
 
-
     def __init__(self,
                  absolute_position: Tuple[float, float, float],
                  scene: PropScene | None = None,
@@ -81,7 +84,7 @@ class TextBox(EGroup[T.EStringObj]):
         self.line_width = line_width
         self._buff_size = buff_size
         self.abs_position = absolute_position
-        self.alignment=self.ALIGNMENT[alignment]
+        self.alignment = self.ALIGNMENT[alignment]
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def compute_bounding_box(self):
@@ -90,11 +93,9 @@ class TextBox(EGroup[T.EStringObj]):
         x, y, _ = self.abs_position
         return np.array([[x, y, 0]] * 3)
 
-
     @property
     def buff_size(self):
         return self._buff_size if self else 0
-
 
     def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, **other_options):
         cls, kwargs = self.fonts[style]
@@ -107,13 +108,15 @@ class TextBox(EGroup[T.EStringObj]):
         newline.fix_in_frame()
         return newline
 
-
     def generate_text(self,
                       text: str,
                       style: str = '',
-                      align_str: mn.SingleSelector|None=None,
+                      /,
+                      align_index: int | T.EStringObj = -1,
+                      align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                       transform_from: T.EStringObj | int = None,
                       transform_args: dict = None,
+                      delay_anim=False,
                       **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
@@ -125,21 +128,25 @@ class TextBox(EGroup[T.EStringObj]):
             newline = cls(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
             if align_str:
+                if isinstance(align_str, str):
+                    align_str = (align_str, align_str)
+                align_obj = align_index if isinstance(align_index, T.EStringObj) else self[align_index]
                 newline.next_to(
-                    self[-1][align_str].get_bottom(),
+                    align_obj[align_str[0]].get_bottom(),
                     mn.DOWN,
                     buff=self.buff_size + self.next_buff,
-                    index_of_submobject_to_align=align_str
+                    index_of_submobject_to_align=align_str[1]
                 )
+                newline.next_to(align_obj, mn.DOWN, buff=self.buff_size, coor_mask=mn.UP)
             else:
                 newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
             self.next_buff = 0
             if self.alignment and not align_str:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
-            if transform_from is None:
+            if transform_from is None and not delay_anim:
                 newline.e_draw()
-            else:
+            elif not delay_anim:
                 transform_args = transform_args or {}
                 if isinstance(transform_from, int):
                     transform_from = self[transform_from]
@@ -156,19 +163,84 @@ class TextBox(EGroup[T.EStringObj]):
         self.clear()
 
     if TYPE_CHECKING:
-        def title(self, text: str, **kwargs) -> T.EStringObj: ...
-        def explain(self, text: str, **kwargs) -> T.EStringObj: ...
-        def explainM(self, text: str, **kwargs) -> T.EStringObj: ...
-        def normal(self, text: str, **kwargs) -> T.EStringObj: ...
-        def math(self, text: str, **kwargs) -> T.EStringObj: ...
-        def fancy(self, text: str, **kwargs) -> T.EStringObj: ...
-        def title_screen(self, text: str, **kwargs) -> T.EStringObj: ...
+        def title(self, text: str,
+                  align_index: int | T.EStringObj = -1,
+                  align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                  transform_from: T.EStringObj | int = None,
+                  transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def explain(self, text: str,
+                    align_index: int | T.EStringObj = -1,
+                    align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                    transform_from: T.EStringObj | int = None,
+                    transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def explainM(self, text: str,
+                     align_index: int | T.EStringObj = -1,
+                     align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                     transform_from: T.EStringObj | int = None,
+                     transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def normal(self, text: str,
+                   align_index: int | T.EStringObj = -1,
+                   align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                   transform_from: T.EStringObj | int = None,
+                   transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def math(self, text: str,
+                 align_index: int | T.EStringObj = -1,
+                 align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                 transform_from: T.EStringObj | int = None,
+                 transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def fancy(self, text: str,
+                  align_index: int | T.EStringObj = -1,
+                  align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                  transform_from: T.EStringObj | int = None,
+                  transform_args: dict = None, **kwargs) -> T.EStringObj: ...
+
+        def title_screen(self, text: str,
+                         align_index: int | T.EStringObj = -1,
+                         align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                         transform_from: T.EStringObj | int = None,
+                         transform_args: dict = None, **kwargs) -> T.EStringObj: ...
 
     for style in fonts:
         exec(f"""
 def {style}(self, text: str, **kwargs):
     return self.generate_text(text, '{style}', **kwargs)
 """)
+
+    # @contextmanager
+    # def join_parts(self,
+    #                delay_anim=False,
+    #                realign_result=False,
+    #                transform_from: T.EStringObj | int = None,
+    #                transform_args: dict = None):
+    #     proxy = TempTextBoxProxy(self)
+    #     yield proxy
+    #     head: mn.StringMobject
+    #     head, *rest = proxy
+    #     head.string = head.string + ' '.join(x.string for x in rest)
+    #     for r in rest:
+    #         head.add(*r)
+    #     self.add(head)
+    #     if realign_result and self.alignment:
+    #         (get_side, side) = self.alignment
+    #         head.align_to(get_side(self), side)
+    #     if not delay_anim:
+    #         if transform_from is not None:
+    #             if isinstance(transform_from, int):
+    #                 transform_from = self[transform_from]
+    #             self.scene.play(mn.TransformMatchingStrings(
+    #                 transform_from.copy(),
+    #                 head,
+    #                 **transform_args,
+    #             ))
+    #         else:
+    #             head.e_draw()
+    #     proxy.clear()
+    #     self.scene.remove(proxy)
 
     def e_update(self, index, text: str, transform_args=None, **kwargs):
         old = self[index]
@@ -187,8 +259,40 @@ def {style}(self, text: str, **kwargs):
         new.e_draw()
         old.add(*new.submobjects)
 
-
     def down(self, buff=mn.MED_SMALL_BUFF):
         self.next_buff = buff
 
 
+# class TempTextBoxProxy(TextBox):
+#     def __init__(self, parent: TextBox):
+#         self.next_buff = 0
+#         self.parent = parent
+#         self.line_width = parent.line_width
+#         self._buff_size = parent._buff_size
+#         self.abs_position = parent.abs_position
+#         self.alignment = parent.alignment
+#         super(TextBox, self).__init__()
+#
+#     @property
+#     def buff_size(self):
+#         return self._buff_size
+#
+#     def __getitem__(self, item):
+#         return self.parent[item]
+#
+#     def get_bottom(self):
+#         if not self:
+#             return self.parent.get_bottom()
+#         return super().get_bottom()
+#
+#     for style in TextBox.fonts:
+#         exec(f"""
+# def {style}(self, text: str, **kwargs):
+#     return self.generate_text(text, '{style}', delay_anim=True, **kwargs)
+#     """)
+#
+#     def __getattr__(self, item):
+#         return getattr(self.parent, item)
+#
+#     def __iter__(self):
+#         return iter(self.submobjects)

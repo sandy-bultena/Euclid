@@ -3,10 +3,13 @@ from __future__ import annotations
 from enum import EnumType, Enum
 from itertools import pairwise
 
+import numpy as np
+
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
 from euclidlib.Objects import Text as Tx
+from euclidlib.Objects import Angel
 import math
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple
@@ -101,14 +104,18 @@ class EuclidLine(EMObject, mn.Line):
     def extend(self, r: float, rate_func=mn.smooth):
         if r < 0:
             return self.prepend(-r)
-        x2, y2, _ = self.point(r + self.get_length())
-        self.e_end = (x2, y2, 0)
+        self.e_end = self.point(r + self.get_length())
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.get_start(), self.e_end))
 
     def prepend(self, r: float, rate_func=mn.smooth):
-        x2, y2, _ = self.point(-r)
-        self.e_start = (x2, y2, 0)
+        self.e_start = self.point(-r)
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.get_end()))
+
+    def extend_and_prepend(self, r: float, rate_func=mn.smooth):
+        self.e_start = self.point(-r)
+        self.e_end = self.point(r + self.get_length())
+        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.e_end))
+
 
     def extend_cpy(self, r: float):
         if r < 0:
@@ -262,6 +269,111 @@ class EuclidLine(EMObject, mn.Line):
                 l.e_remove()
 
         return pt
+
+    def _perp_off_line(self, p: P.EuclidPoint, dist_end: float, dist_start: float, /, speed=1):
+        with self.scene.animation_speed(speed):
+            A, B = self.get_start_and_end()
+            C = self.pointify(p)
+            p: Dict[str, P.EuclidPoint] = {}
+            c: Dict[str, C.EuclidCircle] = {}
+            l: EuclidLine = self.copy().e_fade()
+            l.extend_and_prepend(mn_scale(40))
+
+            # draw a circle with the lesser of $re,$rs as the radius
+            radius = min(dist_end, dist_start)
+            c['C'] = Circle.EuclidCircle(C, C + RIGHT * (radius + mn_scale(10)))
+
+            # define two points equidistance from our initial point
+            for num in range(0, 10):
+                pts = c['C'].intersect(l)
+                if len(pts) == 2:
+                    break
+                l.extend_and_prepend(mn_scale(100))
+
+            p['D'] = P.EuclidPoint(pts[0])
+            p['E'] = P.EuclidPoint(pts[1])
+            c['C'].e_remove()
+
+            lb = EuclidLine(*pts).e_fade()
+            pb = lb.bisect()
+            lfinal = EuclidLine(C, pb)
+            with self.scene.simultaneous():
+                p['D'].e_remove()
+                p['E'].e_remove()
+                lb.e_remove()
+                pb.e_remove()
+                l.e_remove()
+        return lfinal
+
+        pass
+
+    def _perp_on_line(self, p: P.EuclidPoint, dist_end: float, dist_start: float, /, speed=1, inside=False):
+        with self.scene.animation_speed(speed):
+            A, B = self.get_start_and_end()
+            C = p.get_center()
+            l: Dict[str, EuclidLine] = {}
+            p: Dict[str, P.EuclidPoint] = {}
+            c: Dict[str, Circle.EuclidCircle] = {}
+            ln: EuclidLine = self.copy().e_fade()
+
+            radius = max(dist_start, dist_end)
+            ln.extend(dist_start - dist_end)
+            c['C'] = Circle.EuclidCircle(C, C + RIGHT * radius)
+
+            # define two points equidistance from our initial point
+            pts = c['C'].intersect(ln)
+            p['D'] = P.EuclidPoint(pts[0])
+            p['E'] = P.EuclidPoint(pts[1])
+
+            c['C'].e_remove()
+
+            # find 3rd point of equilateral triangle, without drawing lines
+            c1 = Circle.EuclidCircle(p['D'], p['E'])
+            c2 = Circle.EuclidCircle(p['E'], p['D'])
+            pts = c1.intersect(c2)
+
+            # if point is at either end of the line, check for positive/negative
+            # options, otherwise go with defaults;
+            if mn.get_norm(A - C) < mn_scale(.1) or mn.get_norm(B - C) < mn_scale(.1):
+                l1 = EuclidLine(C, pts[1], delay_anim=True)
+                l2 = EuclidLine(C, pts[0], delay_anim=True)
+                a1 = Angel.calculateAngle(self, l1)
+                a2 = Angel.calculateAngle(self, l2)
+
+                if inside:
+                    l2, l1 = l1, l2
+
+                if abs(a1 - PI/2) < 0.1 * DEGREES:
+                    l['CF'] = l1
+                    l2.e_delete()
+                elif abs(a2 - PI/2) < 0.1 * DEGREES:
+                    l['CF'] = l2
+                    l1.e_delete()
+                else:
+                    raise ArithmeticError(f"Bad Angles {a1=} and {a2=}")
+
+                l['CF'].e_draw()
+            else:
+                l['CF'] = EuclidLine(C, pts[int(inside)])
+
+            with self.scene.simultaneous():
+                p['D'].e_remove()
+                p['E'].e_remove()
+                c1.e_remove()
+                c2.e_remove()
+                ln.e_remove()
+            return l['CF']
+
+
+
+
+    def perpendicular(self, p: P.EuclidPoint, /, speed=1, inside=False):
+        rs = mn.get_norm(self.pointify(p) - self.get_start())
+        re = mn.get_norm(self.pointify(p) - self.get_end())
+        if (rs + re - self.get_length()) > mn_scale(0.1):
+            return self._perp_off_line(p, re, rs, speed=speed)
+        return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
+
 
 
 
