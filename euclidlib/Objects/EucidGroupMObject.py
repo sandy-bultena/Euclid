@@ -73,6 +73,7 @@ class PsuedoGroup(EMObject):
         full = set(range(len(self.get_group())))
         return full - exceptions
 
+    @freezable
     def e_remove(self):
         for obj in self.get_group():
             if obj.in_scene():
@@ -80,11 +81,13 @@ class PsuedoGroup(EMObject):
         super().e_remove()
         return self
 
+    @freezable
     def remove_labels(self):
         for x in self.get_group():
             x.remove_label()
         return self
 
+    @freezable
     def e_draw(self, skip_anim=False):
         for obj in self.get_group():
             if not obj.visible():
@@ -95,11 +98,13 @@ class PsuedoGroup(EMObject):
     for name in EMObjectPlayer._properties():
         exec(f'''
 @property
+@freezable
 def {name}(self, *args):
     return EGroupPlayer(self).{name}'''.strip())
 
     for name in EMObjectPlayer._methods():
         exec(f'''
+@freezable
 def {name}(self, *args):
     return EGroupPlayer(self).{name}(*args)'''.strip())
 

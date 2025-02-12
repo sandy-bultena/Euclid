@@ -309,22 +309,7 @@ def EuclidAngle(l1: EuclidLine | str,
                 no_right: bool = False,
                 **kwargs):
     if isinstance(l1, str):
-        l1s, l2s = l1[:2], l1[1:]
-        from inspect import currentframe
-        f = currentframe()
-        while f.f_back:
-            f = f.f_back
-            if 'l' in f.f_locals:
-                break
-        if f.f_back is None:
-            raise Exception("Can't Find Scene")
-        lines = f.f_locals.get('l', {})
-        l1 = lines.get(l1s, lines.get(l1s[::-1]))
-        if l1 is None:
-            raise Exception(f"Can't find lines {l1s} or {l1s[::-1]} in {lines}")
-        l2 = lines.get(l2s, lines.get(l2s[::-1]))
-        if l2 is None:
-            raise Exception(f"Can't find lines {l2s} or {l2s[::-1]} in {lines}")
+        l1, l2 = EuclidLine.find_in_frame(l1)
 
     assert (l2 is not None)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from functools import partial
+from functools import partial, wraps
 from math import isinf
 
 import manimlib as mn
@@ -10,8 +10,9 @@ from manimlib import Mobject
 
 import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
-from .CustomAnimation import UncreatePreserve
+from .CustomAnimation import UncreatePreserve, EShowCreation, E_MethodAnimation
 from typing import Sized, Self, Callable, Tuple
+from contextlib import contextmanager
 
 # from . import Text as T
 
@@ -52,6 +53,12 @@ class NullAnimationBuilder:
 
     def __call__(self, *args, **kwargs):
         return self
+
+
+def _build_anim_base(anim):
+    if anim.overridden_animation:
+        return anim.overridden_animation
+    return E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
 
 
 class EMObjectPlayer:
@@ -180,7 +187,7 @@ class EMObjectPlayer:
         if self.rotating:
             kwargs['path_arc'] = self.rotating
 
-        anim_built = anim(**kwargs).build()
+        anim_built = _build_anim_base(anim(**kwargs))
         return anim_built
 
     def __call__(self, *args, **kwargs):
@@ -205,6 +212,14 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
     else:
         return *obj, *((0.0,) * (3 - len(obj)))
 
+
+def freezable(func):
+    @wraps(func)
+    def dontIfFrozen(self, *args, **kwargs):
+        if self._freeze:
+            return self
+        return func(self, *args, **kwargs)
+    return dontIfFrozen
 
 
 def find_scene():
@@ -232,7 +247,7 @@ class EMObject(mn.VMobject):
     Virtual = False
 
     def CreationOf(self, *args, **kwargs):
-        return [mn.ShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+        return [EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def RemovalOf(self, *args, **kwargs):
         return [UncreatePreserve(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
@@ -256,12 +271,14 @@ class EMObject(mn.VMobject):
     for name in EMObjectPlayer._properties():
         exec(f'''
 @property
+@freezable
 def {name}(self):
     return EMObjectPlayer(self).{name}
         '''.strip())
 
     for name in EMObjectPlayer._methods():
         exec(f'''
+@freezable
 def {name}(self, *args):
     return EMObjectPlayer(self).{name}(*args)
         '''.strip())
@@ -269,6 +286,7 @@ def {name}(self, *args):
     def visible(self):
         return self.in_scene() and (self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0)
 
+    @freezable
     def add_label(self, *args, **label_args):
         if isinstance(args[-1], dict) and not label_args:
             *args, label_args = args
@@ -279,9 +297,11 @@ def {name}(self, *args):
                 self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
             else:
                 self.scene.play(*new_label.CreationOf())
+            new_label.disable_updaters()
         self.e_label = new_label
         return self
 
+    @freezable
     def remove_label(self):
         if self.e_label is not None:
             if not self.e_label.visible():
@@ -291,6 +311,7 @@ def {name}(self, *args):
         self.e_label = None
         return self
 
+    @freezable
     def undraw_label(self):
         if self.e_label is not None and self.e_label.visible():
             self.scene.play(mn.FadeOut(self.e_label))
@@ -307,6 +328,7 @@ def {name}(self, *args):
         if label:
             return T.Label(label, self, *args, **extra_args)
 
+    @freezable
     def e_draw(self, skip_anim=False):
         if not skip_anim and not self.Virtual:
             anims = [
@@ -342,7 +364,8 @@ def {name}(self, *args):
             end_pos = l2.ref.e_label_point(l2.direction)
             self.e_label.direction = path_func(start_pos + l1.direction, end_pos + l2.direction, alpha) - curr_pos
         return super().interpolate(mobject1, mobject2, alpha, path_func)
-    
+
+    @freezable
     def rotate(
         self,
         angle: float,
@@ -363,6 +386,7 @@ def {name}(self, *args):
             trgt.e_label = trgt.e_label.generate_target()
         return trgt
 
+    @freezable
     def e_remove(self):
         if not self.Virtual and self.visible():
             anims = self.RemovalOf()
@@ -373,6 +397,7 @@ def {name}(self, *args):
             self.scene.remove(self)
         return self
 
+    @freezable
     def e_delete(self):
         self.scene.remove(self)
         if self.e_label:
@@ -389,6 +414,20 @@ def {name}(self, *args):
         if hasattr(self, 'e_label'):
             return self.e_label
 
+    def freeze(self):
+        self._freeze = True
+
+
+    def unfreeze(self):
+        self._freeze = False
+
+
+    @contextmanager
+    def as_frozen(self):
+        self.freeze()
+        yield
+        self.unfreeze()
+
 
     def __init__(self,
                  *args,
@@ -403,6 +442,7 @@ def {name}(self, *args):
                  **kwargs):
         label_args = label_args or label
         self._debug = debug
+        self._freeze = False
         scene = scene or find_scene()
         if scene is None:
             raise Exception("Could Not Find Scene Object")

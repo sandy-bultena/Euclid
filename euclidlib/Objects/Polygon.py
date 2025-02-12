@@ -23,10 +23,18 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         return mn.normalize(direction)
 
     @classmethod
-    def assemble(cls, lines: None|List[L.EuclidLine] = None, points: None|List[P.EuclidPoint] = None, **kwargs):
+    def assemble(cls,
+                 lines: None|List[L.EuclidLine]|str = None,
+                 points: None|List[P.EuclidPoint]|str = None,
+                 angles: None|List[A.EuclidAngleBase] = None,
+                 **kwargs):
         if points:
+            if isinstance(points, str):
+                points = P.EuclidPoint.find_in_frame(points)
             coords = [p.get_center() for p in points]
         elif lines:
+            if isinstance(lines, str):
+                lines = L.EuclidLine.find_in_frame(lines, loop=True)
             tmp_lines = lines + [lines[0]]
             coords = []
             for l1, l2 in pairwise(tmp_lines):
@@ -39,13 +47,13 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             mn.log.warning("Need to provide lines or points")
             return
 
-        return cls(*coords, **kwargs, _assemble_flag=True, _lines=lines, _points=points)
+        return cls(*coords, **kwargs, _assemble_flag=True, _lines=lines, _points=points, _angles=angles)
 
 
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
-            point_labels: List[Tuple[Any, ...]] | List[str] | None = None,
+            point_labels: Sized[Tuple[Any, ...]] | Sized[str] | None = None,
             labels: List[Tuple[str, Vect3]] | None = None,
             angles: List | None = None,
             angle_sizes: List | None = None,
@@ -56,18 +64,12 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             _assemble_flag=False,
             _lines: List[L.EuclidLine] | None = None,
             _points: List[P.EuclidPoint] | None = None,
+            _angles: List[A.EuclidAngleBase] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
-            from inspect import currentframe
             point_names = list(points[0])
-            f = currentframe()
-            while (f := f.f_back) is not None:
-                if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
-                    break
-            if f is None:
-                raise Exception("Can't Find Scene")
-            points = [f.f_locals.get(p, f.f_locals.get('p', {}).get(p)) for p in point_names]
+            points = P.EuclidPoint.find_in_frame(point_names)
 
         if all(isinstance(p, L.EuclidLine) for p in points):
             lines = [p for p in points]
@@ -103,7 +105,11 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         else:
             self.points: List[P.EuclidPoint] = []
 
-        self.angles: List[A.EuclidAngle | None] = [None] * self.sides
+        if _assemble_flag and _angles:
+            self.angles: List[A.EuclidAngleBase] = _angles
+        else:
+            self.angles: List[A.EuclidAngleBase | None] = [None] * self.sides
+
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part, **kwargs)
         if self.sides:
             self.vertices.append(self.vertices[0])
@@ -133,9 +139,9 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         if not (args and isinstance(args[-1], dict)):
             return args
         for x in ('away_from', 'towards'):
-            if args[-1].get(x) == 'center_f':
+            if isinstance(y := args[-1].get(x), str) and y == 'center_f':
                 args[-1][x] = self.get_center_of_mass
-            if args[-1].get(x) == 'center':
+            if  isinstance(y, str) and y == 'center':
                 args[-1][x] = self.get_center_of_mass()
         return args
 
@@ -218,6 +224,10 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             for i, ((l1, l2), (name, size)) in enumerate(zip(line_pairs, names_and_sizes)):
                 if not name:
                     continue
+                old = self.angles[i]
+                if old is not None:
+                    old.e_remove()
+                    self._sub_group.remove(old)
                 self.angles[i] = A.EuclidAngle(l1, l2, size=size, label_args=name, scene=self.scene)
                 self._sub_group.add(self.angles[i])
         return self

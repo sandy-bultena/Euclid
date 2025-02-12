@@ -17,6 +17,22 @@ class EuclidPoint(EMObject, mn.Circle):
     CONSTRUCTION_TIME=0.25
     LabelBuff = mn.MED_SMALL_BUFF
 
+    @staticmethod
+    def find_in_frame(names):
+        from inspect import currentframe
+        point_names = list(names)
+        f = currentframe()
+        while (f := f.f_back) is not None:
+            if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
+                break
+        if f is None:
+            raise Exception(f"Can't Find Points dict or Point variables {', '.join(names)}")
+        points = [f.f_locals.get(p, f.f_locals.get('p', {}).get(p)) for p in names]
+        if all(p is not None for p in points):
+            return points
+
+        raise Exception(f"Can't find point(s) {', '.join( n for p, n in zip(points, names) if p is None)}")
+
     def __init__(self, center, animate_part=None, *args, **kwargs):
         super().__init__(
             arc_center=convert_to_coord(center),

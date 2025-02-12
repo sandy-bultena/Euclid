@@ -19,6 +19,27 @@ class EuclidLine(EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
 
+    @staticmethod
+    def find_in_frame(name, loop=False):
+        if loop:
+            name = name + name[0]
+        parts = [''.join(x) for x in pairwise(name)]
+        from inspect import currentframe
+        f = currentframe()
+        while f.f_back:
+            f = f.f_back
+            if 'l' in f.f_locals:
+                break
+        if f.f_back is None:
+            raise Exception("Can't Find Line Dict")
+        lines = f.f_locals.get('l', {})
+
+        lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
+        if all(l is not None for l in lines):
+            return lines
+
+        raise Exception(f"Can't find line(s) {', '.join( n for p, n in zip(lines, parts) if p is None)}")
+
     def IN(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, PI/2)
@@ -29,17 +50,7 @@ class EuclidLine(EMObject, mn.Line):
 
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
         if isinstance(start, str):
-            from inspect import currentframe
-            point_names = list(start)
-            f = currentframe()
-            while (f := f.f_back) is not None:
-                if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
-                    break
-            if f is None:
-                raise Exception("Can't Find Scene")
-            s, e = start
-            start = f.f_locals.get(s, f.f_locals.get('p', {}).get(s))
-            end = f.f_locals.get(e, f.f_locals.get('p', {}).get(e))
+            start, end = P.EuclidPoint.find_in_frame(start)
 
         self.e_start = self.pointify(start)
         self.e_end = self.pointify(end)
@@ -106,15 +117,18 @@ class EuclidLine(EMObject, mn.Line):
             return self.prepend(-r)
         self.e_end = self.point(r + self.get_length())
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.get_start(), self.e_end))
+        return self
 
     def prepend(self, r: float, rate_func=mn.smooth):
         self.e_start = self.point(-r)
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.get_end()))
+        return self
 
     def extend_and_prepend(self, r: float, rate_func=mn.smooth):
         self.e_start = self.point(-r)
         self.e_end = self.point(r + self.get_length())
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.e_end))
+        return self
 
 
     def extend_cpy(self, r: float):

@@ -155,3 +155,11 @@ class Label(ETex):
             lambda: ref.e_label_point(*self.args, **self.extra_args),
             aligned_edge=lambda: self.align
         )
+
+    def enable_updaters(self):
+        # print(f"START {self.ref} -> {self}:{self.string}")
+        self.resume_updating()
+
+    def disable_updaters(self):
+        # print(f"STOP {self.ref} -> {self}:{self.string}")
+        self.suspend_updating()

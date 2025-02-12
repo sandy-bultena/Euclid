@@ -82,6 +82,15 @@ class PropScene(InteractiveScene):
             self.play(*stored_anims, **kwargs)
 
     @contextmanager
+    def freeze(self, *args: EMObject):
+        for a in args:
+            a.freeze()
+        yield
+        for a in args:
+            a.unfreeze()
+
+
+    @contextmanager
     def skip_animations_for(self, stop=True):
         if stop:
             self.animateState.append(AnimState.SKIP)
@@ -122,6 +131,9 @@ class PropScene(InteractiveScene):
 
     def animations_off_on(self):
         self.animateState[0] = AnimState.NORMAL
+
+    def set_base_animation_speed(self, speed: float):
+        self.animationSpeedStack[0] = speed
 
     def push_step(self, func):
         if not self.steps:
