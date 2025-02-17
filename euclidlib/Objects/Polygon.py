@@ -54,7 +54,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
             point_labels: Sized[Tuple[Any, ...]] | Sized[str] | None = None,
-            labels: List[Tuple[str, Vect3]] | None = None,
+            labels: List[Tuple[str, Vect3] | str | None] | None = None,
             angles: List | None = None,
             angle_sizes: List | None = None,
             fill: mn.Color = None,
@@ -132,6 +132,8 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
 
     def _filter_point_labels(self, args):
+        if args is None:
+            return None
         if isinstance(args, str):
             args = (args,)
         if len(args) == 1:
@@ -146,6 +148,8 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         return args
 
     def _filter_side_labels(self, args):
+        if args is None:
+            return None
         if isinstance(args, str):
             args = (args,)
         if len(args) == 1:

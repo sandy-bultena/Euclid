@@ -21,6 +21,32 @@ class BookScene(PropScene):
     book: int
     prop: int
 
+    @staticmethod
+    def extract_lines(lines: Dict[str, EuclidLine], triangles: Dict[str, EuclidPolygon], label: str):
+        label2 = label + label[0]
+        for l_label, line in zip(pairwise(label2), triangles[label].l):
+            lines[op.add(*l_label)] = line
+
+    @staticmethod
+    def extract_points(points: Dict[str, EuclidPoint], triangles: Dict[str, EuclidPolygon], label: str):
+        for p_label, point in zip(label, triangles[label].p):
+            points[p_label] = point
+
+    @staticmethod
+    def extract_angles(angles: Dict[str, EuclidAngleBase], triangles: Dict[str, EuclidPolygon], label: str):
+        label2 = label[-1] + label + label[0]
+        for i, angle in enumerate(triangles[label].a):
+            if angle is not None:
+                angles[label2[i:i+3]] = angle
+
+
+    @staticmethod
+    def extract_all(lines, points, angles, triangles, label):
+        BookScene.extract_lines(lines, triangles, label)
+        BookScene.extract_points(points, triangles, label)
+        BookScene.extract_angles(angles, triangles, label)
+
+
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
                     buff_size=MED_LARGE_BUFF,

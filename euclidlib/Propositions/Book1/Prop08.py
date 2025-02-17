@@ -156,5 +156,5 @@ class Prop08(Book1Scene):
             t1.explain("Thus the two triangles are equivalent")
             with self.simultaneous():
                 t2.e_fade()
-                t2.blue[0:3]
+                t2.blue[0:3]()
             t2.math(r"\triangle ABC \equiv \triangle DEF")

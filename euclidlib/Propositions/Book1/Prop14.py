@@ -146,7 +146,7 @@ class Prop14(Book1Scene):
             a['e'] = EuclidAngle('DBE', size=mn_scale(60), label=r'\epsilon')
             with self.simultaneous():
                 t2.e_fade()
-                t2.blue[0:4]
+                t2.blue[0:4]()
                 t2.red(-1, -2)
 
         @self.push_step
@@ -155,7 +155,7 @@ class Prop14(Book1Scene):
                         "contradiction, and therefore must be incorrect")
             with self.simultaneous():
                 t2.e_fade()
-                t2.blue[0:3]
+                t2.blue[0:3]()
                 t2.red(3)
                 t2.red(-1, -2)
 

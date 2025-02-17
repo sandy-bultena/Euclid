@@ -12,6 +12,7 @@ class EGroupPlayer:
         self.group = group.get_group()
         self.manager = group.get_manager()
         self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, EMObject)]
+        self.indices = None
 
     for name in EMObjectPlayer._properties():
         exec(f'''
@@ -31,7 +32,7 @@ def {name}(self, *args):
 '''.strip())
 
     def __call__(self, *index, **kwargs):
-        to_exec = self.players
+        to_exec = self.indices or self.players
 
         if index:
             to_exec = [self.players[i] for i in index]
@@ -41,12 +42,8 @@ def {name}(self, *args):
         return self.obj
 
     def __getitem__(self, item: int | slice):
-        if isinstance(item, slice):
-            for player in self.players[item]:
-                player()
-        else:
-            self.players[item]()
-        return self.obj
+        self.indices = self.players[item]
+        return self
 
 
 class PsuedoGroup(EMObject):

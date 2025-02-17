@@ -58,10 +58,11 @@ class PropScene(InteractiveScene):
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
         elif self.animateState[-1] == AnimState.SKIP:
-            if not self.skip_animations:
+            currently_skipping = self.skip_animations
+            if not currently_skipping:
                 self.force_skipping()
             super().play(*anims, **kwargs)
-            if not self.skip_animations:
+            if not currently_skipping:
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
             pass

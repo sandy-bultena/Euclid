@@ -328,7 +328,7 @@ def EuclidAngle(l1: EuclidLine | str,
     elif th_diff < -PI:
         th_diff = TAU + th_diff
 
-    if abs(abs(th_diff) - PI/2) < 0.1 and not no_right:
+    if abs(abs(th_diff) - PI/2) < (0.1*DEGREES) and not no_right:
         return RightAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)
     else:
         return ArcAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)
