@@ -32,6 +32,7 @@ class PROP_NAME(BookScene):
         # ----------------------------------------------
         @self.push_step
         def _c1():
+            t1.down()
             t1.title("Construction:")
 
         # ----------------------------------------------

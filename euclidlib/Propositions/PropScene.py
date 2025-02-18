@@ -55,6 +55,13 @@ class PropScene(InteractiveScene):
             else:
                 anims = [self.update_runtime(anim, speed) for anim in anims]
             super().play(*anims, **kwargs)
+            for anim in anims:
+                if isinstance(anim, AnimationGroup):
+                    for subanim in anim.animations:
+                        if subanim.is_remover():
+                            self.remove(subanim.mobject)
+                        else:
+                            self.add(subanim.mobject)
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
         elif self.animateState[-1] == AnimState.SKIP:
@@ -81,6 +88,16 @@ class PropScene(InteractiveScene):
         stored_anims = self.animationsStored.pop()
         if stored_anims:
             self.play(*stored_anims, **kwargs)
+
+    @contextmanager
+    def delayed(self, **kwargs):
+        self.animateState.append(AnimState.STORING)
+        self.animationsStored.append([])
+        yield
+        self.animateState.pop()
+        stored_anims = self.animationsStored.pop()
+        if stored_anims:
+            self.play(LaggedStart(*stored_anims, **kwargs))
 
     @contextmanager
     def freeze(self, *args: EMObject):

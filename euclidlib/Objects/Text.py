@@ -73,8 +73,15 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         self.select_parts(selector).set_color(color)
         return self
 
-    def transform_from(self, other: EStringObj, **transform_args):
-        self.scene.play(mn.TransformMatchingStrings(other.copy(), self, **transform_args))
+    def transform_from(self, other: mn.VGroup, substr: str = '', **transform_args):
+        copy = other.copy if not substr else other[substr].copy()
+        if not substr:
+            animation_type = mn.TransformMatchingStrings
+        elif substr == self.string:
+            animation_type = lambda a, b, **args: a.animate(**args).move_to(b)
+        else:
+            animation_type = mn.TransformMatchingParts
+        return self.scene.play(animation_type(copy, self, **transform_args))
 
     @property
     def CONSTRUCTION_TIME(self):
@@ -176,3 +183,10 @@ class Label(ETex):
     def disable_updaters(self):
         # print(f"STOP {self.ref} -> {self}:{self.string}")
         self.suspend_updating()
+
+    def transfer_ownership(self, emobject: E.EMObject):
+        if emobject.e_label is not None:
+            emobject.e_label.e_remove()
+        emobject.e_label = self
+        self.ref.e_label = None
+        self.ref = emobject

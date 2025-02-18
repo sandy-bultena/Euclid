@@ -148,11 +148,9 @@ class TextBox(EGroup[T.EStringObj]):
                 newline.align_to(get_side(self), side)
                 newline.shift(mn.RIGHT * self.indent_value)
             if break_into_parts:
-                print(break_into_parts)
                 parts = [self.generate_text(part, style, delay_anim=True)
                          for part in break_into_parts]
                 for p, t in zip(parts, break_into_parts):
-                    print(t)
                     p.next_to(newline[t], mn.ORIGIN, buff=0)
                     if not delay_anim:
                         p.e_draw()
