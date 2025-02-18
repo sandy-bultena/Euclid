@@ -17,11 +17,12 @@ from contextlib import contextmanager
 # from . import Text as T
 
 DEFAULT_FADE_OPACITY = 0.15
+DEFAULT_TEXT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
-def mn_coord(x: int, y: int, z: int = 0):
+def mn_coord(x: int|float, y: int|float, z: int|float = 0):
     return np.array([
         (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (400 - y) * (8.0 / 800),
@@ -453,7 +454,8 @@ def {name}(self, *args):
         kwargs['stroke_width'] = stroke_width
 
         if self.Virtual:
-            kwargs['stroke_opacity'] = 0.2 if self.scene.debug else 0.0
+            kwargs['stroke_opacity'] = 0.5 if self.scene.debug else 0.0
+            kwargs['stroke_width'] = 2 * stroke_width
             kwargs['stroke_color'] = mn.RED
 
         super().__init__(*args, **kwargs)

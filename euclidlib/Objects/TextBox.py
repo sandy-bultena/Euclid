@@ -81,6 +81,7 @@ class TextBox(EGroup[T.EStringObj]):
                  buff_size=mn.SMALL_BUFF,
                  **kwargs):
         self.next_buff = 0
+        self.indent_value = 0
         self.line_width = line_width
         self._buff_size = buff_size
         self.abs_position = absolute_position
@@ -145,6 +146,7 @@ class TextBox(EGroup[T.EStringObj]):
             if self.alignment and not align_str:
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
+                newline.shift(mn.RIGHT * self.indent_value)
             if break_into_parts:
                 print(break_into_parts)
                 parts = [self.generate_text(part, style, delay_anim=True)
@@ -174,6 +176,18 @@ class TextBox(EGroup[T.EStringObj]):
     def e_remove(self):
         super().e_remove()
         self.clear()
+
+    def __delitem__(self, key):
+        self[key].e_remove()
+        self.remove(self[key])
+
+    def __delslice__(self, i, j):
+        for x in self[i:j]:
+            x.e_remove()
+        self.remove(*self[i:j])
+
+    def delete_last(self):
+        del self[-1]
 
     if TYPE_CHECKING:
         def title(self, text: str,
@@ -282,7 +296,7 @@ def {style}(self, text: str, **kwargs):
         assert isinstance(old, T.EStringObj)
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_corner(mn.UL), mn.DR, buff=0)
-        self.scene.play(mn.TransformMatchingTex(old, new, **transform_args))
+        self.scene.play(CA.AppendString(old, new, **transform_args))
         self.replace_submobject(index, new)
 
     def e_append(self, index, text: str, **kwargs):
@@ -293,8 +307,26 @@ def {style}(self, text: str, **kwargs):
         new.e_draw()
         old.add(*new.submobjects)
 
+    def e_append_morph(self, index, text: str, color: None = None, transform_args=None, **kwargs):
+        if color:
+            kwargs['t2c'] = {text: color}
+        transform_args = transform_args or {}
+        if 'run_time' not in transform_args:
+            transform_args['run_time'] = 0.5
+        old = self[index]
+        new = self._generate_text_no_anim(f"{old.string} {text}", old.style, **kwargs)
+        new.next_to(old.get_corner(mn.UL), mn.DR, buff=0)
+        self.scene.play(CA.AppendString(old, new, **transform_args))
+        self.replace_submobject(index, new)
+
     def down(self, buff=mn.MED_SMALL_BUFF):
         self.next_buff = buff
+
+    def indent(self, buff=mn.MED_SMALL_BUFF):
+        self.indent_value += buff
+
+    def unindent(self, buff=mn.MED_SMALL_BUFF):
+        self.indent_value -= buff
 
 
 # class TempTextBoxProxy(TextBox):

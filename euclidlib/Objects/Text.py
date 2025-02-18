@@ -24,14 +24,27 @@ MARKUP_REPLACE = (
 )
 
 MATH_PREAMBLE = (
+    r'\usepackage{pifont}'
     r'\usepackage{unicode-math}'
+    r'\usepackage[normalem]{ulem}'
     r'\newcommand{\ecrossmark}{\textrm{\ding{55}}}',
     r'\newcommand{\echeckmark}{\textrm{\ding{51}}}'
 )
 
 TEX_REPLACE = (
     (re.compile(r'\{txt:(.*?)}'), r'\\text{\1}'),
+    (re.compile(r'\{mstrike:(.*?)}'), r'\\text{\\sout{\\ensuremath{\1}}}'),
+    (re.compile(r'\{strike:(.*?)}'), r'\\sout{\1}'),
 )
+
+mn.TEX_TO_SYMBOL_COUNT[R"\ne"] = 1
+mn.TEX_TO_SYMBOL_COUNT[R"\neq"] = 1
+mn.TEX_TO_SYMBOL_COUNT[R"\relax"] = 0
+mn.TEX_TO_SYMBOL_COUNT[R"\ensuremath"] = 0
+mn.TEX_TO_SYMBOL_COUNT[R"\ifmmode"] = 0
+mn.TEX_TO_SYMBOL_COUNT[R"\else"] = 0
+mn.TEX_TO_SYMBOL_COUNT[R"\fi"] = 0
+mn.TEX_TO_SYMBOL_COUNT[R"\sout"] = 1
 
 
 class EStringObj(E.EMObject, mn.StringMobject, ABC):

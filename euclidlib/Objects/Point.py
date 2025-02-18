@@ -77,3 +77,7 @@ class EuclidPoint(EMObject, mn.Circle):
         dx = x1 - x0
         dy = y1 - y0
         return math.sqrt(dx**2 + dy**2)
+
+
+class VirtualPoint(EuclidPoint):
+    Virtual = True

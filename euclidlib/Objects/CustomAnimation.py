@@ -30,6 +30,25 @@ class EuclidAnimation(mn.Animation):
             self.mobject.e_label.disable_updaters()
 
 
+
+class AppendString(mn.TransformMatchingStrings):
+    @staticmethod
+    def transform_fade_in(anim: mn.Animation):
+        if not isinstance(anim, mn.FadeInFromPoint):
+            return anim
+        return mn.Write(anim.mobject, run_time=anim.run_time)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.anims = list(map(self.transform_fade_in, self.anims))
+        self.animations = list(map(mn.prepare_animation, self.anims))
+        self.build_animations_with_timings(0)
+
+
+
+
+
+
 class EShowCreation(mn.ShowCreation, EuclidAnimation):
     pass
 

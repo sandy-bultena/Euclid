@@ -54,7 +54,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
             point_labels: Sized[Tuple[Any, ...]] | Sized[str] | None = None,
-            labels: List[Tuple[str, Vect3] | str | None] | None = None,
+            labels: Sized[Tuple[str, Vect3] | str | None] | None = None,
             angles: List | None = None,
             angle_sizes: List | None = None,
             fill: mn.Color = None,
@@ -276,27 +276,38 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.points[index] = newpoint
         self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
 
-    def move_point_to(self, index: int, dest: P.EuclidPoint):
-        self.vertices[index] = dest.get_center()
+    def move_point_to(self, index: int, dest: P.EuclidPoint | Vect3):
+        dest = convert_to_coord(dest)
+        self.vertices[index] = dest
         self.vertices[-1] = self.vertices[0]
 
+        all_parts = [*self.p, *self.a, *self.l]
+        all_labels = [a.e_label for a in all_parts if a.e_label is not None]
+
+        for label in all_labels:
+            label.enable_updaters()
+
         with self.scene.simultaneous():
+            pass
             self.scene.play(self.p[index].animate.move_to(dest))
-            self.scene.play(self.l[index].animate.put_start_and_end_on(dest.get_center(), self.l[index].get_end()))
+            self.scene.play(self.l[index].animate.put_start_and_end_on(dest, self.l[index].get_end()))
             self.scene.play(self.l[(index - 1) % self.sides].animate.put_start_and_end_on(
-                self.l[(index - 1) % self.sides].get_start(), dest.get_center()))
+                self.l[(index - 1) % self.sides].get_start(), dest))
 
             for i in range(self.sides):
                 if self.angles[i] is not None:
                     old_angle = self.angles[i]
-                    l1 = L.VirtualLine(self.vertices[i - 1], self.vertices[i])
+                    l1 = L.VirtualLine(self.vertices[(i - 1) % self.sides], self.vertices[i])
                     l2 = L.VirtualLine(self.vertices[i], self.vertices[i + 1])
-                    new_angle = A.EuclidAngle(l1, l2, size=old_angle.size)
+                    new_angle = A.EuclidAngle(l1, l2, size=old_angle.size, delay_anim=True)
                     self.scene.play(mn.Transform(old_angle, new_angle))
-            self.vertices[index] = dest.get_center()
-            self.vertices[-1] = self.vertices[0]
-            self.scene.play(self.animate.set_points_as_corners(self.vertices))
-        pass
+                    l2.e_remove()
+                    l1.e_remove()
+        self.vertices[index] = dest
+        self.vertices[-1] = self.vertices[0]
+        self.scene.play(self.animate.set_points_as_corners(self.vertices))
+        for label in all_labels:
+            label.disable_updaters()
 
     def CreationOf(self, *args, **kwargs):
         return [mn.FadeIn(self)]

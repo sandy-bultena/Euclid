@@ -51,7 +51,7 @@ class Prop18(Book1Scene):
         def _i2():
             t1.explain("If line AC is greater than BC, "
                        "then angle ABC is greater than BAC")
-            t2.math(r'y > x\ \Rightarrow\ \beta > \alpha')
+            t2.math(r'y > x\ \implies \beta > \alpha')
 
         # ----------------------------------------------
         # Proof
