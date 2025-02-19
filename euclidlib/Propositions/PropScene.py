@@ -56,7 +56,7 @@ class PropScene(InteractiveScene):
                 anims = [self.update_runtime(anim, speed) for anim in anims]
             super().play(*anims, **kwargs)
             for anim in anims:
-                if isinstance(anim, AnimationGroup):
+                if isinstance(anim, LaggedStart):
                     for subanim in anim.animations:
                         if subanim.is_remover():
                             self.remove(subanim.mobject)

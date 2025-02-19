@@ -11,6 +11,7 @@ from . import Angel as A
 
 EPSILON = mn_scale(1)
 
+
 class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def IN(self, v: Vect3):
         center = self.get_center_of_mass()
@@ -24,9 +25,9 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
     @classmethod
     def assemble(cls,
-                 lines: None|List[L.EuclidLine]|str = None,
-                 points: None|List[P.EuclidPoint]|str = None,
-                 angles: None|List[A.EuclidAngleBase] = None,
+                 lines: None | List[L.EuclidLine] | str = None,
+                 points: None | List[P.EuclidPoint] | str = None,
+                 angles: None | List[A.EuclidAngleBase] = None,
                  **kwargs):
         if points:
             if isinstance(points, str):
@@ -48,7 +49,6 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             return
 
         return cls(*coords, **kwargs, _assemble_flag=True, _lines=lines, _points=points, _angles=angles)
-
 
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
@@ -117,6 +117,21 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.cached_opacity = 0
         self.cached_fade = 1
 
+        if _assemble_flag:
+            with self.scene.simultaneous():
+                if _lines:
+                    for l in _lines:
+                        l.e_normal()
+
+                if _points:
+                    for p in _points:
+                        p.e_normal()
+
+                if _angles:
+                    for a in _angles:
+                        if a is not None:
+                            a.e_normal()
+
     def set_e_fill(
             self,
             color: ManimColor | Iterable[ManimColor] = None,
@@ -130,7 +145,6 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def get_group(self):
         return mn.VGroup(*self._sub_group)
 
-
     def _filter_point_labels(self, args):
         if args is None:
             return None
@@ -143,7 +157,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         for x in ('away_from', 'towards'):
             if isinstance(y := args[-1].get(x), str) and y == 'center_f':
                 args[-1][x] = self.get_center_of_mass
-            if  isinstance(y, str) and y == 'center':
+            if isinstance(y, str) and y == 'center':
                 args[-1][x] = self.get_center_of_mass()
         return args
 
@@ -166,7 +180,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
                               scene=self.scene,
                               label_args=self._filter_point_labels(args),
                               delay_anim=delay_anim,
-                )
+                              )
                 for coord, args
                 in zip(self.vertices, labels)]
 

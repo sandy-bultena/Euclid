@@ -10,19 +10,18 @@ from manimlib import Mobject
 
 import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
+
 from .CustomAnimation import UncreatePreserve, EShowCreation, E_MethodAnimation
 from typing import Sized, Self, Callable, Tuple
 from contextlib import contextmanager
 
-# from . import Text as T
-
 DEFAULT_FADE_OPACITY = 0.15
-DEFAULT_TEXT_FADE_OPACITY = 0.15
+DEFAULT_TEXT_FADE_OPACITY = 0.3
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
-def mn_coord(x: int|float, y: int|float, z: int|float = 0):
+def mn_coord(x: int | float, y: int | float, z: int | float = 0):
     return np.array([
         (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (400 - y) * (8.0 / 800),
@@ -56,6 +55,17 @@ class NullAnimationBuilder:
         return self
 
 
+class NullPlayer:
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __getattr__(self, item):
+        return self
+
+    def __call__(self, *args, **kwargs):
+        return self.obj
+
+
 def _build_anim_base(anim):
     if anim.overridden_animation:
         return anim.overridden_animation
@@ -66,8 +76,16 @@ class EMObjectPlayer:
     def __init__(self, eobj: EMObject):
         self.rotating = False
         self.eobj = eobj
-        self.anim = eobj.animate
-        self.label_anim = eobj.e_label.animate if eobj.e_label is not None else NullAnimationBuilder()
+
+        if eobj.is_frozen:
+            self.anim = NullAnimationBuilder()
+        else:
+            self.anim = eobj.animate
+
+        if eobj.is_frozen or eobj.e_label is None or eobj.e_label.is_frozen:
+            self.label_anim = NullAnimationBuilder()
+        else:
+            self.label_anim = eobj.e_label.animate
 
         self.o_animate_part = eobj.animate_part
         self.l_animate_part = eobj.e_label.animate_part if eobj.e_label is not None else []
@@ -77,6 +95,11 @@ class EMObjectPlayer:
         self.main_animate = False
         self.label_animate = False
         self.rotation = []
+
+    @property
+    def _fade_opacity(self):
+        from . import T
+        return DEFAULT_TEXT_FADE_OPACITY if isinstance(self.eobj, T.EStringObj) else DEFAULT_FADE_OPACITY
 
     @classmethod
     def _properties(cls):
@@ -100,7 +123,7 @@ class EMObjectPlayer:
     def e_fade(self):
         self.main_animate = self.label_animate = True
         for meth in self.o_animate_part:
-            getattr(self.anim, meth)(opacity=DEFAULT_FADE_OPACITY)
+            getattr(self.anim, meth)(opacity=self._fade_opacity)
         for meth in self.l_animate_part:
             getattr(self.label_anim, meth)(opacity=0.0)
         return self
@@ -179,8 +202,19 @@ class EMObjectPlayer:
         self.rotating = angle
         return self
 
+    def e_scale(self,
+                scale: float,
+                min_scale_factor: float = 1e-8,
+                about_point: Vect3 | None = None,
+                about_edge: Vect3 = ORIGIN):
+        self.main_animate = True
+        self.anim.scale(scale, min_scale_factor, about_point, about_edge)
+        return self
+
     def _build_anim(self, anim, obj: mn.VMobject, flag, **kwargs):
         if obj is None or not flag:
+            return None
+        if isinstance(anim, NullAnimationBuilder):
             return None
         if 'run_time' not in kwargs:
             kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
@@ -217,9 +251,20 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
 def freezable(func):
     @wraps(func)
     def dontIfFrozen(self, *args, **kwargs):
-        if self._freeze:
+        if self.is_frozen:
             return self
         return func(self, *args, **kwargs)
+
+    return dontIfFrozen
+
+
+def freezable_player(func):
+    @wraps(func)
+    def dontIfFrozen(self, *args, **kwargs):
+        if self.is_frozen:
+            return NullPlayer(self)
+        return func(self, *args, **kwargs)
+
     return dontIfFrozen
 
 
@@ -269,17 +314,23 @@ class EMObject(mn.VMobject):
 
         def e_rotate(self, about: Vect3, angle: float) -> EMObjectPlayer: ...
 
+        def e_scale(self,
+                scale: float,
+                min_scale_factor: float = 1e-8,
+                about_point: Vect3 | None = None,
+                about_edge: Vect3 = ORIGIN) -> EMObjectPlayer: ...
+
     for name in EMObjectPlayer._properties():
         exec(f'''
 @property
-@freezable
+@freezable_player
 def {name}(self):
     return EMObjectPlayer(self).{name}
         '''.strip())
 
     for name in EMObjectPlayer._methods():
         exec(f'''
-@freezable
+@freezable_player
 def {name}(self, *args):
     return EMObjectPlayer(self).{name}(*args)
         '''.strip())
@@ -368,11 +419,11 @@ def {name}(self, *args):
 
     @freezable
     def rotate(
-        self,
-        angle: float,
-        axis: Vect3 = OUT,
-        about_point: Vect3 | None = None,
-        **kwargs
+            self,
+            angle: float,
+            axis: Vect3 = OUT,
+            about_point: Vect3 | None = None,
+            **kwargs
     ) -> Self:
         if self.get_label() and hasattr(self.get_label(), 'direction') and not callable(self.e_label.direction):
             self.e_label.direction = mn.rotate_vector(self.e_label.direction, angle)
@@ -418,17 +469,18 @@ def {name}(self, *args):
     def freeze(self):
         self._freeze = True
 
-
     def unfreeze(self):
         self._freeze = False
 
+    @property
+    def is_frozen(self):
+        return self._freeze
 
     @contextmanager
     def as_frozen(self):
         self.freeze()
         yield
         self.unfreeze()
-
 
     def __init__(self,
                  *args,

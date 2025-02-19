@@ -1,3 +1,5 @@
+from functools import cache
+
 import manimlib as mn
 from manimlib import Scene
 from typing import Callable
@@ -46,7 +48,17 @@ class AppendString(mn.TransformMatchingStrings):
 
 
 
+class MoveToAndReplace(mn.MoveToTarget):
+    def __init__(self, source: mn.Mobject, target: mn.Mobject, **kwargs):
+        self.source = source
+        self.true_target = target
+        source.generate_target().move_to(target)
+        super().__init__(source, **kwargs)
 
+    def clean_up_from_scene(self, scene: Scene) -> None:
+        super().clean_up_from_scene(scene)
+        scene.remove(self.source)
+        scene.add(self.true_target)
 
 
 class EShowCreation(mn.ShowCreation, EuclidAnimation):

@@ -2,24 +2,26 @@ import sys
 import os
 sys.path.append(os.getcwd())
 
-from euclidlib.Propositions.BookScene import BookScene
+from euclidlib.Propositions.BookScene import Book{book_num}Scene
 from euclidlib.Objects import *
 
 
-class PROP_NAME(BookScene):
+class Prop{prop_num}(Book{book_num}Scene):
     steps = []
     title = ""
 
     def define_steps(self):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        {extra_text_boxes}
+        l: Dict[str | int, EuclidLine] = {{}}
+        p: Dict[str | int, EuclidPoint] = {{}}
+        c: Dict[str | int, EuclidCircle] = {{}}
+        t: Dict[str | int, EuclidTriangle] = {{}}
+        a: Dict[str | int, EuclidAngleBase] = {{}}
+        eq: Dict[str | int, EStringObj] = {{}}
+        ex: Dict[str | int, Mobject] = {{}}
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
-        eq: Dict[str | int, EStringObj] = {}
-
+        {extra_points}
         # ----------------------------------------------
         # In Other Words
         # ----------------------------------------------
