@@ -32,6 +32,26 @@ class EuclidAnimation(mn.Animation):
             self.mobject.e_label.disable_updaters()
 
 
+class Indicate(mn.Transform):
+    mobject: mn.VMobject
+    def __init__(
+        self,
+        mobject: mn.VMobject,
+        scale_factor: float = 1.2,
+        color = mn.YELLOW,
+        rate_func: Callable[[float], float] = mn.there_and_back,
+        **kwargs
+    ):
+        self.scale_factor = scale_factor
+        self.color = color
+        super().__init__(mobject, rate_func=rate_func, **kwargs)
+
+    def create_target(self) -> mn.VMobject:
+        target = self.mobject.copy()
+        target.set_stroke(width=self.scale_factor*target.get_stroke_width())
+        target.set_color(self.color)
+        return target
+
 
 class AppendString(mn.TransformMatchingStrings):
     @staticmethod

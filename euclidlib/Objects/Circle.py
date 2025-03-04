@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 
 from euclidlib.Objects.EucidMObject import *
 from euclidlib.Objects import Line as L
@@ -83,7 +84,7 @@ class EuclidCircle(EMObject, mn.Circle):
         else:
             return h1, h2, 0
 
-    def intersect_line(self, other: L.EuclidLine) -> Vect3 | None:
+    def intersect_line(self, other: mn.Line) -> Vect3 | None:
         x, y, _ = self.e_center
         r = self.radius
 
@@ -148,15 +149,23 @@ class EuclidCircle(EMObject, mn.Circle):
 
         return results
 
+    def highlight(self, color=RED, scale=2.0, **args):
+        return (self.animate(rate_func=mn.there_and_back, **args)
+                    .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
+
+    def intersect_selection(self, other: mn.Rectangle):
+        corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
+        return any(self.intersect(mn.Line(x, y)) for x, y in pairwise(corners))
 
 
-
-    def intersect(self, other: EMObject) -> Vect3 | None:
-        match other:
-            case EuclidCircle():
-                return self.intersect_circle(other)
-            case L.EuclidLine():
-                return self.intersect_line(other)
+    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | None:
+        if isinstance(other, EuclidCircle):
+            return self.intersect_circle(other)
+        if isinstance(other, mn.Line):
+            return self.intersect_line(other)
+        if isinstance(other, mn.Rectangle):
+            return self.intersect_selection(other)
+        super().intersect(other)
 
 
 class VirtualCircle(EuclidCircle):

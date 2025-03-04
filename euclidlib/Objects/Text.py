@@ -65,6 +65,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
     def apply_rules(self, txt):
         return reduce(lambda part, rule: rule[0].sub(rule[1], part), self.REPLACEMENT_RULES, txt)
 
+    def intersect(self, other: mn.Mobject, reverse=True):
+        return False
+
     def set_parts_color(self, selector: mn.Selector, color: mn.ManimColor):
         if isinstance(selector, str):
             selector = self.apply_rules(selector)
@@ -100,6 +103,16 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
                          stroke_width=stroke_width,
                          lag_ratio=lag_ratio,
                          **kwargs)]
+
+    def __getstate__(self):
+        state = super().__getstate__().copy()
+        if 'reconstruct_string' in state:
+            del state['reconstruct_string']
+        return state
+
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self.parse()
 
 
 class EText(EStringObj, mn.Text):

@@ -118,6 +118,7 @@ class TextBox(EGroup[T.EStringObj]):
                       transform_from: T.EStringObj | int = None,
                       transform_args: dict = None,
                       delay_anim=False,
+                      skip_anim=False,
                       break_into_parts: Tuple[str, ...] | None = None,
                       **other_options):
         cls, kwargs = self.fonts[style]
@@ -153,12 +154,12 @@ class TextBox(EGroup[T.EStringObj]):
                 for p, t in zip(parts, break_into_parts):
                     p.next_to(newline[t], mn.ORIGIN, buff=0)
                     if not delay_anim:
-                        p.e_draw()
+                        p.e_draw(skip_anim)
                 self.add(newline)
                 return *parts, newline
 
             elif transform_from is None and not delay_anim:
-                newline.e_draw()
+                newline.e_draw(skip_anim)
             elif not delay_anim:
                 transform_args = transform_args or {}
                 if isinstance(transform_from, int):

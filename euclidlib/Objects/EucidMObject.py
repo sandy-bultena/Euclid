@@ -372,8 +372,13 @@ def {name}(self, *args):
     def e_label_point(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def intersect(self, other: EMObject):
-        raise NotImplementedError()
+    def highlight(self):
+        raise NotImplementedError(f"{self.__class__.__name__} Highlighting is Undefined")
+
+    def intersect(self, other: mn.Mobject, reverse=True):
+        if reverse and isinstance(other, EMObject):
+            return other.intersect(self, False)
+        raise NotImplementedError(f"{self.__class__.__name__}-{other.__class__.__name__} Intersection is Undefined")
 
     def init_label(self, label: str, *args, **extra_args):
         from . import T
@@ -481,6 +486,21 @@ def {name}(self, *args):
         self.freeze()
         yield
         self.unfreeze()
+
+
+
+    def __getstate__(self):
+        state = super().__getstate__().copy()
+        if 'scene' in state:
+            del state['scene']
+        if 'shader_wrapper' in state:
+            del state['shader_wrapper']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.scene = find_scene()
+        self.shader_wrapper = None
 
     def __init__(self,
                  *args,

@@ -4,7 +4,10 @@ from enum import Enum
 
 from manimlib import *
 from euclidlib.Objects import *
+from euclidlib.Objects import EucidMObject as EM
+from euclidlib.Objects import CustomAnimation as CA
 from os import getenv
+import pyglet
 
 
 class AnimState(Enum):
@@ -27,11 +30,53 @@ class PropScene(InteractiveScene):
         self._speed = float(getenv('SPEED', 1))
         super().__init__(*args, **kwargs)
 
+    def gather_selection_euclid(self):
+        self.is_selecting = False
+        self.to_highlight = []
+        if self.selection_rectangle in self.mobjects:
+            self.remove(self.selection_rectangle)
+            single = False
+            if self.selection_rectangle.get_arc_length() < 1e-2:
+                single = True
+                self.selection_rectangle.set_width(0.1)
+                self.selection_rectangle.set_height(0.1)
+            for mob in reversed(self.get_selection_search_set()):
+                if not isinstance(mob, EM.EMObject):
+                    continue
+                if not mob.visible():
+                    continue
+                try:
+                    if mob.intersect(self.selection_rectangle):
+                        self.to_highlight.append(mob)
+                        if single:
+                            break
+
+                except NotImplementedError as e:
+                    log.warn(str(e))
+                    pass
+
+    def on_key_press(self, symbol: int, modifiers: int) -> None:
+        super().on_key_press(symbol, modifiers)
+        char = chr(symbol)
+        if char == 'z' and (modifiers & ALL_MODIFIERS) == 0:
+            self.enable_selection()
+        else:
+            super().on_key_press(symbol, modifiers)
+
+    def on_key_release(self, symbol: int, modifiers: int) -> None:
+        char = chr(symbol)
+        if char == 'z':
+            self.gather_selection_euclid()
+            anims = [t.highlight() for t in self.to_highlight]
+            if anims:
+                self.play(*anims)
+            self.to_highlight = []
+        else:
+            super().on_key_press(symbol, modifiers)
 
     def post_play(self):
         super().post_play()
         self.animationCountObject.increment_value().to_corner(DR)
-
 
     def update_runtime(self, anim: AnimationType, speed: float):
         if not isinstance(anim, Animation):
@@ -45,7 +90,7 @@ class PropScene(InteractiveScene):
     def wait(self, duration: float = None, *args, **kwargs):
         if not duration:
             duration = self.default_wait_time
-        super().wait(duration/self.get_current_speed(), *args, **kwargs)
+        super().wait(duration / self.get_current_speed(), *args, **kwargs)
 
     def play(self, *anims: AnimationType, **kwargs):
         if self.animateState[-1] == AnimState.NORMAL:
@@ -106,7 +151,6 @@ class PropScene(InteractiveScene):
         yield
         for a in args:
             a.unfreeze()
-
 
     @contextmanager
     def skip_animations_for(self, stop=True):

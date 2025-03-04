@@ -328,3 +328,11 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
     def RemovalOf(self, *args, **kwargs):
         return [mn.FadeOut(self)]
+
+    def intersect(self, other: Mobject, reverse=True):
+        if isinstance(other, mn.Rectangle):
+            return self.intersect_selection(other)
+        super().intersect(other)
+
+    def intersect_selection(self, other: mn.Rectangle):
+        return False

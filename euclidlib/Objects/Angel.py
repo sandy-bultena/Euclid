@@ -207,6 +207,19 @@ class EuclidAngleBase(EMObject):
             return lAD, p1, c1, c2, cA
 
 
+    def highlight(self, color=RED, scale=2.0, **args):
+        return (self.animate(rate_func=mn.there_and_back, **args)
+                    .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
+
+    def intersect(self, other: Mobject, reverse=True):
+        if isinstance(other, mn.Rectangle):
+            return self.intersect_selection(other)
+        super().intersect(other)
+
+    def intersect_selection(self, other: mn.Rectangle):
+        return other.is_touching(self)
+
+
 class ArcAngle(EuclidAngleBase, mn.Arc):
     def __init__(self,
                  l1: EuclidLine,

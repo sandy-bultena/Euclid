@@ -4,6 +4,7 @@ import math
 from typing import Iterable
 
 from .EucidMObject import *
+from . import Circle as C
 from .utils import call_or_get
 
 
@@ -77,6 +78,20 @@ class EuclidPoint(EMObject, mn.Circle):
         dx = x1 - x0
         dy = y1 - y0
         return math.sqrt(dx**2 + dy**2)
+
+    def highlight(self, color=RED, scale=2.0, **args):
+        target = self.animate(rate_func=mn.there_and_back, **args)
+        target.scale(scale)
+        target.set_color(color)
+        return target
+
+    def intersect(self, other: Mobject, reverse=True):
+        if isinstance(other, mn.Rectangle):
+            return self.intersect_selection(other)
+        super().intersect(other)
+
+    def intersect_selection(self, other: mn.Rectangle):
+        return other.is_touching(self)
 
 
 class VirtualPoint(EuclidPoint):
