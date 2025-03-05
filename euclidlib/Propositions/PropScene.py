@@ -28,6 +28,8 @@ class PropScene(InteractiveScene):
         self.animationSpeedStack: List[float] = []
         self.debug = bool(getenv('DEBUG'))
         self._speed = float(getenv('SPEED', 1))
+        self.drawing = False
+        self.drawings = VGroup(z_index=10)
         super().__init__(*args, **kwargs)
 
     def gather_selection_euclid(self):
@@ -60,6 +62,13 @@ class PropScene(InteractiveScene):
         char = chr(symbol)
         if char == 'z' and (modifiers & ALL_MODIFIERS) == 0:
             self.enable_selection()
+        elif char == 'x' and (modifiers & ALL_MODIFIERS) == 0:
+            self.drawing = True
+            self.drawings.add(VMobject())
+            self.add(self.drawings[-1])
+        elif char == 'c' and (modifiers & ALL_MODIFIERS) == 0:
+            self.remove(self.drawings)
+            self.drawings.clear()
         else:
             super().on_key_press(symbol, modifiers)
 
@@ -71,8 +80,19 @@ class PropScene(InteractiveScene):
             if anims:
                 self.play(*anims)
             self.to_highlight = []
+        elif char == 'x':
+            self.drawing = False
         else:
             super().on_key_press(symbol, modifiers)
+
+    def on_mouse_motion(self, point: Vect3, d_point: Vect3) -> None:
+        if self.drawing:
+            latest = self.drawings[-1]
+            if not latest.has_points():
+                latest.set_points_as_corners([point - d_point, point])
+            else:
+                latest.add_line_to(point)
+        return super().on_mouse_motion(point, d_point)
 
     def post_play(self):
         super().post_play()
