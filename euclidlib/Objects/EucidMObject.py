@@ -159,6 +159,10 @@ class EMObjectPlayer:
         return self._e_color(mn.WHITE)
 
     @property
+    def grey(self):
+        return self._e_color(mn.GREY)
+
+    @property
     def lift(self):
         if self.eobj.visible():
             self.eobj.scene.add(self.eobj)
@@ -306,6 +310,7 @@ class EMObject(mn.VMobject):
         green: EMObjectPlayer
         red: EMObjectPlayer
         white: EMObjectPlayer
+        grey: EMObjectPlayer
         e_fade: EMObjectPlayer
         e_normal: EMObjectPlayer
         lift: EMObjectPlayer

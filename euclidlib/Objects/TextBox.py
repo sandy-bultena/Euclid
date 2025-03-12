@@ -86,6 +86,8 @@ class TextBox(EGroup[T.EStringObj]):
         self._buff_size = buff_size
         self.abs_position = absolute_position
         self.alignment = self.ALIGNMENT[alignment]
+        self.decoration = None
+        self.decorations = []
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def compute_bounding_box(self):
@@ -127,6 +129,7 @@ class TextBox(EGroup[T.EStringObj]):
         if ((cls is T.ETexText or issubclass(cls, (mn.MarkupText, T.ETexText))) and
                 self.line_width is not None):
             kwargs['line_width'] = self.line_width
+        decor = None
         with self.scene.simultaneous():
             newline = cls(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
@@ -148,17 +151,26 @@ class TextBox(EGroup[T.EStringObj]):
                 (get_side, side) = self.alignment
                 newline.align_to(get_side(self), side)
                 newline.shift(mn.RIGHT * self.indent_value)
+            if self.decoration:
+                decor = cls(self.decoration, **kwargs, scene=self.scene, delay_anim=True)
+                decor.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
             if break_into_parts:
                 parts = [self.generate_text(part, style, delay_anim=True)
                          for part in break_into_parts]
+                if decor is not None:
+                    decor.e_draw(skip_anim)
                 for p, t in zip(parts, break_into_parts):
                     p.next_to(newline[t], mn.ORIGIN, buff=0)
                     if not delay_anim:
                         p.e_draw(skip_anim)
                 self.add(newline)
+                if decor is not None:
+                    self.decorations.append(decor)
                 return *parts, newline
 
             elif transform_from is None and not delay_anim:
+                if decor is not None:
+                    decor.e_draw(skip_anim)
                 newline.e_draw(skip_anim)
             elif not delay_anim:
                 transform_args = transform_args or {}
@@ -169,6 +181,8 @@ class TextBox(EGroup[T.EStringObj]):
                     newline,
                     **transform_args,
                 ))
+        if decor is not None:
+            self.decorations.append(decor)
         self.add(newline)
         return newline
 
@@ -326,6 +340,12 @@ def {style}(self, text: str, **kwargs):
 
     def unindent(self, buff=mn.MED_SMALL_BUFF):
         self.indent_value -= buff
+
+    def decorate(self, text='–'):
+        self.decoration = text
+
+    def reset_decoration(self):
+        self.decoration = None
 
 
 # class TempTextBoxProxy(TextBox):

@@ -11,6 +11,7 @@ from typing import Tuple, Any, Self, Callable
 EPSILON = mn_scale(1)
 if TYPE_CHECKING:
     from manimlib import Vect3
+
     ANGLE_DATA = tuple[
         Vect3 | None,
         tuple[float, float] | None,
@@ -90,6 +91,10 @@ class EAngleBase(EMObject):
     vec1: mn.Vect2
     vec2: mn.Vect2
 
+    @property
+    def v(self):
+        return np.array([self.vx, self.vy, 0])
+
     def pointwise_become_partial(self, start: ArcAngle, a: float, b: float) -> Self:
         if a <= 0:
             self.e_start_angle = start.e_start_angle
@@ -102,7 +107,6 @@ class EAngleBase(EMObject):
             self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
         return super().pointwise_become_partial(start, a, b)
 
-
     def interpolate(
             self,
             mobject1: ArcAngle,
@@ -114,7 +118,6 @@ class EAngleBase(EMObject):
         self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
         self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
         return super().interpolate(mobject1, mobject2, alpha, path_func)
-
 
     def get_arc_center(self) -> Vect3:
         return np.array([self.vx, self.vy, 0])
@@ -206,10 +209,9 @@ class EAngleBase(EMObject):
             # ------------------------------------------------------------------------
             return lAD, p1, c1, c2, cA
 
-
     def highlight(self, color=RED, scale=2.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
-                    .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
+                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
     def intersect(self, other: Mobject, reverse=True):
         if isinstance(other, mn.Rectangle):
@@ -218,6 +220,94 @@ class EAngleBase(EMObject):
 
     def intersect_selection(self, other: mn.Rectangle):
         return other.is_touching(self)
+
+    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=1):
+        with self.scene.animation_speed(speed):
+            start, end = line.get_start_and_end()
+            if not (np.array_equal(start, point.get_center()) or np.array_equal(end, point.get_center())):
+                mn.log.error("When copying an angle to a line, "
+                             "the point must be one of the endpoints\n"
+                             f"{point=} | {start=} | {end=}")
+                return
+
+            if np.array_equal(end, point.get_center()):
+                end, start = start, end
+            clone = ELine(start, end, stroke_color=BLUE)
+            if clone.get_length() < mn_scale(500):
+                clone.extend(mn_scale(500))
+
+            min_length = min(self.l1.get_length(),
+                             self.l2.get_length(),
+                             line.get_length()) - mn_scale(10)
+
+            # ------------------------------------------------------------------------
+            # define point D and E on angle
+            # ------------------------------------------------------------------------
+            c1 = C.ECircle(self.v, self.v + RIGHT * min_length, fill_color=RED)
+            p1 = c1.intersect(self.l1)
+            p2 = c1.intersect(self.l2)
+            pn1 = P.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
+            pn2 = P.EPoint(p2[0], label=('P2', dict(away_from=p1[0])))
+            c1.e_remove()
+
+            # ------------------------------------------------------------------------
+            # copy CE to AF
+            # ------------------------------------------------------------------------
+            l1 = ELine(self.v, p1[0])
+            ln1, o = l1.copy_to_point(point)
+            ln1.green()
+
+            c2 = C.ECircle(point, ln1.get_end())
+            with self.scene.delayed():
+                for x in (ln1, o):
+                    x.e_remove()
+
+            p3 = c2.intersect(line)
+            if not p3:
+                for i in range(5):
+                    clone.extend(100)
+                    p3 = c2.intersect(clone)
+
+            pn3 = P.EPoint(p3[0])
+
+            l3 = ELine(p1[0], p2[0])
+            l3.e_fade()
+            ln3, o2 = l3.copy_to_point(pn3)
+            c3 = C.ECircle(pn3, ln3.get_end())
+            c3.e_fade()
+
+            p4 = c3.intersect(c2)
+            lt1 = ELine(point, p4[0], delay_anim=True)
+            lt2 = ELine(point, p4[1], delay_anim=True)
+
+            with self.scene.delayed():
+                for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
+                    x.e_remove()
+
+            if negative:
+                at1 = EAngle(lt1, line, delay_anim=True)
+                at2 = EAngle(lt2, line, delay_anim=True)
+            else:
+                at1 = EAngle(line, lt1, delay_anim=True)
+                at2 = EAngle(line, lt2, delay_anim=True)
+
+            if abs(at2.e_angle - self.e_angle) < mn_scale(1):
+                lt2, lt1 = lt1, lt2
+                at1.e_remove()
+                angle = at2
+            else:
+                angle = at1
+                at2.e_remove()
+
+
+            lt1.e_draw()
+            angle.e_draw()
+
+            with self.scene.delayed():
+                for x in (lt2, c2, c3, clone):
+                    x.e_remove()
+            return lt1, angle
+
 
 
 class ArcAngle(EAngleBase, mn.Arc):
@@ -269,8 +359,9 @@ class ArcAngle(EAngleBase, mn.Arc):
         )
 
 
-class RightAngle(EAngleBase, mn.VMobject):
+class RightAngle(EAngleBase):
     LabelBuff = 0.15
+
     def __init__(self,
                  l1: ELine,
                  l2: ELine,
@@ -313,7 +404,6 @@ class RightAngle(EAngleBase, mn.VMobject):
             self.e_draw()
 
 
-
 def EAngle(l1: ELine | str,
            l2: ELine = None,
            size: float = mn_scale(40),
@@ -339,9 +429,7 @@ def EAngle(l1: ELine | str,
     elif th_diff < -PI:
         th_diff = TAU + th_diff
 
-    if abs(abs(th_diff) - PI/2) < (0.1*DEGREES) and not no_right:
+    if abs(abs(th_diff) - PI / 2) < (0.1 * DEGREES) and not no_right:
         return RightAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)
     else:
         return ArcAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)
-
-
