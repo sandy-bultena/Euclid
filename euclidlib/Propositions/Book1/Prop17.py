@@ -16,11 +16,11 @@ class Prop17(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(500, 430))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(150, 200)
@@ -37,7 +37,7 @@ class Prop17(Book1Scene):
             t1.title("In other words:")
             t1.explain("Given any triangle ABC")
 
-            t['ABC'] = EuclidTriangle('ABC', point_labels='ABC')
+            t['ABC'] = ETriangle('ABC', point_labels='ABC')
 
         @self.push_step
         def _i2():
@@ -61,10 +61,10 @@ class Prop17(Book1Scene):
             t1.title("Proof:")
             t1.explain("Extend line BC to point D")
 
-            l['CD'] = EuclidLine('CD')
+            l['CD'] = ELine('CD')
             l['AC'] = t['ABC'].l[2]
-            p['D'] = EuclidPoint(D, label=('D', dict(away_from=C)))
-            a['ACD'] = EuclidAngle('ACD', size=mn_scale(20), label=r'\alpha')
+            p['D'] = EPoint(D, label=('D', dict(away_from=C)))
+            a['ACD'] = EAngle('ACD', size=mn_scale(20), label=r'\alpha')
 
         @self.push_step
         def _p2():

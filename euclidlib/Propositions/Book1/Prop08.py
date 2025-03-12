@@ -17,11 +17,11 @@ class Prop08(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(absolute_position=mn_coord(500, 330))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         A = mn_coord(100, 450)
         B = mn_coord(300, 450)
@@ -41,8 +41,8 @@ class Prop08(Book1Scene):
                        "triangle equal to the three sides of the other "
                        "triangle (SSS)")
 
-            t['ABC'] = EuclidTriangle(A, B, C, point_labels=[('A', LEFT), ('B', RIGHT), ('C', UP)])
-            t['EDF'] = EuclidTriangle(E, D, F, point_labels=[('E', LEFT), ('D', RIGHT), ('F', UP)])
+            t['ABC'] = ETriangle(A, B, C, point_labels=[('A', LEFT), ('B', RIGHT), ('C', UP)])
+            t['EDF'] = ETriangle(E, D, F, point_labels=[('E', LEFT), ('D', RIGHT), ('F', UP)])
 
             t2.math('CB = EF')
             t2.math('AC = DF')

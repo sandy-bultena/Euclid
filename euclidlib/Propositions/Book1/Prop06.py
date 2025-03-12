@@ -16,11 +16,11 @@ class Prop06(Book1Scene):
         t2 = TextBox(absolute_position=mn_coord(450, 330))
         t4 = TextBox(absolute_position=mn_coord(450, 330))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         A = mn_coord(225, 250)
         B = mn_coord(425, 450)
@@ -36,10 +36,10 @@ class Prop06(Book1Scene):
             t1.title("In other words:")
             t1.explain("Start with a triangle with equal base angles")
             # with self.simultaneous():
-            t['ABC'] = EuclidTriangle('ABC',
-                                      point_labels=['A', ('B', RIGHT), ('C', LEFT)],
-                                      angles=[None, r'\alpha', r'\alpha']
-                                      )
+            t['ABC'] = ETriangle('ABC',
+                                 point_labels=['A', ('B', RIGHT), ('C', LEFT)],
+                                 angles=[None, r'\alpha', r'\alpha']
+                                 )
             t2.math(r'\angle ACB = \angle ABC', fill_color=BLUE)
 
         @self.push_step
@@ -77,11 +77,11 @@ class Prop06(Book1Scene):
         def _p3():
             nonlocal B, C, p
             t1.explain("Create a triangle DCB")
-            t['BCD'] = EuclidTriangle('BCD',
-                                      point_labels=[('B', RIGHT),
+            t['BCD'] = ETriangle('BCD',
+                                 point_labels=[('B', RIGHT),
                                                     ('C', LEFT),
                                                     ()],
-                                      ).e_fill(TEAL_D)
+                                 ).e_fill(TEAL_D)
             t['BCD'].replace_point(-1, p['D'])
             t['BCD'].replace_line(-1, l['BD'])
             p['D'].add_label('D', away_from=t['BCD'].get_center)
@@ -144,7 +144,7 @@ class Prop06(Book1Scene):
 
         @self.push_step
         def _p8():
-            a['ACD'] = EuclidAngle(t['BCD'].l[1], t['ABC'].l[2], size=mn_scale(120), label=r'\beta')
+            a['ACD'] = EAngle(t['BCD'].l[1], t['ABC'].l[2], size=mn_scale(120), label=r'\beta')
             t2.e_fade()
             with self.simultaneous():
                 t2.explainM(r'let $\angle ACD = \beta$')

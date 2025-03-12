@@ -31,18 +31,18 @@ class BookScene(PropScene):
     TOC: List[str]
 
     @staticmethod
-    def extract_lines(lines: Dict[str, EuclidLine], triangles: Dict[str, EuclidPolygon], label: str):
+    def extract_lines(lines: Dict[str, ELine], triangles: Dict[str, EPolygon], label: str):
         label2 = label + label[0]
         for l_label, line in zip(pairwise(label2), triangles[label].l):
             lines[op.add(*l_label)] = line
 
     @staticmethod
-    def extract_points(points: Dict[str, EuclidPoint], triangles: Dict[str, EuclidPolygon], label: str):
+    def extract_points(points: Dict[str, EPoint], triangles: Dict[str, EPolygon], label: str):
         for p_label, point in zip(label, triangles[label].p):
             points[p_label] = point
 
     @staticmethod
-    def extract_angles(angles: Dict[str, EuclidAngleBase], triangles: Dict[str, EuclidPolygon], label: str):
+    def extract_angles(angles: Dict[str, EAngleBase], triangles: Dict[str, EPolygon], label: str):
         label2 = label[-1] + label + label[0]
         for i, angle in enumerate(triangles[label].a):
             if angle is not None:

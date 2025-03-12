@@ -16,11 +16,11 @@ class Prop19(Book1Scene):
         t2 = TextBox(mn_coord(475, 430))
         t3 = TextBox(mn_coord(300, 250))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(75, 150)
@@ -39,11 +39,11 @@ class Prop19(Book1Scene):
             nonlocal A, B, C
             t1.title("In other words:")
             t1.explain("Given a triangle ABC")
-            t['ABC'] = EuclidTriangle('ABC',
-                                      point_labels='ABC',
-                                      labels='cab',
-                                      angles=r'\alpha \beta \gamma'.split()
-                                      )
+            t['ABC'] = ETriangle('ABC',
+                                 point_labels='ABC',
+                                 labels='cab',
+                                 angles=r'\alpha \beta \gamma'.split()
+                                 )
             t2.math(r'\beta > \alpha\ \land \ \beta > \gamma', fill_color=BLUE)
 
         @self.push_step

@@ -18,11 +18,11 @@ class Prop10(Book1Scene):
         C = mn.midpoint(A, B) + UP * 2
         D = mn.midpoint(A, B) + DOWN * 2
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         # ----------------------------------------------
         # In Other Words
@@ -31,15 +31,15 @@ class Prop10(Book1Scene):
         def _i1():
             t1.title("In other words:")
             t1.explain("Start with a line segment AB")
-            p['A']  = EuclidPoint(A, label=('A', LEFT))
-            p['B']  = EuclidPoint(B, label=('B', RIGHT))
-            l['AB'] = EuclidLine('AB')
+            p['A']  = EPoint(A, label=('A', LEFT))
+            p['B']  = EPoint(B, label=('B', RIGHT))
+            l['AB'] = ELine('AB')
 
         @self.push_step
         def _i2():
             t1.explain("and cut it in half")
             nonlocal C, D
-            l['half'] = EuclidLine('CD')
+            l['half'] = ELine('CD')
 
         # ----------------------------------------------
         # Construction
@@ -63,7 +63,7 @@ class Prop10(Book1Scene):
         def _c3():
             t1.explain("Bisect angle ACB, and extend line past the line segment{nb: AB <sub>(I.9)</sub>")
             nonlocal p
-            a['t'] = EuclidAngle('ACB')
+            a['t'] = EAngle('ACB')
             l['CD'], p['D'], *objs = a['t'].bisect(2)
             with self.simultaneous():
                 for o in objs:
@@ -71,7 +71,7 @@ class Prop10(Book1Scene):
                 a['t'].e_remove()
                 pts = l['CD'].intersect(l['AB'])
                 p['D'].e_remove()
-            p['D'] = EuclidPoint(pts, label=('D', UR))
+            p['D'] = EPoint(pts, label=('D', UR))
 
         @self.push_step
         def _c4():
@@ -117,8 +117,8 @@ class Prop10(Book1Scene):
             t1.explain("Angle ACD equals BCD since we bisected angle ACB")
             l['CD'].e_normal()
             with self.simultaneous():
-                a['ACD'] = EuclidAngle('ACD', label=r'\alpha')
-                a['DCB'] = EuclidAngle('DCB', label=r'\alpha')
+                a['ACD'] = EAngle('ACD', label=r'\alpha')
+                a['DCB'] = EAngle('DCB', label=r'\alpha')
             t2.math(r'\angle ACD = \angle BCD = \alpha')
 
         @self.push_step
@@ -127,8 +127,8 @@ class Prop10(Book1Scene):
                        "equal sides, and an equal angle between them,")
             t[1].e_unfill()
             with self.simultaneous():
-                t[2] = EuclidTriangle.assemble(lines=[l['AD'], l['CD'], l['AC']]).e_fill(GREEN_D)
-                t[3] = EuclidTriangle.assemble(lines=[l['BD'], l['BC'], l['CD']]).e_fill(LIGHT_PINK)
+                t[2] = ETriangle.assemble(lines=[l['AD'], l['CD'], l['AC']]).e_fill(GREEN_D)
+                t[3] = ETriangle.assemble(lines=[l['BD'], l['BC'], l['CD']]).e_fill(LIGHT_PINK)
 
 
         @self.push_step

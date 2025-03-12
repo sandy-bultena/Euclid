@@ -14,7 +14,7 @@ def darken(colour: ManimColor):
        for color in mn.listify(colour)
    ]
 
-class EuclidPoint(EMObject, mn.Circle):
+class EPoint(EMObject, mn.Circle):
     CONSTRUCTION_TIME=0.25
     LabelBuff = mn.MED_SMALL_BUFF
 
@@ -94,5 +94,5 @@ class EuclidPoint(EMObject, mn.Circle):
         return other.is_touching(self)
 
 
-class VirtualPoint(EuclidPoint):
+class VirtualPoint(EPoint):
     Virtual = True

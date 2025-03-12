@@ -1,4 +1,5 @@
 import pathlib
+from itertools import batched
 
 template_path = pathlib.Path(__file__).parent / 'PropTemplate.txt'
 template_string = template_path.read_text()
@@ -15,10 +16,11 @@ def main():
         text_boxes.append(text_box.split(','))
 
     while point := input("Extra Points?: "):
-        points.append(point.split(','))
+        points.append(list(batched(point.split(','), 2)))
 
-    text_boxes = [f't{i} = TextBox(mn_coord({x}, {y}))' for i, (x, y) in enumerate(text_boxes, start=2)]
-    points = [f'{chr(ord("A") + i)} = mn_coord({x}, {y})' for i, (x, y) in enumerate(points)]
+    text_boxes = (f't{i} = TextBox(mn_coord({x}, {y}))' for i, (x, y) in enumerate(text_boxes, start=2))
+    points = (f'{chr(ord("A") + i)} = ' + ','.join(f'mn_coord({x}, {y})' for x, y in line)
+              for i, line in enumerate(points))
 
     text_boxes_text = f'\n{indent}'.join(text_boxes) + '\n'
     points_text = f'\n{indent}'.join(points) + '\n'

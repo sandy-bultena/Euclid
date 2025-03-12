@@ -7,7 +7,7 @@ from euclidlib.Objects.EucidMObject import *
 from euclidlib.Objects import Line as L
 import manimlib as mn
 
-class EuclidCircle(EMObject, mn.Circle):
+class ECircle(EMObject, mn.Circle):
     CONSTRUCTION_TIME=0.75
     AUX_CONSTRUCTION_TIME = 0.25
 
@@ -41,7 +41,7 @@ class EuclidCircle(EMObject, mn.Circle):
             **kwargs
         )
 
-    def intersect_circle(self, other: EuclidCircle) -> Vect3 | None:
+    def intersect_circle(self, other: ECircle) -> Vect3 | None:
         p2, r2 = other.e_center, other.radius
         base = L.VirtualLine(self.e_center, p2, scene=self.scene, stroke_color=BLUE)
         d = base.get_length()
@@ -159,7 +159,7 @@ class EuclidCircle(EMObject, mn.Circle):
 
 
     def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | None:
-        if isinstance(other, EuclidCircle):
+        if isinstance(other, ECircle):
             return self.intersect_circle(other)
         if isinstance(other, mn.Line):
             return self.intersect_line(other)
@@ -168,5 +168,5 @@ class EuclidCircle(EMObject, mn.Circle):
         super().intersect(other)
 
 
-class VirtualCircle(EuclidCircle):
+class VirtualCircle(ECircle):
     Virtual = True

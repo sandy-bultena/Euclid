@@ -18,11 +18,11 @@ class Prop22(Book1Scene):
         t2 = TextBox(mn_coord(475, 200), line_width=mn_h_scale(550))
         t3 = TextBox(mn_coord(500, 475), line_width=mn_h_scale(550))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
         ex: Dict[str | int, Mobject] = {}
 
@@ -41,12 +41,12 @@ class Prop22(Book1Scene):
             t1.explain("Start with three lines a,b,c where the sum of any two "
                        "is greater than the third")
             with self.delayed():
-                p['A'] = EuclidPoint(A[0], label=('a', LEFT))
-                l['A'] = EuclidLine(*A)
-                p['B'] = EuclidPoint(B[0], label=('b', LEFT))
-                l['B'] = EuclidLine(*B)
-                p['C'] = EuclidPoint(C[0], label=('c', LEFT))
-                l['C'] = EuclidLine(*C)
+                p['A'] = EPoint(A[0], label=('a', LEFT))
+                l['A'] = ELine(*A)
+                p['B'] = EPoint(B[0], label=('b', LEFT))
+                l['B'] = ELine(*B)
+                p['C'] = EPoint(C[0], label=('c', LEFT))
+                l['C'] = ELine(*C)
             with self.delayed():
                 t2.math('b + c > a')
                 t2.math('c + a > b')
@@ -57,9 +57,9 @@ class Prop22(Book1Scene):
             t1.explain("Construct a line DE of sufficient length such that "
                        "it is greater than the sum of a,b,c")
             with self.delayed():
-                p['D'] = EuclidPoint(D, label=('D', LEFT))
-                l['DE'] = EuclidLine('DE')
-                p['E'] = EuclidPoint(E, label=('E', RIGHT))
+                p['D'] = EPoint(D, label=('D', LEFT))
+                l['DE'] = ELine('DE')
+                p['E'] = EPoint(E, label=('E', RIGHT))
 
         def copy_line(name, F, A, D, a):
             def func():
@@ -79,7 +79,7 @@ class Prop22(Book1Scene):
         def draw_circle(name, F, D):
             def func():
                 t1.explain(f"Draw a circle, with center {F}, and radius {D}{F}")
-                c[F] = EuclidCircle(p[F], p[D])
+                c[F] = ECircle(p[F], p[D])
 
             func.__name__ = name
             return func
@@ -92,10 +92,10 @@ class Prop22(Book1Scene):
             t1.explain("From the intersection point K, construct two lines "
                        "KF and KG")
             pts = c['G'].intersect(c['F'])
-            p['K'] = EuclidPoint(pts[0], label=('K', UP))
+            p['K'] = EPoint(pts[0], label=('K', UP))
             with self.simultaneous():
-                l['FK'] = EuclidLine('KF')
-                l['GK'] = EuclidLine('KG')
+                l['FK'] = ELine('KF')
+                l['GK'] = ELine('KG')
             with self.simultaneous():
                 c['G'].e_fade()
                 c['F'].e_fade()

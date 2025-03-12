@@ -19,11 +19,11 @@ class Prop14(Book1Scene):
         t2 = TextBox(mn_coord(500, 430))
         t3 = TextBox(mn_coord(275, 275))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(150, 250)
@@ -39,23 +39,23 @@ class Prop14(Book1Scene):
         def _i1():
             t1.title("In other words:")
             t1.explain("Start with an arbitrary line segment AB")
-            p['A'] = EuclidPoint(A, label=('A', UP))
-            p['B'] = EuclidPoint(B, label=('B', DOWN))
-            l['AB'] = EuclidLine('AB')
+            p['A'] = EPoint(A, label=('A', UP))
+            p['B'] = EPoint(B, label=('B', DOWN))
+            l['AB'] = ELine('AB')
 
         @self.push_step
         def _i2():
             t1.explain("Draw a line from B to an arbitrary point C")
-            p['C'] = EuclidPoint(C, label=('C', LEFT))
-            l['BC'] = EuclidLine('BC')
+            p['C'] = EPoint(C, label=('C', LEFT))
+            l['BC'] = ELine('BC')
 
         @self.push_step
         def _i3():
             t1.explain("Draw a line from B to a point D (not on the same side as C),")
-            p['C'] = EuclidPoint(D, label=('D', RIGHT))
-            l['BD'] = EuclidLine('BD')
-            a['a'] = EuclidAngle('ABC', label=r'\alpha', size=mn_scale(40))
-            a['b'] = EuclidAngle('DBA', label=r'\beta', size=mn_scale(30))
+            p['C'] = EPoint(D, label=('D', RIGHT))
+            l['BD'] = ELine('BD')
+            a['a'] = EAngle('ABC', label=r'\alpha', size=mn_scale(40))
+            a['b'] = EAngle('DBA', label=r'\beta', size=mn_scale(30))
 
         @self.push_step
         def _i4():
@@ -87,9 +87,9 @@ class Prop14(Book1Scene):
             t2.down()
             t2.math(r"CB, BE\ =\ CE", fill_color=BLUE)
 
-            p['E'] = EuclidPoint(E, label=('E', UP))
-            l['BE'] = EuclidLine('BE')
-            a['th'] = EuclidAngle(l['BE'], l['AB'], size=mn_scale(70), label=r'\theta')
+            p['E'] = EPoint(E, label=('E', UP))
+            l['BE'] = ELine('BE')
+            a['th'] = EAngle(l['BE'], l['AB'], size=mn_scale(70), label=r'\theta')
             with self.simultaneous():
                 l['BD'].e_fade()
                 a['b'].e_fade()
@@ -143,7 +143,7 @@ class Prop14(Book1Scene):
             t1.explainM("... which is "
                         r"impossible since $\beta$ is the sum of $\theta$ and $\epsilon$")
             t2.math(r'\beta = \theta + \epsilon')
-            a['e'] = EuclidAngle('DBE', size=mn_scale(60), label=r'\epsilon')
+            a['e'] = EAngle('DBE', size=mn_scale(60), label=r'\epsilon')
             with self.simultaneous():
                 t2.e_fade()
                 t2.blue[0:4]()

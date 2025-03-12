@@ -12,7 +12,7 @@ from . import Angel as A
 EPSILON = mn_scale(1)
 
 
-class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
+class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def IN(self, v: Vect3):
         center = self.get_center_of_mass()
         direction = center - v
@@ -25,17 +25,17 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
     @classmethod
     def assemble(cls,
-                 lines: None | List[L.EuclidLine] | str = None,
-                 points: None | List[P.EuclidPoint] | str = None,
-                 angles: None | List[A.EuclidAngleBase] = None,
+                 lines: None | List[L.ELine] | str = None,
+                 points: None | List[P.EPoint] | str = None,
+                 angles: None | List[A.EAngleBase] = None,
                  **kwargs):
         if points:
             if isinstance(points, str):
-                points = P.EuclidPoint.find_in_frame(points)
+                points = P.EPoint.find_in_frame(points)
             coords = [p.get_center() for p in points]
         elif lines:
             if isinstance(lines, str):
-                lines = L.EuclidLine.find_in_frame(lines, loop=True)
+                lines = L.ELine.find_in_frame(lines, loop=True)
             tmp_lines = lines + [lines[0]]
             coords = []
             for l1, l2 in pairwise(tmp_lines):
@@ -62,16 +62,16 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             animate_part=('set_e_fill',),
             delay_anim=False,
             _assemble_flag=False,
-            _lines: List[L.EuclidLine] | None = None,
-            _points: List[P.EuclidPoint] | None = None,
-            _angles: List[A.EuclidAngleBase] | None = None,
+            _lines: List[L.ELine] | None = None,
+            _points: List[P.EPoint] | None = None,
+            _angles: List[A.EAngleBase] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
             point_names = list(points[0])
-            points = P.EuclidPoint.find_in_frame(point_names)
+            points = P.EPoint.find_in_frame(point_names)
 
-        if all(isinstance(p, L.EuclidLine) for p in points):
+        if all(isinstance(p, L.ELine) for p in points):
             lines = [p for p in points]
             tmp_lines = lines + [points[0]]
             points = []
@@ -96,19 +96,19 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.vertices = [convert_to_coord(p) for p in points]
         self.sides = len(self.vertices)
         if _assemble_flag and _lines:
-            self.lines: List[L.EuclidLine] = _lines
+            self.lines: List[L.ELine] = _lines
         else:
-            self.lines: List[L.EuclidLine] = []
+            self.lines: List[L.ELine] = []
 
         if _assemble_flag and _points:
-            self.points: List[P.EuclidPoint] = _points
+            self.points: List[P.EPoint] = _points
         else:
-            self.points: List[P.EuclidPoint] = []
+            self.points: List[P.EPoint] = []
 
         if _assemble_flag and _angles:
-            self.angles: List[A.EuclidAngleBase] = _angles
+            self.angles: List[A.EAngleBase] = _angles
         else:
-            self.angles: List[A.EuclidAngleBase | None] = [None] * self.sides
+            self.angles: List[A.EAngleBase | None] = [None] * self.sides
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part, **kwargs)
         if self.sides:
@@ -176,11 +176,11 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         labels = self.options.get('point_labels', [()] * self.sides)
         with self.scene.simultaneous_speed(self.speed):
             self.points = [
-                P.EuclidPoint(coord,
-                              scene=self.scene,
-                              label_args=self._filter_point_labels(args),
-                              delay_anim=delay_anim,
-                              )
+                P.EPoint(coord,
+                         scene=self.scene,
+                         label_args=self._filter_point_labels(args),
+                         delay_anim=delay_anim,
+                         )
                 for coord, args
                 in zip(self.vertices, labels)]
 
@@ -188,7 +188,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         if self.lines:
             return
         with self.scene.simultaneous_speed(self.speed):
-            self.lines = [L.EuclidLine(p0, p1, delay_anim=delay_anim) for p0, p1 in pairwise(self.vertices)]
+            self.lines = [L.ELine(p0, p1, delay_anim=delay_anim) for p0, p1 in pairwise(self.vertices)]
 
     def define_sub_objs(self, delay_anim=False):
         self.define_points(delay_anim=delay_anim)
@@ -233,7 +233,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
         if not self.angles:
             self.angles = [
-                A.EuclidAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim)
+                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim)
                 for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
                 if name is not None
             ]
@@ -246,7 +246,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
                 if old is not None:
                     old.e_remove()
                     self._sub_group.remove(old)
-                self.angles[i] = A.EuclidAngle(l1, l2, size=size, label_args=name, scene=self.scene)
+                self.angles[i] = A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene)
                 self._sub_group.add(self.angles[i])
         return self
 
@@ -280,17 +280,17 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def v(self):
         return self.vertices
 
-    def replace_line(self, index, newline: L.EuclidLine):
+    def replace_line(self, index, newline: L.ELine):
         self.lines[index].e_delete()
         self.lines[index] = newline
         self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
 
-    def replace_point(self, index, newpoint: P.EuclidPoint):
+    def replace_point(self, index, newpoint: P.EPoint):
         self.points[index].e_delete()
         self.points[index] = newpoint
         self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
 
-    def move_point_to(self, index: int, dest: P.EuclidPoint | Vect3):
+    def move_point_to(self, index: int, dest: P.EPoint | Vect3):
         dest = convert_to_coord(dest)
         self.vertices[index] = dest
         self.vertices[-1] = self.vertices[0]
@@ -313,7 +313,7 @@ class EuclidPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
                     old_angle = self.angles[i]
                     l1 = L.VirtualLine(self.vertices[(i - 1) % self.sides], self.vertices[i])
                     l2 = L.VirtualLine(self.vertices[i], self.vertices[i + 1])
-                    new_angle = A.EuclidAngle(l1, l2, size=old_angle.size, delay_anim=True)
+                    new_angle = A.EAngle(l1, l2, size=old_angle.size, delay_anim=True)
                     self.scene.play(mn.Transform(old_angle, new_angle))
                     l2.e_remove()
                     l1.e_remove()

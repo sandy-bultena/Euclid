@@ -19,11 +19,11 @@ class Prop07(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(500, 330), line_width=mn_h_scale(550))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         A = mn_coord(450, 650)
         B = mn_coord(200, 650)
@@ -41,9 +41,9 @@ class Prop07(Book1Scene):
             t1.explain("There is a unique point C where the sides of "
                        "the triangle, AC and BC, meet")
 
-            t['ABC'] = EuclidTriangle('ABC',
-                                      point_labels=[('A', DOWN), ('B', DOWN), ('C', UP)],
-                                      labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
+            t['ABC'] = ETriangle('ABC',
+                                 point_labels=[('A', DOWN), ('B', DOWN), ('C', UP)],
+                                 labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
             p['A'], p['B'], p['C'] = t['ABC'].p
 
         # ----------------------------------------------
@@ -58,9 +58,9 @@ class Prop07(Book1Scene):
             t1.explain("Create triangle ABD")
 
             nonlocal D
-            t['ABD'] = EuclidTriangle('ABD',
-                                      point_labels=[(), (), ('D', UP)],
-                                      labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
+            t['ABD'] = ETriangle('ABD',
+                                 point_labels=[(), (), ('D', UP)],
+                                 labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
             p['D'] = t['ABD'].p[-1]
             t2.math('AC = AD = r_1')
             t2.math('BC = BD = r_2')
@@ -70,9 +70,9 @@ class Prop07(Book1Scene):
             t1.explain("Construct line CD, thus creating triangles ACD and BCD")
 
             nonlocal p
-            l['CD'] = EuclidLine('CD')
-            t['CAD'] = EuclidTriangle(t['ABC'].l[-1], t['ABD'].l[-1], l['CD'])
-            t['CBD'] = EuclidTriangle(t['ABC'].l[1], t['ABD'].l[1], l['CD'])
+            l['CD'] = ELine('CD')
+            t['CAD'] = ETriangle(t['ABC'].l[-1], t['ABD'].l[-1], l['CD'])
+            t['CBD'] = ETriangle(t['ABC'].l[1], t['ABD'].l[1], l['CD'])
             with self.simultaneous():
                 t['ABC'].e_fade()
                 t['ABD'].e_fade()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from euclidlib.Objects.EucidMObject import *
-from .Line import EuclidLine
+from .Line import ELine
 from manimlib import TAU
 from . import Text as T
 from . import Point as P
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     ]
 
 
-def angle_coords(l1: EuclidLine, l2: EuclidLine) -> ANGLE_DATA:
+def angle_coords(l1: ELine, l2: ELine) -> ANGLE_DATA:
     (l1x0, l1y0, _), (l1x1, l1y1, _) = l1.get_start(), l1.get_end()
     (l2x0, l2y0, _), (l2x1, l2y1, _) = l2.get_start(), l2.get_end()
 
@@ -63,7 +63,7 @@ def angleOf(p0: mn.Vect3, p1: mn.Vect3):
     )
 
 
-def calculateAngle(l1: EuclidLine, l2: EuclidLine):
+def calculateAngle(l1: ELine, l2: ELine):
     (vx, vy, _), vec1, vec2 = angle_coords(l1, l2)
 
     if vx is None:
@@ -77,10 +77,10 @@ def calculateAngle(l1: EuclidLine, l2: EuclidLine):
     return th_diff % TAU
 
 
-class EuclidAngleBase(EMObject):
+class EAngleBase(EMObject):
     LabelBuff = 0.15
-    l1: EuclidLine
-    l2: EuclidLine
+    l1: ELine
+    l2: ELine
     size: float
     e_angle: float
     e_start_angle: float
@@ -158,8 +158,8 @@ class EuclidAngleBase(EMObject):
             # make two temporary lines
             # ------------------------------------------------------------------------
             with self.scene.simultaneous():
-                s1 = EuclidLine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
-                s2 = EuclidLine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
+                s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
+                s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
 
             # ------------------------------------------------------------------------
             # define points B and C on the two lines, equidistance from the vertex
@@ -167,27 +167,27 @@ class EuclidAngleBase(EMObject):
             # pick the shorter of the two lines to find the initial point
             short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
             p = s1.point(0.75 * short.get_length())
-            pB = P.EuclidPoint(p)
-            cA = C.EuclidCircle(self.get_arc_center(), pB).e_fade()
+            pB = P.EPoint(p)
+            cA = C.ECircle(self.get_arc_center(), pB).e_fade()
             p = cA.intersect(self.l2)
-            pC = P.EuclidPoint(p[0])
+            pC = P.EPoint(p[0])
 
             # ------------------------------------------------------------------------
             # draw two circles, radius BC, centers: B & C.
             # - find the intersection points between two circles
             # ------------------------------------------------------------------------
-            c1 = C.EuclidCircle(pB, pC).e_fade()
-            c2 = C.EuclidCircle(pC, pB).e_fade()
+            c1 = C.ECircle(pB, pC).e_fade()
+            c2 = C.ECircle(pC, pB).e_fade()
             ps = c1.intersect(c2)
             if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
-                p1 = P.EuclidPoint(ps[0])
+                p1 = P.EPoint(ps[0])
             else:
-                p1 = P.EuclidPoint(ps[1])
+                p1 = P.EPoint(ps[1])
 
             # ------------------------------------------------------------------------
             # draw a line to intersection
             # ------------------------------------------------------------------------
-            lAD = EuclidLine(self.get_arc_center(), p1)
+            lAD = ELine(self.get_arc_center(), p1)
 
             # ------------------------------------------------------------------------
             # cleanup
@@ -220,10 +220,10 @@ class EuclidAngleBase(EMObject):
         return other.is_touching(self)
 
 
-class ArcAngle(EuclidAngleBase, mn.Arc):
+class ArcAngle(EAngleBase, mn.Arc):
     def __init__(self,
-                 l1: EuclidLine,
-                 l2: EuclidLine,
+                 l1: ELine,
+                 l2: ELine,
                  size: float,
                  angle_data: ANGLE_DATA,
                  angle1: float,
@@ -269,13 +269,11 @@ class ArcAngle(EuclidAngleBase, mn.Arc):
         )
 
 
-
-
-class RightAngle(EuclidAngleBase, mn.VMobject):
+class RightAngle(EAngleBase, mn.VMobject):
     LabelBuff = 0.15
     def __init__(self,
-                 l1: EuclidLine,
-                 l2: EuclidLine,
+                 l1: ELine,
+                 l2: ELine,
                  size: float,
                  angle_data: ANGLE_DATA,
                  angle1: float,
@@ -316,13 +314,13 @@ class RightAngle(EuclidAngleBase, mn.VMobject):
 
 
 
-def EuclidAngle(l1: EuclidLine | str,
-                l2: EuclidLine = None,
-                size: float = mn_scale(40),
-                no_right: bool = False,
-                **kwargs):
+def EAngle(l1: ELine | str,
+           l2: ELine = None,
+           size: float = mn_scale(40),
+           no_right: bool = False,
+           **kwargs):
     if isinstance(l1, str):
-        l1, l2 = EuclidLine.find_in_frame(l1)
+        l1, l2 = ELine.find_in_frame(l1)
 
     assert (l2 is not None)
 

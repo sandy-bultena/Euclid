@@ -16,11 +16,11 @@ class Prop15(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(475, 430))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(150, 250)
@@ -38,14 +38,14 @@ class Prop15(Book1Scene):
             t1.explain("Given two arbitrary line segments AB "
                        "and CD which intersect at point E")
             with self.simultaneous():
-                p["A"] = EuclidPoint(A, label=("A", dict(away_from=B)))
-                p["B"] = EuclidPoint(B, label=("B", dict(away_from=A)))
-            l["AB"] = EuclidLine(A, B)
+                p["A"] = EPoint(A, label=("A", dict(away_from=B)))
+                p["B"] = EPoint(B, label=("B", dict(away_from=A)))
+            l["AB"] = ELine(A, B)
             with self.simultaneous():
-                p["C"] = EuclidPoint(C, label=("C", LEFT))
-                p["D"] = EuclidPoint(D, label=("D", RIGHT))
-            l["CD"] = EuclidLine(C, D)
-            p["E"] = EuclidPoint(l["CD"].intersect(l["AB"]), label=('E', dict(away_from=mn.midpoint(A, D))))
+                p["C"] = EPoint(C, label=("C", LEFT))
+                p["D"] = EPoint(D, label=("D", RIGHT))
+            l["CD"] = ELine(C, D)
+            p["E"] = EPoint(l["CD"].intersect(l["AB"]), label=('E', dict(away_from=mn.midpoint(A, D))))
 
         @self.push_step
         def _i2():
@@ -54,11 +54,11 @@ class Prop15(Book1Scene):
             l["CE"], l["DE"] = l["CD"].e_split(p["E"])
             l["AE"], l["BE"] = l["AB"].e_split(p["E"])
             with self.simultaneous():
-                a["a"] = EuclidAngle('AEC', label=r"\alpha")
-                a["b"] = EuclidAngle("BED", label=r"\beta")
+                a["a"] = EAngle('AEC', label=r"\alpha")
+                a["b"] = EAngle("BED", label=r"\beta")
             with self.simultaneous():
-                a["g"] = EuclidAngle("AED", label=r"\gamma", size=mn_scale(50))
-                a["t"] = EuclidAngle("BEC", label=r"\theta", size=mn_scale(50))
+                a["g"] = EAngle("AED", label=r"\gamma", size=mn_scale(50))
+                a["t"] = EAngle("BEC", label=r"\theta", size=mn_scale(50))
             t2.math(r"\alpha=\beta")
             t2.math(r"\gamma=\theta")
 

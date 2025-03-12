@@ -19,11 +19,11 @@ class Prop11(Book1Scene):
         t2 = TextBox(mn_coord(500, 430))
         t3 = TextBox(mn_coord(700, 150), alignment='n', line_width=mn_scale(1000))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         A = mn_coord(100, 400)
         B = mn_coord(450, 400)
@@ -43,16 +43,16 @@ class Prop11(Book1Scene):
                        "perpendicular to that on which it stands.")
 
             with self.simultaneous():
-                p[1] = EuclidPoint(mn_coord(100, 600), label=('A', LEFT))
-                p[2] = EuclidPoint(mn_coord(400, 600), label=('B', RIGHT))
-                p[3] = EuclidPoint(mn_coord(250, 600), label=('C', DOWN))
-                p[4] = EuclidPoint(mn_coord(250, 300), label=('D', UP))
-                l[1] = EuclidLine(p[1], p[3])
-                l[2] = EuclidLine(p[3], p[2])
-                l[3] = EuclidLine(p[4], p[3])
+                p[1] = EPoint(mn_coord(100, 600), label=('A', LEFT))
+                p[2] = EPoint(mn_coord(400, 600), label=('B', RIGHT))
+                p[3] = EPoint(mn_coord(250, 600), label=('C', DOWN))
+                p[4] = EPoint(mn_coord(250, 300), label=('D', UP))
+                l[1] = ELine(p[1], p[3])
+                l[2] = ELine(p[3], p[2])
+                l[3] = ELine(p[4], p[3])
             with self.simultaneous():
-                a[1] = EuclidAngle(l[3], l[1], size=mn_scale(40))
-                a[2] = EuclidAngle(l[2], l[3], size=mn_scale(60))
+                a[1] = EAngle(l[3], l[1], size=mn_scale(40))
+                a[2] = EAngle(l[2], l[3], size=mn_scale(60))
             t2.math(r'\angle ACD = \angle BCD = \rightangle \text{(right angle)}')
             tmp = EGroup(*p.values(), *l.values(), *a.values())
             TMP.append(tmp)
@@ -72,20 +72,20 @@ class Prop11(Book1Scene):
             t1.title("Construction:")
             t1.explain("Start with a line segment AB, and an arbitrary "
                        "point C on this line")
-            p['A'] = EuclidPoint(A, label=('A', LEFT))
-            p['B'] = EuclidPoint(B, label=('B', RIGHT))
-            l['AB'] = EuclidLine('AB')
-            p['C'] = EuclidPoint(l['AB'].point_from_proportion(0.55), label=('C', DOWN))
+            p['A'] = EPoint(A, label=('A', LEFT))
+            p['B'] = EPoint(B, label=('B', RIGHT))
+            l['AB'] = ELine('AB')
+            p['C'] = EPoint(l['AB'].point_from_proportion(0.55), label=('C', DOWN))
             l['AC'], l['BC'] = l['AB'].e_split(p['C'])
 
         @self.push_step
         def _c2():
             t1.explain("Define another point D on line AB")
-            p['D'] = EuclidPoint(l['AC'].point_from_proportion(0.28), label=('D', DOWN))
-            c['C'] = EuclidCircle(p['C'], p['D'])
+            p['D'] = EPoint(l['AC'].point_from_proportion(0.28), label=('D', DOWN))
+            c['C'] = ECircle(p['C'], p['D'])
             pt = c['C'].intersect(l['BC'])
             t1.explain("Define point E such that EC equals CD")
-            p['E'] = EuclidPoint(pt[0], label=('E', DOWN))
+            p['E'] = EPoint(pt[0], label=('E', DOWN))
             l['CE'], l['EB'] = l['BC'].e_split(p['E'])
             l['AD'], l['CD'] = l['AC'].e_split(p['D'])
 
@@ -101,13 +101,13 @@ class Prop11(Book1Scene):
         @self.push_step
         def _c4():
             t1.explain("Construct line segment FC")
-            l['CF'] = EuclidLine(p['F'], p['C'])
+            l['CF'] = ELine(p['F'], p['C'])
 
         @self.push_step
         def _c5():
             t1.explain("Angle ACF and angle BCF are right angles")
-            a['ACF'] = EuclidAngle('FCA')
-            a['BCF'] = EuclidAngle('BCF', size=mn_scale(50))
+            a['ACF'] = EAngle('FCA')
+            a['BCF'] = EAngle('BCF', size=mn_scale(50))
             with self.simultaneous():
                 l['DF'].e_fade()
                 l['EF'].e_fade()
@@ -148,16 +148,16 @@ class Prop11(Book1Scene):
                        "sides equal to each other, "
                        "thus all the angles are equal to each {nb:other <sub>(I.8)</sub>}")
             with self.simultaneous():
-                t[3] = EuclidTriangle.assemble(lines=[l['DF'], l['CF'], l['CD']]).e_fill(BLUE_D)
-                t[2] = EuclidTriangle.assemble(lines=[l['EF'], l['CF'], l['CE']]).e_fill(GREEN_D)
+                t[3] = ETriangle.assemble(lines=[l['DF'], l['CF'], l['CD']]).e_fill(BLUE_D)
+                t[2] = ETriangle.assemble(lines=[l['EF'], l['CF'], l['CE']]).e_fill(GREEN_D)
 
             with self.simultaneous():
-                a['CDF'] =  EuclidAngle('CDF', label=r'\beta')
-                a['CEF'] =  EuclidAngle('CEF', label=r'\beta')
-                a['DFC'] =  EuclidAngle('DFC', label=r'\theta', size=mn_scale(50))
-                a['CFE'] =  EuclidAngle('CFE', label=r'\theta', size=mn_scale(60))
-                a['ACF'] =  EuclidAngle('ACF', label=r'\alpha')
-                a['BCF'] =  EuclidAngle('BCF', label=r'\alpha', size=mn_scale(30))
+                a['CDF'] =  EAngle('CDF', label=r'\beta')
+                a['CEF'] =  EAngle('CEF', label=r'\beta')
+                a['DFC'] =  EAngle('DFC', label=r'\theta', size=mn_scale(50))
+                a['CFE'] =  EAngle('CFE', label=r'\theta', size=mn_scale(60))
+                a['ACF'] =  EAngle('ACF', label=r'\alpha')
+                a['BCF'] =  EAngle('BCF', label=r'\alpha', size=mn_scale(30))
 
             with self.simultaneous():
                 t2.math(r'\angle CDF = \angle CEF = \beta')

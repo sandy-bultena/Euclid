@@ -1,5 +1,5 @@
 from __future__ import annotations
-from euclidlib.Objects.Polygon import EuclidPolygon
+from euclidlib.Objects.Polygon import EPolygon
 
-class EuclidTriangle(EuclidPolygon):
+class ETriangle(EPolygon):
     pass

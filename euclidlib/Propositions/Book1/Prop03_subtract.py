@@ -20,10 +20,10 @@ class Book1Prop3(Book1Scene):
         C = mn_coord(350, 350)
         D = mn_coord(600, 350)
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
 
         rAB = math.sqrt(
             (A[0] - B[0]) ** 2 +
@@ -44,20 +44,20 @@ class Book1Prop3(Book1Scene):
             t1.explain("Start with line AB and line CD, where CD is larger than AB")
 
             with self.simultaneous():
-                p['A'] = EuclidPoint(A, scene=self, label_args=('A', LEFT))
-                p['B'] = EuclidPoint(B, scene=self, label_args=('B', RIGHT))
-                l['AB'] = EuclidLine(p['A'], p['B'], scene=self)
+                p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
+                p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+                l['AB'] = ELine(p['A'], p['B'], scene=self)
 
-                p['C'] = EuclidPoint(C, scene=self, label_args=('C', DOWN))
-                p['D'] = EuclidPoint(D, scene=self, label_args=('D', DOWN))
-                l['CD'] = EuclidLine(p['C'], p['D'], scene=self)
+                p['C'] = EPoint(C, scene=self, label_args=('C', DOWN))
+                p['D'] = EPoint(D, scene=self, label_args=('D', DOWN))
+                l['CD'] = ELine(p['C'], p['D'], scene=self)
 
         @self.push_step
         def _2():
             t1.explain("Construct a line that is equal to CD minus AB")
 
-            p['F'] = EuclidPoint(F, scene=self, label_args=('F', RIGHT))
-            l['DF'] = EuclidLine(D, F, scene=self, stroke_color=BLUE)
+            p['F'] = EPoint(F, scene=self, label_args=('F', RIGHT))
+            l['DF'] = ELine(D, F, scene=self, stroke_color=BLUE)
 
         # ------------------------------------------------------------------------
         # Construction
@@ -81,14 +81,14 @@ class Book1Prop3(Book1Scene):
         @self.push_step
         def _5():
             t1.explain("Draw a circle with C as the center and CE as the radius")
-            c['E'] = EuclidCircle(p['C'], p['E'], scene=self)
+            c['E'] = ECircle(p['C'], p['E'], scene=self)
 
         @self.push_step
         def _6():
             t1.explain("Define the intersection of the circle and CD as F")
             pts = c['E'].intersect(l['CD'])
-            p['F'] = EuclidPoint(pts[0], scene=self, label_args=('F', UR))
-            l['CF'] = EuclidLine(C, p['F'], scene=self)
+            p['F'] = EPoint(pts[0], scene=self, label_args=('F', UR))
+            l['CF'] = ELine(C, p['F'], scene=self)
 
         @self.push_step
         def _7():
@@ -96,7 +96,7 @@ class Book1Prop3(Book1Scene):
                 c['E'].e_fade()
                 l['CE'].e_fade()
             t1.explain("Line DF is the difference between line CD and line AB")
-            l['DF'] = EuclidLine(D, p['F'], scene=self)
+            l['DF'] = ELine(D, p['F'], scene=self)
 
         # ------------------------------------------------------------------------
         # Proof

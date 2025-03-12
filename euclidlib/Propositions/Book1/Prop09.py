@@ -16,11 +16,11 @@ class Prop09(Book1Scene):
         t1 = TextBox(absolute_position=mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(absolute_position=mn_coord(500, 430))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
 
         A = mn_coord(100, 400)
         B = mn_coord(400, 200)
@@ -34,27 +34,27 @@ class Prop09(Book1Scene):
             nonlocal A, B, C
             t1.title("In other words:")
             t1.explain("Start with two straight lines joined at a single point")
-            l['AC_'] = EuclidLine('BA')
-            l['AB_'] = EuclidLine('AC')
-            p['A'] = EuclidPoint(A, label_args=('A', DOWN))
+            l['AC_'] = ELine('BA')
+            l['AB_'] = ELine('AC')
+            p['A'] = EPoint(A, label_args=('A', DOWN))
 
         @self.push_step
         def _i2():
             t1.explain("Divide the resulting angle into two, using only a straight edge and compass")
             pt = l['AB_'].point(mn_scale(250))
             with self.pause_animations_for():
-                p['B'] = EuclidPoint(pt)
-                c['A'] = EuclidCircle(A, p['B'])
+                p['B'] = EPoint(pt)
+                c['A'] = ECircle(A, p['B'])
                 pt = c['A'].intersect(l['AC_'])
-                p['C'] = EuclidPoint(pt[0])
-                l['AB'] = EuclidLine(A, p['B'])
-                l['AC'] = EuclidLine(A, p['C'])
-                l['BC'] = EuclidLine(p['B'], p['C'])
+                p['C'] = EPoint(pt[0])
+                l['AB'] = ELine(A, p['B'])
+                l['AC'] = ELine(A, p['C'])
+                l['BC'] = ELine(p['B'], p['C'])
                 t[1] = EquilateralTriangle.build(p['C'], p['B'])
             l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
-            l['AD'] = EuclidLine(A, p['D'])
-            a['DAC'] = EuclidAngle('DAC', label=r'\alpha')
-            a['DAB'] = EuclidAngle('DAB', label=r'\alpha', size=mn_scale(50))
+            l['AD'] = ELine(A, p['D'])
+            a['DAC'] = EAngle('DAC', label=r'\alpha')
+            a['DAB'] = EAngle('DAB', label=r'\alpha', size=mn_scale(50))
 
         # ----------------------------------------------
         # Construction
@@ -165,8 +165,8 @@ class Prop09(Book1Scene):
                 l['BD'].white()
                 l['CD'].white()
             with self.simultaneous():
-                t[3] = EuclidTriangle(l['AB'], l['BD'], l['AD']).e_fill(GREEN_E)
-                t[2] = EuclidTriangle(l['AC'], l['CD'], l['AD']).e_fill(PINK)
+                t[3] = ETriangle(l['AB'], l['BD'], l['AD']).e_fill(GREEN_E)
+                t[2] = ETriangle(l['AC'], l['CD'], l['AD']).e_fill(PINK)
 
             with self.simultaneous():
                 t2.e_fade()
@@ -179,10 +179,10 @@ class Prop09(Book1Scene):
             with self.simultaneous():
                 a['DAC'].e_draw()
                 a['DAB'].e_draw()
-                a['ACD'] = EuclidAngle('ACD', label=r'\beta')
-                a['ABD'] = EuclidAngle('ABD', label=r'\beta')
-                a['CDA'] = EuclidAngle('CDA', label=r'\theta')
-                a['BDA'] = EuclidAngle('BDA', label=r'\theta')
+                a['ACD'] = EAngle('ACD', label=r'\beta')
+                a['ABD'] = EAngle('ABD', label=r'\beta')
+                a['CDA'] = EAngle('CDA', label=r'\theta')
+                a['BDA'] = EAngle('BDA', label=r'\theta')
 
             with self.simultaneous():
                 t2.math(r'\angle CAD = \angle DAB = \alpha')
@@ -218,7 +218,7 @@ class Prop09(Book1Scene):
             t1.explain("Or angle CAD is half the angle CAB")
             with self.simultaneous():
                 a['DAB'].e_remove()
-                a['CAB'] = EuclidAngle('CAB', label_args=(r'2\alpha', 0.75), size=mn_scale(80))
+                a['CAB'] = EAngle('CAB', label_args=(r'2\alpha', 0.75), size=mn_scale(80))
 
             with self.simultaneous():
                 t2.e_fade()

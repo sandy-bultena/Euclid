@@ -17,11 +17,11 @@ class Prop05(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(400, 180))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        a: Dict[str | int, EAngleBase] = {}
+        t: Dict[str | int, ETriangle] = {}
 
         A = mn_coord(200, 200)
         B = mn_coord(300, 440)
@@ -34,10 +34,10 @@ class Prop05(Book1Scene):
         def _i1():
             t1.title("In other words:")
             t1.explain("Given an isosceles triangle ABC")
-            t['ABC'] = EuclidTriangle(A, B, C,
-                                      point_labels=[('A', UP), ('B', RIGHT), ('C', LEFT)],
-                                      angles=[r'\gamma', None, None]
-                                      )
+            t['ABC'] = ETriangle(A, B, C,
+                                 point_labels=[('A', UP), ('B', RIGHT), ('C', LEFT)],
+                                 angles=[r'\gamma', None, None]
+                                 )
             t2.math("AB = AC", fill_color=BLUE)
 
         @self.push_step
@@ -62,11 +62,11 @@ class Prop05(Book1Scene):
             D = l['BY'].point(mn_scale(100))
             E = l['CZ'].point(mn_scale(100))
             with self.simultaneous():
-                a['YBC'] = EuclidAngle(l['BC'], l['BY'], label=r'\beta')
-                a['ZCB'] = EuclidAngle(l['BC'], l['CZ'], label=r'\beta')
+                a['YBC'] = EAngle(l['BC'], l['BY'], label=r'\beta')
+                a['ZCB'] = EAngle(l['BC'], l['CZ'], label=r'\beta')
             with self.simultaneous():
-                p['D'] = EuclidPoint(D, label_args=('D', dict(away_from=E)))
-                p['E'] = EuclidPoint(E, label_args=('E', dict(away_from=D)))
+                p['D'] = EPoint(D, label_args=('D', dict(away_from=E)))
+                p['E'] = EPoint(E, label_args=('E', dict(away_from=D)))
             t2.math(r"\angle BCE = \angle CBD")
 
         @self.push_step
@@ -95,9 +95,9 @@ class Prop05(Book1Scene):
         def _p2():
             t1.explain("Define a point along the extension of AB")
             D = l['BY'].point(mn_scale(100))
-            p['D'] = EuclidPoint(D, label_args=('D', dict(away_from=C)))
+            p['D'] = EPoint(D, label_args=('D', dict(away_from=C)))
             # TODO: ARROW?
-            l['BD'] = EuclidLine(B, D)
+            l['BD'] = ELine(B, D)
 
         @self.push_step
         def _p3():
@@ -120,8 +120,8 @@ class Prop05(Book1Scene):
             l['BC'].e_fade()
             t1.explain("Create triangle AEB")
             t2.down(mn.MED_SMALL_BUFF)
-            l['BE'] = EuclidLine(B, p['E'])
-            t['AEB'] = EuclidTriangle(p['E'], p['A'], p['B']).e_fill(BLUE_E)
+            l['BE'] = ELine(B, p['E'])
+            t['AEB'] = ETriangle(p['E'], p['A'], p['B']).e_fill(BLUE_E)
             t2.math(r'AE, \angle EAB = \gamma, AB')
 
         @self.push_step
@@ -137,10 +137,10 @@ class Prop05(Book1Scene):
                 l['BD'].e_normal()
                 l['AC'].e_remove()
             with self.simultaneous():
-                l['AC'] = EuclidLine(A, C)
-                l['CD'] = EuclidLine(C, p['D'])
+                l['AC'] = ELine(A, C)
+                l['CD'] = ELine(C, p['D'])
             t2.math(r'AD, \angle DAC = \gamma, AC')
-            t['ADC'] = EuclidTriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
+            t['ADC'] = ETriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
 
         @self.push_step
         def _p7():
@@ -161,16 +161,16 @@ class Prop05(Book1Scene):
         def _p8():
             t1.explain("then all the sides and angles are {nb:equal <sub>I.4</sub>}")
             with self.simultaneous():
-                a['ACD'] = EuclidAngle(l['CD'], l['AC'], size=mn_scale(40), label=r'\delta')
-                a['ABE'] = EuclidAngle(l['AB'], l['BE'], size=mn_scale(40), label=r'\delta')
+                a['ACD'] = EAngle(l['CD'], l['AC'], size=mn_scale(40), label=r'\delta')
+                a['ABE'] = EAngle(l['AB'], l['BE'], size=mn_scale(40), label=r'\delta')
 
             t2.down(MED_SMALL_BUFF)
             t2.math('CD = BE')
             t2.math(r'\angle ACD = \angle ABE = \delta')
 
             with self.simultaneous():
-                a['CDB'] = EuclidAngle(l['BD'], l['CD'], size=mn_scale(20), label=r'\sigma')
-                a['CEB'] = EuclidAngle(l['BE'], l['CE'], size=mn_scale(20), label=r'\sigma')
+                a['CDB'] = EAngle(l['BD'], l['CD'], size=mn_scale(20), label=r'\sigma')
+                a['CEB'] = EAngle(l['BE'], l['CE'], size=mn_scale(20), label=r'\sigma')
             t2.math(r'\angle CDA = \angle BEA = \sigma')
 
         @self.push_step
@@ -183,7 +183,7 @@ class Prop05(Book1Scene):
                     x.e_remove()
 
             t1.explain("Lets look at triangle CEB")
-            t['CEB'] = EuclidTriangle(p['C'], p['E'], p['B'], skip_anim=True).e_fill(PINK)
+            t['CEB'] = ETriangle(p['C'], p['E'], p['B'], skip_anim=True).e_fill(PINK)
             a['CEB'].e_normal()
             t2.down()
             t2.math(r'CE, \angle BEA = \angle BEC = \sigma, BE')
@@ -197,7 +197,7 @@ class Prop05(Book1Scene):
                 for x in (a['CDB'], l['CD'], l['BD'], l['BC']):
                     x.e_normal()
 
-            t['CDB'] = EuclidTriangle(p['C'], p['D'], p['B'], skip_anim=True).e_fill(PINK)
+            t['CDB'] = ETriangle(p['C'], p['D'], p['B'], skip_anim=True).e_fill(PINK)
 
             t1.explain("And at triangle CDB")
             t2.math(r'BD, \angle CDA = \angle CDB = \sigma, CD')
@@ -216,8 +216,8 @@ class Prop05(Book1Scene):
 
             t['CDB'].e_fade().e_unfill()
             with self.simultaneous():
-                a['BCD'] = EuclidAngle('BCD', size=mn_scale(50), label=r'\epsilon')
-                a['CBE'] = EuclidAngle('CBE', size=mn_scale(50), label=r'\epsilon')
+                a['BCD'] = EAngle('BCD', size=mn_scale(50), label=r'\epsilon')
+                a['CBE'] = EAngle('CBE', size=mn_scale(50), label=r'\epsilon')
 
             with self.simultaneous():
                 t['CEB'].e_fill(PINK)
@@ -229,8 +229,8 @@ class Prop05(Book1Scene):
         def _p11():
             nonlocal l
             with self.simultaneous():
-                a['CBD'] = EuclidAngle('CBD', size=mn_scale(25), label=r'\beta')
-                a['BCE'] = EuclidAngle('BCE', size=mn_scale(25), label=r'\beta')
+                a['CBD'] = EAngle('CBD', size=mn_scale(25), label=r'\beta')
+                a['BCE'] = EAngle('BCE', size=mn_scale(25), label=r'\beta')
 
             t2.math(r'\angle BCE = \angle CBD = \beta')
 
@@ -282,8 +282,8 @@ class Prop05(Book1Scene):
                 for x in ('CD', 'BE', 'BY', 'CZ'):
                     l[x].e_remove()
 
-                a['ABC'] = EuclidAngle('ABC', size=mn_scale(30), label=r'\alpha')
-                a['ACB'] = EuclidAngle('ACB', size=mn_scale(30), label=r'\alpha')
+                a['ABC'] = EAngle('ABC', size=mn_scale(30), label=r'\alpha')
+                a['ACB'] = EAngle('ACB', size=mn_scale(30), label=r'\alpha')
             with self.simultaneous():
                 pass
 

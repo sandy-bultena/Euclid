@@ -23,10 +23,10 @@ class Book1Prop2(Book1Scene):
         C = mn_coord(440, 400)
         D = mn_coord(250, 400)
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
 
         # ------------------------------------------------------------------------
         # Construction
@@ -36,15 +36,15 @@ class Book1Prop2(Book1Scene):
             t1.title("Construction:")
             t1.explain("Start with line segment AB and Point C")
 
-            p['A'] = EuclidPoint(A, label_args=('A', dict(away_from=B)))
-            p['B'] = EuclidPoint(B, label_args=('B', dict(away_from=A)))
-            l['AB'] = EuclidLine(p['A'], p['B'], stroke_color=BLUE)
-            p['C'] = EuclidPoint(C, label_args=('C', dict(away_from=A)))
+            p['A'] = EPoint(A, label_args=('A', dict(away_from=B)))
+            p['B'] = EPoint(B, label_args=('B', dict(away_from=A)))
+            l['AB'] = ELine(p['A'], p['B'], stroke_color=BLUE)
+            p['C'] = EPoint(C, label_args=('C', dict(away_from=A)))
 
         @self.push_step
         def _2():
             t1.explain("Construct line segment AC")
-            l['AC'] = EuclidLine(p['A'], p['C'])
+            l['AC'] = ELine(p['A'], p['C'])
 
         @self.push_step
         def _3():
@@ -60,25 +60,25 @@ class Book1Prop2(Book1Scene):
         @self.push_step
         def _4():
             t1.explain("Draw a circle with A as the center and AB as the radius")
-            c['A'] = EuclidCircle(A, B)
+            c['A'] = ECircle(A, B)
 
         @self.push_step
         def _5():
             t1.explain("Label the intersection of the circle and line AD as E")
             pts = c['A'].intersect(l['AD'])
-            p['E'] = EuclidPoint(pts[0], label_args=('E', DL))
+            p['E'] = EPoint(pts[0], label_args=('E', DL))
 
         @self.push_step
         def _6():
             t1.explain("Draw a circle with D as the center and ED as the radius")
             c['A'].e_fade()
-            c['D'] = EuclidCircle(p['D'], p['E'])
+            c['D'] = ECircle(p['D'], p['E'])
 
         @self.push_step
         def _7():
             t1.explain("Label the intersection of the circle and line CD as F")
             pts = c['D'].intersect(l['CD'])
-            p['F'] = EuclidPoint(pts[0], label_args=('F', RIGHT))
+            p['F'] = EPoint(pts[0], label_args=('F', RIGHT))
 
         @self.push_step
         def _8():
@@ -89,7 +89,7 @@ class Book1Prop2(Book1Scene):
                 t[1].e_fade()
                 l['CD'].e_fade()
                 l['AD'].e_fade()
-            l['CF'] = EuclidLine(C, p['F'])
+            l['CF'] = ELine(C, p['F'])
 
         # ------------------------------------------------------------------------
         # Proof
@@ -128,8 +128,8 @@ class Book1Prop2(Book1Scene):
                 p['E'].e_draw()
                 p['F'].e_draw()
             with self.simultaneous():
-                l['DE'] = EuclidLine(p['D'], p['E'], label_args=('y', dict(inside=True)))
-                l['DF'] = EuclidLine(p['D'], p['F'], label_args=('y', dict(outside=True)))
+                l['DE'] = ELine(p['D'], p['E'], label_args=('y', dict(inside=True)))
+                l['DF'] = ELine(p['D'], p['F'], label_args=('y', dict(outside=True)))
             t2.math("DE = DF = y")
 
         @self.push_step
@@ -143,7 +143,7 @@ class Book1Prop2(Book1Scene):
                 l['DE'].e_fade()
 
             t1.explain("AE is the difference between DA and DE")
-            l['AE'] = EuclidLine(A, p['E'], label_args=('x-y', dict(align=RIGHT, inside=True)))
+            l['AE'] = ELine(A, p['E'], label_args=('x-y', dict(align=RIGHT, inside=True)))
             t2.math("AE = DA - DE")
             t2.math("AE = x  - y")
 
@@ -157,7 +157,7 @@ class Book1Prop2(Book1Scene):
                 l['DF'].e_fade()
 
             t1.explain("CF is the difference between DC and DF")
-            l['CF'] = EuclidLine(C, p['F'], label_args=('x-y', dict(align=LEFT, outside=True)))
+            l['CF'] = ELine(C, p['F'], label_args=('x-y', dict(align=LEFT, outside=True)))
             t2.math("CF = DC - DF")
             t2.math("CF = x  - y")
 
@@ -216,15 +216,15 @@ class Book1Prop2(Book1Scene):
 
             t3.title("But what if?")
             t3.explain("Start with line segment AB and point C")
-            p['A'] = EuclidPoint(A, label_args=('A', dict(away_from=B)))
-            p['B'] = EuclidPoint(C, label_args=('B', dict(away_from=A)))
-            l['AB'] = EuclidLine(p['A'], p['B'], stroke_color=BLUE)
-            p['C'] = EuclidPoint(D, label_args=('C', dict(away_from=A)))
+            p['A'] = EPoint(A, label_args=('A', dict(away_from=B)))
+            p['B'] = EPoint(C, label_args=('B', dict(away_from=A)))
+            l['AB'] = ELine(p['A'], p['B'], stroke_color=BLUE)
+            p['C'] = EPoint(D, label_args=('C', dict(away_from=A)))
 
         @self.push_step
         def _18():
             t3.explain("Construct line segment AC")
-            l['AC'] = EuclidLine(A, D)
+            l['AC'] = ELine(A, D)
 
         @self.push_step
         def _19():
@@ -239,7 +239,7 @@ class Book1Prop2(Book1Scene):
         @self.push_step
         def _20():
             t3.explain("Draw a circle with A as the center and AB as the radius")
-            c['A'] = EuclidCircle(A, C)
+            c['A'] = ECircle(A, C)
 
         @self.push_step
         def _21():
@@ -256,19 +256,19 @@ class Book1Prop2(Book1Scene):
         def _23():
             t3.explain("Label the intersection of the circle and line AD as E")
             pts = c['A'].intersect(l['AD'])
-            p['E'] = EuclidPoint(pts[0], label_args=('E', RIGHT))
+            p['E'] = EPoint(pts[0], label_args=('E', RIGHT))
 
         @self.push_step
         def _24():
             c['A'].e_fade()
             t3.explain("Draw a circle with D as the center and ED as the radius")
-            c['D'] = EuclidCircle(p['D'], p['E'])
+            c['D'] = ECircle(p['D'], p['E'])
 
         @self.push_step
         def _25():
             t3.explain("Label the intersection of the circle and line CD as F")
             pts = c['D'].intersect(l['CD'])
-            p['F'] = EuclidPoint(pts[0], label_args=('F', RIGHT))
+            p['F'] = EPoint(pts[0], label_args=('F', RIGHT))
 
         @self.push_step
         def _26():
@@ -280,7 +280,7 @@ class Book1Prop2(Book1Scene):
                 l['AD'].e_fade()
 
             t3.explain("Line AB is equal to line CF")
-            l['CF'] = EuclidLine(D, p['F'])
+            l['CF'] = ELine(D, p['F'])
 
         # ------------------------------------------------------------------------
         # Proof

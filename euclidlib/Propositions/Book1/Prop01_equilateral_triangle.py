@@ -16,40 +16,40 @@ class Book1Prop1(Book1Scene):
         A = mn_coord(200, 500)
         B = mn_coord(450, 500)
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
 
         @self.push_step
         def _1():
             t1.title("Construction:")
             t1.explain("Start with line segment AB")
-            p['A'] = EuclidPoint(A, scene=self, label_args=('A', LEFT))
-            p['B'] = EuclidPoint(B, scene=self, label_args=('B', RIGHT))
-            l['AB'] = EuclidLine(p['A'], p['B'], scene=self)
+            p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
+            p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+            l['AB'] = ELine(p['A'], p['B'], scene=self)
 
         @self.push_step
         def _2():
             t1.explain("Create a circle with center A and radius AB")
-            c['A'] = EuclidCircle(p['A'], p['B'], scene=self)
+            c['A'] = ECircle(p['A'], p['B'], scene=self)
 
         @self.push_step
         def _3():
             t1.explain("Create a circle with center B and radius AB")
-            c['B'] = EuclidCircle(p['B'], p['A'], scene=self)
+            c['B'] = ECircle(p['B'], p['A'], scene=self)
 
         @self.push_step
         def _4():
             t1.explain("Label the intersection point C")
             pts = c['A'].intersect(c['B'])
-            p['C'] = EuclidPoint(pts[0], scene=self, label_args=('C', UP))
+            p['C'] = EPoint(pts[0], scene=self, label_args=('C', UP))
 
         @self.push_step
         def _5():
             t1.explain("Create line AC and CB")
             with self.simultaneous():
-                l['AC'] = EuclidLine(p['A'], p['C'], scene=self)
-                l['BC'] = EuclidLine(p['B'], p['C'], scene=self)
+                l['AC'] = ELine(p['A'], p['C'], scene=self)
+                l['BC'] = ELine(p['B'], p['C'], scene=self)
 
         @self.push_step
         def _6():

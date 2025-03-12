@@ -17,11 +17,11 @@ class Prop20(Book1Scene):
         t2 = TextBox(mn_coord(475, 430))
         t3 = TextBox(mn_coord(300, 250))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(250, 150)
@@ -37,11 +37,11 @@ class Prop20(Book1Scene):
             nonlocal A, B, C
             t1.title("In other words:")
             t1.explain("Given a triangle ABC")
-            t['ABC'] = EuclidTriangle('ABC',
-                                      point_labels='ABC',
-                                      labels='cab',
-                                      angles=r'\alpha \beta \gamma'.split()
-                                      )
+            t['ABC'] = ETriangle('ABC',
+                                 point_labels='ABC',
+                                 labels='cab',
+                                 angles=r'\alpha \beta \gamma'.split()
+                                 )
 
         @self.push_step
         def _i2():
@@ -70,9 +70,9 @@ class Prop20(Book1Scene):
         def _p2():
             t1.explain("Define point D, such that CD equals AC")
             t2.math(r"CD =\ AC")
-            c['C'] = EuclidCircle(C, A)
+            c['C'] = ECircle(C, A)
             pts = c['C'].intersect(l['Bp'])
-            p['D'] = EuclidPoint(pts[0], label=('D', DOWN))
+            p['D'] = EPoint(pts[0], label=('D', DOWN))
             c['C'].e_remove()
 
             l['CD'], l['Dp'] = l['Bp'].e_split(p['D'])
@@ -90,8 +90,8 @@ class Prop20(Book1Scene):
         def _p3():
             t1.explain("Create line AD, making the triangle ACD an isosceles triangle, "
                        "thus the angles CAD and CDA are equal (I.5)")
-            l['AD'] = EuclidLine(A, p['D'])
-            t['ACD'] = EuclidTriangle.assemble(lines=[t['ABC'].l[2], l['CD'], l['AD']])
+            l['AD'] = ELine(A, p['D'])
+            t['ACD'] = ETriangle.assemble(lines=[t['ABC'].l[2], l['CD'], l['AD']])
             with self.simultaneous():
                 t['ACD'].set_angles(r'\theta', None, r'\theta', mn_scale(50), None, mn_scale(50))
             t['ACD'].e_fill(BLUE_D)

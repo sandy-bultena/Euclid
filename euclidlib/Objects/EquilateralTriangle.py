@@ -8,8 +8,8 @@ from euclidlib.Objects import Triangle as T
 def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
     scene = scene or find_scene()
     with scene.animation_speed(speed):
-        c1 = Circle.EuclidCircle(p1, p2, scene=scene).e_fade()
-        c2 = Circle.EuclidCircle(p2, p1, scene=scene).e_fade()
+        c1 = Circle.ECircle(p1, p2, scene=scene).e_fade()
+        c2 = Circle.ECircle(p2, p1, scene=scene).e_fade()
 
         pts = c1.intersect(c2)
         l1 = L.VirtualLine(p1, p2)
@@ -21,8 +21,8 @@ def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
         else:
             C = pts[1]
 
-        p = P.EuclidPoint(C, scene=scene)
-        t = T.EuclidTriangle(p1, p2, C, scene=scene)
+        p = P.EPoint(C, scene=scene)
+        t = T.ETriangle(p1, p2, C, scene=scene)
         with scene.simultaneous():
             c1.e_remove()
             c2.e_remove()

@@ -20,11 +20,11 @@ class Prop21(Book1Scene):
         t2 = TextBox(mn_coord(375, 200))
         t3 = TextBox(mn_coord(300, 250))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj | Tuple[EStringObj, ...]] = {}
         ex: Dict[str | int, Mobject] = {}
 
@@ -41,7 +41,7 @@ class Prop21(Book1Scene):
             nonlocal A, B, C
             t1.title("In other words:")
             t1.explain("Given a triangle ABC")
-            t['ABC'] = EuclidTriangle(
+            t['ABC'] = ETriangle(
                 'ABC',
                 point_labels='ABC',
                 labels='c_1 a b_1'.split()
@@ -52,13 +52,13 @@ class Prop21(Book1Scene):
         def _i2():
             nonlocal A, B, C
             t1.explain("From a point within the triangle ABC...")
-            p['D'] = EuclidPoint(D)
+            p['D'] = EPoint(D)
 
         @self.push_step
         def _i3():
             nonlocal D, B, C
             t1.explain("... construct a second triangle DBC")
-            t['DBC'] = EuclidTriangle(
+            t['DBC'] = ETriangle(
                 'DBC',
                 point_labels=(('D', dict(away_from=C)), None, None),
                 labels='c_2 a b_2'.split()
@@ -103,7 +103,7 @@ class Prop21(Book1Scene):
 
             l['BX'] = t['DBC'].l[0].copy().prepend(mn_scale(200))
             pts = l['BX'].intersect(t['ABC'].l[2])
-            p['E'] = EuclidPoint(pts, label=('E', RIGHT))
+            p['E'] = EPoint(pts, label=('E', RIGHT))
 
             l['EX'], l['BE'] = l['BX'].e_split(p['E'])
             l['DE'], l['BD'] = l['BE'].copy().e_split(t['DBC'].p[0])
@@ -116,18 +116,18 @@ class Prop21(Book1Scene):
 
             # define new triangles
 
-            t['EDC'] = EuclidTriangle.assemble(lines=[l['DE'], t['DBC'].l[2], l['CE']])
+            t['EDC'] = ETriangle.assemble(lines=[l['DE'], t['DBC'].l[2], l['CE']])
             t['EDC'].set_labels('c_3', (), 'b_4')
 
-            t['ABE'] = EuclidTriangle.assemble(
+            t['ABE'] = ETriangle.assemble(
                 lines=[t['ABC'].l[0], l['BE'], l['AE']],
                 angles=[t['ABC'].a[0], None, None]
             )
             t['ABE'].set_labels((), (), 'b_3')
 
             b1 = t['ABC'].l[2]
-            b1.add_label('b_1', outside=True, buff=EuclidLine.LabelBuff * 2 + MED_LARGE_BUFF)
-            ex['b1'] = mn.Brace(b1, direction=b1.OUT(), buff=EuclidLine.LabelBuff * 2)
+            b1.add_label('b_1', outside=True, buff=ELine.LabelBuff * 2 + MED_LARGE_BUFF)
+            ex['b1'] = mn.Brace(b1, direction=b1.OUT(), buff=ELine.LabelBuff * 2)
             self.play(mn.FadeInFromPoint(ex['b1'], point=b1.e_label.get_center()))
             b1.freeze()
 
@@ -186,7 +186,7 @@ class Prop21(Book1Scene):
             t1.explain("The sum of lines DE and EC is greater than CD (I.18)")
             with self.simultaneous():
                 t['ABE'].e_fade()
-                p['D2'] = EuclidPoint(D, label=('D', dict(away_from=C)))
+                p['D2'] = EPoint(D, label=('D', dict(away_from=C)))
                 t['DBC'].l[0].e_fade()
                 l['BD'].e_fade()
                 t['EDC'].e_normal()

@@ -15,11 +15,11 @@ class Prop18(Book1Scene):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
         t2 = TextBox(mn_coord(475, 430))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         A = mn_coord(75, 150)
@@ -35,7 +35,7 @@ class Prop18(Book1Scene):
             nonlocal A, B, C
             t1.title("In other words:")
             t1.explain("Given a triangle ABC")
-            t['ABC'] = EuclidTriangle(
+            t['ABC'] = ETriangle(
                 'ABC',
                 point_labels='ABC',
                 angles=r'\alpha \beta \gamma'.split(),
@@ -66,9 +66,9 @@ class Prop18(Book1Scene):
         @self.push_step
         def _p2():
             t1.explain("Create point D on line AC, such that CD equals BC")
-            c['C'] = EuclidCircle(C, B)
+            c['C'] = ECircle(C, B)
             pts = c['C'].intersect(l['CA'])
-            p['D'] = EuclidPoint(pts[0], label=('D', l['CA'].OUT()))
+            p['D'] = EPoint(pts[0], label=('D', l['CA'].OUT()))
             c['C'].e_remove()
             l['CD'], l['AD'] = l['CA'].e_split(p['D'])
             with self.simultaneous():
@@ -87,13 +87,13 @@ class Prop18(Book1Scene):
                 a['ABC'].e_fade()
                 a['BCA'].e_fade()
 
-            l['BD'] = EuclidLine('BD')
-            t['ABD'] = EuclidTriangle.assemble(
+            l['BD'] = ELine('BD')
+            t['ABD'] = ETriangle.assemble(
                 lines=[l['AB'], l['BD'], l['AD']],
                 angles=[a['a'], None, None]
             )
 
-            t['DBC'] = EuclidTriangle.assemble(
+            t['DBC'] = ETriangle.assemble(
                 lines=[l['BD'], l['BC'], l['CD']],
                 angles=[None, None, a['BCA']]
             )

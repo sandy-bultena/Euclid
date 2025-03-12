@@ -18,11 +18,11 @@ class Prop13(Book1Scene):
         t2 = TextBox(mn_coord(50, 500))
         t3 = TextBox(mn_coord(150, 450))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
-        a: Dict[str | int, EuclidAngleBase] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
 
         D = mn_coord(100, 400)
@@ -38,24 +38,24 @@ class Prop13(Book1Scene):
             t1.title("In other words:")
             t1.explain("Start with an arbitrary line segment CD "
                        "and an arbitrary point B on the line")
-            p['D'] = EuclidPoint(D, label=('D', LEFT))
-            p['C'] = EuclidPoint(C, label=('C', RIGHT))
-            l['CD'] = EuclidLine('DC')
-            p['B'] = EuclidPoint(B, label=('B', DOWN))
+            p['D'] = EPoint(D, label=('D', LEFT))
+            p['C'] = EPoint(C, label=('C', RIGHT))
+            l['CD'] = ELine('DC')
+            p['B'] = EPoint(B, label=('B', DOWN))
             l['BD'], l['BC'] = l['CD'].e_split(p['B'])
 
         @self.push_step
         def _i2():
             t1.explain("Draw a line from point an arbitrary point A to point B")
-            p['A'] = EuclidPoint(A, label=('A', UP))
-            l['AB'] = EuclidLine('AB')
+            p['A'] = EPoint(A, label=('A', UP))
+            l['AB'] = ELine('AB')
 
         @self.push_step
         def _i3():
             t1.explain("The sum of the angles ABD and ABC is equal to two right angles")
             nonlocal l
-            a['alpha'] = EuclidAngle('ABD', size=mn_scale(70), label=r'\alpha')
-            a['beta'] = EuclidAngle('CBA', size=mn_scale(80), label=r'\beta')
+            a['alpha'] = EAngle('ABD', size=mn_scale(70), label=r'\alpha')
+            a['beta'] = EAngle('CBA', size=mn_scale(80), label=r'\beta')
             t2.math(r'\angle DBA\ +\ \angle ABC\ =\ 2\ \rightangle')
 
 
@@ -76,9 +76,9 @@ class Prop13(Book1Scene):
                 l['AB'].e_fade()
             t1.explain("Construct a perpendicular line to point E <sub>(I.11)</sub>")
             l['BE'] = l['CD'].perpendicular(p['B'])
-            p['E'] = EuclidPoint(l['BE'].get_end(), label=('E', UP))
-            a['gamma'] = EuclidAngle('CBE', label=r'\gamma')
-            a['epsilon'] = EuclidAngle('EBD', size=mn_scale(20), label=r'\epsilon')
+            p['E'] = EPoint(l['BE'].get_end(), label=('E', UP))
+            a['gamma'] = EAngle('CBE', label=r'\gamma')
+            a['epsilon'] = EAngle('EBD', size=mn_scale(20), label=r'\epsilon')
             t1.explainM(r'1. Angles $\gamma$ and $\epsilon$ are right angles')
             eq['1'] = t3.math(r'1.\quad\quad\quad\epsilon = \gamma', font_size=30)
 
@@ -90,7 +90,7 @@ class Prop13(Book1Scene):
                 a['epsilon'].e_fade()
                 a['beta'].e_normal()
                 l['AB'].e_normal()
-            a['theta'] = EuclidAngle('ABE', size=mn_scale(90), label=r'\theta')
+            a['theta'] = EAngle('ABE', size=mn_scale(90), label=r'\theta')
 
             eq['2-1'] = t3.math(r'2.', font_size=30)
             eq['2-2'] = t3.math(r'\gamma = \beta + \theta', align_str=r'=', align_index=-2, font_size=30)

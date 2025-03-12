@@ -21,10 +21,10 @@ class Book1Prop4(Book1Scene):
         t2 = TextBox(mn_coord(40, 400), line_width=mn_h_scale(550))
         t3 = TextBox(mn_coord(100, 500), line_width=mn_h_scale(800))
 
-        l: Dict[str | int, EuclidLine] = {}
-        p: Dict[str | int, EuclidPoint] = {}
-        c: Dict[str | int, EuclidCircle] = {}
-        t: Dict[str | int, EuclidTriangle] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
         a: Dict[str | int, Angel] = {}
 
         A = mn_coord(300, 250)
@@ -51,21 +51,21 @@ class Book1Prop4(Book1Scene):
             t2.math("AC = DF")
             t2.math(r"\measuredangle BAC = \measuredangle FDE")
 
-            t['ABC'] = EuclidTriangle(A, B, C,
-                                      scene=self,
-                                      point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
+            t['ABC'] = ETriangle(A, B, C,
+                                 scene=self,
+                                 point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
                                                     ('C', dict(away_from='center_f'))],
-                                      labels=[('x', dict(outside=True)), (), ('y', dict(inside=True))],
-                                      angles=[r'\alpha', None, None, mn_scale(20)]
-                                      )
+                                 labels=[('x', dict(outside=True)), (), ('y', dict(inside=True))],
+                                 angles=[r'\alpha', None, None, mn_scale(20)]
+                                 )
 
-            t['DEF'] = EuclidTriangle(D, E, F,
-                                      scene=self,
-                                      point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
+            t['DEF'] = ETriangle(D, E, F,
+                                 scene=self,
+                                 point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
                                                     ('F', dict(away_from='center_f'))],
-                                      labels=[('x', dict(inside=True)), (), ('y', dict(outside=True))],
-                                      angles=[r'\alpha', None, None]
-                                      )
+                                 labels=[('x', dict(inside=True)), (), ('y', dict(outside=True))],
+                                 angles=[r'\alpha', None, None]
+                                 )
 
         @self.push_step
         def _i2():
@@ -163,7 +163,7 @@ class Book1Prop4(Book1Scene):
                        "BAC and EDF are equal ")
 
             t['DEF'].a[0].e_draw()
-            a['ABC'] = EuclidAngle(t['ABC'].l[0], t['ABC'].l[2], label=r'\alpha', size=mn_scale(20), scene=self)
+            a['ABC'] = EAngle(t['ABC'].l[0], t['ABC'].l[2], label=r'\alpha', size=mn_scale(20), scene=self)
             with self.simultaneous():
                 t['ABC'].l[2].e_normal()
                 t['DEF'].l[2].e_normal()
