@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from functools import partial, wraps
 from math import isinf
+from os import remove
 
 import manimlib as mn
 import numpy as np
@@ -391,7 +392,9 @@ def {name}(self, *args):
             return T.Label(label, self, *args, **extra_args)
 
     @freezable
-    def e_draw(self, skip_anim=False):
+    def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
+        anim_args = anim_args or dict()
+        removal_args = anim_args if removal_args is None else removal_args
         if not skip_anim and not self.Virtual:
             anims = [
                 anim
@@ -401,11 +404,16 @@ def {name}(self, *args):
             ]
 
             if anims:
-                self.scene.play(*anims)
+                self.scene.play(*anims, **anim_args)
             if self.animation_objects:
                 for obj in self.animation_objects:
                     obj.clear_updaters()
-                self.scene.play(*map(partial(mn.Uncreate, run_time=self.AUX_CONSTRUCTION_TIME), self.animation_objects))
+                with self.scene.simultaneous(**removal_args):
+                    for obj in self.animation_objects:
+                        if isinstance(obj, EMObject):
+                            obj.e_remove()
+                        else:
+                            self.scene.play(mn.Uncreate(obj))
         else:
             self.scene.add(self)
         return self
@@ -449,12 +457,15 @@ def {name}(self, *args):
         return trgt
 
     @freezable
-    def e_remove(self):
+    def e_remove(self, anim_args=None):
+        anim_args = anim_args or dict()
+        if 'run_time' not in anim_args:
+            anim_args['run_time'] = self.CONSTRUCTION_TIME
         if not self.Virtual and self.visible():
             anims = self.RemovalOf()
             self.undraw_label()
             if anims:
-                self.scene.play(*anims, run_time=self.CONSTRUCTION_TIME)
+                self.scene.play(*anims, **anim_args)
         else:
             self.scene.remove(self)
         return self

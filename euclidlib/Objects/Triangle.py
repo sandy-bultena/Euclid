@@ -2,12 +2,16 @@ from __future__ import annotations
 
 from math import atan2, cos, sin, atan
 from typing import Sized, Tuple, Any, List
-from euclidlib.Objects.Polygon import EPolygon
+
+import numpy as np
+
+from euclidlib.Objects.Polygon import EPolygon, LABEL_ARGS
 from euclidlib.Objects.EucidMObject import *
 from . import EucidGroupMObject as G
 from . import Line as L
 from . import Point as P
 from . import Angel as A
+from . import Circle as C
 
 
 class ETriangle(EPolygon):
@@ -49,3 +53,71 @@ class ETriangle(EPolygon):
         x3 = x1 + d2
         y3 = y2 = y1 - h1
         return np.array([x2, y2, 0]), np.array([x3, y3, 0]), d1 + d2
+
+    @classmethod
+    def SSS(cls,
+            base: EMObject | Vect3,
+            *sides: float | L.ELine,
+            labels: LABEL_ARGS = (None, None, None),
+            point_labels: LABEL_ARGS = (None, None, None),
+            **kwargs):
+        assert(len(sides) == 3)
+        coord = convert_to_coord(base)
+        r = [cls.length_of(s) for s in sides]
+
+        p1, p2, p3 = cls.calculate_SSS(coord, *r)
+        if p2 is None:
+            return p1
+        center = mn.center_of_mass([p1, p2, p3])
+
+        labels_full = [cls._filter_side_labels(x) for x in labels]
+        point_labels_full = [
+            cls._filter_point_labels_with_center(x, center)
+            for x in point_labels]
+
+        p = P.EPoint(p2, label=point_labels_full[1])
+
+        c1 = C.ECircle(p2, p2 + RIGHT * r[0], temp_line_label=labels_full[0])
+        c1.e_fade()
+
+        l2 = L.ELine(p2, p3, label=labels_full[1])
+        nextp = P.EPoint(p3, label=point_labels_full[2])
+
+        c2 = C.ECircle(p3, p3 + r[2] * RIGHT, temp_line_label=labels_full[2])
+        c2.e_fade()
+
+        new = cls(p1, p2, p3,
+                  labels=[labels_full[0], None, labels_full[2]],
+                  point_labels=[point_labels_full[0], None, None],
+                  **kwargs)
+        if p.e_label is not None:
+            p.e_label.transfer_ownership(new.p[1])
+        if nextp.e_label is not None:
+            nextp.e_label.transfer_ownership(new.p[2])
+        if l2.e_label is not None:
+            l2.e_label.transfer_ownership(new.l[1])
+        with new.scene.simultaneous():
+            c1.e_remove()
+            c2.e_remove()
+            p.e_remove()
+            nextp.e_remove()
+            l2.e_remove()
+        return new
+
+
+    @classmethod
+    def calculate_SSS(cls, coord: Vect3, *r: float):
+        next = coord + RIGHT * r[1]
+        c1 = C.VirtualCircle(coord, coord + RIGHT * r[0])
+        c2 = C.VirtualCircle(next, next + RIGHT * r[2])
+        p3s = c1.intersect(c2)
+        c1.e_delete()
+        c2.e_delete()
+        if not p3s:
+            mn.log.warn("circles don't intersect")
+            return p3s, None, None
+        if p3s[0][1] > p3s[1][1]:
+            xy1 = p3s[0]
+        else:
+            xy1 = p3s[1]
+        return xy1, coord, next

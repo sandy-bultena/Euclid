@@ -7,15 +7,24 @@ from euclidlib.Objects.EucidMObject import *
 from euclidlib.Objects import Line as L
 import manimlib as mn
 
+
 class ECircle(EMObject, mn.Circle):
-    CONSTRUCTION_TIME=0.75
+    CONSTRUCTION_TIME = 0.75
     AUX_CONSTRUCTION_TIME = 0.25
 
     def CreationOf(self, *args, **kwargs):
-        tmpLine = mn.Line(self.e_center, self.get_end(), stroke_color=mn.RED)
+        tmpLine = L.ELine(self.e_center, self.get_end(),
+                          stroke_color=mn.RED,
+                          label=self.temp_line_label,
+                          delay_anim=True)
         self.animation_objects.append(tmpLine)
-        self.scene.play(mn.ShowCreation(tmpLine, run_time=self.AUX_CONSTRUCTION_TIME))
+        tmpLine.e_draw(
+            anim_args=dict(
+                run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+            ))
         tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+        if tmpLine.e_label is not None:
+            tmpLine.e_label.enable_updaters()
         return super().CreationOf(*args, **kwargs)
 
     def e_label_point(self, angle: float, direction: Vect3 = None, outside=True, buff=None):
@@ -23,9 +32,10 @@ class ECircle(EMObject, mn.Circle):
         edge = self.get_bounding_box_point(direction)
         return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
 
-    def __init__(self, center, point, *args, **kwargs):
+    def __init__(self, center, point, temp_line_label=None, *args, **kwargs):
         self.e_center = convert_to_coord(center)
         self.e_point = convert_to_coord(point)
+        self.temp_line_label = temp_line_label
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]
@@ -100,10 +110,10 @@ class ECircle(EMObject, mn.Circle):
             #   (x-$x)^2 + ($m x + $b - $y)^2 = $r^2
 
             i = y0 - m * x0
-            a = 1 + m**2
+            a = 1 + m ** 2
             b = 2 * m * (i - y) - 2 * x
-            c = (i - y)**2 + x**2 - r**2
-            sqr = b**2 - 4 * a * c
+            c = (i - y) ** 2 + x ** 2 - r ** 2
+            sqr = b ** 2 - 4 * a * c
 
             if sqr < 0:
                 return None
@@ -122,9 +132,9 @@ class ECircle(EMObject, mn.Circle):
 
             a = 1
             b = -2 * y
-            c = (x0 - x)**2 + y**2 - r**2
+            c = (x0 - x) ** 2 + y ** 2 - r ** 2
 
-            sqr = b**2 - 4 * a * c
+            sqr = b ** 2 - 4 * a * c
 
             if sqr < 0:
                 return None
@@ -139,7 +149,7 @@ class ECircle(EMObject, mn.Circle):
         min_x = min(x1, x0)
         max_y = max(y1, y0)
         min_y = min(y1, y0)
-        
+
         epsilon = mn_scale(1)
 
         if min_x - epsilon <= x3 <= max_x + epsilon and min_y - epsilon <= y3 < max_y + epsilon:
@@ -151,12 +161,11 @@ class ECircle(EMObject, mn.Circle):
 
     def highlight(self, color=RED, scale=2.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
-                    .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
+                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
     def intersect_selection(self, other: mn.Rectangle):
         corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
         return any(self.intersect(mn.Line(x, y)) for x, y in pairwise(corners))
-
 
     def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | None:
         if isinstance(other, ECircle):

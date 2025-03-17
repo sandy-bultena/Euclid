@@ -229,6 +229,8 @@ class PropScene(InteractiveScene):
         raise NotImplemented()
 
     def runFull(self):
+        max_step_name = max(len(step.__name__ )for step in self.steps)
+        preformat = f" Running func = {{:-<{max_step_name}}} | anim={{}}"
         with self.animation_speed(self._speed or 1):
             if not self.debug:
                 self.title_page()
@@ -237,7 +239,7 @@ class PropScene(InteractiveScene):
             self.wait()
             for step in self.steps:
                 if self.debug:
-                    print(f" Running func={step.__name__} | anim={self.num_plays}")
+                    print(preformat.format(step.__name__, self.num_plays))
                 step()
                 self.wait()
             print(f" DONE | anim={self.num_plays}")

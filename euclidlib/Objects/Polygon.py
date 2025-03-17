@@ -1,7 +1,8 @@
 from __future__ import annotations
+from typing_extensions import Unpack
 
 from itertools import pairwise, zip_longest
-from typing import Tuple, Iterable, Any
+from typing import Tuple, Iterable, Any, Dict, TypedDict
 
 from euclidlib.Objects.EucidMObject import *
 from . import EucidGroupMObject as G
@@ -10,6 +11,33 @@ from . import Point as P
 from . import Angel as A
 
 EPSILON = mn_scale(1)
+
+LABEL_ARG = (None | str |
+             Tuple[str, Unpack[tuple[Any, ...]], Dict[str, Any]] |
+             Tuple[str, Unpack[tuple[Any, ...]]])
+
+LABEL_ARGS = Iterable[LABEL_ARG]
+
+FULL_ANGLES_ARG = (Tuple[LABEL_ARG] |
+                   Tuple[LABEL_ARG, LABEL_ARG] |
+                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG] |
+                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float] |
+                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float] |
+                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float, float])
+
+ANGLE_ARGS = (Tuple[LABEL_ARG] |
+              Tuple[LABEL_ARG, LABEL_ARG] |
+              Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG])
+ANGLE_SIZE_ARGS = (Tuple[float] |
+                   Tuple[float, float] |
+                   Tuple[float, float, float])
+
+
+class OPTIONS(TypedDict):
+    point_labels: LABEL_ARG
+    labels: LABEL_ARG
+    angles: FULL_ANGLES_ARG
+    fill: mn.Color
 
 
 class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
@@ -53,10 +81,10 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed: float = 1,
-            point_labels: Sized[Tuple[Any, ...]] | Sized[str] | None = None,
-            labels: Sized[Tuple[str, Vect3] | str | None] | None = None,
-            angles: List | None = None,
-            angle_sizes: List | None = None,
+            point_labels: LABEL_ARG | None = None,
+            labels: LABEL_ARG | None = None,
+            angles: ANGLE_ARGS | None = None,
+            angle_sizes: ANGLE_SIZE_ARGS | None = None,
             fill: mn.Color = None,
             z_index=-1,
             animate_part=('set_e_fill',),
@@ -86,7 +114,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
 
         assert all(p is not None for p in points)
 
-        self.options = {
+        self.options: OPTIONS = {
             k: locals()[k]
             for k in ('point_labels', 'labels', 'angles', 'fill')
             if locals()[k] is not None
@@ -106,7 +134,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             self.points: List[P.EPoint] = []
 
         if _assemble_flag and _angles:
-            self.angles: List[A.EAngleBase] = _angles
+            self.angles: List[A.EAngleBase | None] = _angles
         else:
             self.angles: List[A.EAngleBase | None] = [None] * self.sides
         self._sub_group.add(*(an for an in self.angles if an is not None))
@@ -146,7 +174,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def get_group(self):
         return mn.VGroup(*self._sub_group)
 
-    def _filter_point_labels(self, args):
+    def _filter_point_labels(self, args: LABEL_ARG):
         if args is None:
             return None
         if isinstance(args, str):
@@ -162,7 +190,23 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
                 args[-1][x] = self.get_center_of_mass()
         return args
 
-    def _filter_side_labels(self, args):
+    @staticmethod
+    def _filter_point_labels_with_center(args: LABEL_ARG, center):
+        if args is None:
+            return None
+        if isinstance(args, str):
+            args = (args,)
+        if len(args) == 1:
+            args = *args, dict(away_from='center')
+        if not (args and isinstance(args[-1], dict)):
+            return args
+        for x in ('away_from', 'towards'):
+            if isinstance(y := args[-1].get(x), str) and y == 'center':
+                args[-1][x] = center
+        return args
+
+    @staticmethod
+    def _filter_side_labels(args: LABEL_ARG):
         if args is None:
             return None
         if isinstance(args, str):
@@ -189,17 +233,18 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         if self.lines:
             return
         with self.scene.simultaneous_speed(self.speed):
-            self.lines = [L.ELine(p0, p1, delay_anim=delay_anim) for p0, p1 in pairwise(self.vertices)]
+            self.lines = [L.ELine(p0, p1, delay_anim=True) for p0, p1 in pairwise(self.vertices)]
+            if 'labels' in self.options:
+                self.set_labels(*self.options['labels'])
+            if not delay_anim:
+                for l in self.lines:
+                    l.e_draw()
 
     def define_sub_objs(self, delay_anim=False):
         self.define_points(delay_anim=delay_anim)
         self.define_lines(delay_anim=delay_anim)
 
         self._sub_group.add(*self.lines, *self.points)
-
-        with self.scene.simultaneous_speed(self.speed):
-            if 'labels' in self.options:
-                self.set_labels(*self.options['labels'])
         with self.scene.simultaneous_speed(self.speed):
             if 'angles' in self.options:
                 self.set_angles(*self.options['angles'], delay_anim=delay_anim)
@@ -214,14 +259,14 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     def e_unfill(self):
         return self.e_fill(opacity=0)
 
-    def set_labels(self, *labels: Tuple[Any, ...] | str):
+    def set_labels(self, *labels: LABEL_ARG):
         for l, label_data in zip(self.lines, labels):
             label_data = self._filter_side_labels(label_data)
             if label_data:
                 l.add_label(*label_data)
         return self
 
-    def set_point_labels(self, *labels: Tuple[Any, ...]):
+    def set_point_labels(self, *labels: LABEL_ARG):
         for p, label_data in zip(self.points, labels):
             label_data = self._filter_point_labels(label_data)
             p.add_label(*label_data)
