@@ -64,7 +64,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             _assemble_flag=False,
             _lines: List[L.ELine] | None = None,
             _points: List[P.EPoint] | None = None,
-            _angles: List[A.EAngleBase] | None = None,
+            _angles: List[A.EAngleBase | None] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
@@ -109,6 +109,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             self.angles: List[A.EAngleBase] = _angles
         else:
             self.angles: List[A.EAngleBase | None] = [None] * self.sides
+        self._sub_group.add(*(an for an in self.angles if an is not None))
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part, **kwargs)
         if self.sides:

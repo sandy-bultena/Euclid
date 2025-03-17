@@ -66,7 +66,7 @@ class NullPlayer:
         return self.obj
 
 
-def _build_anim_base(anim):
+def e_animate(anim):
     if anim.overridden_animation:
         return anim.overridden_animation
     return E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
@@ -226,7 +226,7 @@ class EMObjectPlayer:
         if self.rotating:
             kwargs['path_arc'] = self.rotating
 
-        anim_built = _build_anim_base(anim(**kwargs))
+        anim_built = e_animate(anim(**kwargs))
         return anim_built
 
     def __call__(self, *args, **kwargs):

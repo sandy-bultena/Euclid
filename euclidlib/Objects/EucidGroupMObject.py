@@ -65,6 +65,9 @@ class PsuedoGroup(EMObject):
     def get_manager(self):
         return self,
 
+    def get_e_family(self):
+        return *self.get_manager(), *self.get_group()
+
     def except_index(self, *indices):
         exceptions = set(indices)
         full = set(range(len(self.get_group())))
@@ -113,7 +116,7 @@ class EGroup[T](PsuedoGroup, EMObject, mn.VGroup[T]):
         return []
 
     def get_group(self):
-        return self
+        return self.submobjects
 
     def get_manager(self):
         return ()
