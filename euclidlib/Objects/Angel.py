@@ -243,7 +243,7 @@ class EAngleBase(EMObject):
             # ------------------------------------------------------------------------
             # define point D and E on angle
             # ------------------------------------------------------------------------
-            c1 = C.ECircle(self.v, self.v + RIGHT * min_length, fill_color=RED)
+            c1 = C.ECircle(self.v, self.v + RIGHT * min_length)
             p1 = c1.intersect(self.l1)
             p2 = c1.intersect(self.l2)
             pn1 = P.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
@@ -253,28 +253,27 @@ class EAngleBase(EMObject):
             # ------------------------------------------------------------------------
             # copy CE to AF
             # ------------------------------------------------------------------------
-            l1 = ELine(self.v, p1[0])
+            l1 = ELine(self.v, p1[0], stroke_color=GREEN)
             ln1, o = l1.copy_to_point(point)
             ln1.green()
-
-            c2 = C.ECircle(point, ln1.get_end())
+            c2 = C.ECircle(point, ln1.get_end(), stroke_color=GREEN)
             with self.scene.delayed():
                 for x in (ln1, o):
                     x.e_remove()
-
             p3 = c2.intersect(line)
             if not p3:
                 for i in range(5):
                     clone.extend(100)
                     p3 = c2.intersect(clone)
 
-            pn3 = P.EPoint(p3[0])
+            pn3 = P.EPoint(p3[0], fill_color=GREEN)
+            l1.white()
+            c2.white.e_fade()
 
-            l3 = ELine(p1[0], p2[0])
-            l3.e_fade()
+            l3 = ELine(p1[0], p2[0], stroke_color=GREEN)
             ln3, o2 = l3.copy_to_point(pn3)
             c3 = C.ECircle(pn3, ln3.get_end())
-            c3.e_fade()
+            c2.e_normal()
 
             p4 = c3.intersect(c2)
             lt1 = ELine(point, p4[0], delay_anim=True)
@@ -283,14 +282,12 @@ class EAngleBase(EMObject):
             with self.scene.delayed():
                 for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
                     x.e_remove()
-
             if negative:
                 at1 = EAngle(lt1, line, delay_anim=True)
                 at2 = EAngle(lt2, line, delay_anim=True)
             else:
                 at1 = EAngle(line, lt1, delay_anim=True)
                 at2 = EAngle(line, lt2, delay_anim=True)
-
             if abs(at2.e_angle - self.e_angle) < mn_scale(1):
                 lt2, lt1 = lt1, lt2
                 at1.e_remove()
@@ -298,16 +295,14 @@ class EAngleBase(EMObject):
             else:
                 angle = at1
                 at2.e_remove()
-
-
+            
             lt1.e_draw()
             angle.e_draw()
-
+            
             with self.scene.delayed():
                 for x in (lt2, c2, c3, clone):
                     x.e_remove()
             return lt1, angle
-
 
 
 class ArcAngle(EAngleBase, mn.Arc):

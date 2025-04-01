@@ -36,6 +36,8 @@ class ECircle(EMObject, mn.Circle):
         self.e_center = convert_to_coord(center)
         self.e_point = convert_to_coord(point)
         self.temp_line_label = temp_line_label
+        if 'stoke_color' not in kwargs:
+            kwargs['stroke_color'] = mn.WHITE
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]
@@ -46,7 +48,6 @@ class ECircle(EMObject, mn.Circle):
             start_angle=angle,
             arc_center=self.e_center,
             radius=self.radius,
-            stroke_color=mn.WHITE,
             *args,
             **kwargs
         )

@@ -8,7 +8,6 @@ import numpy as np
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
-from euclidlib.Objects import Text as Tx
 from euclidlib.Objects import Angel
 import math
 from euclidlib.Objects import EquilateralTriangle
@@ -141,10 +140,10 @@ class ELine(EMObject, mn.Line):
         return x, y, 0
 
     def length_from_end(self, p: P.EPoint):
-        p.distance_to(self.get_end())
+        return p.distance_to(self.get_end())
 
     def length_from_start(self, p: P.EPoint):
-        p.distance_to(self.get_start())
+        return p.distance_to(self.get_start())
 
     def extend(self, r: float, rate_func=mn.smooth):
         if r < 0:
@@ -154,11 +153,14 @@ class ELine(EMObject, mn.Line):
         return self
 
     def prepend(self, r: float, rate_func=mn.smooth):
+        if r < 0:
+            return self.extend(r)
         self.e_start = self.point(-r)
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.get_end()))
         return self
 
     def extend_and_prepend(self, r: float, rate_func=mn.smooth):
+        r = abs(r)
         self.e_start = self.point(-r)
         self.e_end = self.point(r + self.get_length())
         self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.e_end))
@@ -209,12 +211,14 @@ class ELine(EMObject, mn.Line):
                 l['CD'] = t[1].l[1]
             with self.scene.simultaneous():
                 t[1].e_fade()
+                l['AD'].e_normal()
+                l['CD'].e_normal()
 
-            def find_extended_intersection(p1, p2, circle, line, extend_dir=1):
+            def find_extended_intersection(p1, p2, circle, line, extend_dir=1, required_intersections=1):
                 c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
                 pts = c[circle].intersect(l[line])
-                for _ in range(100):
-                    if pts:
+                for _ in range(5):
+                    if len(pts) >= required_intersections:
                         break
                     l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
                     pts = c[circle].intersect(l[line])
@@ -229,12 +233,13 @@ class ELine(EMObject, mn.Line):
             p['B'] = P.EPoint(B, scene=self.scene)
 
             if p['D'].distance_to(pts[0]) > mn_scale(1):
-                F = find_extended_intersection(p['D'], p['E'], 'D', 'CD')
+                F = find_extended_intersection(p['D'], p['E'], 'D', 'CD', required_intersections=2)
             else:
                 F = [p['E'].get_center()]
 
-            pF = P.EPoint(F[0])
-            lCF = ELine(C, F[0])
+            new_end = min(F, key=lambda a: abs(self.get_length() - mn.get_dist(a, C)))
+            pF = P.EPoint(new_end)
+            lCF = ELine(C, new_end)
 
             with self.scene.simultaneous():
                 for group in (p, l, c, t):
@@ -412,15 +417,59 @@ class ELine(EMObject, mn.Line):
                 ln.e_remove()
             return l['CF']
 
-
-
-
     def perpendicular(self, p: P.EPoint, /, speed=1, inside=False):
         rs = mn.get_norm(self.pointify(p) - self.get_start())
         re = mn.get_norm(self.pointify(p) - self.get_end())
         if (rs + re - self.get_length()) > mn_scale(0.1):
             return self._perp_off_line(p, re, rs, speed=speed)
         return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
+
+    def parallel(self, p: P.EPoint, /, speed=1):
+        B, C = self.get_start_and_end()
+        A = self.pointify(p)
+
+        # make sure line goes from left to right
+        if B[0] > C[0]:
+            B, C = C, B
+
+        # define a new line
+        with self.scene.animation_speed(speed):
+            tempC = C
+            if mn.get_dist(B, C) < mn_scale(100):
+                tempC = C + mn.normalize(C - B) * mn_scale(100)
+            ln = ELine(B, tempC, stroke_color=GREEN)
+
+            # is point on the line?
+            rs = self.length_from_start(p)
+            re = self.length_from_end(p)
+            if abs(rs + re - self.get_length()) < mn_scale(0.1):
+                clone = self.copy()
+                ln.e_remove()
+                return clone
+
+            # create point D on the line
+            pD = P.EPoint(ln.point_from_proportion(0.5))
+            lBD, lDC = ln.e_split(pD)
+            lAD = ELine(A, pD, stroke_color=BLUE)
+
+            # copy angle
+            aADC = Angel.EAngle(lDC, lAD)
+            lEA, angle = aADC.copy_to_line(p, lAD, negative=True)
+
+            # extend the line
+            lEA.prepend(mn_scale(200))
+
+            #cleanup
+            with self.scene.delayed():
+                aADC.e_remove()
+                angle.e_remove()
+                pD.e_remove()
+                lAD.e_remove()
+                lDC.e_remove()
+                lBD.e_remove()
+                ln.e_remove()
+
+            return lEA
 
 
 
