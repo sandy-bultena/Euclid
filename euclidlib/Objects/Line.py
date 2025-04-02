@@ -214,12 +214,16 @@ class ELine(EMObject, mn.Line):
                 l['AD'].e_normal()
                 l['CD'].e_normal()
 
-            def find_extended_intersection(p1, p2, circle, line, extend_dir=1, required_intersections=1):
+            def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
                 c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
                 pts = c[circle].intersect(l[line])
                 for _ in range(5):
-                    if len(pts) >= required_intersections:
+                    if pts and not find_min:
                         break
+                    if pts and find_min:
+                        minim = min(abs(self.get_length() - mn.get_dist(a, C)) for a in pts)
+                        if minim < mn_scale(0.1):
+                            break
                     l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
                     pts = c[circle].intersect(l[line])
                 else:
@@ -233,7 +237,7 @@ class ELine(EMObject, mn.Line):
             p['B'] = P.EPoint(B, scene=self.scene)
 
             if p['D'].distance_to(pts[0]) > mn_scale(1):
-                F = find_extended_intersection(p['D'], p['E'], 'D', 'CD', required_intersections=2)
+                F = find_extended_intersection(p['D'], p['E'], 'D', 'CD', find_min=True)
             else:
                 F = [p['E'].get_center()]
 
@@ -472,7 +476,8 @@ class ELine(EMObject, mn.Line):
             return lEA
 
 
-
+class EDashedLine(ELine, mn.DashedLine):
+    pass
 
 
 class VirtualLine(ELine):

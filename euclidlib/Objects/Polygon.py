@@ -139,7 +139,8 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
             self.angles: List[A.EAngleBase | None] = [None] * self.sides
         self._sub_group.add(*(an for an in self.angles if an is not None))
 
-        super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part, **kwargs)
+        super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
+                         delay_anim=delay_anim, **kwargs)
         if self.sides:
             self.vertices.append(self.vertices[0])
         self.define_sub_objs(delay_anim)
@@ -342,7 +343,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.vertices[-1] = self.vertices[0]
 
         all_parts = [*self.p, *self.a, *self.l]
-        all_labels = [a.e_label for a in all_parts if a.e_label is not None]
+        all_labels = [a.e_label for a in all_parts if a is not None and a.e_label is not None]
 
         for label in all_labels:
             label.enable_updaters()

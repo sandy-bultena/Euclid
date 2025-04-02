@@ -250,7 +250,7 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
     if isinstance(obj, mn.Mobject):
         return obj.get_center()
     else:
-        return *obj, *((0.0,) * (3 - len(obj)))
+        return np.array([*obj, *((0.0,) * (3 - len(obj)))])
 
 
 def freezable(func):

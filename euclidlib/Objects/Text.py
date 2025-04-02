@@ -25,8 +25,9 @@ MARKUP_REPLACE = (
 
 MATH_PREAMBLE = (
     r'\usepackage{pifont}'
-    r'\usepackage{unicode-math}'
+    # r'\usepackage{unicode-math}'
     r'\usepackage[normalem]{ulem}'
+    r'\usepackage{stix}'
     r'\newcommand{\ecrossmark}{\textrm{\ding{55}}}',
     r'\newcommand{\echeckmark}{\textrm{\ding{51}}}'
 )
@@ -81,7 +82,7 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         if not substr and isinstance(other, EStringObj):
             animation_type = mn.TransformMatchingStrings
         elif substr == self.string:
-            animation_type = CA.MoveToAndReplace#lambda a, b, **args: a.animate(**args).move_to(b)
+            animation_type = CA.MoveToAndReplace  # lambda a, b, **args: a.animate(**args).move_to(b)
         else:
             animation_type = mn.TransformMatchingParts
         return self.scene.play(animation_type(copy, self, **transform_args))
@@ -99,10 +100,10 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
 
     def RemovalOf(self, *args, stroke_color=mn.RED_A, stroke_width=0.5, lag_ratio=0, **kwargs):
         return [CA.UnWrite(self,
-                         stroke_color=stroke_color,
-                         stroke_width=stroke_width,
-                         lag_ratio=lag_ratio,
-                         **kwargs)]
+                           stroke_color=stroke_color,
+                           stroke_width=stroke_width,
+                           lag_ratio=lag_ratio,
+                           **kwargs)]
 
     def __getstate__(self):
         state = super().__getstate__().copy()
@@ -127,9 +128,9 @@ class ETexText(EStringObj, mn.TexText):
         packages = r'''
             \usepackage[no-math]{{fontspec}}
         '''
-        preamble = rf'''
+        preamble = '\n'.join(MATH_PREAMBLE) + rf'''
             \setmainfont[Mapping=tex-text]{{{font}}}
-        ''' + '\n'.join(MATH_PREAMBLE)
+        '''
 
         if line_width:
             px = line_width / mn.FRAME_WIDTH * mn.DEFAULT_PIXEL_WIDTH / 2.5
@@ -161,8 +162,13 @@ class ETex(EStringObj, mn.Tex):
         super().__init__(
             text,
             *args,
-            template='basic_ctex',
-            additional_preamble='\n'.join(MATH_PREAMBLE),
+            template='empty_ctex',
+            additional_preamble='\n'.join([
+                r'\usepackage{amsmath}',
+                r'\usepackage{amssymb}',
+                r'\usepackage{xcolor}',
+                *MATH_PREAMBLE
+            ]),
             **kwargs)
 
     pass
@@ -182,7 +188,7 @@ class Label(ETex):
         self.ref = ref
         self.args = args
         self.extra_args = extra_args
-        self.align=align
+        self.align = align
         super().__init__(text, font_size=20, scene=ref.scene, delay_anim=True)
         self.f_always.move_to(
             lambda: ref.e_label_point(*self.args, **self.extra_args),
