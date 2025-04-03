@@ -213,6 +213,7 @@ class EAngleBase(EMObject):
         return (self.animate(rate_func=mn.there_and_back, **args)
                 .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
+    @log
     def intersect(self, other: Mobject, reverse=True):
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
@@ -221,20 +222,21 @@ class EAngleBase(EMObject):
     def intersect_selection(self, other: mn.Rectangle):
         return other.is_touching(self)
 
-    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=1):
+    @log
+    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=1) -> Tuple[ELine, EAngleBase]:
         with self.scene.animation_speed(speed):
             start, end = line.get_start_and_end()
-            if not (np.array_equal(start, point.get_center()) or np.array_equal(end, point.get_center())):
+            if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
                 mn.log.error("When copying an angle to a line, "
                              "the point must be one of the endpoints\n"
-                             f"{point=} | {start=} | {end=}")
-                return
+                             f"{point.get_center()=} | {start=} | {end=}")
+                raise ValueError()
 
             if np.array_equal(end, point.get_center()):
                 end, start = start, end
             clone = ELine(start, end, stroke_color=BLUE)
             if clone.get_length() < mn_scale(500):
-                clone.extend(mn_scale(500))
+                clone.extend_and_prepend(mn_scale(250))
 
             min_length = min(self.l1.get_length(),
                              self.l2.get_length(),

@@ -253,6 +253,26 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
         return np.array([*obj, *((0.0,) * (3 - len(obj)))])
 
 
+def animate(func):
+    @wraps(func)
+    def animate_change(self: EMObject, *args, rate_func=mn.smooth, **kwargs):
+        if self.scene.animateState[-1] != ps.AnimState.PAUSED:
+            an = self.animate(rate_func=rate_func)
+            func(self, an, *args, **kwargs)
+            self.scene.play(an)
+            return self
+        else:
+            return func(self, self, *args, **kwargs)
+    return animate_change
+
+
+def log(func):
+    @wraps(func)
+    def logMethodName(self, *args, **kwargs):
+        with self.scene.trace(self, f"{type(self).__name__}:{func.__name__}"):
+            return func(self, *args, **kwargs)
+    return logMethodName
+
 def freezable(func):
     @wraps(func)
     def dontIfFrozen(self, *args, **kwargs):
@@ -416,6 +436,8 @@ def {name}(self, *args):
                             self.scene.play(mn.Uncreate(obj))
         else:
             self.scene.add(self)
+            if self.scene.debug:
+                self.scene.update_frame()
         return self
 
     def interpolate(

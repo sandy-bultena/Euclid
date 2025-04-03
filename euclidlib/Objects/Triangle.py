@@ -8,6 +8,7 @@ import numpy as np
 from euclidlib.Objects.Polygon import EPolygon, LABEL_ARGS
 from euclidlib.Objects.EucidMObject import *
 from . import EucidGroupMObject as G
+from . import Parallelogram as Para
 from . import Line as L
 from . import Point as P
 from . import Angel as A
@@ -44,7 +45,7 @@ class ETriangle(EPolygon):
     def calculate_SAS(cls, point: Vect3, r1: float, angle: float, r2: float):
         x1, y1, _ = point
         theta = atan((r1 - r2 * cos(angle)) /
-                      (r2 * sin(angle)))
+                     (r2 * sin(angle)))
         h1 = r1 * cos(theta)
         d1 = r1 * sin(theta)
         d2 = r2 * sin(angle - theta)
@@ -61,7 +62,7 @@ class ETriangle(EPolygon):
             labels: LABEL_ARGS = (None, None, None),
             point_labels: LABEL_ARGS = (None, None, None),
             **kwargs):
-        assert(len(sides) == 3)
+        assert (len(sides) == 3)
         coord = convert_to_coord(base)
         r = [cls.length_of(s) for s in sides]
 
@@ -104,7 +105,6 @@ class ETriangle(EPolygon):
             l2.e_remove()
         return new
 
-
     @classmethod
     def calculate_SSS(cls, coord: Vect3, *r: float):
         next = coord + RIGHT * r[1]
@@ -121,3 +121,63 @@ class ETriangle(EPolygon):
         else:
             xy1 = p3s[1]
         return xy1, coord, next
+
+    @log
+    def parallelogram(self, angle: A.EAngleBase, /, speed=1):
+        with self.scene.animation_speed(speed):
+            point = self.l[1].bisect()
+            point.add_label('P_1', UP)
+            l = L.ELine(self.p[1], self.p[2])
+            l.e_fade()
+            l1, l2 = l.e_split(point)
+            with self.scene.simultaneous():
+                l1.red()
+                l2.blue()
+
+            # Copy angle onto 2nd triangle line EC at bisect point
+            side1, angle2 = angle.copy_to_line(point, l2)
+            side1.extend(mn_scale(100))
+            side1.red()
+
+            # Draw a line through triangle point 1, parallel triangle line 2
+            with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2", 16):
+                line2 = self.l[1].parallel(self.p[0])
+                line2.blue()
+                point2 = P.EPoint(line2.intersect(side1), label=("P_2", UP))
+
+            # Draw a line through triangle point 3, parallel to side 1
+            with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1", 16):
+                line3 = side1.parallel(self.p[2])
+                line3.green()
+                point3 = P.EPoint(line3.intersect(line2), label=("P_3", UP))
+
+            # construct polygon
+            poly = Para.EParallelogram(point2, point, self.p[2], point3)
+
+            with self.scene.simultaneous():
+                side1.e_remove()
+                line2.e_remove()
+                line3.e_remove()
+                l1.e_remove()
+                l2.e_remove()
+                point.e_remove()
+                point2.e_remove()
+                point3.e_remove()
+
+            return poly, angle2
+
+    @log
+    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=1):
+        with self.scene.animation_speed(speed):
+            # create parallelogram equal in size to triangle (I.42)
+            s1, a2 = self.parallelogram(angle)
+            # s1.e_fade()
+            a2.e_remove()
+
+            # copy this parallelogram to the line
+            s4 = s1.copy_to_line(line)
+            with self.scene.simultaneous():
+                s1.e_remove()
+
+            return s4
+

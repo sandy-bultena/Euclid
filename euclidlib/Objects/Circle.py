@@ -5,6 +5,7 @@ from itertools import pairwise
 
 from euclidlib.Objects.EucidMObject import *
 from euclidlib.Objects import Line as L
+from euclidlib.Objects import Point
 import manimlib as mn
 
 
@@ -61,7 +62,7 @@ class ECircle(EMObject, mn.Circle):
         d2 = d - d1
 
         hsqr = r2 ** 2 - d2 ** 2
-        if abs(hsqr) < 0.2:
+        if abs(hsqr) < mn_scale(0.2):
             hsqr = 0
 
         if hsqr < 0:

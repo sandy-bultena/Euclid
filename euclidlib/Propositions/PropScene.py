@@ -26,6 +26,7 @@ class PropScene(InteractiveScene):
         self.animateState: List[AnimState] = [AnimState.NORMAL]
         self.animationsStored = []
         self.animationSpeedStack: List[float] = []
+        self.traceStack: List[Text] = []
         self.debug = bool(getenv('DEBUG'))
         self._speed = float(getenv('SPEED', 1))
         self.drawing = False
@@ -207,6 +208,33 @@ class PropScene(InteractiveScene):
         with self.animation_speed(run_time):
             with self.simultaneous(**kwargs):
                 yield
+
+    @contextmanager
+    def trace(self, obj, name: str, font_size=16, **kwargs):
+        if not self.debug:
+            yield
+            return
+
+        function = Text(name, font_size=font_size)
+        if self.traceStack:
+            function.next_to(self.traceStack[-1], UP, buff=SMALL_BUFF, aligned_edge=RIGHT)
+        else:
+            function.next_to(self.animationCountObject, UP, aligned_edge=RIGHT)
+        self.traceStack.append(function)
+        self.add(function)
+        self.play(
+            Write(function),
+            Indicate(obj, color=GREEN),
+            run_time=1
+        )
+        yield
+        self.play(
+            Uncreate(function, lag_ratio=0.1),
+            Indicate(obj, color=RED),
+            run_time=1
+        )
+        self.traceStack.pop()
+
 
     def animations_off(self):
         self.animateState[0] = AnimState.PAUSED

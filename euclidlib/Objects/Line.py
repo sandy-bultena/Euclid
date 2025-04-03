@@ -55,7 +55,6 @@ class ELine(EMObject, mn.Line):
         self.e_end = self.pointify(end)
         super().__init__(self.e_start, self.e_end, *args, **kwargs)
 
-
     def e_label_point(self, direction: mn.Vect3=None, inside=None, outside=None, alpha=0.5, buff=None):
         try:
             point = self.point_from_proportion(alpha)
@@ -66,7 +65,6 @@ class ELine(EMObject, mn.Line):
         elif outside:
             direction = self.OUT()
         return point + (buff or self.LabelBuff) * direction
-
 
     def point(self, r: float):
         vec = self.get_unit_vector()
@@ -95,7 +93,6 @@ class ELine(EMObject, mn.Line):
             return self.intersect_selection(other)
         super().intersect(other)
 
-
     def intersect_selection(self, other: mn.Rectangle):
         if other.get_arc_length() < 1e-3:
             other = mn.Rectangle(0.2, 0.2).move_to(other)
@@ -103,7 +100,6 @@ class ELine(EMObject, mn.Line):
         return any(self.intersect_bound_line(mn.Line(x, y)) for x, y in pairwise(corners)) or (
             other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
         )
-
 
     def intersect_bound_line(self, l2: mn.Line):
         (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
@@ -116,7 +112,6 @@ class ELine(EMObject, mn.Line):
         x = x1 + (uA * (x2 - x1))
         y = y1 + (uA * (y2 - y1))
         return x, y, 0
-
 
     def intersect_line(self, l2: mn.Line):
         (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
@@ -145,25 +140,28 @@ class ELine(EMObject, mn.Line):
     def length_from_start(self, p: P.EPoint):
         return p.distance_to(self.get_start())
 
-    def extend(self, r: float, rate_func=mn.smooth):
+    @animate
+    def extend(self, anim: ELine, r: float):
         if r < 0:
             return self.prepend(-r)
         self.e_end = self.point(r + self.get_length())
-        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.get_start(), self.e_end))
+        anim.set_points_by_ends(self.get_start(), self.e_end)
         return self
 
-    def prepend(self, r: float, rate_func=mn.smooth):
+    @animate
+    def prepend(self, anim: ELine, r: float):
         if r < 0:
             return self.extend(r)
         self.e_start = self.point(-r)
-        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.get_end()))
+        anim.set_points_by_ends(self.e_start, self.get_end())
         return self
 
-    def extend_and_prepend(self, r: float, rate_func=mn.smooth):
+    @animate
+    def extend_and_prepend(self, anim: ELine, r: float):
         r = abs(r)
         self.e_start = self.point(-r)
         self.e_end = self.point(r + self.get_length())
-        self.scene.play(self.animate(rate_func=rate_func).set_points_by_ends(self.e_start, self.e_end))
+        anim.set_points_by_ends(self.e_start, self.e_end)
         return self
 
 
@@ -217,7 +215,8 @@ class ELine(EMObject, mn.Line):
             def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
                 c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
                 pts = c[circle].intersect(l[line])
-                for _ in range(5):
+                self.add(l[line])
+                for _ in range(15):
                     if pts and not find_min:
                         break
                     if pts and find_min:
@@ -252,6 +251,7 @@ class ELine(EMObject, mn.Line):
 
             return lCF, pF
 
+    @log
     def copy_to_line(self, target: P.EPoint, target_line: ELine, speed=1):
         lx, px = self.copy_to_point(target, speed=speed)
         if lx is None or px is None:
@@ -428,6 +428,7 @@ class ELine(EMObject, mn.Line):
             return self._perp_off_line(p, re, rs, speed=speed)
         return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
 
+    @log
     def parallel(self, p: P.EPoint, /, speed=1):
         B, C = self.get_start_and_end()
         A = self.pointify(p)
@@ -436,12 +437,12 @@ class ELine(EMObject, mn.Line):
         if B[0] > C[0]:
             B, C = C, B
 
-        # define a new line
         with self.scene.animation_speed(speed):
-            tempC = C
-            if mn.get_dist(B, C) < mn_scale(100):
-                tempC = C + mn.normalize(C - B) * mn_scale(100)
-            ln = ELine(B, tempC, stroke_color=GREEN)
+            with self.scene.trace(self, "define a new line"):
+                tempC = C
+                if mn.get_dist(B, C) < mn_scale(100):
+                    tempC = C + mn.normalize(C - B) * mn_scale(100)
+                ln = ELine(B, tempC, stroke_color=GREEN)
 
             # is point on the line?
             rs = self.length_from_start(p)
@@ -451,17 +452,16 @@ class ELine(EMObject, mn.Line):
                 ln.e_remove()
                 return clone
 
-            # create point D on the line
-            pD = P.EPoint(ln.point_from_proportion(0.5))
-            lBD, lDC = ln.e_split(pD)
-            lAD = ELine(A, pD, stroke_color=BLUE)
+            with self.scene.trace(ln ,"create point D on the line"):
+                pD = P.EPoint(ln.point_from_proportion(0.5))
+                lBD, lDC = ln.e_split(pD)
+                lAD = ELine(A, pD, stroke_color=BLUE)
 
-            # copy angle
-            aADC = Angel.EAngle(lDC, lAD)
-            lEA, angle = aADC.copy_to_line(p, lAD, negative=True)
-
-            # extend the line
-            lEA.prepend(mn_scale(200))
+            with self.scene.trace(mn.VGroup(lDC, lAD) ,"copy angle"):
+                aADC = Angel.EAngle(lDC, lAD)
+                lEA, angle = aADC.copy_to_line(p, lAD, negative=True)
+            with self.scene.trace(lEA ,"extend the line"):
+                lEA.prepend(mn_scale(200))
 
             #cleanup
             with self.scene.delayed():
