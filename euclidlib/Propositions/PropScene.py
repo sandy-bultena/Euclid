@@ -27,7 +27,7 @@ class PropScene(InteractiveScene):
         self.animationsStored = []
         self.animationSpeedStack: List[float] = []
         self.traceStack: List[Text] = []
-        self.debug = bool(getenv('DEBUG'))
+        self.debug = getenv('DEBUG') or ''
         self._speed = float(getenv('SPEED', 1))
         self.drawing = False
         self.drawings = VGroup(z_index=10)
@@ -135,6 +135,8 @@ class PropScene(InteractiveScene):
             if not currently_skipping:
                 self.force_skipping()
             super().play(*anims, **kwargs)
+            self.update_frame(force_draw=True)
+            self.file_writer.write_frame(self.camera)
             if not currently_skipping:
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
@@ -192,10 +194,13 @@ class PropScene(InteractiveScene):
             yield
 
     @contextmanager
-    def run_animations_for(self):
-        self.animateState.append(AnimState.NORMAL)
-        yield
-        self.animateState.pop()
+    def run_animations_for(self, stop=True):
+        if stop:
+            self.animateState.append(AnimState.NORMAL)
+            yield
+            self.animateState.pop()
+        else:
+            yield
 
     @contextmanager
     def animation_speed(self, run_time: float):
@@ -210,10 +215,12 @@ class PropScene(InteractiveScene):
                 yield
 
     @contextmanager
-    def trace(self, obj, name: str, font_size=16, **kwargs):
-        if not self.debug:
+    def trace(self, *data, font_size=16, **kwargs):
+        if 'trace' not in self.debug:
             yield
             return
+
+        name = data[-1]
 
         function = Text(name, font_size=font_size)
         if self.traceStack:
@@ -221,18 +228,17 @@ class PropScene(InteractiveScene):
         else:
             function.next_to(self.animationCountObject, UP, aligned_edge=RIGHT)
         self.traceStack.append(function)
-        self.add(function)
-        self.play(
-            Write(function),
-            Indicate(obj, color=GREEN),
-            run_time=1
-        )
+        with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
+            self.play(
+                Write(function),
+                run_time=1
+            )
         yield
-        self.play(
-            Uncreate(function, lag_ratio=0.1),
-            Indicate(obj, color=RED),
-            run_time=1
-        )
+        with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
+            self.play(
+                Write(function, rate_func=lambda a: smooth(1-a), remover=True),
+                run_time=1
+            )
         self.traceStack.pop()
 
 

@@ -7,7 +7,7 @@ from euclidlib.Objects import Line
 from euclidlib.Objects.EucidMObject import *
 
 class EParallelogram(Polygon.EPolygon):
-    def __init__(self, *points: EMObject|Vect3, **kwargs):
+    def __init__(self, *points: EMObject | Vect3, **kwargs):
         if points and isinstance(points[0], str):
             point_names = list(points[0])
             points = Point.EPoint.find_in_frame(point_names)
@@ -27,25 +27,25 @@ class EParallelogram(Polygon.EPolygon):
             l2p2 = self.l[1].parallel(p2)
             l2p2.e_fade()
 
-        with self.scene.trace(l2p2 ,"Find intersect of 1st line of parallelogram to parallel line l2p2"):
+        with self.scene.trace(l2p2, "Find intersect of 1st line of parallelogram to parallel line l2p2"):
             p22 = Point.EPoint(l2p2.intersect(self.l[0]), label=('p_{22}', UP))
 
-        with self.scene.trace(p22 ,"Draw diagonal, find intersection with 4th line of parallelogram"):
+        with self.scene.trace(p22, "Draw diagonal, find intersection with 4th line of parallelogram"):
             diag = Line.ELine(p22, p1)
             diag.e_fade()
             p44 = Point.EPoint(diag.intersect(self.l[3]), label=('p_{44}', UP))
 
-        with self.scene.trace(self.l[2] ,"Draw a line at point p44, parallel to 3rd line of parallelogram"):
+        with self.scene.trace(self.l[2], "Draw a line at point p44, parallel to 3rd line of parallelogram"):
             l3p44 = self.l[2].parallel(p44)
             l3p44.blue()
 
-        with self.scene.trace(l2p2 ,"Find intersect of l2p2 and l3p44"):
+        with self.scene.trace(l2p2, "Find intersect of l2p2 and l3p44"):
             p3 = Point.EPoint(l2p2.intersect(l3p44), label=('p_3', UP))
 
-        with self.scene.trace(l3p44 ,"Fine intersect of 2nd line of parallelogram to parallel line KL"):
+        with self.scene.trace(l3p44, "Fine intersect of 2nd line of parallelogram to parallel line KL"):
             p4 = Point.EPoint(self.l[1].intersect(l3p44), label=('p_4', UP))
 
-        with self.scene.trace(Mobject() ,"construct a parallelogram"):
+        with self.scene.trace("construct a parallelogram"):
             poly = EParallelogram(p1, p2, p3, p4)
 
         # cleanup
@@ -110,11 +110,10 @@ class EParallelogram(Polygon.EPolygon):
                 t2.e_remove()
                 p4.e_remove()
 
+
             with self.scene.trace(self, "create the complement with the given line at point 3", font_size=18):
                 x = self._create_complement(l4)
 
-            with self.scene.simultaneous():
-                x.e_fade()
             p6 = Point.EPoint(line.get_start())
             p7 = Point.EPoint(line.get_end())
             y = x._move_to_edge(p6, p7)

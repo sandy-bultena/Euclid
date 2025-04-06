@@ -281,30 +281,41 @@ class EAngleBase(EMObject):
             lt1 = ELine(point, p4[0], delay_anim=True)
             lt2 = ELine(point, p4[1], delay_anim=True)
 
+            lt3 = ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
+            lt4 = ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
+
             with self.scene.delayed():
                 for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
                     x.e_remove()
+
+            lines = [lt1, lt2, lt3, lt4]
             if negative:
-                at1 = EAngle(lt1, line, delay_anim=True)
-                at2 = EAngle(lt2, line, delay_anim=True)
+                angles = [EAngle(l, line, delay_anim=True) for l in lines]
             else:
-                at1 = EAngle(line, lt1, delay_anim=True)
-                at2 = EAngle(line, lt2, delay_anim=True)
-            if abs(at2.e_angle - self.e_angle) < mn_scale(1):
-                lt2, lt1 = lt1, lt2
-                at1.e_remove()
-                angle = at2
+                angles = [EAngle(line, l, delay_anim=True) for l in lines]
+
+            def smallest_diff(line_angle):
+                i, _, angle = line_angle
+                return abs(angle.e_angle - self.e_angle)
+
+            final_index, final_line, final_angle = min(zip(range(4), lines, angles), key=smallest_diff)
+
+            if final_index < 2:
+                final_line.e_draw()
+                final_angle.e_draw()
             else:
-                angle = at1
-                at2.e_remove()
-            
-            lt1.e_draw()
-            angle.e_draw()
+                lines[final_index-2].e_draw()
+                final_line.e_draw()
+                final_angle.e_draw()
             
             with self.scene.delayed():
-                for x in (lt2, c2, c3, clone):
+                for x in (*lines, *angles, c2, c3, clone):
+                    if x is final_line:
+                        continue
+                    if x is final_angle:
+                        continue
                     x.e_remove()
-            return lt1, angle
+            return final_line, final_angle
 
 
 class ArcAngle(EAngleBase, mn.Arc):

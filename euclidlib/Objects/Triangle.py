@@ -140,13 +140,13 @@ class ETriangle(EPolygon):
             side1.red()
 
             # Draw a line through triangle point 1, parallel triangle line 2
-            with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2", 16):
+            with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
                 line2 = self.l[1].parallel(self.p[0])
                 line2.blue()
                 point2 = P.EPoint(line2.intersect(side1), label=("P_2", UP))
 
             # Draw a line through triangle point 3, parallel to side 1
-            with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1", 16):
+            with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
                 line3 = side1.parallel(self.p[2])
                 line3.green()
                 point3 = P.EPoint(line3.intersect(line2), label=("P_3", UP))
@@ -176,8 +176,7 @@ class ETriangle(EPolygon):
 
             # copy this parallelogram to the line
             s4 = s1.copy_to_line(line)
-            with self.scene.simultaneous():
-                s1.e_remove()
+            s1.e_remove()
 
             return s4
 

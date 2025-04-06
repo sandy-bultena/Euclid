@@ -11,7 +11,7 @@ from euclidlib.Objects import Triangle as T
 from euclidlib.Objects import Angel
 import math
 from euclidlib.Objects import EquilateralTriangle
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Set
 from euclidlib.Objects.EucidMObject import *
 
 class ELine(EMObject, mn.Line):
@@ -140,21 +140,27 @@ class ELine(EMObject, mn.Line):
     def length_from_start(self, p: P.EPoint):
         return p.distance_to(self.get_start())
 
-    @animate
-    def extend(self, anim: ELine, r: float):
-        if r < 0:
-            return self.prepend(-r)
+    def _extend(self, anim: ELine, r: float):
         self.e_end = self.point(r + self.get_length())
         anim.set_points_by_ends(self.get_start(), self.e_end)
         return self
 
-    @animate
-    def prepend(self, anim: ELine, r: float):
-        if r < 0:
-            return self.extend(r)
+    def _prepend(self, anim: ELine, r: float):
         self.e_start = self.point(-r)
         anim.set_points_by_ends(self.e_start, self.get_end())
         return self
+
+    @animate
+    def extend(self, anim: ELine, r: float):
+        if r < 0:
+            return self._prepend(anim, -r)
+        return self._extend(anim, r)
+
+    @animate
+    def prepend(self, anim: ELine, r: float):
+        if r < 0:
+            return self._extend(anim, -r)
+        return self._prepend(anim, r)
 
     @animate
     def extend_and_prepend(self, anim: ELine, r: float):
@@ -175,6 +181,7 @@ class ELine(EMObject, mn.Line):
         x2, y2, _ = self.point(-r)
         return ELine(self.get_start(), (x2, y2, 0))
 
+    @log
     def copy_to_point(self, target: P.EPoint, speed=1) -> Tuple[ELine, P.EPoint]:
         A = self.get_start()
         B = self.get_end()
@@ -189,7 +196,7 @@ class ELine(EMObject, mn.Line):
             # ------------------------------------------------------------------------
             # If point is already on the line, just make a clone, and return results
             # ------------------------------------------------------------------------
-            if abs(A[0] - C[0]) < 0.1 and abs(A[1] - C[1] < 0.1):
+            if abs(A[0] - C[0]) < mn_scale(0.1) and abs(A[1] - C[1]) < mn_scale(0.1):
                 lCF = self.copy()
                 pF = P.EPoint(C, scene=self.scene)
                 return lCF, pF
@@ -208,9 +215,11 @@ class ELine(EMObject, mn.Line):
                 l['AD'] = t[1].l[2]
                 l['CD'] = t[1].l[1]
             with self.scene.simultaneous():
-                t[1].e_fade()
-                l['AD'].e_normal()
-                l['CD'].e_normal()
+                parts: Dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
+                del parts[id(l['AD'])]
+                del parts[id(l['CD'])]
+                for part in parts.values():
+                    part.e_fade()
 
             def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
                 c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
@@ -227,7 +236,6 @@ class ELine(EMObject, mn.Line):
                     pts = c[circle].intersect(l[line])
                 else:
                     raise Exception("Infinite Loop")
-                l[line].e_fade()
                 return pts
 
             pts = find_extended_intersection(A, B, 'C', 'AD', -1)
@@ -245,9 +253,10 @@ class ELine(EMObject, mn.Line):
             lCF = ELine(C, new_end)
 
             with self.scene.simultaneous():
-                for group in (p, l, c, t):
-                    for obj in group.values():
-                        obj.e_remove()
+                mobjs: Dict[int, EMObject] = {id(x): x for group in (p, l, c) for x in group.values()}
+                mobjs |= {id(x): x for x in t[1].get_e_family()}
+                for obj in mobjs.values():
+                    obj.e_remove()
 
             return lCF, pF
 
@@ -263,12 +272,12 @@ class ELine(EMObject, mn.Line):
             clone = target_line.copy()
             for _ in range(1000):
                 p = c.intersect(clone)
-                if p is not None:
+                if p is not None and len(p):
                     break
                 if target_line.length_from_end(target) > target_line.length_from_start(target):
-                    clone.extend(mn_scale(10))
+                    clone.extend(c.get_radius()/2)
                 else:
-                    clone.prepend(mn_scale(10))
+                    clone.prepend(c.get_radius()/2)
             else:
                 print("Circle didn't intercept!!!\n")
                 with self.scene.simultaneous():
@@ -278,7 +287,7 @@ class ELine(EMObject, mn.Line):
                     clone.e_remove()
                 return lx, px
 
-            np = P.EPoint(p[0])
+            np = P.EPoint(p[0], fill_color=PINK)
             nl = ELine(target, np)
 
             if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
