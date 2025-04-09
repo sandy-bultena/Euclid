@@ -99,8 +99,8 @@ class EMObjectPlayer:
 
     @property
     def _fade_opacity(self):
-        from . import T
-        return DEFAULT_TEXT_FADE_OPACITY if isinstance(self.eobj, T.EStringObj) else DEFAULT_FADE_OPACITY
+        from euclidlib.Objects import Text
+        return DEFAULT_TEXT_FADE_OPACITY if isinstance(self.eobj, Text.EStringObj) else DEFAULT_FADE_OPACITY
 
     @classmethod
     def _properties(cls):
@@ -407,9 +407,9 @@ def {name}(self, *args):
         raise NotImplementedError(f"{self.__class__.__name__}-{other.__class__.__name__} Intersection is Undefined")
 
     def init_label(self, label: str, *args, **extra_args):
-        from . import T
+        from euclidlib.Objects import Text
         if label:
-            return T.Label(label, self, *args, **extra_args)
+            return Text.Label(label, self, *args, **extra_args)
 
     @freezable
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):

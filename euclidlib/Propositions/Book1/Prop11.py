@@ -5,6 +5,7 @@ sys.path.append(os.getcwd())
 from euclidlib.Objects import EquilateralTriangle
 from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
+from typing import Dict
 
 
 class Prop11(Book1Scene):

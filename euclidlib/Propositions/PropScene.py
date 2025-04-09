@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import traceback
 from enum import Enum
 
 from manimlib import *
@@ -283,8 +284,11 @@ class PropScene(InteractiveScene):
         pass
 
     def construct(self) -> None:
-        self.animationCountObject = DecimalNumber(num_decimal_places=0).to_corner(DR)
-        if self.debug:
-            self.add(self.animationCountObject)
-        self.define_steps()
-        self.runFull()
+        try:
+            self.animationCountObject = DecimalNumber(num_decimal_places=0).to_corner(DR)
+            if self.debug:
+                self.add(self.animationCountObject)
+            self.define_steps()
+            self.runFull()
+        except Exception:
+            traceback.print_exc()

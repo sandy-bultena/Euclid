@@ -41,6 +41,8 @@ class OPTIONS(TypedDict):
 
 
 class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
+    MAX_SIZE = 0
+
     def IN(self, v: Vect3):
         center = self.get_center_of_mass()
         direction = center - v
@@ -50,6 +52,24 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         center = self.get_center_of_mass()
         direction = v - center
         return mn.normalize(direction)
+
+    @classmethod
+    def update_size(cls, sizes):
+        if cls.MAX_SIZE >= sizes:
+            return
+        for i in range(cls.MAX_SIZE, sizes):
+            exec(f"""
+def l(self):
+    return self.l[{i}]
+def a(self):
+    return self.a[{i}]
+def p(self):
+    return self.p[{i}]
+setattr(cls, 'l{i}', property(l))
+setattr(cls, 'a{i}', property(a))
+setattr(cls, 'p{i}', property(p))
+            """)
+        cls.MAX_SIZE = sizes
 
     @classmethod
     def assemble(cls,
@@ -123,6 +143,7 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
         self.speed = speed
         self.vertices = [convert_to_coord(p) for p in points]
         self.sides = len(self.vertices)
+        self.update_size(self.sides)
         if _assemble_flag and _lines:
             self.lines: List[L.ELine] = _lines
         else:
@@ -326,6 +347,24 @@ class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
     @property
     def v(self):
         return self.vertices
+
+    if TYPE_CHECKING:
+        l0: L.ELine
+        l1: L.ELine
+        l2: L.ELine
+        l3: L.ELine
+        l4: L.ELine
+        a0: A.EAngleBase
+        a1: A.EAngleBase
+        a2: A.EAngleBase
+        a3: A.EAngleBase
+        a4: A.EAngleBase
+        p0: P.EPoint
+        p1: P.EPoint
+        p2: P.EPoint
+        p3: P.EPoint
+        p4: P.EPoint
+
 
     def replace_line(self, index, newline: L.ELine):
         self.lines[index].e_delete()

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from enum import Enum
+from itertools import pairwise
 
 from manimlib import *
 from typing import Callable
@@ -31,29 +32,33 @@ class BookScene(PropScene):
     TOC: List[str]
 
     @staticmethod
-    def extract_lines(lines: Dict[str, ELine], triangles: Dict[str, EPolygon], label: str):
+    def extract_lines(lines: Dict[str, ELine], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+        tri_name = tri_name or label
         label2 = label + label[0]
-        for l_label, line in zip(pairwise(label2), triangles[label].l):
+        for l_label, line in zip(pairwise(label2), triangles[tri_name].l):
             lines[op.add(*l_label)] = line
 
     @staticmethod
-    def extract_points(points: Dict[str, EPoint], triangles: Dict[str, EPolygon], label: str):
-        for p_label, point in zip(label, triangles[label].p):
+    def extract_points(points: Dict[str, EPoint], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+        tri_name = tri_name or label
+        for p_label, point in zip(label, triangles[tri_name].p):
             points[p_label] = point
 
     @staticmethod
-    def extract_angles(angles: Dict[str, EAngleBase], triangles: Dict[str, EPolygon], label: str):
+    def extract_angles(angles: Dict[str, EAngleBase], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+        tri_name = tri_name or label
         label2 = label[-1] + label + label[0]
-        for i, angle in enumerate(triangles[label].a):
+        for i, angle in enumerate(triangles[tri_name].a):
             if angle is not None:
                 angles[label2[i:i+3]] = angle
 
 
     @staticmethod
-    def extract_all(lines, points, angles, triangles, label):
-        BookScene.extract_lines(lines, triangles, label)
-        BookScene.extract_points(points, triangles, label)
-        BookScene.extract_angles(angles, triangles, label)
+    def extract_all(lines, points, angles, triangles, label, tri_name=None):
+        tri_name = tri_name or label
+        BookScene.extract_lines(lines, triangles, label, tri_name)
+        BookScene.extract_points(points, triangles, label, tri_name)
+        BookScene.extract_angles(angles, triangles, label, tri_name)
 
 
     def title_page(self):
@@ -174,12 +179,54 @@ class Book1Scene(BookScene):
     ]
 
     def title_page(self):
-        super().title_page()
-
         title_box = TextBox(mn_scale(0, 100, 0),
                             line_width=mn_h_scale(550),
                             alignment='w'
                             )
-        title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
-                        "you were not born to be a scientific thinker.", write_simultaneous=True)
-        title_box.explain("-Albert Einstein")
+        with self.simultaneous():
+            super().title_page()
+            title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
+                            "you were not born to be a scientific thinker.", font_size=64, write_simultaneous=True)
+            title_box.explain("-Albert Einstein", font_size=32)
+
+            top = 400
+            bot = top + 100
+            left = 945
+            right = 75 + left
+            A_base = np.array([right, top, 0])
+            B_base = np.array([left, bot, 0])
+
+            side = -1 * (B_base[0] - A_base[0]) / (bot - top)
+            b = A_base[1] - side * A_base[0]
+            C_base = np.array([(1 / side) * (bot - b), bot, 0])
+
+            A = mn_coord(*A_base)
+            B = mn_coord(*B_base)
+            C = mn_coord(*C_base)
+
+            tABC = ETriangle('ABC', point_labels='ABC', angles=' ')
+            sB = ESquare(B, A, point_labels=['F', None, None, 'G'])
+            sA = ESquare(A, C, point_labels=['H', None, None, 'K'])
+            sC = ESquare(C, B, point_labels=['E', None, None, 'D'])
+
+            sABD = ETriangle.assemble(lines=[tABC.l0, sC.l2, EDashedLine(A, sC.p3)])
+            sFBC = ETriangle.assemble(lines=[sB.l0, tABC.l1, EDashedLine(sB.p0, C)])
+            sBCK = ETriangle.assemble(lines=[tABC.l1, sA.l2, EDashedLine(B, sA.p3)])
+            sECA = ETriangle.assemble(lines=[sC.l0, tABC.l2, EDashedLine(A, sC.p0)])
+
+            with self.pause_animations_for():
+                lAlx = sC.l2.parallel(tABC.p0)
+            pL = EPoint(lAlx.intersect(sC.l3), label=('L', DOWN))
+
+            sBDL = EParallelogram(B, sC.p3, pL)
+            sCEL = EParallelogram(C, sC.p0, pL)
+
+            sA.e_fill(GREEN)
+            sCEL.e_fill(GREEN)
+            sECA.e_fill(GREEN_D)
+            sBCK.e_fill(GREEN_D)
+
+            sB.e_fill(BLUE)
+            sBDL.e_fill(BLUE)
+            sABD.e_fill(BLUE_D)
+            sFBC.e_fill(BLUE_D)

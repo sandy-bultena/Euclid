@@ -5,6 +5,7 @@ sys.path.append(os.getcwd())
 
 from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
+from typing import Dict
 
 
 class Prop16(Book1Scene):

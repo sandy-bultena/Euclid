@@ -4,6 +4,7 @@ import os
 sys.path.append(os.getcwd())
 from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
+from typing import Dict
 
 
 class Book1Prop4(Book1Scene):

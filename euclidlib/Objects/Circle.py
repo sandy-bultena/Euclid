@@ -102,9 +102,9 @@ class ECircle(EMObject, mn.Circle):
 
         x0, y0, _ = other.get_start()
         x1, y1, _ = other.get_end()
-        m = other.get_slope()
+        m = other.get_e_slope()
 
-        if abs(m) < 1e90:
+        if not math.isinf(m):
             # math:
             # circle eq'n: (x-$x)^2 + (y-$y)^2 = $r^2
             # line eq'n:   y = mx+b, (b = $y1 - $m * $x1)
@@ -155,9 +155,9 @@ class ECircle(EMObject, mn.Circle):
         epsilon = mn_scale(1)
 
         if min_x - epsilon <= x3 <= max_x + epsilon and min_y - epsilon <= y3 < max_y + epsilon:
-            results.append((x3, y3, 0))
+            results.append(np.array((x3, y3, 0)))
         if min_x - epsilon <= x4 <= max_x + epsilon and min_y - epsilon <= y4 < max_y + epsilon:
-            results.append((x4, y4, 0))
+            results.append(np.array((x4, y4, 0)))
 
         return results
 

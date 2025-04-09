@@ -116,8 +116,8 @@ class ELine(EMObject, mn.Line):
     def intersect_line(self, l2: mn.Line):
         (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
         (x10, y10, _), (x11, y11, _) = l2.get_start_and_end()
-        m1 = self.get_slope()
-        m2 = l2.get_slope()
+        m1 = self.get_e_slope()
+        m2 = l2.get_e_slope()
 
         if abs(m1 - m2) < 0.1:
             return
@@ -139,6 +139,17 @@ class ELine(EMObject, mn.Line):
 
     def length_from_start(self, p: P.EPoint):
         return p.distance_to(self.get_start())
+
+    def get_e_slope(self) -> float:
+        (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
+        if abs(x2 - x1) < mn_scale(0.01):
+            if abs(y2 - y1) < mn_scale(0.01):
+                return math.nan
+            if y2 > y1:
+                return math.inf
+            return -math.inf
+
+        return (y2-y1)/(x2-x1)
 
     def _extend(self, anim: ELine, r: float):
         self.e_end = self.point(r + self.get_length())
@@ -165,8 +176,8 @@ class ELine(EMObject, mn.Line):
     @animate
     def extend_and_prepend(self, anim: ELine, r: float):
         r = abs(r)
-        self.e_start = self.point(-r)
         self.e_end = self.point(r + self.get_length())
+        self.e_start = self.point(-r)
         anim.set_points_by_ends(self.e_start, self.e_end)
         return self
 
@@ -336,6 +347,7 @@ class ELine(EMObject, mn.Line):
 
         return pt
 
+    @log
     def _perp_off_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1):
         with self.scene.animation_speed(speed):
             A, B = self.get_start_and_end()
@@ -371,12 +383,11 @@ class ELine(EMObject, mn.Line):
                 l.e_remove()
         return lfinal
 
-        pass
-
+    @log
     def _perp_on_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1, inside=False):
         with self.scene.animation_speed(speed):
             A, B = self.get_start_and_end()
-            C = p.get_center()
+            C = self.pointify(p)
             l: Dict[str, ELine] = {}
             p: Dict[str, P.EPoint] = {}
             c: Dict[str, Circle.ECircle] = {}
@@ -417,7 +428,6 @@ class ELine(EMObject, mn.Line):
                     l1.e_delete()
                 else:
                     raise ArithmeticError(f"Bad Angles {a1=} and {a2=}")
-
                 l['CF'].e_draw()
             else:
                 l['CF'] = ELine(C, pts[int(inside)])
@@ -484,9 +494,89 @@ class ELine(EMObject, mn.Line):
 
             return lEA
 
+    def dashed(self):
+        dd = EDashedLine(*self.get_start_and_end(),
+                         skip_anim=True,
+                         stroke_color=self.get_stroke_color(),
+                         stroke_width=float(self.get_stroke_width()),
+                         stroke_opacity=float(self.get_stroke_opacity()))
+        self.scene.play(mn.FadeOut(self))
+        return dd
+
+    def dashed_copy(self):
+        dd = EDashedLine(*self.get_start_and_end(),
+                         skip_anim=True,
+                         stroke_color=self.get_stroke_color(),
+                         stroke_width=float(self.get_stroke_width()),
+                         stroke_opacity=float(self.get_stroke_opacity()))
+        return dd
+
 
 class EDashedLine(ELine, mn.DashedLine):
-    pass
+    def __init__(self, *args, dash_length=mn.DEFAULT_DASH_LENGTH, positive_space_ratio=0.5, **kwargs):
+        self.dash_length = dash_length
+        self.positive_space_ratio = positive_space_ratio
+        super().__init__(*args, dash_length=dash_length, positive_space_ratio=positive_space_ratio, **kwargs)
+
+
+    def get_start_and_end(self) -> tuple[Vect3, Vect3]:
+        return self.get_start(), self.get_end()
+
+
+    def set_points_by_ends(self,
+        start: Vect3,
+        end: Vect3,
+        buff: float = 0,
+        path_arc: float = 0):
+        if len(self.submobjects) == 0:
+            return mn.Line.set_points_by_ends(self, start, end, buff, path_arc)
+
+        ref = mn.DashedLine(start, end,
+                            stroke_color=self.get_stroke_color(),
+                            stroke_width=float(self.get_stroke_width()),
+                            stroke_opacity=float(self.get_stroke_opacity()))
+        self.become(ref)
+        return self
+
+
+    def calculate_num_dashes(self, dash_length: float, positive_space_ratio: float, length=0) -> int:
+        length = length or self.get_length()
+        try:
+            full_length = dash_length / positive_space_ratio
+            return int(np.ceil(length / full_length))
+        except ZeroDivisionError:
+            return 1
+
+
+    def _extend(self, anim: ELine, r: float):
+        self.e_end = self.point(r + self.get_length())
+        anim.set_points_by_ends(self.get_start(), self.e_end)
+        return self
+
+    def _prepend(self, anim: ELine, r: float):
+        self.e_start = self.point(-r)
+        anim.set_points_by_ends(self.e_start, self.get_end())
+        return self
+
+    @animate
+    def extend(self, anim: ELine, r: float):
+        if r < 0:
+            return self._prepend(anim, -r)
+        return self._extend(anim, r)
+
+    @animate
+    def prepend(self, anim: ELine, r: float):
+        if r < 0:
+            return self._extend(anim, -r)
+        return self._prepend(anim, r)
+
+    @animate
+    def extend_and_prepend(self, anim: ELine, r: float):
+        r = abs(r)
+        self.e_end = self.point(r + self.get_length())
+        self.e_start = self.point(-r)
+        anim.set_points_by_ends(self.e_start, self.e_end)
+        return self
 
 
 class VirtualLine(ELine):
