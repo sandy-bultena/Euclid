@@ -21,7 +21,7 @@ class ESquare(Parallelogram.EParallelogram):
 
         with self.scene.pause_animations_for(True):
             l2 = Line.VirtualLine(*points)
-            l11 = l2.perpendicular(points[0])
+            l11 = l2.perpendicular(points[0], speed=0)
             c = Circle.ECircle(*points)
             p1 = Point.EPoint(c.intersect(l11)[0])
 

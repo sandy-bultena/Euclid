@@ -123,62 +123,58 @@ class ETriangle(EPolygon):
         return xy1, coord, next
 
     @log
-    def parallelogram(self, angle: A.EAngleBase, /, speed=-1):
-        with self.scene.animation_speed(speed) as draw:
-            point = self.l[1].bisect()
-            point.add_label('P_1', UP)
-            l = L.ELine(self.p[1], self.p[2])
-            l.e_fade()
-            l1, l2 = l.e_split(point)
-            with self.scene.simultaneous():
-                l1.red()
-                l2.blue()
+    @anim_speed
+    def parallelogram(self, angle: A.EAngleBase):
+        point = self.l[1].bisect(speed=0)
+        point.add_label('P_1', UP)
+        l = L.ELine(self.p[1], self.p[2])
+        l.e_fade()
+        l1, l2 = l.e_split(point)
+        with self.scene.simultaneous():
+            l1.red()
+            l2.blue()
 
-            # Copy angle onto 2nd triangle line EC at bisect point
-            side1, angle2 = angle.copy_to_line(point, l2)
-            side1.extend(mn_scale(100))
-            side1.red()
+        # Copy angle onto 2nd triangle line EC at bisect point
+        side1, angle2 = angle.copy_to_line(point, l2, speed=0)
+        side1.extend(mn_scale(100))
+        side1.red()
 
-            # Draw a line through triangle point 1, parallel triangle line 2
-            with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
-                line2 = self.l[1].parallel(self.p[0])
-                line2.blue()
-                point2 = P.EPoint(line2.intersect(side1), label=("P_2", UP))
+        # Draw a line through triangle point 1, parallel triangle line 2
+        with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
+            line2 = self.l[1].parallel(self.p[0], speed=0)
+            line2.blue()
+            point2 = P.EPoint(line2.intersect(side1), label=("P_2", UP))
 
-            # Draw a line through triangle point 3, parallel to side 1
-            with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
-                line3 = side1.parallel(self.p[2])
-                line3.green()
-                point3 = P.EPoint(line3.intersect(line2), label=("P_3", UP))
+        # Draw a line through triangle point 3, parallel to side 1
+        with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
+            line3 = side1.parallel(self.p[2], speed=0)
+            line3.green()
+            point3 = P.EPoint(line3.intersect(line2), label=("P_3", UP))
 
-            # construct polygon
-            poly = Para.EParallelogram(point2, point, self.p[2], point3)
+        # construct polygon
+        poly = Para.EParallelogram(point2, point, self.p[2], point3)
 
-            with self.scene.simultaneous():
-                side1.e_remove()
-                line2.e_remove()
-                line3.e_remove()
-                l1.e_remove()
-                l2.e_remove()
-                point.e_remove()
-                point2.e_remove()
-                point3.e_remove()
+        with self.scene.simultaneous():
+            side1.e_remove()
+            line2.e_remove()
+            line3.e_remove()
+            l1.e_remove()
+            l2.e_remove()
+            point.e_remove()
+            point2.e_remove()
+            point3.e_remove()
 
-            draw += [poly, angle2]
-
-            return poly, angle2
+        return poly, angle2
 
     @log
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=-1):
-        with self.scene.animation_speed(speed) as draw:
-            # create parallelogram equal in size to triangle (I.42)
-            s1, a2 = self.parallelogram(angle)
-            # s1.e_fade()
-            a2.e_remove()
+    @anim_speed
+    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
+        # create parallelogram equal in size to triangle (I.42)
+        s1, a2 = self.parallelogram(angle, speed=0)
+        a2.e_remove()
 
-            # copy this parallelogram to the line
-            s4 = s1.copy_to_line(line)
-            s1.e_remove()
-            draw.append(s4)
-            return s4
+        # copy this parallelogram to the line
+        s4 = s1.copy_to_line(line, speed=0)
+        s1.e_remove()
+        return s4
 

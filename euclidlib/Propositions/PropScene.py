@@ -214,9 +214,11 @@ class PropScene(InteractiveScene):
             self.animationSpeedStack.append(run_time)
             yield []
             self.animationSpeedStack.pop()
-        else:
+        elif run_time < 0:
             with self.pause_animations_for() as l:
                 yield l
+        else:
+            yield []
 
 
     @contextmanager

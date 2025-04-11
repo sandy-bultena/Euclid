@@ -199,7 +199,8 @@ class ELine(EMObject, mn.Line):
         return ELine(self.get_start(), (x2, y2, 0))
 
     @log
-    def copy_to_point(self, target: P.EPoint, speed=-1) -> Tuple[ELine, P.EPoint]:
+    @anim_speed
+    def copy_to_point(self, target: P.EPoint) -> Tuple[ELine, P.EPoint]:
         A = self.get_start()
         B = self.get_end()
         C = self.pointify(target)
@@ -209,117 +210,114 @@ class ELine(EMObject, mn.Line):
         c: Dict[str | int, Circle.ECircle] = {}
         t: Dict[str | int, T.ETriangle] = {}
 
-        with self.scene.animation_speed(speed) as draw:
-            # ------------------------------------------------------------------------
-            # If point is already on the line, just make a clone, and return results
-            # ------------------------------------------------------------------------
-            if abs(A[0] - C[0]) < mn_scale(0.1) and abs(A[1] - C[1]) < mn_scale(0.1):
-                lCF = self.copy()
-                pF = P.EPoint(C, scene=self.scene)
-                return lCF, pF
-
-            # ------------------------------------------------------------------------
-            # Copy the line to the new point using methods from proposition 2
-            # ------------------------------------------------------------------------
-
-            # join the two lines
-            l['AC'] = ELine(A, C, scene=self.scene).e_fade()
-
-            # construct equilateral on above line (D = apex of triangle)
-            t[1] = EquilateralTriangle.build(A, C)
-            p['D'] = t[1].p[-1]
-            with self.scene.simultaneous():
-                l['AD'] = t[1].l[2]
-                l['CD'] = t[1].l[1]
-            with self.scene.simultaneous():
-                parts: Dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
-                del parts[id(l['AD'])]
-                del parts[id(l['CD'])]
-                for part in parts.values():
-                    part.e_fade()
-
-            def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
-                c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
-                pts = c[circle].intersect(l[line])
-                self.add(l[line])
-                for _ in range(15):
-                    if pts and not find_min:
-                        break
-                    if pts and find_min:
-                        minim = min(abs(self.get_length() - mn.get_dist(a, C)) for a in pts)
-                        if minim < mn_scale(0.1):
-                            break
-                    l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
-                    pts = c[circle].intersect(l[line])
-                else:
-                    raise Exception("Infinite Loop")
-                return pts
-
-            pts = find_extended_intersection(A, B, 'C', 'AD', -1)
-
-            p['E'] = P.EPoint(pts[0], scene=self.scene)
-            p['B'] = P.EPoint(B, scene=self.scene)
-
-            if p['D'].distance_to(pts[0]) > mn_scale(1):
-                F = find_extended_intersection(p['D'], p['E'], 'D', 'CD', find_min=True)
-            else:
-                F = [p['E'].get_center()]
-
-            new_end = min(F, key=lambda a: abs(self.get_length() - mn.get_dist(a, C)))
-            pF = P.EPoint(new_end)
-            lCF = ELine(C, new_end)
-
-            with self.scene.simultaneous():
-                mobjs: Dict[int, EMObject] = {id(x): x for group in (p, l, c) for x in group.values()}
-                mobjs |= {id(x): x for x in t[1].get_e_family()}
-                for obj in mobjs.values():
-                    obj.e_remove()
-            draw += lCF, pF
+        # ------------------------------------------------------------------------
+        # If point is already on the line, just make a clone, and return results
+        # ------------------------------------------------------------------------
+        if abs(A[0] - C[0]) < mn_scale(0.1) and abs(A[1] - C[1]) < mn_scale(0.1):
+            lCF = self.copy()
+            pF = P.EPoint(C, scene=self.scene)
             return lCF, pF
 
+        # ------------------------------------------------------------------------
+        # Copy the line to the new point using methods from proposition 2
+        # ------------------------------------------------------------------------
+
+        # join the two lines
+        l['AC'] = ELine(A, C, scene=self.scene).e_fade()
+
+        # construct equilateral on above line (D = apex of triangle)
+        t[1] = EquilateralTriangle.build(A, C)
+        p['D'] = t[1].p[-1]
+        with self.scene.simultaneous():
+            l['AD'] = t[1].l[2]
+            l['CD'] = t[1].l[1]
+        with self.scene.simultaneous():
+            parts: Dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
+            del parts[id(l['AD'])]
+            del parts[id(l['CD'])]
+            for part in parts.values():
+                part.e_fade()
+
+        def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
+            c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
+            pts = c[circle].intersect(l[line])
+            self.add(l[line])
+            for _ in range(15):
+                if pts and not find_min:
+                    break
+                if pts and find_min:
+                    minim = min(abs(self.get_length() - mn.get_dist(a, C)) for a in pts)
+                    if minim < mn_scale(0.1):
+                        break
+                l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
+                pts = c[circle].intersect(l[line])
+            else:
+                raise Exception("Infinite Loop")
+            return pts
+
+        pts = find_extended_intersection(A, B, 'C', 'AD', -1)
+
+        p['E'] = P.EPoint(pts[0], scene=self.scene)
+        p['B'] = P.EPoint(B, scene=self.scene)
+
+        if p['D'].distance_to(pts[0]) > mn_scale(1):
+            F = find_extended_intersection(p['D'], p['E'], 'D', 'CD', find_min=True)
+        else:
+            F = [p['E'].get_center()]
+
+        new_end = min(F, key=lambda a: abs(self.get_length() - mn.get_dist(a, C)))
+        pF = P.EPoint(new_end)
+        lCF = ELine(C, new_end)
+
+        with self.scene.simultaneous():
+            mobjs: Dict[int, EMObject] = {id(x): x for group in (p, l, c) for x in group.values()}
+            mobjs |= {id(x): x for x in t[1].get_e_family()}
+            for obj in mobjs.values():
+                obj.e_remove()
+        return lCF, pF
+
     @log
-    def copy_to_line(self, target: P.EPoint, target_line: ELine, speed=-1):
-        lx, px = self.copy_to_point(target, speed=speed)
+    @anim_speed
+    def copy_to_line(self, target: P.EPoint, target_line: ELine):
+        lx, px = self.copy_to_point(target, speed=0)
         if lx is None or px is None:
             return
 
-        with self.scene.animation_speed(speed) as draw:
-            c = Circle.ECircle(target, lx.get_end())
+        c = Circle.ECircle(target, lx.get_end())
 
-            clone = target_line.copy()
-            for _ in range(1000):
-                p = c.intersect(clone)
-                if p is not None and len(p):
-                    break
-                if target_line.length_from_end(target) > target_line.length_from_start(target):
-                    clone.extend(c.get_radius()/2)
-                else:
-                    clone.prepend(c.get_radius()/2)
+        clone = target_line.copy()
+        for _ in range(1000):
+            p = c.intersect(clone)
+            if p is not None and len(p):
+                break
+            if target_line.length_from_end(target) > target_line.length_from_start(target):
+                clone.extend(c.get_radius()/2)
             else:
-                print("Circle didn't intercept!!!\n")
-                with self.scene.simultaneous():
-                    px.e_remove()
-                    lx.blue()
-                    c.e_remove()
-                    clone.e_remove()
-                return lx, px
-
-            np = P.EPoint(p[0], fill_color=PINK)
-            nl = ELine(target, np)
-
-            if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
-                np.e_remove()
-                nl.extend(self.get_length() - nl.get_length())
-                np = P.EPoint(nl.get_end())
-
+                clone.prepend(c.get_radius()/2)
+        else:
+            print("Circle didn't intercept!!!\n")
             with self.scene.simultaneous():
                 px.e_remove()
-                lx.e_remove()
+                lx.blue()
                 c.e_remove()
-                if clone.in_scene():
-                    clone.e_remove()
-            draw += [nl, np]
-            return nl, np
+                clone.e_remove()
+            return lx, px
+
+        np = P.EPoint(p[0], fill_color=PINK)
+        nl = ELine(target, np)
+
+        if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
+            np.e_remove()
+            nl.extend(self.get_length() - nl.get_length())
+            np = P.EPoint(nl.get_end())
+
+        with self.scene.simultaneous():
+            px.e_remove()
+            lx.e_remove()
+            c.e_remove()
+            if clone.in_scene():
+                clone.e_remove()
+        return nl, np
 
     def e_rotate_to(self, angle: float):
         theta = angle - self.get_angle()
@@ -337,116 +335,113 @@ class ELine(EMObject, mn.Line):
         self.e_delete()
         return lines
 
-    def bisect(self, speed=1):
+    @anim_speed
+    def bisect(self):
         cls = type(self)
-        with self.scene.animation_speed(speed) as draw:
-            c1 = Circle.ECircle(*self.get_start_and_end()[::-1]).e_fade()
-            c2 = Circle.ECircle(*self.get_start_and_end()).e_fade()
-            pts = c1.intersect(c2)
-            l = cls(*pts).e_fade()
+        c1 = Circle.ECircle(*self.get_start_and_end()[::-1]).e_fade()
+        c2 = Circle.ECircle(*self.get_start_and_end()).e_fade()
+        pts = c1.intersect(c2)
+        l = cls(*pts).e_fade()
 
-            pt = P.EPoint(l.intersect(self))
-            with self.scene.simultaneous():
-                c1.e_remove()
-                c2.e_remove()
-                l.e_remove()
-            draw.append(pt)
+        pt = P.EPoint(l.intersect(self))
+        with self.scene.simultaneous():
+            c1.e_remove()
+            c2.e_remove()
+            l.e_remove()
         return pt
 
     @log
-    def _perp_off_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1):
-        with self.scene.animation_speed(speed) as draw:
-            A, B = self.get_start_and_end()
-            C = self.pointify(p)
-            p: Dict[str, P.EPoint] = {}
-            c: Dict[str, C.ECircle] = {}
-            l: ELine = self.copy().e_fade()
-            l.extend_and_prepend(mn_scale(40))
+    @anim_speed
+    def _perp_off_line(self, p: P.EPoint, dist_end: float, dist_start: float):
+        A, B = self.get_start_and_end()
+        C = self.pointify(p)
+        p: Dict[str, P.EPoint] = {}
+        c: Dict[str, C.ECircle] = {}
+        l: ELine = self.copy().e_fade()
+        l.extend_and_prepend(mn_scale(40))
 
-            # draw a circle with the lesser of $re,$rs as the radius
-            radius = min(dist_end, dist_start)
-            c['C'] = Circle.ECircle(C, C + RIGHT * (radius + mn_scale(10)))
+        # draw a circle with the lesser of $re,$rs as the radius
+        radius = min(dist_end, dist_start)
+        c['C'] = Circle.ECircle(C, C + RIGHT * (radius + mn_scale(10)))
 
-            # define two points equidistance from our initial point
-            for num in range(0, 10):
-                pts = c['C'].intersect(l)
-                if len(pts) == 2:
-                    break
-                l.extend_and_prepend(mn_scale(100))
+        # define two points equidistance from our initial point
+        for num in range(0, 10):
+            pts = c['C'].intersect(l)
+            if len(pts) == 2:
+                break
+            l.extend_and_prepend(mn_scale(100))
 
-            p['D'] = P.EPoint(pts[0])
-            p['E'] = P.EPoint(pts[1])
-            c['C'].e_remove()
+        p['D'] = P.EPoint(pts[0])
+        p['E'] = P.EPoint(pts[1])
+        c['C'].e_remove()
 
-            lb = ELine(*pts).e_fade()
-            pb = lb.bisect()
-            lfinal = ELine(C, pb)
-            with self.scene.simultaneous():
-                p['D'].e_remove()
-                p['E'].e_remove()
-                lb.e_remove()
-                pb.e_remove()
-                l.e_remove()
-            draw.append(lfinal)
+        lb = ELine(*pts).e_fade()
+        pb = lb.bisect(speed=0)
+        lfinal = ELine(C, pb)
+        with self.scene.simultaneous():
+            p['D'].e_remove()
+            p['E'].e_remove()
+            lb.e_remove()
+            pb.e_remove()
+            l.e_remove()
         return lfinal
 
     @log
-    def _perp_on_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1, inside=False):
-        with self.scene.animation_speed(speed) as draw:
-            A, B = self.get_start_and_end()
-            C = self.pointify(p)
-            l: Dict[str, ELine] = {}
-            p: Dict[str, P.EPoint] = {}
-            c: Dict[str, Circle.ECircle] = {}
-            ln: ELine = self.copy().e_fade()
+    @anim_speed
+    def _perp_on_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, inside=False):
+        A, B = self.get_start_and_end()
+        C = self.pointify(p)
+        l: Dict[str, ELine] = {}
+        p: Dict[str, P.EPoint] = {}
+        c: Dict[str, Circle.ECircle] = {}
+        ln: ELine = self.copy().e_fade()
 
-            radius = max(dist_start, dist_end)
-            ln.extend(dist_start - dist_end)
-            c['C'] = Circle.ECircle(C, C + RIGHT * radius)
+        radius = max(dist_start, dist_end)
+        ln.extend(dist_start - dist_end)
+        c['C'] = Circle.ECircle(C, C + RIGHT * radius)
 
-            # define two points equidistance from our initial point
-            pts = c['C'].intersect(ln)
-            p['D'] = P.EPoint(pts[0])
-            p['E'] = P.EPoint(pts[1])
+        # define two points equidistance from our initial point
+        pts = c['C'].intersect(ln)
+        p['D'] = P.EPoint(pts[0])
+        p['E'] = P.EPoint(pts[1])
 
-            c['C'].e_remove()
+        c['C'].e_remove()
 
-            # find 3rd point of equilateral triangle, without drawing lines
-            c1 = Circle.ECircle(p['D'], p['E'])
-            c2 = Circle.ECircle(p['E'], p['D'])
-            pts = c1.intersect(c2)
+        # find 3rd point of equilateral triangle, without drawing lines
+        c1 = Circle.ECircle(p['D'], p['E'])
+        c2 = Circle.ECircle(p['E'], p['D'])
+        pts = c1.intersect(c2)
 
-            # if point is at either end of the line, check for positive/negative
-            # options, otherwise go with defaults;
-            if mn.get_norm(A - C) < mn_scale(.1) or mn.get_norm(B - C) < mn_scale(.1):
-                l1 = ELine(C, pts[1], delay_anim=True)
-                l2 = ELine(C, pts[0], delay_anim=True)
-                a1 = Angel.calculateAngle(self, l1)
-                a2 = Angel.calculateAngle(self, l2)
+        # if point is at either end of the line, check for positive/negative
+        # options, otherwise go with defaults;
+        if mn.get_norm(A - C) < mn_scale(.1) or mn.get_norm(B - C) < mn_scale(.1):
+            l1 = ELine(C, pts[1], delay_anim=True)
+            l2 = ELine(C, pts[0], delay_anim=True)
+            a1 = Angel.calculateAngle(self, l1)
+            a2 = Angel.calculateAngle(self, l2)
 
-                if inside:
-                    l2, l1 = l1, l2
+            if inside:
+                l2, l1 = l1, l2
 
-                if abs(a1 - PI/2) < 0.1 * DEGREES:
-                    l['CF'] = l1
-                    l2.e_delete()
-                elif abs(a2 - PI/2) < 0.1 * DEGREES:
-                    l['CF'] = l2
-                    l1.e_delete()
-                else:
-                    raise ArithmeticError(f"Bad Angles {a1=} and {a2=}")
-                l['CF'].e_draw()
+            if abs(a1 - PI/2) < 0.1 * DEGREES:
+                l['CF'] = l1
+                l2.e_delete()
+            elif abs(a2 - PI/2) < 0.1 * DEGREES:
+                l['CF'] = l2
+                l1.e_delete()
             else:
-                l['CF'] = ELine(C, pts[int(inside)])
+                raise ArithmeticError(f"Bad Angles {a1=} and {a2=}")
+            l['CF'].e_draw()
+        else:
+            l['CF'] = ELine(C, pts[int(inside)])
 
-            with self.scene.simultaneous():
-                p['D'].e_remove()
-                p['E'].e_remove()
-                c1.e_remove()
-                c2.e_remove()
-                ln.e_remove()
-            draw.append(l['CF'])
-            return l['CF']
+        with self.scene.simultaneous():
+            p['D'].e_remove()
+            p['E'].e_remove()
+            c1.e_remove()
+            c2.e_remove()
+            ln.e_remove()
+        return l['CF']
 
     def perpendicular(self, p: P.EPoint, /, speed=-1, inside=False):
         rs = mn.get_norm(self.pointify(p) - self.get_start())
@@ -456,7 +451,8 @@ class ELine(EMObject, mn.Line):
         return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
 
     @log
-    def parallel(self, p: P.EPoint, /, speed=-1):
+    @anim_speed
+    def parallel(self, p: P.EPoint):
         B, C = self.get_start_and_end()
         A = self.pointify(p)
 
@@ -464,44 +460,42 @@ class ELine(EMObject, mn.Line):
         if B[0] > C[0]:
             B, C = C, B
 
-        with self.scene.animation_speed(speed) as draw:
-            with self.scene.trace(self, "define a new line"):
-                tempC = C
-                if mn.get_dist(B, C) < mn_scale(100):
-                    tempC = C + mn.normalize(C - B) * mn_scale(100)
-                ln = ELine(B, tempC, stroke_color=GREEN)
+        with self.scene.trace(self, "define a new line"):
+            tempC = C
+            if mn.get_dist(B, C) < mn_scale(100):
+                tempC = C + mn.normalize(C - B) * mn_scale(100)
+            ln = ELine(B, tempC, stroke_color=GREEN)
 
-            # is point on the line?
-            rs = self.length_from_start(p)
-            re = self.length_from_end(p)
-            if abs(rs + re - self.get_length()) < mn_scale(0.1):
-                clone = self.copy()
-                ln.e_remove()
-                return clone
+        # is point on the line?
+        rs = self.length_from_start(p)
+        re = self.length_from_end(p)
+        if abs(rs + re - self.get_length()) < mn_scale(0.1):
+            clone = self.copy()
+            ln.e_remove()
+            return clone
 
-            with self.scene.trace(ln ,"create point D on the line"):
-                pD = P.EPoint(ln.point_from_proportion(0.5))
-                lBD, lDC = ln.e_split(pD)
-                lAD = ELine(A, pD, stroke_color=BLUE)
+        with self.scene.trace(ln ,"create point D on the line"):
+            pD = P.EPoint(ln.point_from_proportion(0.5))
+            lBD, lDC = ln.e_split(pD)
+            lAD = ELine(A, pD, stroke_color=BLUE)
 
-            with self.scene.trace(mn.VGroup(lDC, lAD) ,"copy angle"):
-                aADC = Angel.EAngle(lDC, lAD)
-                lEA, angle = aADC.copy_to_line(p, lAD, negative=True)
-            with self.scene.trace(lEA ,"extend the line"):
-                lEA.prepend(mn_scale(200))
+        with self.scene.trace(mn.VGroup(lDC, lAD) ,"copy angle"):
+            aADC = Angel.EAngle(lDC, lAD)
+            lEA, angle = aADC.copy_to_line(p, lAD, negative=True, speed=0)
+        with self.scene.trace(lEA ,"extend the line"):
+            lEA.prepend(mn_scale(200))
 
-            #cleanup
-            with self.scene.delayed():
-                aADC.e_remove()
-                angle.e_remove()
-                pD.e_remove()
-                lAD.e_remove()
-                lDC.e_remove()
-                lBD.e_remove()
-                ln.e_remove()
+        #cleanup
+        with self.scene.delayed():
+            aADC.e_remove()
+            angle.e_remove()
+            pD.e_remove()
+            lAD.e_remove()
+            lDC.e_remove()
+            lBD.e_remove()
+            ln.e_remove()
 
-            draw.append(lEA)
-            return lEA
+        return lEA
 
     def dashed(self):
         dd = EDashedLine(*self.get_start_and_end(),

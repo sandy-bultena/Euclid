@@ -73,7 +73,7 @@ class EParallelogram(Polygon.EPolygon):
             self.set_angles(None, " ", None)
             flag += 1
 
-        l2, a2 = self.a[1].copy_to_line(point2, l1, negative=True)
+        l2, a2 = self.a[1].copy_to_line(point2, l1, negative=True, speed=0)
         if flag:
             self.a[1].e_remove()
         l2.e_fade()
@@ -81,7 +81,7 @@ class EParallelogram(Polygon.EPolygon):
         # copy line 2
         l2.extend(self.l[1].get_length())
         l2.e_fade()
-        nl2, np3 = self.l[1].copy_to_line(point2, l2)
+        nl2, np3 = self.l[1].copy_to_line(point2, l2, speed=0)
         l2.e_remove()
 
         coords = [point1.get_center(), point2.get_center(), np3.get_center()]
@@ -94,34 +94,33 @@ class EParallelogram(Polygon.EPolygon):
         return parall
 
     @log
-    def copy_to_line(self, line: Line.ELine, /, speed=-1):
-        with self.scene.animation_speed(speed) as draw:
-            with self.scene.trace(self.l[2], "extend 3rd line"):
-                t1 = self.l[2].copy().prepend(line.get_length() + mn_scale(50))
-                t2, _ = t1.e_split(self.p[2])
-                _.e_remove()
-                with self.scene.simultaneous():
-                    t1.e_fade()
-
-            with self.scene.trace(line, "copy line to our extension"):
-                l4, p4 = line.copy_to_line(self.p[2], t2)
-                l4.red()
-                t2.e_remove()
-                p4.e_remove()
-
-
-            with self.scene.trace(self, "create the complement with the given line at point 3", font_size=18):
-                x = self._create_complement(l4)
-
-            p6 = Point.EPoint(line.get_start())
-            p7 = Point.EPoint(line.get_end())
-            y = x._move_to_edge(p6, p7)
-
+    @anim_speed
+    def copy_to_line(self, line: Line.ELine):
+        with self.scene.trace(self.l[2], "extend 3rd line"):
+            t1 = self.l[2].copy().prepend(line.get_length() + mn_scale(50))
+            t2, _ = t1.e_split(self.p[2])
+            _.e_remove()
             with self.scene.simultaneous():
-                x.e_remove()
-                l4.e_remove()
-                p6.e_remove()
-                p7.e_remove()
+                t1.e_fade()
 
-            draw.append(y)
-            return y
+        with self.scene.trace(line, "copy line to our extension"):
+            l4, p4 = line.copy_to_line(self.p[2], t2, speed=0)
+            l4.red()
+            t2.e_remove()
+            p4.e_remove()
+
+
+        with self.scene.trace(self, "create the complement with the given line at point 3", font_size=18):
+            x = self._create_complement(l4)
+
+        p6 = Point.EPoint(line.get_start())
+        p7 = Point.EPoint(line.get_end())
+        y = x._move_to_edge(p6, p7)
+
+        with self.scene.simultaneous():
+            x.e_remove()
+            l4.e_remove()
+            p6.e_remove()
+            p7.e_remove()
+
+        return y

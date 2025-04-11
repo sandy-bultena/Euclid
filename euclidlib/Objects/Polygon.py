@@ -428,86 +428,83 @@ setattr(cls, 'p{i}', property(p))
         return False
 
     @log
-    def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False, speed=-1):
-        with self.scene.animation_speed(speed) as draw:
-            coords = convert_to_coord(point)
-            line = L.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
-            para = self.copy_to_parallelogram_on_line(line, angle)
-            line.e_remove()
-            draw.append(para)
-            return para
+    @anim_speed
+    def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False):
+        coords = convert_to_coord(point)
+        line = L.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
+        para = self.copy_to_parallelogram_on_line(line, angle, speed=0)
+        line.e_remove()
+        return para
 
     @log
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=-1):
-        with self.scene.animation_speed(speed) as draw:
-            # ------------------------------------------------------------------------
-            # get a list of triangles that make up the polygon
-            # ------------------------------------------------------------------------
-            triangles = self.copy_to_triangles()
+    @anim_speed
+    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
+        # ------------------------------------------------------------------------
+        # get a list of triangles that make up the polygon
+        # ------------------------------------------------------------------------
+        triangles = self.copy_to_triangles(speed=0)
 
-            # ------------------------------------------------------------------------
-            # convert each triangle to a parallelogram
-            # ------------------------------------------------------------------------
-            parallels = []
+        # ------------------------------------------------------------------------
+        # convert each triangle to a parallelogram
+        # ------------------------------------------------------------------------
+        parallels = []
 
-            current_line = line.copy()
-            coords = current_line.get_start_and_end()
-            for tri in triangles:
-                tri.e_fill(RED)
-                with self.scene.pause_animations_for():
-                    parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle))
+        current_line = line.copy()
+        coords = current_line.get_start_and_end()
+        for tri in triangles:
+            tri.e_fill(RED)
+            with self.scene.pause_animations_for():
+                parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle), speed=0)
 
-                with self.scene.simultaneous():
-                    parallels[-1].e_draw()
-                    tri.e_remove()
-                current_line.e_delete()
-                current_line = L.ELine(*reversed(parallels[-1].l[2].get_start_and_end()),
-                                       skip_anim=True,
-                                       stroke_color=RED)
-                new = current_line
-            current_line.e_delete()
-            from . import Parallelogram as Para
-            poly = Para.EParallelogram(*coords, *reversed(new.get_start_and_end()))
             with self.scene.simultaneous():
-                for x in parallels:
-                    x.e_remove()
-            return poly
+                parallels[-1].e_draw()
+                tri.e_remove()
+            current_line.e_delete()
+            current_line = L.ELine(*reversed(parallels[-1].l[2].get_start_and_end()),
+                                   skip_anim=True,
+                                   stroke_color=RED)
+        current_line.e_delete()
+        from . import Parallelogram as Para
+        poly = Para.EParallelogram(*coords, *reversed(current_line.get_start_and_end()))
+        with self.scene.simultaneous():
+            for x in parallels:
+                x.e_remove()
+        return poly
 
     @log
-    def copy_to_triangles(self, /, speed=-1):
+    @anim_speed
+    def copy_to_triangles(self):
         from . import Triangle as Tri
-        with self.scene.animation_speed(speed) as draw:
-            triangles = []
-            sides = self.sides
-            coords = [p.get_center() for p in self.points]
-            new = EPolygon(*coords)
-            while sides > 3:
-                # calculate the index with the most 'narrow' extension
-                min_index, min_angle = min(enumerate(self.angle_values), key=lambda a: a[1])
+        triangles = []
+        sides = self.sides
+        coords = [p.get_center() for p in self.points]
+        new = EPolygon(*coords)
+        while sides > 3:
+            # calculate the index with the most 'narrow' extension
+            min_index, min_angle = min(enumerate(self.angle_values), key=lambda a: a[1])
 
-                # chop this section off - step 1 calculate points
-                if min_index == self.sides - 1:
-                    triangle_points = [new.p[min_index - 1], new.p[min_index], new.p[0]]
-                    new_points = new.p[:-1]
-                elif min_index == 0:
-                    triangle_points = [new.p[sides - 1], new.p[min_index], new.p[min_index + 1]]
-                    new_points = new.p[1:]
-                else:
-                    triangle_points = [new.p[min_index + x] for x in (-1, 0, 1)]
-                    new_points = new.p[:min_index] + new.p[min_index + 1:]
+            # chop this section off - step 1 calculate points
+            if min_index == self.sides - 1:
+                triangle_points = [new.p[min_index - 1], new.p[min_index], new.p[0]]
+                new_points = new.p[:-1]
+            elif min_index == 0:
+                triangle_points = [new.p[sides - 1], new.p[min_index], new.p[min_index + 1]]
+                new_points = new.p[1:]
+            else:
+                triangle_points = [new.p[min_index + x] for x in (-1, 0, 1)]
+                new_points = new.p[:min_index] + new.p[min_index + 1:]
 
-                # create and save new triangle, update polygon
-                triangles.append(Tri.ETriangle(*triangle_points))
-                new2 = EPolygon(*new_points, delay_anim=True)
-                self.scene.play(mn.ReplacementTransform(new, new2))
-                new = new2
-                sides = new.sides
+            # create and save new triangle, update polygon
+            triangles.append(Tri.ETriangle(*triangle_points))
+            new2 = EPolygon(*new_points, delay_anim=True)
+            self.scene.play(mn.ReplacementTransform(new, new2))
+            new = new2
+            sides = new.sides
 
-            last = Tri.ETriangle(*new.p)
-            new.e_remove()
-            triangles.append(last)
-            draw.extend(triangles)
-            return triangles
+        last = Tri.ETriangle(*new.p)
+        new.e_remove()
+        triangles.append(last)
+        return triangles
 
     @property
     def angle_values(self):

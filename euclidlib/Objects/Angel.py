@@ -158,64 +158,63 @@ class EAngleBase(EMObject):
             base = self.get_arc_center() + bisect_dir * self.size
         return base + bisect_dir * (buff or self.LabelBuff)
 
-    def bisect(self, speed):
+    @anim_speed
+    def bisect(self):
         vx, vy, _ = self.get_arc_center()
         v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
         v2 = np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0.0])
 
-        with self.scene.animation_speed(speed) as draw:
-            # ------------------------------------------------------------------------
-            # make two temporary lines
-            # ------------------------------------------------------------------------
-            with self.scene.simultaneous():
-                s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
-                s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
+        # ------------------------------------------------------------------------
+        # make two temporary lines
+        # ------------------------------------------------------------------------
+        with self.scene.simultaneous():
+            s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
+            s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
 
-            # ------------------------------------------------------------------------
-            # define points B and C on the two lines, equidistance from the vertex
-            # ------------------------------------------------------------------------
-            # pick the shorter of the two lines to find the initial point
-            short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
-            p = s1.point(0.75 * short.get_length())
-            pB = P.EPoint(p)
-            cA = C.ECircle(self.get_arc_center(), pB).e_fade()
-            p = cA.intersect(self.l2)
-            pC = P.EPoint(p[0])
+        # ------------------------------------------------------------------------
+        # define points B and C on the two lines, equidistance from the vertex
+        # ------------------------------------------------------------------------
+        # pick the shorter of the two lines to find the initial point
+        short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
+        p = s1.point(0.75 * short.get_length())
+        pB = P.EPoint(p)
+        cA = C.ECircle(self.get_arc_center(), pB).e_fade()
+        p = cA.intersect(self.l2)
+        pC = P.EPoint(p[0])
 
-            # ------------------------------------------------------------------------
-            # draw two circles, radius BC, centers: B & C.
-            # - find the intersection points between two circles
-            # ------------------------------------------------------------------------
-            c1 = C.ECircle(pB, pC).e_fade()
-            c2 = C.ECircle(pC, pB).e_fade()
-            ps = c1.intersect(c2)
-            if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
-                p1 = P.EPoint(ps[0])
-            else:
-                p1 = P.EPoint(ps[1])
+        # ------------------------------------------------------------------------
+        # draw two circles, radius BC, centers: B & C.
+        # - find the intersection points between two circles
+        # ------------------------------------------------------------------------
+        c1 = C.ECircle(pB, pC).e_fade()
+        c2 = C.ECircle(pC, pB).e_fade()
+        ps = c1.intersect(c2)
+        if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
+            p1 = P.EPoint(ps[0])
+        else:
+            p1 = P.EPoint(ps[1])
 
-            # ------------------------------------------------------------------------
-            # draw a line to intersection
-            # ------------------------------------------------------------------------
-            lAD = ELine(self.get_arc_center(), p1)
+        # ------------------------------------------------------------------------
+        # draw a line to intersection
+        # ------------------------------------------------------------------------
+        lAD = ELine(self.get_arc_center(), p1)
 
-            # ------------------------------------------------------------------------
-            # cleanup
-            # ------------------------------------------------------------------------
-            with self.scene.simultaneous():
-                c1.e_fade()
-                c2.e_fade()
-                cA.e_fade()
-                s1.e_remove()
-                s2.e_remove()
-                pB.e_remove()
-                pC.e_remove()
+        # ------------------------------------------------------------------------
+        # cleanup
+        # ------------------------------------------------------------------------
+        with self.scene.simultaneous():
+            c1.e_fade()
+            c2.e_fade()
+            cA.e_fade()
+            s1.e_remove()
+            s2.e_remove()
+            pB.e_remove()
+            pC.e_remove()
 
-            # ------------------------------------------------------------------------
-            # return new line, point, all circles
-            # ------------------------------------------------------------------------
-            draw += [lAD, p1, c1, c2, cA]
-            return lAD, p1, c1, c2, cA
+        # ------------------------------------------------------------------------
+        # return new line, point, all circles
+        # ------------------------------------------------------------------------
+        return lAD, p1, c1, c2, cA
 
     def highlight(self, color=RED, scale=2.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
@@ -231,100 +230,99 @@ class EAngleBase(EMObject):
         return other.is_touching(self)
 
     @log
-    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=-1) -> Tuple[ELine, EAngleBase]:
-        with self.scene.animation_speed(speed) as draw:
-            start, end = line.get_start_and_end()
-            if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
-                mn.log.error("When copying an angle to a line, "
-                             "the point must be one of the endpoints\n"
-                             f"{point.get_center()=} | {start=} | {end=}")
-                raise ValueError()
+    @anim_speed
+    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
+        start, end = line.get_start_and_end()
+        if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
+            mn.log.error("When copying an angle to a line, "
+                         "the point must be one of the endpoints\n"
+                         f"{point.get_center()=} | {start=} | {end=}")
+            raise ValueError()
 
-            if np.array_equal(end, point.get_center()):
-                end, start = start, end
-            clone = ELine(start, end, stroke_color=BLUE)
-            if clone.get_length() < mn_scale(500):
-                clone.extend_and_prepend(mn_scale(250))
+        if np.array_equal(end, point.get_center()):
+            end, start = start, end
+        clone = ELine(start, end, stroke_color=BLUE)
+        if clone.get_length() < mn_scale(500):
+            clone.extend_and_prepend(mn_scale(250))
 
-            min_length = min(self.l1.get_length(),
-                             self.l2.get_length(),
-                             line.get_length()) - mn_scale(10)
+        min_length = min(self.l1.get_length(),
+                         self.l2.get_length(),
+                         line.get_length()) - mn_scale(10)
 
-            # ------------------------------------------------------------------------
-            # define point D and E on angle
-            # ------------------------------------------------------------------------
-            c1 = C.ECircle(self.v, self.v + RIGHT * min_length)
-            p1 = c1.intersect(self.l1)
-            p2 = c1.intersect(self.l2)
-            pn1 = P.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
-            pn2 = P.EPoint(p2[0], label=('P2', dict(away_from=p1[0])))
-            c1.e_remove()
+        # ------------------------------------------------------------------------
+        # define point D and E on angle
+        # ------------------------------------------------------------------------
+        c1 = C.ECircle(self.v, self.v + RIGHT * min_length)
+        p1 = c1.intersect(self.l1)
+        p2 = c1.intersect(self.l2)
+        pn1 = P.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
+        pn2 = P.EPoint(p2[0], label=('P2', dict(away_from=p1[0])))
+        c1.e_remove()
 
-            # ------------------------------------------------------------------------
-            # copy CE to AF
-            # ------------------------------------------------------------------------
-            l1 = ELine(self.v, p1[0], stroke_color=GREEN)
-            ln1, o = l1.copy_to_point(point)
-            ln1.green()
-            c2 = C.ECircle(point, ln1.get_end(), stroke_color=GREEN)
-            with self.scene.delayed():
-                for x in (ln1, o):
-                    x.e_remove()
-            p3 = c2.intersect(line)
-            if not p3:
-                for i in range(5):
-                    clone.extend(100)
-                    p3 = c2.intersect(clone)
+        # ------------------------------------------------------------------------
+        # copy CE to AF
+        # ------------------------------------------------------------------------
+        l1 = ELine(self.v, p1[0], stroke_color=GREEN)
+        ln1, o = l1.copy_to_point(point)
+        ln1.green()
+        c2 = C.ECircle(point, ln1.get_end(), stroke_color=GREEN)
+        with self.scene.delayed():
+            for x in (ln1, o):
+                x.e_remove()
+        p3 = c2.intersect(line)
+        if not p3:
+            for i in range(5):
+                clone.extend(100)
+                p3 = c2.intersect(clone)
 
-            pn3 = P.EPoint(p3[0], fill_color=GREEN)
-            l1.white()
-            c2.white.e_fade()
+        pn3 = P.EPoint(p3[0], fill_color=GREEN)
+        l1.white()
+        c2.white.e_fade()
 
-            l3 = ELine(p1[0], p2[0], stroke_color=GREEN)
-            ln3, o2 = l3.copy_to_point(pn3)
-            c3 = C.ECircle(pn3, ln3.get_end())
-            c2.e_normal()
+        l3 = ELine(p1[0], p2[0], stroke_color=GREEN)
+        ln3, o2 = l3.copy_to_point(pn3)
+        c3 = C.ECircle(pn3, ln3.get_end())
+        c2.e_normal()
 
-            p4 = c3.intersect(c2)
-            lt1 = ELine(point, p4[0], delay_anim=True)
-            lt2 = ELine(point, p4[1], delay_anim=True)
+        p4 = c3.intersect(c2)
+        lt1 = ELine(point, p4[0], delay_anim=True)
+        lt2 = ELine(point, p4[1], delay_anim=True)
 
-            lt3 = ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
-            lt4 = ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
+        lt3 = ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
+        lt4 = ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
 
-            with self.scene.delayed():
-                for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
-                    x.e_remove()
+        with self.scene.delayed():
+            for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
+                x.e_remove()
 
-            lines = [lt1, lt2, lt3, lt4]
-            if negative:
-                angles = [EAngle(l, line, delay_anim=True) for l in lines]
-            else:
-                angles = [EAngle(line, l, delay_anim=True) for l in lines]
+        lines = [lt1, lt2, lt3, lt4]
+        if negative:
+            angles = [EAngle(l, line, delay_anim=True) for l in lines]
+        else:
+            angles = [EAngle(line, l, delay_anim=True) for l in lines]
 
-            def smallest_diff(line_angle):
-                i, _, angle = line_angle
-                return abs(angle.e_angle - self.e_angle)
+        def smallest_diff(line_angle):
+            i, _, angle = line_angle
+            return abs(angle.e_angle - self.e_angle)
 
-            final_index, final_line, final_angle = min(zip(range(4), lines, angles), key=smallest_diff)
+        final_index, final_line, final_angle = min(zip(range(4), lines, angles), key=smallest_diff)
 
-            if final_index < 2:
-                final_line.e_draw()
-                final_angle.e_draw()
-            else:
-                lines[final_index-2].e_draw()
-                final_line.e_draw()
-                final_angle.e_draw()
-            
-            with self.scene.delayed():
-                for x in (*lines, *angles, c2, c3, clone):
-                    if x is final_line:
-                        continue
-                    if x is final_angle:
-                        continue
-                    x.e_remove()
-            draw += [final_line, final_angle]
-            return final_line, final_angle
+        if final_index < 2:
+            final_line.e_draw()
+            final_angle.e_draw()
+        else:
+            lines[final_index-2].e_draw()
+            final_line.e_draw()
+            final_angle.e_draw()
+
+        with self.scene.delayed():
+            for x in (*lines, *angles, c2, c3, clone):
+                if x is final_line:
+                    continue
+                if x is final_angle:
+                    continue
+                x.e_remove()
+        return final_line, final_angle
 
 
 class ArcAngle(EAngleBase, mn.Arc):

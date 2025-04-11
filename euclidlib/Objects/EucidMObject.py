@@ -265,7 +265,6 @@ def animate(func):
             return func(self, self, *args, **kwargs)
     return animate_change
 
-
 def log(func):
     @wraps(func)
     def logMethodName(self, *args, **kwargs):
@@ -281,6 +280,19 @@ def freezable(func):
         return func(self, *args, **kwargs)
 
     return dontIfFrozen
+
+def anim_speed(func):
+    @wraps(func)
+    def animate_change(self: EMObject, *args, speed=-1, **kwargs):
+        with self.scene.animation_speed(speed) as draw:
+            x = func(self, *args, **kwargs)
+            if isinstance(x, (tuple, list)):
+                draw.extend(x)
+            else:
+                draw.append(x)
+        return x
+
+    return animate_change
 
 
 def freezable_player(func):
