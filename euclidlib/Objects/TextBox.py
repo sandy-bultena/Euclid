@@ -272,36 +272,6 @@ def {style}(self, text: str, **kwargs):
     return self.generate_text(text, '{style}', **kwargs)
 """)
 
-    # @contextmanager
-    # def join_parts(self,
-    #                delay_anim=False,
-    #                realign_result=False,
-    #                transform_from: T.EStringObj | int = None,
-    #                transform_args: dict = None):
-    #     proxy = TempTextBoxProxy(self)
-    #     yield proxy
-    #     head: mn.StringMobject
-    #     head, *rest = proxy
-    #     head.string = head.string + ' '.join(x.string for x in rest)
-    #     for r in rest:
-    #         head.add(*r)
-    #     self.add(head)
-    #     if realign_result and self.alignment:
-    #         (get_side, side) = self.alignment
-    #         head.align_to(get_side(self), side)
-    #     if not delay_anim:
-    #         if transform_from is not None:
-    #             if isinstance(transform_from, int):
-    #                 transform_from = self[transform_from]
-    #             self.scene.play(mn.TransformMatchingStrings(
-    #                 transform_from.copy(),
-    #                 head,
-    #                 **transform_args,
-    #             ))
-    #         else:
-    #             head.e_draw()
-    #     proxy.clear()
-    #     self.scene.remove(proxy)
 
     def e_update(self, index, text: str, transform_args=None, **kwargs):
         old = self[index]
@@ -348,36 +318,3 @@ def {style}(self, text: str, **kwargs):
         self.decoration = None
 
 
-# class TempTextBoxProxy(TextBox):
-#     def __init__(self, parent: TextBox):
-#         self.next_buff = 0
-#         self.parent = parent
-#         self.line_width = parent.line_width
-#         self._buff_size = parent._buff_size
-#         self.abs_position = parent.abs_position
-#         self.alignment = parent.alignment
-#         super(TextBox, self).__init__()
-#
-#     @property
-#     def buff_size(self):
-#         return self._buff_size
-#
-#     def __getitem__(self, item):
-#         return self.parent[item]
-#
-#     def get_bottom(self):
-#         if not self:
-#             return self.parent.get_bottom()
-#         return super().get_bottom()
-#
-#     for style in TextBox.fonts:
-#         exec(f"""
-# def {style}(self, text: str, **kwargs):
-#     return self.generate_text(text, '{style}', delay_anim=True, **kwargs)
-#     """)
-#
-#     def __getattr__(self, item):
-#         return getattr(self.parent, item)
-#
-#     def __iter__(self):
-#         return iter(self.submobjects)

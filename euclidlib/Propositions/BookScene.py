@@ -50,8 +50,7 @@ class BookScene(PropScene):
         label2 = label[-1] + label + label[0]
         for i, angle in enumerate(triangles[tri_name].a):
             if angle is not None:
-                angles[label2[i:i+3]] = angle
-
+                angles[label2[i:i + 3]] = angle
 
     @staticmethod
     def extract_all(lines, points, angles, triangles, label, tri_name=None):
@@ -59,7 +58,6 @@ class BookScene(PropScene):
         BookScene.extract_lines(lines, triangles, label, tri_name)
         BookScene.extract_points(points, triangles, label, tri_name)
         BookScene.extract_angles(angles, triangles, label, tri_name)
-
 
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
@@ -85,10 +83,10 @@ class BookScene(PropScene):
                 self.add(entries)
                 entries.next_to(self.frame.get_corner(DL), DR)
 
-                distance_diff = entries.get_center() - entries[self.prop-1].get_center()
+                distance_diff = entries.get_center() - entries[self.prop - 1].get_center()
                 self.play(entries.animate(run_time=1, rate_func=rush_from).move_to(distance_diff, coor_mask=UP))
 
-                line = entries[self.prop-1]
+                line = entries[self.prop - 1]
                 entries.remove(line)
                 self.play(line.animate.set_fill(BLUE))
 
@@ -127,57 +125,6 @@ class BookScene(PropScene):
 
 
 class Book1Scene(BookScene):
-    TOC = [
-        "Construct an equilateral triangle",
-        "Copy a line",
-        "Subtract one line from another",
-        "Equal triangles if equal side-angle-side",
-        "Isosceles triangle gives equal base angles",
-        "Equal base angles gives isosceles triangle",
-        "Two sides of triangle meet at unique point",
-        "Equal triangles if equal side-side-side",
-        "How to bisect an angle",
-        "Bisect a line",
-        "Construct right angle, point on line",
-        "Construct perpendicular, point to line",
-        "Sum of angles on straight line = 180",
-        "Two lines form a single line if angle = 180",
-        "Vertical angles equal one another",
-        "Exterior angle larger than interior angle",
-        "Sum of two interior angles less than 180",
-        "Greater side opposite of greater angle",
-        "Greater angle opposite of greater side",
-        "Sum of two angles greater than third",
-        "Triangle within triangle has smaller sides",
-        "Construct triangle from given lines",
-        "Copy an angle",
-        "Larger angle gives larger base",
-        "Larger base gives larger angle",
-        "Equal triangles if equal angle-side-angle",
-        "Alternate angles equal then lines parallel",
-        "Sum of interior angles = 180 , lines parallel",
-        "Lines parallel, alternate angles are equal",
-        "Lines parallel to same line are parallel to themselves",
-        "Construct one line parallel to another",
-        "Sum of interior angles of a triangle = 180",
-        "Lines joining ends of equal parallels are parallel",
-        "Opposite sides-angles equal in parallelogram",
-        "Parallelograms, same base-height have equal area",
-        "Parallelograms, equal base-height have equal area",
-        "Triangles, same base-height have equal area",
-        "Triangles, equal base-height have equal area",
-        "Equal triangles on same base, have equal height",
-        "Equal triangles on equal base, have equal height",
-        "Triangle is half parallelogram with same base and height",
-        "Construct parallelogram with equal area as triangle",
-        "Parallelogram complements are equal",
-        "Construct parallelogram on line, equal to triangle",
-        "Construct parallelogram equal to polygon",
-        "Construct a square",
-        "Pythagoras' theorem",
-        "Inverse Pythagoras' theorem",
-    ]
-
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
                             line_width=mn_h_scale(550),
@@ -230,3 +177,77 @@ class Book1Scene(BookScene):
             sBDL.e_fill(BLUE)
             sABD.e_fill(BLUE_D)
             sFBC.e_fill(BLUE_D)
+
+class Book2Scene(BookScene):
+    def title_page(self):
+        title_box = TextBox(mn_scale(0, 100, 0),
+                            line_width=mn_h_scale(600),
+                            alignment='e'
+                            )
+        with self.simultaneous():
+            super().title_page()
+
+            with self.pause_animations_for():
+                title_box.fancy("It is a remarkable fact in the history of geometry, "
+                                "that the Elements of Euclid, "
+                                "written two thousand years ago, are still regarded by many as the best "
+                                "introduction to the mathematical sciences.", font_size=48, write_simultaneous=True)
+                title_box.explain("""
+                - Florian Cajori,
+                  A History of Mathematics (1893)
+                """, font_size=16)
+
+                title_box[-1].align_to(title_box[-2], RIGHT)
+
+                title_box.down()
+                title_box.explain('<b>Definitions:</b>')
+                title_box.explain("Any rectangular parallelogram is said to "
+                                  "be contained by the two straight "
+                                  "lines containing the right angle.")
+                title_box.explain("And in any parallelogrammic area let any one whatever of "
+                                  "the parallelograms about its diameter with the two complements "
+                                  "be called a gnomon.")
+
+                para = EPolygon(
+                    mn_coord(450, 700),
+                    mn_coord(600, 700),
+                    mn_coord(650, 600),
+                    mn_coord(500, 600))
+                gnomon = EPolygon(
+                    mn_coord(450, 700),
+                    mn_coord(600, 700),
+                    mn_coord(617, 667),
+                    mn_coord(517, 667),
+                    mn_coord(550, 600),
+                    mn_coord(500, 600),
+                )
+                gnomon.e_fill(BLUE_D)
+
+                diag = ELine(mn_coord(450, 700), mn_coord(650, 600))
+                l1 = ELine(mn_coord(500, 700), mn_coord(550, 600))
+                cross = l1.intersect(diag)
+                p = EPoint(cross)
+                l2 = para.l0.parallel(p)
+                l3 = ELine(
+                    l2.intersect(para.l3),
+                    l2.intersect(para.l1),
+                )
+                ar1 = ELine(mn_coord(650, 660),
+                            mn_coord(690, 660))
+                ar2 = ELine(mn_coord(650, 660),
+                            mn_coord(660, 650))
+                ar3 = ELine(mn_coord(650, 660),
+                            mn_coord(660, 670))
+
+            with self.delayed():
+                for x in title_box:
+                    x.e_draw()
+            with self.simultaneous():
+                para.e_draw()
+                gnomon.e_draw()
+                diag.e_draw()
+                l1.e_draw()
+                l3.e_draw()
+                ar1.e_draw()
+                ar2.e_draw()
+                ar3.e_draw()

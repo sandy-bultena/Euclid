@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import itertools
+
 from euclidlib.Objects.EucidMObject import *
 from .Line import ELine
 from manimlib import TAU
@@ -139,9 +142,13 @@ class EAngleBase(EMObject):
     def get_bisect(self, alpha=0.5):
         return self.proportion_angle(alpha)
 
+    @staticmethod
+    def vector_of_angle(angle):
+        return np.array([math.cos(angle), math.sin(angle), 0.0])
+
     def get_bisect_dir(self, alpha=0.5):
         bisect = self.get_bisect(alpha)
-        return np.array([math.cos(bisect), math.sin(bisect), 0.0])
+        return self.vector_of_angle(bisect)
 
     def e_label_point(self, alpha=0.5, buff=None):
         bisect_dir = self.get_bisect_dir(alpha)
@@ -156,7 +163,7 @@ class EAngleBase(EMObject):
         v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
         v2 = np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0.0])
 
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             # ------------------------------------------------------------------------
             # make two temporary lines
             # ------------------------------------------------------------------------
@@ -207,6 +214,7 @@ class EAngleBase(EMObject):
             # ------------------------------------------------------------------------
             # return new line, point, all circles
             # ------------------------------------------------------------------------
+            draw += [lAD, p1, c1, c2, cA]
             return lAD, p1, c1, c2, cA
 
     def highlight(self, color=RED, scale=2.0, **args):
@@ -223,8 +231,8 @@ class EAngleBase(EMObject):
         return other.is_touching(self)
 
     @log
-    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=1) -> Tuple[ELine, EAngleBase]:
-        with self.scene.animation_speed(speed):
+    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False, speed=-1) -> Tuple[ELine, EAngleBase]:
+        with self.scene.animation_speed(speed) as draw:
             start, end = line.get_start_and_end()
             if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
                 mn.log.error("When copying an angle to a line, "
@@ -315,6 +323,7 @@ class EAngleBase(EMObject):
                     if x is final_angle:
                         continue
                     x.e_remove()
+            draw += [final_line, final_angle]
             return final_line, final_angle
 
 
@@ -412,10 +421,40 @@ class RightAngle(EAngleBase):
             self.e_draw()
 
 
+class Gnomon(ArcAngle):
+    def init_label(self, labels: str | List[str], *args, **extra_args):
+        if isinstance(labels, str):
+            return super().init_label(labels, *args, **extra_args)
+        return T.LabelGroup(
+            labels,
+            self,
+            itertools.repeat(args),
+            itertools.repeat(extra_args)
+        )
+
+
+    def tangent_at_start(self):
+        dir = -PI/2 if self.e_angle > 0 else PI/2
+        return self.vector_of_angle(self.e_start_angle + dir)
+
+    def tangent_at_end(self):
+        dir = PI/2 if self.e_angle > 0 else -PI/2
+        return self.vector_of_angle(self.e_end_angle + dir)
+
+    def e_label_point(self, index=0, alpha=0.5, buff=None):
+        if index==0:
+            return super().e_label_point(alpha, buff)
+        if index==1:
+            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
+        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
+
+
+
 def EAngle(l1: ELine | str,
            l2: ELine = None,
            size: float = mn_scale(40),
            no_right: bool = False,
+           gnomon: bool = False,
            **kwargs):
     if isinstance(l1, str):
         l1, l2 = ELine.find_in_frame(l1)
@@ -431,6 +470,15 @@ def EAngle(l1: ELine | str,
     th1 = math.atan2(v1[1], v1[0])
     th2 = math.atan2(v2[1], v2[0])
     th_diff = th2 - th1
+
+    # RELEVANT CHANGE HERE ------------------------------------------
+    if gnomon:
+        if 0 < th_diff < PI:
+            th_diff = th_diff - TAU
+        elif -PI < th_diff < PI:
+            th_diff = TAU + th_diff
+        return Gnomon(l1, l2, size, data, th1, th2, th_diff, **kwargs)
+    # ----------------------------------------------------------------
 
     if th_diff > PI:
         th_diff = th_diff - TAU

@@ -36,8 +36,14 @@ class ELine(EMObject, mn.Line):
         lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
         if all(l is not None for l in lines):
             return lines
-
-        raise Exception(f"Can't find line(s) {', '.join( n for p, n in zip(lines, parts) if p is None)}")
+        try:
+            points = [P.EPoint.find_in_frame(part) for part in parts]
+            vlines = [VirtualLine(*p) for p in points]
+            return vlines
+        except Exception as e:
+            raise Exception(
+                f"Can't find line(s) {', '.join( n for p, n in zip(lines, parts) if p is None)}\n" +
+                e.args[0])
 
     def IN(self):
         vec = self.get_unit_vector()
@@ -132,7 +138,7 @@ class ELine(EMObject, mn.Line):
             x = (y11 - y00 + m1 * x00 - m2 * x11) / (m1 - m2)
             y = m1 * (x - x00) + y00
 
-        return x, y, 0
+        return np.array([x, y, 0])
 
     def length_from_end(self, p: P.EPoint):
         return p.distance_to(self.get_end())
@@ -193,7 +199,7 @@ class ELine(EMObject, mn.Line):
         return ELine(self.get_start(), (x2, y2, 0))
 
     @log
-    def copy_to_point(self, target: P.EPoint, speed=1) -> Tuple[ELine, P.EPoint]:
+    def copy_to_point(self, target: P.EPoint, speed=-1) -> Tuple[ELine, P.EPoint]:
         A = self.get_start()
         B = self.get_end()
         C = self.pointify(target)
@@ -203,7 +209,7 @@ class ELine(EMObject, mn.Line):
         c: Dict[str | int, Circle.ECircle] = {}
         t: Dict[str | int, T.ETriangle] = {}
 
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             # ------------------------------------------------------------------------
             # If point is already on the line, just make a clone, and return results
             # ------------------------------------------------------------------------
@@ -268,16 +274,16 @@ class ELine(EMObject, mn.Line):
                 mobjs |= {id(x): x for x in t[1].get_e_family()}
                 for obj in mobjs.values():
                     obj.e_remove()
-
+            draw += lCF, pF
             return lCF, pF
 
     @log
-    def copy_to_line(self, target: P.EPoint, target_line: ELine, speed=1):
+    def copy_to_line(self, target: P.EPoint, target_line: ELine, speed=-1):
         lx, px = self.copy_to_point(target, speed=speed)
         if lx is None or px is None:
             return
 
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             c = Circle.ECircle(target, lx.get_end())
 
             clone = target_line.copy()
@@ -312,7 +318,7 @@ class ELine(EMObject, mn.Line):
                 c.e_remove()
                 if clone.in_scene():
                     clone.e_remove()
-
+            draw += [nl, np]
             return nl, np
 
     def e_rotate_to(self, angle: float):
@@ -333,7 +339,7 @@ class ELine(EMObject, mn.Line):
 
     def bisect(self, speed=1):
         cls = type(self)
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             c1 = Circle.ECircle(*self.get_start_and_end()[::-1]).e_fade()
             c2 = Circle.ECircle(*self.get_start_and_end()).e_fade()
             pts = c1.intersect(c2)
@@ -344,12 +350,12 @@ class ELine(EMObject, mn.Line):
                 c1.e_remove()
                 c2.e_remove()
                 l.e_remove()
-
+            draw.append(pt)
         return pt
 
     @log
     def _perp_off_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1):
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             A, B = self.get_start_and_end()
             C = self.pointify(p)
             p: Dict[str, P.EPoint] = {}
@@ -381,11 +387,12 @@ class ELine(EMObject, mn.Line):
                 lb.e_remove()
                 pb.e_remove()
                 l.e_remove()
+            draw.append(lfinal)
         return lfinal
 
     @log
     def _perp_on_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, speed=1, inside=False):
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             A, B = self.get_start_and_end()
             C = self.pointify(p)
             l: Dict[str, ELine] = {}
@@ -438,9 +445,10 @@ class ELine(EMObject, mn.Line):
                 c1.e_remove()
                 c2.e_remove()
                 ln.e_remove()
+            draw.append(l['CF'])
             return l['CF']
 
-    def perpendicular(self, p: P.EPoint, /, speed=1, inside=False):
+    def perpendicular(self, p: P.EPoint, /, speed=-1, inside=False):
         rs = mn.get_norm(self.pointify(p) - self.get_start())
         re = mn.get_norm(self.pointify(p) - self.get_end())
         if (rs + re - self.get_length()) > mn_scale(0.1):
@@ -448,7 +456,7 @@ class ELine(EMObject, mn.Line):
         return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
 
     @log
-    def parallel(self, p: P.EPoint, /, speed=1):
+    def parallel(self, p: P.EPoint, /, speed=-1):
         B, C = self.get_start_and_end()
         A = self.pointify(p)
 
@@ -456,7 +464,7 @@ class ELine(EMObject, mn.Line):
         if B[0] > C[0]:
             B, C = C, B
 
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             with self.scene.trace(self, "define a new line"):
                 tempC = C
                 if mn.get_dist(B, C) < mn_scale(100):
@@ -492,6 +500,7 @@ class ELine(EMObject, mn.Line):
                 lBD.e_remove()
                 ln.e_remove()
 
+            draw.append(lEA)
             return lEA
 
     def dashed(self):

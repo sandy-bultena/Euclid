@@ -109,6 +109,7 @@ setattr(cls, 'p{i}', property(p))
             z_index=-1,
             animate_part=('set_e_fill',),
             delay_anim=False,
+            skip_anim=False,
             _assemble_flag=False,
             _lines: List[L.ELine] | None = None,
             _points: List[P.EPoint] | None = None,
@@ -161,10 +162,10 @@ setattr(cls, 'p{i}', property(p))
         self._sub_group.add(*(an for an in self.angles if an is not None))
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
-                         delay_anim=delay_anim, **kwargs)
+                         delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
         if self.sides:
             self.vertices.append(self.vertices[0])
-        self.define_sub_objs(delay_anim)
+        self.define_sub_objs(delay_anim, skip_anim)
         self.cached_opacity = 0
         self.cached_fade = 1
 
@@ -237,7 +238,7 @@ setattr(cls, 'p{i}', property(p))
             args = *args, dict(outside=True)
         return args
 
-    def define_points(self, delay_anim=False):
+    def define_points(self, delay_anim=False, skip_anim=False):
         if self.points:
             return
         labels = self.options.get('point_labels', [()] * self.sides)
@@ -247,11 +248,12 @@ setattr(cls, 'p{i}', property(p))
                          scene=self.scene,
                          label_args=self._filter_point_labels(args),
                          delay_anim=delay_anim,
+                         skip_anim=skip_anim,
                          )
                 for coord, args
                 in zip(self.vertices, labels)]
 
-    def define_lines(self, delay_anim=False):
+    def define_lines(self, delay_anim=False, skip_anim=False):
         if self.lines:
             return
         with self.scene.simultaneous_speed(self.speed):
@@ -260,16 +262,16 @@ setattr(cls, 'p{i}', property(p))
                 self.set_labels(*self.options['labels'])
             if not delay_anim:
                 for l in self.lines:
-                    l.e_draw()
+                    l.e_draw(skip_anim=skip_anim)
 
-    def define_sub_objs(self, delay_anim=False):
-        self.define_points(delay_anim=delay_anim)
-        self.define_lines(delay_anim=delay_anim)
+    def define_sub_objs(self, delay_anim=False, skip_anim=False):
+        self.define_points(delay_anim=delay_anim, skip_anim=skip_anim)
+        self.define_lines(delay_anim=delay_anim, skip_anim=skip_anim)
 
         self._sub_group.add(*self.lines, *self.points)
         with self.scene.simultaneous_speed(self.speed):
             if 'angles' in self.options:
-                self.set_angles(*self.options['angles'], delay_anim=delay_anim)
+                self.set_angles(*self.options['angles'], delay_anim=delay_anim, skip_anim=skip_anim)
 
     def e_fill(self, color: ManimColor = None, opacity=0.5):
         self.scene.play(
@@ -294,14 +296,14 @@ setattr(cls, 'p{i}', property(p))
             p.add_label(*label_data)
         return self
 
-    def set_angles(self, *angle_data: str | float | None, delay_anim=False):
+    def set_angles(self, *angle_data: str | float | None, delay_anim=False,  skip_anim=False):
         names, sizes = angle_data[:self.sides], angle_data[self.sides:]
         names_and_sizes = zip_longest(names, sizes, fillvalue=mn_scale(40))
         line_pairs = pairwise([self.lines[-1]] + self.lines)
 
         if not self.angles:
             self.angles = [
-                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim)
+                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim, skip_anim=skip_anim)
                 for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
                 if name is not None
             ]
@@ -426,18 +428,18 @@ setattr(cls, 'p{i}', property(p))
         return False
 
     @log
-    def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False, speed=1):
-        with self.scene.animation_speed(speed):
+    def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False, speed=-1):
+        with self.scene.animation_speed(speed) as draw:
             coords = convert_to_coord(point)
             line = L.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
             para = self.copy_to_parallelogram_on_line(line, angle)
             line.e_remove()
-
+            draw.append(para)
             return para
 
     @log
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=1):
-        with self.scene.animation_speed(speed):
+    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=-1):
+        with self.scene.animation_speed(speed) as draw:
             # ------------------------------------------------------------------------
             # get a list of triangles that make up the polygon
             # ------------------------------------------------------------------------
@@ -472,9 +474,9 @@ setattr(cls, 'p{i}', property(p))
             return poly
 
     @log
-    def copy_to_triangles(self, /, speed=1):
+    def copy_to_triangles(self, /, speed=-1):
         from . import Triangle as Tri
-        with self.scene.animation_speed(speed):
+        with self.scene.animation_speed(speed) as draw:
             triangles = []
             sides = self.sides
             coords = [p.get_center() for p in self.points]
@@ -504,6 +506,7 @@ setattr(cls, 'p{i}', property(p))
             last = Tri.ETriangle(*new.p)
             new.e_remove()
             triangles.append(last)
+            draw.extend(triangles)
             return triangles
 
     @property

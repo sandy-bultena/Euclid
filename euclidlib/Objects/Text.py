@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import itertools
 from abc import ABC
+from typing import List, Iterable, Tuple, Any, Dict
 
 from . import EucidMObject as E
 from . import CustomAnimation as CA
@@ -206,6 +208,53 @@ class Label(ETex):
     def disable_updaters(self):
         # print(f"STOP {self.ref} -> {self}:{self.string}")
         self.suspend_updating()
+
+    def transfer_ownership(self, emobject: E.EMObject):
+        if emobject.e_label is not None:
+            emobject.e_label.e_remove()
+        emobject.e_label = self
+        self.ref.e_label = None
+        self.ref = emobject
+
+
+class LabelGroup(G.EGroup[Label]):
+    def CreationOf(self, *args, **kwargs):
+        kwargs['run_time'] = self.ref.CONSTRUCTION_TIME
+        return [
+            y
+            for x in self
+            for y in x.CreationOf(*args, **kwargs)
+        ]
+
+    def RemovalOf(self, *args, **kwargs):
+        kwargs['run_time'] = self.ref.AUX_CONSTRUCTION_TIME
+
+        return [
+            y
+            for x in self
+            for y in x.RemovalOf(*args, **kwargs)
+        ]
+
+    def __init__(self, texts: List[str], ref: E.EMObject, pos_args: Iterable[Tuple], kw_args: Iterable[Dict[str, Any]]):
+        self.ref = ref
+        super().__init__(
+            (Label(txt, ref, *pos, index=i, **kw)
+            for txt, pos, kw, i
+            in zip(texts, pos_args, kw_args, itertools.count())),
+            delay_anim=True
+        )
+
+    @property
+    def is_frozen(self):
+        return self._freeze or self.ref.is_frozen
+
+    def enable_updaters(self):
+        for x in self:
+            x.resume_updating()
+
+    def disable_updaters(self):
+        for x in self:
+            x.suspend_updating()
 
     def transfer_ownership(self, emobject: E.EMObject):
         if emobject.e_label is not None:

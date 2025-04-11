@@ -188,11 +188,16 @@ class PropScene(InteractiveScene):
     @contextmanager
     def pause_animations_for(self, stop=True):
         if stop:
+            to_draw = []
             self.animateState.append(AnimState.PAUSED)
-            yield
+            yield to_draw
             self.animateState.pop()
+            with self.simultaneous():
+                for x in to_draw:
+                    x.e_draw()
+
         else:
-            yield
+            yield []
 
     @contextmanager
     def run_animations_for(self, stop=True):
@@ -205,9 +210,14 @@ class PropScene(InteractiveScene):
 
     @contextmanager
     def animation_speed(self, run_time: float):
-        self.animationSpeedStack.append(run_time)
-        yield
-        self.animationSpeedStack.pop()
+        if run_time > 0:
+            self.animationSpeedStack.append(run_time)
+            yield []
+            self.animationSpeedStack.pop()
+        else:
+            with self.pause_animations_for() as l:
+                yield l
+
 
     @contextmanager
     def simultaneous_speed(self, run_time: float, **kwargs):

@@ -94,9 +94,8 @@ class EParallelogram(Polygon.EPolygon):
         return parall
 
     @log
-    def copy_to_line(self, line: Line.ELine, /, speed=1):
-        with self.scene.animation_speed(speed):
-
+    def copy_to_line(self, line: Line.ELine, /, speed=-1):
+        with self.scene.animation_speed(speed) as draw:
             with self.scene.trace(self.l[2], "extend 3rd line"):
                 t1 = self.l[2].copy().prepend(line.get_length() + mn_scale(50))
                 t2, _ = t1.e_split(self.p[2])
@@ -124,4 +123,5 @@ class EParallelogram(Polygon.EPolygon):
                 p6.e_remove()
                 p7.e_remove()
 
+            draw.append(y)
             return y

@@ -123,8 +123,8 @@ class ETriangle(EPolygon):
         return xy1, coord, next
 
     @log
-    def parallelogram(self, angle: A.EAngleBase, /, speed=1):
-        with self.scene.animation_speed(speed):
+    def parallelogram(self, angle: A.EAngleBase, /, speed=-1):
+        with self.scene.animation_speed(speed) as draw:
             point = self.l[1].bisect()
             point.add_label('P_1', UP)
             l = L.ELine(self.p[1], self.p[2])
@@ -164,11 +164,13 @@ class ETriangle(EPolygon):
                 point2.e_remove()
                 point3.e_remove()
 
+            draw += [poly, angle2]
+
             return poly, angle2
 
     @log
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=1):
-        with self.scene.animation_speed(speed):
+    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase, /, speed=-1):
+        with self.scene.animation_speed(speed) as draw:
             # create parallelogram equal in size to triangle (I.42)
             s1, a2 = self.parallelogram(angle)
             # s1.e_fade()
@@ -177,6 +179,6 @@ class ETriangle(EPolygon):
             # copy this parallelogram to the line
             s4 = s1.copy_to_line(line)
             s1.e_remove()
-
+            draw.append(s4)
             return s4
 

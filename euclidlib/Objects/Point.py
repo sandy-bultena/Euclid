@@ -19,7 +19,7 @@ class EPoint(EMObject, mn.Circle):
     LabelBuff = mn.MED_SMALL_BUFF
 
     @staticmethod
-    def find_in_frame(names):
+    def find_in_frame(names) -> List[EPoint]:
         from inspect import currentframe
         point_names = list(names)
         f = currentframe()
@@ -60,10 +60,10 @@ class EPoint(EMObject, mn.Circle):
 
     def e_label_point(self,
                       direction: mn.Vect3 = None,
+                      buff: float = None,
                       *,
                       away_from: Callable[[], mn.Vect3] | float = None,
                       towards: Callable[[], mn.Vect3] | float = None,
-                      buff: float = None
                       ):
         center = self.get_arc_center()
         if away_from is not None:
