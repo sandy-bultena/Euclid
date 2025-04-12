@@ -2,8 +2,9 @@ import sys
 import os
 sys.path.append(os.getcwd())
 
-from euclidlib.Propositions.BookScene import Book{book_num}Scene
+from euclidlib.Propositions.BookScene import Book{book_num}Scene, AttrDict
 from euclidlib.Objects import *
+from typing import Dict
 
 
 class Prop{prop_num}(Book{book_num}Scene):

@@ -65,6 +65,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
             **kwargs
         )
 
+    def highlight(self, color=mn.RED, *args, **kwargs):
+        return mn.FlashAround(self, *args, color=color, **kwargs)
+
     def apply_rules(self, txt):
         return reduce(lambda part, rule: rule[0].sub(rule[1], part), self.REPLACEMENT_RULES, txt)
 

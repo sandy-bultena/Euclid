@@ -121,7 +121,7 @@ class TextBox(EGroup[T.EStringObj]):
                       transform_args: dict = None,
                       delay_anim=False,
                       skip_anim=False,
-                      break_into_parts: Tuple[str, ...] | None = None,
+                      break_into_parts: Tuple[str, ...] | str | None = None,
                       **other_options):
         cls, kwargs = self.fonts[style]
         kwargs = kwargs | other_options
@@ -155,6 +155,8 @@ class TextBox(EGroup[T.EStringObj]):
                 decor = cls(self.decoration, **kwargs, scene=self.scene, delay_anim=True)
                 decor.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
             if break_into_parts:
+                if isinstance(break_into_parts, str):
+                    break_into_parts = text.split(break_into_parts)
                 parts = [self.generate_text(part, style, delay_anim=True)
                          for part in break_into_parts]
                 if decor is not None:
@@ -208,7 +210,7 @@ class TextBox(EGroup[T.EStringObj]):
                   align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                   transform_from: T.EStringObj | int = None,
                   transform_args: dict = None,
-                  break_into_parts: Tuple[str, ...] | None = None,
+                  break_into_parts: Tuple[str, ...] | str | None = None,
                   **kwargs,
                   ) -> T.EStringObj: ...
 
@@ -217,7 +219,7 @@ class TextBox(EGroup[T.EStringObj]):
                     align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                     transform_from: T.EStringObj | int = None,
                     transform_args: dict = None,
-                    break_into_parts: Tuple[str, ...] | None = None,
+                    break_into_parts: Tuple[str, ...] | str | None = None,
                     **kwargs,
                     ) -> T.EStringObj: ...
 
@@ -226,7 +228,7 @@ class TextBox(EGroup[T.EStringObj]):
                      align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                      transform_from: T.EStringObj | int = None,
                      transform_args: dict = None,
-                     break_into_parts: Tuple[str, ...] | None = None,
+                     break_into_parts: Tuple[str, ...] | str | None = None,
                      **kwargs,
                      ) -> T.EStringObj: ...
 
@@ -235,7 +237,7 @@ class TextBox(EGroup[T.EStringObj]):
                    align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                    transform_from: T.EStringObj | int = None,
                    transform_args: dict = None,
-                   break_into_parts: Tuple[str, ...] | None = None,
+                   break_into_parts: Tuple[str, ...] | str | None = None,
                    **kwargs,
                    ) -> T.EStringObj: ...
 
@@ -244,7 +246,7 @@ class TextBox(EGroup[T.EStringObj]):
                  align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                  transform_from: T.EStringObj | int = None,
                  transform_args: dict = None,
-                 break_into_parts: Tuple[str, ...] | None = None,
+                 break_into_parts: Tuple[str, ...] | str | None = None,
                  **kwargs,
                  ) -> T.EStringObj: ...
 
@@ -253,7 +255,7 @@ class TextBox(EGroup[T.EStringObj]):
                   align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                   transform_from: T.EStringObj | int = None,
                   transform_args: dict = None,
-                  break_into_parts: Tuple[str, ...] | None = None,
+                  break_into_parts: Tuple[str, ...] | str | None = None,
                   **kwargs,
                   ) -> T.EStringObj: ...
 
@@ -262,7 +264,7 @@ class TextBox(EGroup[T.EStringObj]):
                          align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                          transform_from: T.EStringObj | int = None,
                          transform_args: dict = None,
-                         break_into_parts: Tuple[str, ...] | None = None,
+                         break_into_parts: Tuple[str, ...] | str | None = None,
                          **kwargs,
                          ) -> T.EStringObj: ...
 

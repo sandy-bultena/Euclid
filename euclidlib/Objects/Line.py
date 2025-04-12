@@ -88,7 +88,7 @@ class ELine(EMObject, mn.Line):
         y = r / math.sqrt(dy**2 + dx**2) * dy + ys
         return x, y
 
-    def highlight(self, color=RED, scale=2.0, **args):
+    def highlight(self, color=RED, scale=3.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
                     .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 

@@ -368,6 +368,9 @@ setattr(cls, 'p{i}', property(p))
         p4: P.EPoint
 
 
+    def highlight(self):
+        return self.animate(rate_func=mn.there_and_back).set_fill(RED, opacity=1)
+
     def replace_line(self, index, newline: L.ELine):
         self.lines[index].e_delete()
         self.lines[index] = newline
@@ -454,7 +457,7 @@ setattr(cls, 'p{i}', property(p))
         for tri in triangles:
             tri.e_fill(RED)
             with self.scene.pause_animations_for():
-                parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle), speed=0)
+                parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle, speed=0))
 
             with self.scene.simultaneous():
                 parallels[-1].e_draw()
@@ -520,3 +523,31 @@ setattr(cls, 'p{i}', property(p))
         if sum(values) > (self.sides - 2) * PI:
             values = list(A.calculateAngle(l2, l1) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
         self._angle_values = values
+
+    @log
+    @anim_speed
+    def copy_to_rectangle(self, point: EMObject | Vect3):
+        # need a right angle
+        with self.scene.simultaneous():
+            l1 = L.ELine(LEFT, ORIGIN).e_fade()
+            l2 = L.ELine(LEFT, UL).e_fade()
+        right = A.EAngle(l1, l2)
+        with self.scene.simultaneous():
+            l1.e_remove()
+            l2.e_remove()
+
+        # create parallelogram
+        pll = self.copy_to_parallelogram_on_point(point, right, speed=0)
+        right.e_remove()
+
+        # - points might not be exactly square, due to round offs, or slight
+        #   misalignment, so fix it.
+        p = pll.vertices
+        p[2][0] = p[1][0]
+        p[3][0] = p[0][0]
+        p[1][1] = p[0][1]
+        p[3][1] = p[2][1]
+
+        rect = EPolygon(*p, delay_anim=True)
+        self.scene.play(mn.ReplacementTransform(pll, rect))
+        return rect

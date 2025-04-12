@@ -25,6 +25,11 @@ def get_TOC(toc):
         entries.explain(f"Proposition {i}: {title}", skip_anim=True)
     return VGroup(*entries.submobjects)
 
+class AttrDict[K, T](dict[K, T]):
+    __slots__ = ()
+    __getattr__ = dict[K, T].__getitem__
+    __setattr__ = dict[K, T].__setitem__
+
 
 class BookScene(PropScene):
     book: int

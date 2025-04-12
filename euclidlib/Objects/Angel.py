@@ -150,14 +150,6 @@ class EAngleBase(EMObject):
         bisect = self.get_bisect(alpha)
         return self.vector_of_angle(bisect)
 
-    def e_label_point(self, alpha=0.5, buff=None):
-        bisect_dir = self.get_bisect_dir(alpha)
-        try:
-            base = self.point_from_proportion(alpha)
-        except AssertionError:
-            base = self.get_arc_center() + bisect_dir * self.size
-        return base + bisect_dir * (buff or self.LabelBuff)
-
     @anim_speed
     def bisect(self):
         vx, vy, _ = self.get_arc_center()
@@ -325,6 +317,39 @@ class EAngleBase(EMObject):
         return final_line, final_angle
 
 
+    def init_label(self, labels: str | List[str], *args, **extra_args):
+        if isinstance(labels, str):
+            return super().init_label(labels, *args, **extra_args)
+        return T.LabelGroup(
+            labels,
+            self,
+            itertools.repeat(args),
+            itertools.repeat(extra_args)
+        )
+
+
+    def tangent_at_start(self):
+        dir = -PI/2 if self.e_angle > 0 else PI/2
+        return self.vector_of_angle(self.e_start_angle + dir)
+
+    def tangent_at_end(self):
+        dir = PI/2 if self.e_angle > 0 else -PI/2
+        return self.vector_of_angle(self.e_end_angle + dir)
+
+    def e_label_point(self, index=0, alpha=0.5, buff=None):
+        if index==0:
+            bisect_dir = self.get_bisect_dir(alpha)
+            try:
+                base = self.point_from_proportion(alpha)
+            except AssertionError:
+                base = self.get_arc_center() + bisect_dir * self.size
+            return base + bisect_dir * (buff or self.LabelBuff)
+        if index==1:
+            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
+        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
+
+
+
 class ArcAngle(EAngleBase, mn.Arc):
     def __init__(self,
                  l1: ELine,
@@ -393,6 +418,7 @@ class RightAngle(EAngleBase):
 
         self.e_start_angle = 0.0
         self.e_end_angle = angle
+        self.e_angle = angle
         self.vx, self.vy = 0, 0
 
         super().__init__(**kwargs, delay_anim=True)
@@ -420,32 +446,7 @@ class RightAngle(EAngleBase):
 
 
 class Gnomon(ArcAngle):
-    def init_label(self, labels: str | List[str], *args, **extra_args):
-        if isinstance(labels, str):
-            return super().init_label(labels, *args, **extra_args)
-        return T.LabelGroup(
-            labels,
-            self,
-            itertools.repeat(args),
-            itertools.repeat(extra_args)
-        )
-
-
-    def tangent_at_start(self):
-        dir = -PI/2 if self.e_angle > 0 else PI/2
-        return self.vector_of_angle(self.e_start_angle + dir)
-
-    def tangent_at_end(self):
-        dir = PI/2 if self.e_angle > 0 else -PI/2
-        return self.vector_of_angle(self.e_end_angle + dir)
-
-    def e_label_point(self, index=0, alpha=0.5, buff=None):
-        if index==0:
-            return super().e_label_point(alpha, buff)
-        if index==1:
-            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
-        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
-
+    pass
 
 
 def EAngle(l1: ELine | str,
