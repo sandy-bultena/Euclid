@@ -32,7 +32,7 @@ def main():
         extra_points=points_text
     )
 
-    outputPath = pathlib.Path(__file__).parent / f'Book{book_num}' / f'Prop{prop_num}.py'
+    outputPath = pathlib.Path(__file__).parent / f'Book{book_num}' / f'Prop{prop_num:02}.py'
     outputPath.write_text(new_file_text)
 
 

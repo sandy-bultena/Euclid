@@ -44,6 +44,7 @@ class TextBox(EGroup[T.EStringObj]):
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Arial Rounded MT Bold')),
             explain=(T.EMarkupText, dict(font_size=18, font='Arial')),
+            sidenote=(T.EMarkupText, dict(font_size=18, font='Arial', slant='ITALIC')),
             explainM=(T.ETexText, dict(font_size=18, font='Arial')),
             normal=(T.EText, dict(font_size=16, font='Arial')),
             math=(T.ETex, dict(font_size=20)),
@@ -54,6 +55,7 @@ class TextBox(EGroup[T.EStringObj]):
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
             explain=(T.EMarkupText, dict(font_size=18, font='Arimo')),
+            sidenote=(T.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
             explainM=(T.ETexText, dict(font_size=18, font='Arimo')),
             normal=(T.EText, dict(font_size=16, font='Arimo')),
             math=(T.ETex, dict(font_size=20)),
@@ -64,6 +66,7 @@ class TextBox(EGroup[T.EStringObj]):
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
             explain=(T.EMarkupText, dict(font_size=18)),
+            sidenote=(T.EMarkupText, dict(font_size=18, slant='ITALIC')),
             explainM=(T.ETexText, dict(font_size=18)),
             normal=(T.EText, dict(font_size=16)),
             math=(T.ETex, dict(font_size=20)),
@@ -260,6 +263,15 @@ class TextBox(EGroup[T.EStringObj]):
                   ) -> T.EStringObj: ...
 
         def title_screen(self, text: str,
+                         align_index: int | T.EStringObj = -1,
+                         align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                         transform_from: T.EStringObj | int = None,
+                         transform_args: dict = None,
+                         break_into_parts: Tuple[str, ...] | str | None = None,
+                         **kwargs,
+                         ) -> T.EStringObj: ...
+
+        def sidenote(self, text: str,
                          align_index: int | T.EStringObj = -1,
                          align_str: mn.SingleSelector | Tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                          transform_from: T.EStringObj | int = None,

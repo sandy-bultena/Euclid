@@ -5,11 +5,12 @@ from itertools import pairwise
 
 from euclidlib.Objects.EucidMObject import *
 from euclidlib.Objects import Line as L
+from euclidlib.Objects import Arc
 from euclidlib.Objects import Point
 import manimlib as mn
 
 
-class ECircle(EMObject, mn.Circle):
+class ECircle(mn.Circle, Arc.AbstractArc):
     CONSTRUCTION_TIME = 0.75
     AUX_CONSTRUCTION_TIME = 0.25
 
@@ -28,9 +29,15 @@ class ECircle(EMObject, mn.Circle):
             tmpLine.e_label.enable_updaters()
         return super().CreationOf(*args, **kwargs)
 
-    def e_label_point(self, angle: float, direction: Vect3 = None, outside=True, buff=None):
-        direction = direction or np.array([np.cos(angle), np.sin(angle), 0.0])
-        edge = self.get_bounding_box_point(direction)
+    def e_label_point(self, angle: float, outside=True, buff=None):
+        direction = np.array([np.cos(angle), np.sin(angle), 0.0])
+        try:
+            edge = self.point_at_angle(angle)
+        except AssertionError:
+            try:
+                edge = self.point_from_proportion((angle%TAU)/TAU)
+            except AssertionError:
+                edge = self.get_right()
         return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
 
     def __init__(self, center, point, temp_line_label=None, *args, **kwargs):

@@ -4,6 +4,7 @@ import math
 from functools import partial, wraps
 from math import isinf
 from os import remove
+from pprint import pp
 
 import manimlib as mn
 import numpy as np
@@ -580,6 +581,8 @@ def {name}(self, *args):
             kwargs['stroke_width'] = 2 * stroke_width
             kwargs['stroke_color'] = mn.RED
 
+        # pp(args)
+        # pp(kwargs)
         super().__init__(*args, **kwargs)
         self.e_label = None
         if label_args:

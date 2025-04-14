@@ -3,11 +3,13 @@ from __future__ import annotations
 import itertools
 
 from euclidlib.Objects.EucidMObject import *
-from .Line import ELine
+from .Line import ELine, VirtualLine
+from euclidlib.Objects import Circle as Cir
 from manimlib import TAU
 from . import Text as T
 from . import Point as P
 from . import Circle as C
+from . import Arc as Arc
 import math
 from typing import Tuple, Any, Self, Callable
 
@@ -81,7 +83,7 @@ def calculateAngle(l1: ELine, l2: ELine):
     return th_diff % TAU
 
 
-class EAngleBase(EMObject):
+class EAngleBase(Arc.AbstractArc):
     LabelBuff = 0.15
     l1: ELine
     l2: ELine
@@ -93,133 +95,6 @@ class EAngleBase(EMObject):
     vy: float
     vec1: mn.Vect2
     vec2: mn.Vect2
-
-    @property
-    def v(self):
-        return np.array([self.vx, self.vy, 0])
-
-    def pointwise_become_partial(self, start: ArcAngle, a: float, b: float) -> Self:
-        if a <= 0:
-            self.e_start_angle = start.e_start_angle
-        else:
-            self.e_start_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, a)
-
-        if b >= 1:
-            self.e_end_angle = start.e_end_angle
-        else:
-            self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
-        return super().pointwise_become_partial(start, a, b)
-
-    def interpolate(
-            self,
-            mobject1: ArcAngle,
-            mobject2: ArcAngle,
-            alpha: float,
-            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
-    ) -> Self:
-        self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
-        self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
-        self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
-        return super().interpolate(mobject1, mobject2, alpha, path_func)
-
-    def get_arc_center(self) -> Vect3:
-        return np.array([self.vx, self.vy, 0])
-
-    def shift(self, vector: Vect3) -> Self:
-        self.vx += vector[0]
-        self.vy += vector[1]
-        return super().shift(vector)
-
-    def rotate(self, angle: float, *args, **kwargs) -> Self:
-        self.e_start_angle += angle
-        self.e_end_angle += angle
-        return super().rotate(angle, *args, **kwargs)
-
-    def proportion_angle(self, alpha: float):
-        interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
-        return interp
-
-    def get_bisect(self, alpha=0.5):
-        return self.proportion_angle(alpha)
-
-    @staticmethod
-    def vector_of_angle(angle):
-        return np.array([math.cos(angle), math.sin(angle), 0.0])
-
-    def get_bisect_dir(self, alpha=0.5):
-        bisect = self.get_bisect(alpha)
-        return self.vector_of_angle(bisect)
-
-    @anim_speed
-    def bisect(self):
-        vx, vy, _ = self.get_arc_center()
-        v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
-        v2 = np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0.0])
-
-        # ------------------------------------------------------------------------
-        # make two temporary lines
-        # ------------------------------------------------------------------------
-        with self.scene.simultaneous():
-            s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
-            s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
-
-        # ------------------------------------------------------------------------
-        # define points B and C on the two lines, equidistance from the vertex
-        # ------------------------------------------------------------------------
-        # pick the shorter of the two lines to find the initial point
-        short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
-        p = s1.point(0.75 * short.get_length())
-        pB = P.EPoint(p)
-        cA = C.ECircle(self.get_arc_center(), pB).e_fade()
-        p = cA.intersect(self.l2)
-        pC = P.EPoint(p[0])
-
-        # ------------------------------------------------------------------------
-        # draw two circles, radius BC, centers: B & C.
-        # - find the intersection points between two circles
-        # ------------------------------------------------------------------------
-        c1 = C.ECircle(pB, pC).e_fade()
-        c2 = C.ECircle(pC, pB).e_fade()
-        ps = c1.intersect(c2)
-        if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
-            p1 = P.EPoint(ps[0])
-        else:
-            p1 = P.EPoint(ps[1])
-
-        # ------------------------------------------------------------------------
-        # draw a line to intersection
-        # ------------------------------------------------------------------------
-        lAD = ELine(self.get_arc_center(), p1)
-
-        # ------------------------------------------------------------------------
-        # cleanup
-        # ------------------------------------------------------------------------
-        with self.scene.simultaneous():
-            c1.e_fade()
-            c2.e_fade()
-            cA.e_fade()
-            s1.e_remove()
-            s2.e_remove()
-            pB.e_remove()
-            pC.e_remove()
-
-        # ------------------------------------------------------------------------
-        # return new line, point, all circles
-        # ------------------------------------------------------------------------
-        return lAD, p1, c1, c2, cA
-
-    def highlight(self, color=RED, scale=2.0, **args):
-        return (self.animate(rate_func=mn.there_and_back, **args)
-                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
-
-    @log
-    def intersect(self, other: Mobject, reverse=True):
-        if isinstance(other, mn.Rectangle):
-            return self.intersect_selection(other)
-        super().intersect(other)
-
-    def intersect_selection(self, other: mn.Rectangle):
-        return other.is_touching(self)
 
     @log
     @anim_speed
@@ -317,37 +192,63 @@ class EAngleBase(EMObject):
         return final_line, final_angle
 
 
-    def init_label(self, labels: str | List[str], *args, **extra_args):
-        if isinstance(labels, str):
-            return super().init_label(labels, *args, **extra_args)
-        return T.LabelGroup(
-            labels,
-            self,
-            itertools.repeat(args),
-            itertools.repeat(extra_args)
-        )
+    @anim_speed
+    def bisect(self):
+        vx, vy, _ = self.get_arc_center()
+        v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
+        v2 = np.array([math.cos(self.e_end_angle), math.sin(self.e_end_angle), 0.0])
 
+        # ------------------------------------------------------------------------
+        # make two temporary lines
+        # ------------------------------------------------------------------------
+        with self.scene.simultaneous():
+            s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
+            s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
 
-    def tangent_at_start(self):
-        dir = -PI/2 if self.e_angle > 0 else PI/2
-        return self.vector_of_angle(self.e_start_angle + dir)
+        # ------------------------------------------------------------------------
+        # define points B and C on the two lines, equidistance from the vertex
+        # ------------------------------------------------------------------------
+        # pick the shorter of the two lines to find the initial point
+        short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
+        p = s1.point(0.75 * short.get_length())
+        pB = P.EPoint(p)
+        cA = C.ECircle(self.get_arc_center(), pB).e_fade()
+        p = cA.intersect(self.l2)
+        pC = P.EPoint(p[0])
 
-    def tangent_at_end(self):
-        dir = PI/2 if self.e_angle > 0 else -PI/2
-        return self.vector_of_angle(self.e_end_angle + dir)
+        # ------------------------------------------------------------------------
+        # draw two circles, radius BC, centers: B & C.
+        # - find the intersection points between two circles
+        # ------------------------------------------------------------------------
+        c1 = C.ECircle(pB, pC).e_fade()
+        c2 = C.ECircle(pC, pB).e_fade()
+        ps = c1.intersect(c2)
+        if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
+            p1 = P.EPoint(ps[0])
+        else:
+            p1 = P.EPoint(ps[1])
 
-    def e_label_point(self, index=0, alpha=0.5, buff=None):
-        if index==0:
-            bisect_dir = self.get_bisect_dir(alpha)
-            try:
-                base = self.point_from_proportion(alpha)
-            except AssertionError:
-                base = self.get_arc_center() + bisect_dir * self.size
-            return base + bisect_dir * (buff or self.LabelBuff)
-        if index==1:
-            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
-        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
+        # ------------------------------------------------------------------------
+        # draw a line to intersection
+        # ------------------------------------------------------------------------
+        lAD = ELine(self.get_arc_center(), p1)
 
+        # ------------------------------------------------------------------------
+        # cleanup
+        # ------------------------------------------------------------------------
+        with self.scene.simultaneous():
+            c1.e_fade()
+            c2.e_fade()
+            cA.e_fade()
+            s1.e_remove()
+            s2.e_remove()
+            pB.e_remove()
+            pC.e_remove()
+
+        # ------------------------------------------------------------------------
+        # return new line, point, all circles
+        # ------------------------------------------------------------------------
+        return lAD, p1, c1, c2, cA
 
 
 class ArcAngle(EAngleBase, mn.Arc):
@@ -362,11 +263,6 @@ class ArcAngle(EAngleBase, mn.Arc):
                  **kwargs):
         self.l1 = l1
         self.l2 = l2
-        self.size = size
-        self.e_angle = angle
-        self.e_start_angle = 0.0
-        self.vx, self.vy = 0, 0
-        self.e_end_angle = angle
         center, self.vec1, self.vec2 = angle_data
 
         if kwargs.get('debug', None):
@@ -415,11 +311,6 @@ class RightAngle(EAngleBase):
         self.l1 = l1
         self.l2 = l2
         self.size = size / math.sqrt(2)
-
-        self.e_start_angle = 0.0
-        self.e_end_angle = angle
-        self.e_angle = angle
-        self.vx, self.vy = 0, 0
 
         super().__init__(**kwargs, delay_anim=True)
 

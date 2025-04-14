@@ -25,6 +25,7 @@ def get_TOC(toc):
         entries.explain(f"Proposition {i}: {title}", skip_anim=True)
     return VGroup(*entries.submobjects)
 
+
 class AttrDict[K, T](dict[K, T]):
     __slots__ = ()
     __getattr__ = dict[K, T].__getitem__
@@ -183,6 +184,7 @@ class Book1Scene(BookScene):
             sABD.e_fill(BLUE_D)
             sFBC.e_fill(BLUE_D)
 
+
 class Book2Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
@@ -256,3 +258,67 @@ class Book2Scene(BookScene):
                 ar1.e_draw()
                 ar2.e_draw()
                 ar3.e_draw()
+
+
+class Book3Scene(BookScene):
+    def title_page(self):
+        title_box = TextBox(mn_scale(0, 100, 0),
+                            line_width=mn_h_scale(600),
+                            alignment='e'
+                            )
+        with self.simultaneous():
+            super().title_page()
+
+            with self.pause_animations_for() as draw:
+                title_box.fancy("A circle is a round straight line with a hole in the middle.", font_size=48,
+                                write_simultaneous=True)
+                title_box.explain("""
+                - <b>Mark Twain</b>,
+                  quoting a schoolchild in "-English as She Is Taught-"
+                """, font_size=16)
+
+                title_box[-1].align_to(title_box[-2], RIGHT)
+                title_box.down()
+                title_box.fancy("If people stand in a circle long enough, "
+                                "they'll eventually begin to dance.", font_size=48, write_simultaneous=True)
+                title_box.explain("""
+                <b>George Carlin</b>, Napalm and Silly Putty (2001)
+                """, font_size=16)
+                title_box[-1].align_to(title_box[-2], RIGHT)
+                draw.append(title_box)
+
+            c1 = mn_coord(260, 360)
+            r1 = mn_scale(180)
+            c2 = c1 + mn_scale(80, 0, 0)
+
+            with self.pause_animations_for() as draw:
+                cA = ECircle(c1, c1 + r1 * RIGHT)
+                pE = EPoint(c1, label=('E', DL))
+                pF = EPoint(c2, label=('F', DR))
+
+                pA = cA.e_point_at_angle(PI).add_label('A', away_from=c2)
+                lFA = ELine(c2, pA)
+
+                pD = cA.e_point_at_angle(0).add_label('D', away_from=c2)
+                lFD = ELine(c2, pD)
+
+                pB = cA.e_point_at_angle(140 * DEG).add_label('B', away_from=c2)
+                lFB = ELine(c2, pB)
+
+                pC = cA.e_point_at_angle(100 * DEG).add_label('C', away_from=c2)
+                lFC = ELine(c2, pC)
+
+                pG = cA.e_point_at_angle(PI/4).add_label('G', away_from=c2)
+                lFG = ELine(c2, pG)
+
+                pH = cA.e_point_at_angle(-PI/4).add_label('H', away_from=c2)
+                lFH = ELine(c2, pG)
+
+                draw.extend([cA, pE, pF, pA, lFA, pD, lFD, pB, lFB, pC, lFC, pG, lFG, pH, lFH])
+                draw.append(ELine(pB, pE))
+                draw.append(ELine(pC, pE))
+                draw.append(ELine(pG, pE))
+                draw.append(ELine(pH, pE))
+
+
+
