@@ -38,6 +38,14 @@ class AbstractArc(EMObject, mn.Arc):
     def v(self):
         return np.array([self.vx, self.vy, 0])
 
+    @property
+    def r(self):
+        return self.size
+
+    @property
+    def radius(self):
+        return self.size
+
     def pointwise_become_partial(self, start: AbstractArc, a: float, b: float) -> Self:
         if a <= 0:
             self.e_start_angle = start.e_start_angle
@@ -90,7 +98,6 @@ class AbstractArc(EMObject, mn.Arc):
         bisect = self.get_bisect(alpha)
         return self.vector_of_angle(bisect)
 
-
     def highlight(self, color=RED, scale=2.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
                 .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
@@ -122,12 +129,12 @@ class AbstractArc(EMObject, mn.Arc):
         dir = PI / 2 if self.e_angle > 0 else -PI / 2
         return self.vector_of_angle(self.e_end_angle + dir)
 
-    def tangent_points(self, angle_or_point: float | Mobject | Vect3):
+    def tangent_points(self, angle_or_point: float | Mobject | Vect3, negative=False):
         if isinstance(angle_or_point, (float, np.float32, np.float64)):
             t_point = self.point_at_angle(angle_or_point)
         else:
             t_point = convert_to_coord(angle_or_point)
-        rotation = PI / 2 if self.e_angle > 0 else -PI / 2
+        rotation = PI / 2 * (1 if (negative != self.e_angle > 0) else -1)
         vec = t_point - self.v
         return t_point, t_point + mn.rotate_vector(vec / 2, rotation)
 

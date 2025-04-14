@@ -49,13 +49,13 @@ class ECircle(mn.Circle, Arc.AbstractArc):
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]
-        self.radius = math.sqrt(dx ** 2 + dy ** 2)
+        radius = math.sqrt(dx ** 2 + dy ** 2)
         angle = math.atan2(dy, dx)
 
         super().__init__(
             start_angle=angle,
             arc_center=self.e_center,
-            radius=self.radius,
+            radius=radius,
             *args,
             **kwargs
         )
@@ -184,6 +184,60 @@ class ECircle(mn.Circle, Arc.AbstractArc):
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
         super().intersect(other)
+
+    @log
+    @anim_speed
+    def draw_tangent(self, point: Mobject | Vect3, negative=False):
+        # draw line from point to centre of circle
+        pC = Point.EPoint(self.v)
+        lC = L.ELine(point, pC)
+
+        # if point is inside circle, then we can't do this
+        if lC.get_length() - self.r < mn_scale(-1):
+            raise ValueError("Cannot draw a line from INSIDE circle that touches circle!")
+
+        to_remove = [pC, lC]
+
+        # if the point is on the circle, then draw a line perpendicular
+        # to the radius
+        if abs(lC.get_length() - self.r) < mn_scale(2):
+            l = lC.perpendicular(point, speed=0, inside=negative)
+            l.extend(self.r)
+        # else draw a line from the point tangent to the circle
+        else:
+            # find where line from centre intersects small circle
+            p: Tuple[Vect3, Vect3] = self.intersect(lC)
+            pD = Point.EPoint(p[0]).e_fade()
+            # draw larger circle, and where line from centre intersects small circle
+            cL = ECircle(self.v, point).e_fade()
+            # find line perpendicular to d, and find
+            # intersection with larger circle
+            lPerp = lC.perpendicular(pD, speed=0, inside=negative).e_fade()
+            lPerp.extend(lC.get_length())
+            p = cL.intersect(lPerp)
+            pF = Point.EPoint(p[0]).e_fade()
+            # draw line from point F to centre of circle
+            lF = L.ELine(pF, pC).e_fade()
+            # find intersection of this line with original circle
+            p = self.intersect(lF)
+            # fiddle around because round off errors might make point B
+            # just outside the circle
+            radial = L.ELine(self.get_center(), p[0])
+            if radial.get_length() > self.radius:
+                p = (radial.point(self.radius),)
+            radial.e_remove()
+            pB = Point.EPoint(p[0]).e_fade()
+            # draw the tangent
+            l = L.ELine(point, pB)
+
+            to_remove.extend([pB, radial, lF, pF, lPerp, cL, pD])
+
+        with self.scene.simultaneous():
+            for x in to_remove:
+                x.e_remove()
+
+        return l
+
 
 
 class VirtualCircle(ECircle):
