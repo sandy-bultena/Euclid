@@ -8,6 +8,7 @@ from euclidlib.Objects import Line as L
 from euclidlib.Objects import Arc
 from euclidlib.Objects import Point
 import manimlib as mn
+from euclidlib.Objects import Dashable as Da
 
 
 class ECircle(mn.Circle, Arc.AbstractArc):

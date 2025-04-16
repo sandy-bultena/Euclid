@@ -13,7 +13,7 @@ from manimlib import Mobject
 import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 
-from .CustomAnimation import UncreatePreserve, EShowCreation, E_MethodAnimation
+from euclidlib.Objects import CustomAnimation as CA
 from typing import Sized, Self, Callable, Tuple
 from contextlib import contextmanager
 
@@ -71,7 +71,7 @@ class NullPlayer:
 def e_animate(anim):
     if anim.overridden_animation:
         return anim.overridden_animation
-    return E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
+    return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
 
 
 class EMObjectPlayer:
@@ -260,7 +260,7 @@ def animate(func):
         if self.scene.animateState[-1] != ps.AnimState.PAUSED:
             an = self.animate(rate_func=rate_func)
             func(self, an, *args, **kwargs)
-            self.scene.play(an)
+            self.scene.play(e_animate(an))
             return self
         else:
             return func(self, self, *args, **kwargs)
@@ -331,10 +331,10 @@ class EMObject(mn.VMobject):
     Virtual = False
 
     def CreationOf(self, *args, **kwargs):
-        return [EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+        return [CA.EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def RemovalOf(self, *args, **kwargs):
-        return [UncreatePreserve(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+        return [CA.UncreatePreserve(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def in_scene(self):
         return self in self.scene.mobjects

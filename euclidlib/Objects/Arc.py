@@ -8,9 +8,9 @@ from manimlib import TAU
 from . import Line as Ln
 from . import Text as T
 from . import Point as P
+from euclidlib.Objects import Dashable as Da
 
-
-class AbstractArc(EMObject, mn.Arc):
+class AbstractArc(Da.Dashable, mn.Arc):
     size: float
     e_angle: float
     e_start_angle: float

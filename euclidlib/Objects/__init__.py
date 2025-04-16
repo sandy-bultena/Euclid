@@ -1,4 +1,3 @@
-from euclidlib.Propositions import PropScene as ps
 from .EucidMObject import *
 from .EucidGroupMObject import *
 from .Angel import EAngle, EAngleBase

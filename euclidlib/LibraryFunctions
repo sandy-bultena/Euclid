@@ -78,7 +78,6 @@ Line.pm
     show_parts
     dash
     undash
-    intersect
     int_coords
     angle
     length_from_end

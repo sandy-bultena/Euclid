@@ -37,8 +37,9 @@ def {name}(self, *args):
         if index:
             to_exec = [self.players[i] for i in index]
 
-        for player in to_exec:
-            player(**kwargs)
+        with self.obj.scene.simultaneous():
+            for player in to_exec:
+                player(**kwargs)
         return self.obj
 
     def __getitem__(self, item: int | slice):
@@ -75,9 +76,10 @@ class PsuedoGroup(EMObject):
 
     @freezable
     def e_remove(self):
-        for obj in self.get_group():
-            if obj.in_scene():
-                obj.e_remove()
+        with self.scene.simultaneous():
+            for obj in self.get_group():
+                if obj.in_scene():
+                    obj.e_remove()
         super().e_remove()
         return self
 

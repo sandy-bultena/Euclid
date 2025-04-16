@@ -6,7 +6,6 @@ from enum import Enum
 from manimlib import *
 from euclidlib.Objects import *
 from euclidlib.Objects import EucidMObject as EM
-from euclidlib.Objects import CustomAnimation as CA
 from os import getenv
 import pyglet
 

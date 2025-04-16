@@ -6,6 +6,11 @@ from typing import Callable
 
 from . import EucidMObject as E
 
+@cache
+def EAnimationOf(anim_type: type):
+    return type(f'E_{anim_type.__name__}', (anim_type, EuclidAnimation), {})
+
+
 class UncreatePreserve(mn.Uncreate):
     def __init__(self, obj: mn.Mobject, *args, **kwargs):
         super().__init__(obj, *args, **kwargs)
@@ -26,10 +31,14 @@ class EuclidAnimation(mn.Animation):
         super().begin()
         if self.mobject.e_label:
             self.mobject.e_label.enable_updaters()
+        if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
+            self.mobject.dash_ref.enable_updaters()
 
     def clean_up_from_scene(self, scene: Scene) -> None:
         if self.mobject.e_label:
             self.mobject.e_label.disable_updaters()
+        if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
+            self.mobject.dash_ref.disable_updaters()
 
 
 class Indicate(mn.Transform):

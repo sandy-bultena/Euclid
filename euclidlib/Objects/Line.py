@@ -12,9 +12,11 @@ from euclidlib.Objects import Angel
 import math
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple, Set
+
+from euclidlib.Objects import Dashable as Da
 from euclidlib.Objects.EucidMObject import *
 
-class ELine(EMObject, mn.Line):
+class ELine(Da.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
 
