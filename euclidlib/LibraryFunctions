@@ -15,7 +15,6 @@ Numbers.pm
     find_plane_from_proportional
 
 Triangle.pm
-    copy_to_circle
     area
 
 Angle.pm

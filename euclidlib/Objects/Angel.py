@@ -97,7 +97,7 @@ class EAngleBase(Arc.AbstractArc):
     vec2: mn.Vect2
 
     @log
-    @anim_speed
+    @copy_transform(index=1)
     def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
         start, end = line.get_start_and_end()
         if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):

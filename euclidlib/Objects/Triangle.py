@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import pairwise
 from math import atan2, cos, sin, atan
 from typing import Sized, Tuple, Any, List
 
@@ -208,7 +209,7 @@ class ETriangle(EPolygon):
         pB = P.EPoint(line.get_end())
         cA = C.ECircle(*line.get_start_and_end())
         lAC = L.ELine(line.get_start(), pC).red()
-        lBD = lAC.copy_to_circle(cA, pB, negative=negative, speed=0)
+        lBD = lAC.copy_to_circle(cA, pB, negative=negative)
 
         # which way to construct triangle? make sure angles are less than 90
         a = A.EAngle(line, lBD)
@@ -226,5 +227,43 @@ class ETriangle(EPolygon):
             cA.e_remove()
         return t
 
+    @log
+    @copy_transform()
+    def copy_to_circle(self, circle: C.ECircle) -> ETriangle:
+        angles: G.EGroup[A.EAngleBase] = G.EGroup(
+            A.EAngle(l1, l2, delay_anim=True)
+            for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
+        )
 
+        # Draw a line GH tangent to the circle at point A
+        pA = circle.e_point_at_angle(PI/2)
+        with L.ELine(circle.v, pA) as r1:
+            lGA = r1.perpendicular(pA, negative=True)
 
+        lAH = lGA.prepend_cpy(2 * circle.radius)
+
+        # Copy the angle E to line GH, at point A (I.23)
+        with with_objects(*angles[1].copy_to_line(pA, lAH)) as (la1, a1):
+            la1.extend(2 * circle.radius)
+            pts = circle.intersect(la1)
+            pC = P.EPoint(pts[0])
+
+        # Copy the angle L to line GH, at point A (I.23)
+        with with_objects(*angles[2].copy_to_line(pA, lGA, negative=True)) as (la2, a2):
+            la2.extend(2 * circle.radius)
+            pts = circle.intersect(la2)
+            pB = P.EPoint(pts[1])
+
+        # create new triangle
+        t = ETriangle(pA, pB, pC)
+
+        with self.scene.simultaneous():
+            pA.e_remove()
+            pB.e_remove()
+            pC.e_remove()
+            lGA.e_remove()
+            lAH.e_remove()
+            for x in angles:
+                x.e_remove()
+
+        return t

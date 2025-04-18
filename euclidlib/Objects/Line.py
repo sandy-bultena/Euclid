@@ -202,7 +202,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         return ELine(self.get_start(), (x2, y2, 0))
 
     @log
-    @anim_speed
+    @copy_transform(index=0)
     def copy_to_point(self, target: P.EPoint) -> Tuple[ELine, P.EPoint]:
         A = self.get_start()
         B = self.get_end()
@@ -279,11 +279,11 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         return lCF, pF
 
     @log
-    @anim_speed
+    @copy_transform(index=0)
     def copy_to_line(self, target: P.EPoint, target_line: ELine):
         lx, px = self.copy_to_point(target, speed=-1)
         if lx is None or px is None:
-            return
+            raise Exception("Failed To Copy To Point")
 
         c = Circle.ECircle(target, lx.get_end())
 
@@ -447,7 +447,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
     @log
     @anim_speed
-    def perpendicular(self, p: P.EPoint, /, inside=False):
+    def perpendicular(self, p: P.EPoint, /, inside=False, negative=False):
+        inside = inside or negative
         rs = mn.get_norm(self.pointify(p) - self.get_start())
         re = mn.get_norm(self.pointify(p) - self.get_end())
         if (rs + re - self.get_length()) > mn_scale(0.1):
@@ -567,7 +568,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         return pH
 
     @log
-    @anim_speed
+    @copy_transform()
     def copy_to_circle(self, c: Circle.ECircle, p: P.EPoint, negative=False):
         center = c.v
 

@@ -76,6 +76,9 @@ class AppendString(mn.TransformMatchingStrings):
         self.build_animations_with_timings(0)
 
 
+class DeepTransformCopy(EuclidAnimation, mn.TransformFromCopy):
+    pass
+
 
 class MoveToAndReplace(mn.MoveToTarget):
     def __init__(self, source: mn.Mobject, target: mn.Mobject, **kwargs):

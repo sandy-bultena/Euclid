@@ -1,3 +1,4 @@
+from typing import Self, List
 import manimlib as mn
 import numpy as np
 from euclidlib.Objects import EucidMObject as EM, EGroup, PsuedoGroup, mn_scale
@@ -8,29 +9,57 @@ class Dashable(PsuedoGroup):
     def get_group(self):
         to_ret = [*self.tick_marks]
         if self.dash_ref is not None:
-            to_ret.append(to_ret)
+            to_ret.append(self.dash_ref)
         return to_ret
 
     def __init__(self, *args, **kwargs):
         self.dash_ref: DashPath | None = None
         self.tick_marks = EGroup()
+        self.tick_mark_alphas: List[float] = []
+        self.dash_options = dict()
         super().__init__(*args, **kwargs)
 
     def remove_dash(self):
         if self.dash_ref is not None:
             self.dash_ref.e_remove()
+            self.dash_options = dict()
 
     def dash(self,
              dash_length: float = mn.DEFAULT_DASH_LENGTH,
              positive_space_ratio: float = 0.5,
-             final_opacity=0):
+             final_opacity=0,
+             delay_anim=False):
         self.remove_dash()
+
+        self.dash_options = dict(
+            dash_length=dash_length,
+            positive_space_ratio=positive_space_ratio
+        )
+
         with self.scene.simultaneous():
-            self.dash_ref = DashPath(self, dash_length, positive_space_ratio)
-            self.scene.play(self.animate.set_stroke(opacity=final_opacity))
+            self.dash_ref = DashPath(self, dash_length, positive_space_ratio, delay_anim=delay_anim or not self.visible())
+            if self.visible() and not delay_anim:
+                self.scene.play(self.animate.set_stroke(opacity=final_opacity))
+            else:
+                self.set_stroke(opacity=final_opacity)
 
         self.dash_ref.disable_updaters()
-        self.dash_ref.f_always.become(lambda: DashPath(self, dash_length, positive_space_ratio, delay_anim=True))
+        def updater(dash_ref: DashPath):
+            dash_ref.become(DashPath(self, dash_length, positive_space_ratio, delay_anim=True))
+        self.dash_ref.add_updater(updater, call=False)
+
+    def transform_to(self, other: Self, *sub_animations):
+        animations = []
+        if self.dash_ref is not None:
+            if other.dash_ref is None:
+                other.dash(**self.dash_options, delay_anim=True)
+            animations.append(mn.TransformFromCopy(self.dash_ref, other.dash_ref))
+        if len(self.tick_marks) > 0:
+            if not other.tick_marks:
+                for a, t in zip(self.tick_mark_alphas, self.tick_marks):
+                    other.tick_prop(a, t.get_length(), delay_anim=True)
+            animations.append(mn.TransformFromCopy(self.tick_marks, other.tick_marks))
+        return super().transform_to(other, *animations, *sub_animations)
 
     def _find_tangent_vec(
             self,
@@ -46,8 +75,11 @@ class Dashable(PsuedoGroup):
                          d_alpha: float = 1e-6):
         return mn.rotate_vector(self._find_tangent_vec(alpha, d_alpha), mn.PI/2)
 
-    def tick(self, at_length, tick_size=mn.SMALL_BUFF, label=None):
+    def tick_abs(self, at_length, tick_size=mn.SMALL_BUFF, label=None, delay_anim=False):
         alpha = at_length / self.get_arc_length()
+        self.tick_prop(alpha, tick_size, label, delay_anim)
+
+    def tick_prop(self, alpha, tick_size=mn.SMALL_BUFF, label=None, delay_anim=False):
         direction = self._find_normal_vec(alpha)
         if direction[1] < 0:
             direction = -direction
@@ -58,8 +90,10 @@ class Dashable(PsuedoGroup):
         self.tick_marks.add(Line.ELine(
             point - direction * tick_size/2,
             point + direction * tick_size/2,
-            label=label
+            label=label,
+            delay_anim=delay_anim or not self.visible()
         ))
+        self.tick_mark_alphas.append(alpha)
 
     def even_ticks(self, period: float, tick_size=mn.SMALL_BUFF, labels=()):
         self.clear_ticks()
@@ -67,7 +101,7 @@ class Dashable(PsuedoGroup):
         label_iter = iter(labels)
         with self.scene.delayed():
             while position < (self.get_arc_length() - mn_scale(1)):
-                self.tick(position, tick_size, label=next(label_iter, None))
+                self.tick_abs(position, tick_size, label=next(label_iter, None))
                 position += period
 
     def clear_ticks(self):
@@ -75,6 +109,7 @@ class Dashable(PsuedoGroup):
             with self.scene.simultaneous():
                 self.tick_marks.e_remove()
             self.tick_marks.clear()
+            self.tick_mark_alphas.clear()
 
 
     def un_dash(self, final_opacity=1):

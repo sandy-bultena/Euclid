@@ -16,7 +16,7 @@ class Prop0(BookScene):
     title = ""
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 50), line_width=mn_h_scale(550))
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}
@@ -41,7 +41,7 @@ class Prop0(BookScene):
             la.e_remove()
             t1.e_remove()
 
-        @self.push_step
+        # @self.push_step
         def tickmark_test():
             t1.title("Draw Line")
             la = EArc(2, LEFT * 3 + UP, UP, big=True)
@@ -70,9 +70,31 @@ class Prop0(BookScene):
             line = ELine(LEFT * 3.5, LEFT)
             circle = ECircle(RIGHT*2, RIGHT*4)
             p = circle.point_at_angle(PI/3)
-            res = line.copy_to_circle(circle, p, speed=1)
+            res = line.copy_to_circle(circle, p)
 
         # @self.push_step
         def triangle_golden_ration():
             line = ELine(LEFT * 3.5, LEFT)
             ETriangle.golden(line, speed=1)
+
+        @self.push_step
+        def triangle_copy_to_circle():
+            tri = ETriangle(UP, LEFT, DR)
+            tri.e_move(3 * LEFT)()
+            tri.l0.dash()
+            tri.l1.even_ticks(0.3)
+            circle = ECircle(RIGHT*2, RIGHT*4)
+            t1.title("Triangle to Copy (animated)")
+            res = tri.copy_to_circle(circle, speed=1)
+            self.wait(2)
+            res.e_remove()
+            t1.title("Triangle to Copy (skipped)")
+            res = tri.copy_to_circle(circle, speed=-1)
+
+        # @self.push_step
+        def ticks_animated():
+            line = ELine(LEFT * 4, LEFT)
+            line.dash(dash_length=0.2)
+            circle = ECircle(RIGHT*2, RIGHT*4)
+            p = circle.e_point_at_angle(PI/4)
+            res = line.copy_to_circle(circle, p)

@@ -284,16 +284,43 @@ def freezable(func):
 
 def anim_speed(func):
     @wraps(func)
-    def animate_change(self: EMObject, *args, speed=-1, **kwargs):
+    def animate_change(self: EMObject, *args, speed=-1, no_anim=False, **kwargs):
         with self.scene.animation_speed(speed) as draw:
             x = func(self, *args, **kwargs)
-            if isinstance(x, (tuple, list)):
-                draw.extend(x)
-            else:
-                draw.append(x)
+            if not no_anim:
+                if isinstance(x, (tuple, list)):
+                    draw.extend(x)
+                else:
+                    draw.append(x)
         return x
 
     return animate_change
+
+def copy_transform(*, index=None):
+    def inner(func):
+        @wraps(func)
+        def animate_change(self: EMObject, *args, speed=-1, no_anim=False, **kwargs):
+            if speed > 0:
+                return anim_speed(func)(self, *args, speed=speed, no_anim=no_anim, **kwargs)
+            elif speed < 0:
+                with self.scene.pause_animations_for():
+                    x = func(self, *args, **kwargs)
+                if index is None:
+                    if not no_anim:
+                        self.scene.play(self.transform_to(x))
+                else:
+                    tmp = list(x)
+                    if not no_anim:
+                        with self.scene.simultaneous():
+                            self.scene.play(self.transform_to(tmp[index]))
+                            del tmp[index]
+                            for y in tmp:
+                                y.e_draw()
+                return x
+            else:
+                return func(self, *args, **kwargs)
+        return animate_change
+    return inner
 
 def class_anim_speed(func):
     @wraps(func)
@@ -332,6 +359,15 @@ def find_scene():
             return f_self.scene
         if isinstance(f_self, ps.PropScene):
             return f_self
+
+@contextmanager
+def with_objects(head, *rest):
+    with head:
+        if rest:
+            with with_objects(*rest) as sub_elements:
+                yield head, *sub_elements
+        else:
+            yield head,
 
 
 class EMObject(mn.VMobject):
@@ -438,8 +474,16 @@ def {name}(self, *args):
         if label:
             return Text.Label(label, self, *args, **extra_args)
 
+    def transform_to(self, other: Self, *sub_animations):
+        return mn.AnimationGroup(
+            mn.TransformFromCopy(self, other),
+            *sub_animations
+        )
+
     @freezable
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
+        if self.visible():
+            return
         anim_args = anim_args or dict()
         removal_args = anim_args if removal_args is None else removal_args
         if not skip_anim and not self.Virtual:
@@ -466,6 +510,13 @@ def {name}(self, *args):
             if self.scene.debug:
                 self.scene.update_frame()
         return self
+
+    def __enter__(self):
+        self.e_draw()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.e_remove()
 
     def interpolate(
             self,

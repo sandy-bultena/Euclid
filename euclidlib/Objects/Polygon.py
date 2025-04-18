@@ -296,14 +296,15 @@ setattr(cls, 'p{i}', property(p))
             p.add_label(*label_data)
         return self
 
-    def set_angles(self, *angle_data: str | float | None, delay_anim=False,  skip_anim=False):
+    def set_angles(self, *angle_data: str | float | None, delay_anim=False, skip_anim=False):
         names, sizes = angle_data[:self.sides], angle_data[self.sides:]
         names_and_sizes = zip_longest(names, sizes, fillvalue=mn_scale(40))
         line_pairs = pairwise([self.lines[-1]] + self.lines)
 
         if not self.angles:
             self.angles = [
-                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim, skip_anim=skip_anim)
+                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim,
+                         skip_anim=skip_anim)
                 for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
                 if name is not None
             ]
@@ -367,7 +368,6 @@ setattr(cls, 'p{i}', property(p))
         p3: P.EPoint
         p4: P.EPoint
 
-
     def highlight(self):
         return self.animate(rate_func=mn.there_and_back).set_fill(RED, opacity=1)
 
@@ -430,8 +430,16 @@ setattr(cls, 'p{i}', property(p))
     def intersect_selection(self, other: mn.Rectangle):
         return False
 
+    def transform_to(self, other: Self, *sub_animations):
+        line_transforms = [us.transform_to(them) for us, them in zip(self.l, other.lines)]
+        point_transforms = [us.transform_to(them) for us, them in zip(self.p, other.points)]
+        angle_transforms = [us.transform_to(them)
+                            for us, them in zip(self.a, other.angles) 
+                            if us is not None and them is not None]
+        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations)
+
     @log
-    @anim_speed
+    @copy_transform()
     def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False):
         coords = convert_to_coord(point)
         line = L.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
@@ -440,7 +448,7 @@ setattr(cls, 'p{i}', property(p))
         return para
 
     @log
-    @anim_speed
+    @copy_transform()
     def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
         # ------------------------------------------------------------------------
         # get a list of triangles that make up the polygon
@@ -525,7 +533,7 @@ setattr(cls, 'p{i}', property(p))
         self._angle_values = values
 
     @log
-    @anim_speed
+    @copy_transform()
     def copy_to_rectangle(self, point: EMObject | Vect3):
         # need a right angle
         with self.scene.simultaneous():
