@@ -15,8 +15,6 @@ Numbers.pm
     find_plane_from_proportional
 
 Triangle.pm
-    circumscribe
-    golden
     copy_to_circle
     area
 
@@ -62,22 +60,15 @@ Polygon.pm
     poly
 
 Line.pm
-    tick
-    tickmarks
-    tick_marks
     rotateTo
     subtract
-    golden_ratio
     third_proportional
     third_mean
     fourth_proportional
     mean_proportional
-    copy_to_circle
     square
     parts
     show_parts
-    dash
-    undash
     int_coords
     angle
     length_from_end

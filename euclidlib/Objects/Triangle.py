@@ -178,3 +178,53 @@ class ETriangle(EPolygon):
         s1.e_remove()
         return s4
 
+    @log
+    @anim_speed
+    def circumscribe(self):
+        # bisect two sides of the triangle
+        pD = self.l0.bisect()
+        pE = self.l2.bisect()
+
+        # Find the centre of the circle
+        l1 = self.l0.perpendicular(pD, inside=True)
+        l2 = self.l2.perpendicular(pE, inside=True)
+        p=  l1.intersect(l2)
+
+        c = C.ECircle(p, self.p0)
+
+        with self.scene.simultaneous():
+            l1.e_remove()
+            l2.e_remove()
+            pD.e_remove()
+            pE.e_remove()
+
+        return c
+
+
+    @classmethod
+    @class_anim_speed
+    def golden(cls, line: L.ELine, negative=False):
+        pC = line.golden_ration(speed=0)
+        pB = P.EPoint(line.get_end())
+        cA = C.ECircle(*line.get_start_and_end())
+        lAC = L.ELine(line.get_start(), pC).red()
+        lBD = lAC.copy_to_circle(cA, pB, negative=negative, speed=0)
+
+        # which way to construct triangle? make sure angles are less than 90
+        a = A.EAngle(line, lBD)
+        if a.e_angle < PI:
+            t = cls(line.get_start(), lBD.get_start(), line.get_end())
+        else:
+            t = cls(line.get_start(), line.get_end(), lBD.get_start())
+
+        with t.scene.simultaneous():
+            a.e_remove()
+            pC.e_remove()
+            pB.e_remove()
+            lAC.e_remove()
+            lBD.e_remove()
+            cA.e_remove()
+        return t
+
+
+

@@ -191,9 +191,12 @@ class PropScene(InteractiveScene):
             self.animateState.append(AnimState.PAUSED)
             yield to_draw
             self.animateState.pop()
-            with self.simultaneous():
-                for x in to_draw:
-                    x.e_draw()
+            if len(to_draw) > 1:
+                with self.simultaneous():
+                    for x in to_draw:
+                        x.e_draw()
+            if len(to_draw) == 1:
+                to_draw[0].e_draw()
 
         else:
             yield []

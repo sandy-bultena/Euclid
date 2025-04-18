@@ -295,6 +295,20 @@ def anim_speed(func):
 
     return animate_change
 
+def class_anim_speed(func):
+    @wraps(func)
+    def animate_change(cls: type, *args, speed=-1, **kwargs):
+        scene = find_scene()
+        with scene.animation_speed(speed) as draw:
+            x = func(cls, *args, **kwargs)
+            if isinstance(x, (tuple, list)):
+                draw.extend(x)
+            else:
+                draw.append(x)
+        return x
+
+    return animate_change
+
 
 def freezable_player(func):
     @wraps(func)

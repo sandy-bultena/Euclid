@@ -17,7 +17,6 @@ class Prop0(BookScene):
 
     def define_steps(self):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
-        
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}
@@ -28,7 +27,7 @@ class Prop0(BookScene):
         eq: Dict[str | int, EStringObj] = {}
         ex: Dict[str | int, Mobject] = {}
 
-        @self.push_step
+        # @self.push_step
         def dashed_test():
             t1.title("Draw Line")
             la = ELine(DL * 2, ORIGIN)
@@ -47,7 +46,8 @@ class Prop0(BookScene):
             t1.title("Draw Line")
             la = EArc(2, LEFT * 3 + UP, UP, big=True)
             t1.title("Mark Ticks")
-            la.even_ticks(la.get_arc_length()/15, labels=map(str, itertools.count()))
+            la.dash()
+            la.even_ticks(la.get_arc_length() / 15, labels=map(str, itertools.count()))
             self.wait()
             la.e_fade()
             self.wait()
@@ -55,7 +55,24 @@ class Prop0(BookScene):
             self.wait()
             la.e_remove()
 
+        # @self.push_step
+        def triangle_circumscribe():
+            t = ETriangle(UP, LEFT, DR)
+            c = t.circumscribe(speed=1)
 
+        # @self.push_step
+        def line_golden_ratio():
+            line = ELine(LEFT, RIGHT)
+            p = line.golden_ration(speed=1)
 
+        # @self.push_step
+        def line_copy_to_circle():
+            line = ELine(LEFT * 3.5, LEFT)
+            circle = ECircle(RIGHT*2, RIGHT*4)
+            p = circle.point_at_angle(PI/3)
+            res = line.copy_to_circle(circle, p, speed=1)
 
-
+        # @self.push_step
+        def triangle_golden_ration():
+            line = ELine(LEFT * 3.5, LEFT)
+            ETriangle.golden(line, speed=1)

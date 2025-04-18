@@ -20,14 +20,15 @@ class ECircle(mn.Circle, Arc.AbstractArc):
                           stroke_color=mn.RED,
                           label=self.temp_line_label,
                           delay_anim=True)
-        self.animation_objects.append(tmpLine)
-        tmpLine.e_draw(
-            anim_args=dict(
-                run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
-            ))
-        tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
-        if tmpLine.e_label is not None:
-            tmpLine.e_label.enable_updaters()
+        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
+            self.animation_objects.append(tmpLine)
+            tmpLine.e_draw(
+                anim_args=dict(
+                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+                ))
+            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+            if tmpLine.e_label is not None:
+                tmpLine.e_label.enable_updaters()
         return super().CreationOf(*args, **kwargs)
 
     def e_label_point(self, angle: float, outside=True, buff=None):

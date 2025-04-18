@@ -90,11 +90,12 @@ class PsuedoGroup(EMObject):
         return self
 
     @freezable
-    def e_draw(self, skip_anim=False):
-        for obj in self.get_group():
-            if not obj.visible():
-                obj.e_draw(skip_anim)
-        super().e_draw(skip_anim)
+    def e_draw(self, skip_anim=False, **kwargs):
+        with self.scene.simultaneous():
+            for obj in self.get_group():
+                if not obj.visible():
+                    obj.e_draw(skip_anim, **kwargs)
+        super().e_draw(skip_anim, **kwargs)
         return self
 
     for name in EMObjectPlayer._properties():

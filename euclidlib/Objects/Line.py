@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import EnumType, Enum
 from itertools import pairwise
+from typing_extensions import deprecated
 
 import numpy as np
 
@@ -230,9 +231,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         # construct equilateral on above line (D = apex of triangle)
         t[1] = EquilateralTriangle.build(A, C)
         p['D'] = t[1].p[-1]
-        with self.scene.simultaneous():
-            l['AD'] = t[1].l[2]
-            l['CD'] = t[1].l[1]
+        l['AD'] = t[1].l[2]
+        l['CD'] = t[1].l[1]
         with self.scene.simultaneous():
             parts: Dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
             del parts[id(l['AD'])]
@@ -243,7 +243,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
             c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
             pts = c[circle].intersect(l[line])
-            self.add(l[line])
+            # self.add(l[line])
             for _ in range(15):
                 if pts and not find_min:
                     break
@@ -281,7 +281,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     @log
     @anim_speed
     def copy_to_line(self, target: P.EPoint, target_line: ELine):
-        lx, px = self.copy_to_point(target, speed=0)
+        lx, px = self.copy_to_point(target, speed=-1)
         if lx is None or px is None:
             return
 
@@ -305,7 +305,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 clone.e_remove()
             return lx, px
 
-        np = P.EPoint(p[0], fill_color=PINK)
+        np = P.EPoint(p[0])
         nl = ELine(target, np)
 
         if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
@@ -445,12 +445,14 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             ln.e_remove()
         return l['CF']
 
-    def perpendicular(self, p: P.EPoint, /, speed=-1, inside=False):
+    @log
+    @anim_speed
+    def perpendicular(self, p: P.EPoint, /, inside=False):
         rs = mn.get_norm(self.pointify(p) - self.get_start())
         re = mn.get_norm(self.pointify(p) - self.get_end())
         if (rs + re - self.get_length()) > mn_scale(0.1):
-            return self._perp_off_line(p, re, rs, speed=speed)
-        return self._perp_on_line(p, re, rs, inside=inside, speed=speed)
+            return self._perp_off_line(p, re, rs, speed=0)
+        return self._perp_on_line(p, re, rs, inside=inside, speed=0)
 
     @log
     @anim_speed
@@ -499,6 +501,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
         return lEA
 
+    @deprecated('Use .dash()')
     def dashed(self):
         dd = EDashedLine(*self.get_start_and_end(),
                          skip_anim=True,
@@ -508,6 +511,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         self.scene.play(mn.FadeOut(self))
         return dd
 
+    @deprecated("Use copy().dash()")
     def dashed_copy(self):
         dd = EDashedLine(*self.get_start_and_end(),
                          skip_anim=True,
@@ -515,6 +519,116 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                          stroke_width=float(self.get_stroke_width()),
                          stroke_opacity=float(self.get_stroke_opacity()))
         return dd
+
+    @log
+    @anim_speed
+    def golden_ration(self, negative=False):
+        # take care of negative/positive stuff
+        start, end = self.get_start_and_end()
+        if negative:
+            end, start = start, end
+
+        # drop a perpendicular from the starting point
+        pA = P.EPoint(start)
+        l3t = self.perpendicular(pA).e_fade()
+        if l3t.get_length() < self.get_length():
+            l3t.extend(self.get_length())
+        pA.e_remove()
+
+        # make line $l3 equal to original line length
+        c = Circle.ECircle(start, end)
+        p = c.intersect(l3t)
+        l3 = ELine(start, p[0])
+        l3t.e_remove()
+        c.e_remove()
+
+        # bisect AC
+        pE = l3.bisect()
+
+        # extend CA to point F, such that EF is equal to EB
+        l3.prepend(l3.get_length())
+        c = Circle.ECircle(pE, end)
+        p = c.intersect(l3)
+        pF = P.EPoint(p[0])
+        c.e_remove()
+
+        # find point H such that AH equals AF
+        c = Circle.ECircle(start, pF)
+        p = c.intersect(self)
+        pH = P.EPoint(p[0])
+
+        #cleanup
+        with self.scene.simultaneous():
+            pE.e_remove()
+            c.e_remove()
+            pF.e_remove()
+            l3.e_remove()
+
+        return pH
+
+    @log
+    @anim_speed
+    def copy_to_circle(self, c: Circle.ECircle, p: P.EPoint, negative=False):
+        center = c.v
+
+        # if point not on the circle, choose random point on circle
+        new_point = 0
+        vl = VirtualLine(center, p)
+        if abs(vl.get_length() - c.radius) > mn_scale(1):
+            p = c.point_at_angle(0)
+            new_point = 1
+        vl.e_remove()
+        # draw diameter of circle BC
+        lBC = ELine(p, c).extend(c.radius).e_fade()
+
+        # if original line is too big, abort
+        if lBC.get_length() - self.get_length() < mn_scale(1):
+            if new_point:
+                p.e_remove()
+            lBC.e_remove()
+            raise ValueError("your input line does not fit in the circle")
+
+        # if original line equals the diameter, we are done, cleanup and return
+        if abs( lBC.get_length() - self.get_length()) < 1:
+            if new_point:
+                p.e_remove()
+            return lBC
+
+        # construct a line CE such that it is equal to the original line
+        lDE, pE = self.copy_to_point(p)
+
+        # draw another circle, C centre, radius CE
+        cF = Circle.ECircle(p, pE)
+
+        # find intersection points between two circles
+        pts = cF.intersect(c)
+        if not negative:
+            pA = P.EPoint(pts[0])
+        else:
+            pA = P.EPoint(pts[1])
+
+        # draw line AC, it is equal to the original line
+        lAC = ELine(pA, p)
+
+        #cleanup
+        with self.scene.simultaneous():
+            if new_point:
+                p.e_remove()
+            lBC.e_remove()
+            lDE.e_remove()
+            pE.e_remove()
+            cF.e_remove()
+            pA.e_remove()
+            lAC.e_normal()
+
+        return lAC
+
+
+
+
+
+
+
 
 
 class EDashedLine(ELine, mn.DashedLine):
