@@ -77,7 +77,7 @@ class Prop0(BookScene):
             line = ELine(LEFT * 3.5, LEFT)
             ETriangle.golden(line, speed=1)
 
-        @self.push_step
+        # @self.push_step
         def triangle_copy_to_circle():
             tri = ETriangle(UP, LEFT, DR)
             tri.e_move(3 * LEFT)()
@@ -98,3 +98,51 @@ class Prop0(BookScene):
             circle = ECircle(RIGHT*2, RIGHT*4)
             p = circle.e_point_at_angle(PI/4)
             res = line.copy_to_circle(circle, p)
+
+        # @self.push_step
+        def clean_bisect_test():
+            tri = ETriangle(UP, LEFT, DR, angles='ABC')
+            tri.a0.clean_bisect()
+            tri.a1.clean_bisect(speed=1)
+
+        # @self.push_step
+        def fill_circle_test():
+            circle = ECircle(RIGHT*2, RIGHT*4)
+            circle2 = ECircle(ORIGIN, RIGHT*2)
+            circle.e_fill(RED)
+            circle2.e_fade()
+            circle.e_fade()
+            circle2.e_normal()
+            circle.e_normal()
+
+
+        # @self.push_step
+        def semi_circle_test():
+            cc = EArc.semi_circle(RIGHT, LEFT)
+
+        # @self.push_step
+        def arc_fill_test():
+            la = EArc(2, LEFT * 3 + UP, UP, big=False)
+            la.e_fill(RED)
+
+            pie = la.create_pie()
+            pie.e_fill(BLUE)
+
+        @self.push_step
+        def arc_intersection_test():
+            la = EArc(2, LEFT * 3 + UP, ORIGIN, big=False)
+            lb = EArc(2, UP * 2, DOWN * 2, big=False)
+            ll = ELine(UP * 2.5, DL * 2)
+            pts = la.intersect(lb)
+            pt2 = la.intersect(ll)
+            pt3 = lb.intersect(ll)
+
+            for p in pts:
+                EPoint(p, fill_color=RED)
+            for p in pt2:
+                EPoint(p, fill_color=BLUE)
+            for p in pt3:
+                EPoint(p, fill_color=GREEN)
+
+            la.bisect(speed=1)
+            lb.bisect()

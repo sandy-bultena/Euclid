@@ -267,3 +267,10 @@ class ETriangle(EPolygon):
                 x.e_remove()
 
         return t
+
+    def true_area(self) -> float:
+        a = self.l0.get_length()
+        b = self.l1.get_length()
+        c = self.l2.get_length()
+        s = .5 * (a + b + c)
+        return math.sqrt(s * (s-a) * (s-b) * (s-c))

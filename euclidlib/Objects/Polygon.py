@@ -166,8 +166,6 @@ setattr(cls, 'p{i}', property(p))
         if self.sides:
             self.vertices.append(self.vertices[0])
         self.define_sub_objs(delay_anim, skip_anim)
-        self.cached_opacity = 0
-        self.cached_fade = 1
 
         if _assemble_flag:
             with self.scene.simultaneous():
@@ -183,16 +181,6 @@ setattr(cls, 'p{i}', property(p))
                     for a in _angles:
                         if a is not None:
                             a.e_normal()
-
-    def set_e_fill(
-            self,
-            color: ManimColor | Iterable[ManimColor] = None,
-            opacity: float | Iterable[float] | None = None,
-            border_width: float | None = None,
-            recurse: bool = True
-    ) -> Self:
-        self.cached_fade = opacity
-        return self.set_fill(color, opacity * self.cached_opacity, border_width, recurse)
 
     def get_group(self):
         return mn.VGroup(*self._sub_group)
@@ -272,16 +260,6 @@ setattr(cls, 'p{i}', property(p))
         with self.scene.simultaneous_speed(self.speed):
             if 'angles' in self.options:
                 self.set_angles(*self.options['angles'], delay_anim=delay_anim, skip_anim=skip_anim)
-
-    def e_fill(self, color: ManimColor = None, opacity=0.5):
-        self.scene.play(
-            self.animate.set_fill(color=color, opacity=opacity * self.cached_fade, recurse=False)
-        )
-        self.cached_opacity = opacity
-        return self
-
-    def e_unfill(self):
-        return self.e_fill(opacity=0)
 
     def set_labels(self, *labels: LABEL_ARG):
         for l, label_data in zip(self.lines, labels):
@@ -559,3 +537,6 @@ setattr(cls, 'p{i}', property(p))
         rect = EPolygon(*p, delay_anim=True)
         self.scene.play(mn.ReplacementTransform(pll, rect))
         return rect
+
+    def area(self) -> float:
+        return self.get_arc_length()

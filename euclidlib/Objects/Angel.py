@@ -96,6 +96,10 @@ class EAngleBase(Arc.AbstractArc):
     vec1: mn.Vect2
     vec2: mn.Vect2
 
+    @property
+    def lines(self):
+        return self.l1, self.l2
+
     @log
     @copy_transform(index=1)
     def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
@@ -191,7 +195,6 @@ class EAngleBase(Arc.AbstractArc):
                 x.e_remove()
         return final_line, final_angle
 
-
     @anim_speed
     def bisect(self):
         vx, vy, _ = self.get_arc_center()
@@ -249,6 +252,15 @@ class EAngleBase(Arc.AbstractArc):
         # return new line, point, all circles
         # ------------------------------------------------------------------------
         return lAD, p1, c1, c2, cA
+
+    @log
+    @anim_speed
+    def clean_bisect(self):
+        line, *rest = self.bisect(speed=0)
+        with self.scene.simultaneous():
+            for x in rest:
+                x.e_remove()
+        return line
 
 
 class ArcAngle(EAngleBase, mn.Arc):

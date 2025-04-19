@@ -14,20 +14,6 @@ Numbers.pm
     find_median_plane
     find_plane_from_proportional
 
-Triangle.pm
-    area
-
-Angle.pm
-    clean_bisect
-    arc
-    lines
-
-Circle.pm
-    angle
-    fill
-
-Point.pm
-    distance_between
 
 RegularPolygons.pm
     hexagon
@@ -40,13 +26,6 @@ CalculatePoints.pm
     equilateral_triangle
     isosceles_triangle
     are_points
-
-Arc.pm
-    semi_circle
-    fill
-    fillpie
-    bisect
-    intersect
 
 Polygon.pm
     reposition

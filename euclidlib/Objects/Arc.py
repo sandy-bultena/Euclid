@@ -35,8 +35,12 @@ class AbstractArc(Da.Dashable, mn.Arc):
         super().__init__(start_angle, angle, radius, *args, **kwargs)
 
     @property
-    def v(self):
-        return np.array([self.vx, self.vy, 0])
+    def v(self) -> Vect3:
+        return self.get_arc_center()
+
+    @property
+    def center(self) -> Vect3:
+        return self.get_arc_center()
 
     @property
     def r(self):
@@ -45,6 +49,10 @@ class AbstractArc(Da.Dashable, mn.Arc):
     @property
     def radius(self):
         return self.size
+
+    @property
+    def arc(self):
+        return self.e_angle
 
     def pointwise_become_partial(self, start: AbstractArc, a: float, b: float) -> Self:
         if a <= 0:
@@ -102,15 +110,6 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return (self.animate(rate_func=mn.there_and_back, **args)
                 .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
-    @log
-    def intersect(self, other: Mobject, reverse=True):
-        if isinstance(other, mn.Rectangle):
-            return self.intersect_selection(other)
-        super().intersect(other)
-
-    def intersect_selection(self, other: mn.Rectangle):
-        return other.is_touching(self)
-
     def init_label(self, labels: str | List[str], *args, **extra_args):
         if isinstance(labels, str):
             return super().init_label(labels, *args, **extra_args)
@@ -156,9 +155,182 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
     def e_point_at_angle(self, angle):
         return P.EPoint(self.point_at_angle(angle))
+    
+    def intersect_circle(self, other: AbstractArc) -> Vect3 | None:
+        p2, r2 = other.center, other.radius
+        base = Ln.VirtualLine(self.center, p2, scene=self.scene, stroke_color=BLUE)
+        d = base.get_length()
+
+        d1 = 1 / (2 * d) * (d ** 2 + self.radius ** 2 - r2 ** 2)
+        d2 = d - d1
+
+        hsqr = r2 ** 2 - d2 ** 2
+        if abs(hsqr) < mn_scale(0.2):
+            hsqr = 0
+
+        if hsqr < 0:
+            base.e_remove()
+            return None
+
+        h = math.sqrt(hsqr)
+
+        sx, sy, *_ = base.get_start()
+        if d1 < 1:
+            sx, sy, *_ = base.get_end()
+        px, py, _ = base.point(d1)
+
+        p4x = px + py - sy
+        p4y = py - px + sx
+        p1x = px - py + sy
+        p1y = py + px - sx
+
+        hline1 = Ln.VirtualLine((px, py), (p4x, p4y), scene=self.scene)
+        hline2 = Ln.VirtualLine((px, py), (p1x, p1y), scene=self.scene)
+
+        h1 = hline1.point(h)
+        h2 = hline2.point(h)
+
+        hline1.e_remove()
+        hline2.e_remove()
+        base.e_remove()
+
+        if h1[1] < h2[1]:
+            return h2, h1
+        else:
+            return h1, h2
+
+    def intersect_line(self, other: Ln.ELine) -> Vect3 | None:
+        x, y, _ = self.center
+        r = self.radius
+
+        x0, y0, _ = other.get_start()
+        x1, y1, _ = other.get_end()
+        m = other.get_e_slope()
+
+        if not math.isinf(m):
+            # math:
+            # circle eq'n: (x-$x)^2 + (y-$y)^2 = $r^2
+            # line eq'n:   y = mx+b, (b = $y1 - $m * $x1)
+            # Intersection of line & circle solves the following eq'n for x:
+            #   (x-$x)^2 + ($m x + $b - $y)^2 = $r^2
+
+            i = y0 - m * x0
+            a = 1 + m ** 2
+            b = 2 * m * (i - y) - 2 * x
+            c = (i - y) ** 2 + x ** 2 - r ** 2
+            sqr = b ** 2 - 4 * a * c
+
+            if sqr < 0:
+                return None
+
+            x3 = (-b + math.sqrt(sqr)) / (2 * a)
+            x4 = (-b - math.sqrt(sqr)) / (2 * a)
+            y3 = m * x3 + i
+            y4 = m * x4 + i
+        else:
+            # math:
+            # circle eq'n: (x-$x)^2 + (y-$y)^2 = $r^2
+            # line eq'n:   x = $x1,
+            # Intersection of line & circle solves the following eq'n for y:
+            #   ($x1-$x)^2 + (y-$y)^2 = $r^2
+            # binomial eq'n (-b +/- sqrt(b^2 - 4ac)) / 2a
+
+            a = 1
+            b = -2 * y
+            c = (x0 - x) ** 2 + y ** 2 - r ** 2
+
+            sqr = b ** 2 - 4 * a * c
+
+            if sqr < 0:
+                return None
+
+            x3 = x0
+            x4 = x0
+            y3 = (-b + math.sqrt(sqr)) / (2 * a)
+            y4 = (-b - math.sqrt(sqr)) / (2 * a)
+
+        results = []
+        max_x = max(x1, x0)
+        min_x = min(x1, x0)
+        max_y = max(y1, y0)
+        min_y = min(y1, y0)
+
+        epsilon = mn_scale(1)
+
+        if min_x - epsilon <= x3 <= max_x + epsilon and min_y - epsilon <= y3 < max_y + epsilon:
+            results.append(np.array((x3, y3, 0)))
+        if min_x - epsilon <= x4 <= max_x + epsilon and min_y - epsilon <= y4 < max_y + epsilon:
+            results.append(np.array((x4, y4, 0)))
+
+        return results
+
+    def intersect_selection(self, other: mn.Rectangle):
+        corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
+        return any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners))
+
+    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | List[Vect3] | None:
+        if isinstance(other, AbstractArc):
+            return self.intersect_circle(other)
+        if isinstance(other, Ln.ELine):
+            return self.intersect_line(other)
+        if isinstance(other, mn.Rectangle):
+            return self.intersect_selection(other)
+        return super().intersect(other)
 
 
 class EArc(AbstractArc):
+    @classmethod
+    def semi_circle(cls, p1: P.EPoint | Vect3, p2: P.EPoint | Vect3):
+        with Ln.VirtualLine(p1, p2) as d:
+            r = d.get_length() / 2 + mn_scale(0.0001)
+        return cls(r, p1, p2)
+
+    def create_pie(self, **kwargs):
+        pie = EMObject(stroke_width=0, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
+        pie.set_points(self.get_points())
+        pie.add_points_as_corners([self.v, self.get_start()])
+        return pie
+
+    @anim_speed
+    def bisect(self):
+        line = Ln.ELine(*self.get_start_and_end())
+        p3 = line.bisect()
+        perp = line.perpendicular(p3)
+        perp.extend_and_prepend(2 * self.radius)
+        
+        pts : List[Vect3] | None = self.intersect(perp)
+        results = None
+        if pts:
+            results = P.EPoint(pts[0])
+
+        with self.scene.simultaneous():
+            p3.e_remove()
+            line.e_remove()
+            perp.e_remove()     
+        return results
+    
+    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | None:
+        pts = super().intersect(other, reverse) or []
+        # do the points actually intersect the arc (as opposed to the
+        # circle defining the arc?)
+
+        c = self.center
+        with Cir.VirtualCircle(c, c + RIGHT * self.radius) as virt:
+            results = []
+            start_angle = self.e_start_angle % TAU
+            if self.e_start_angle > self.e_end_angle:
+                start_angle -= TAU
+            end_angle = self.e_end_angle % TAU
+
+            if not isinstance(pts, (list, tuple)):
+                pts = [pts]
+            for p in pts:
+                angle = virt.angle_of_point(p)
+                if start_angle <= angle <= end_angle:
+                    results.append(p)
+
+        return results
+
     def __init__(self,
                  radius: float,
                  point1: EMObject | Vect3,

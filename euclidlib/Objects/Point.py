@@ -10,7 +10,7 @@ from .utils import call_or_get
 
 def darken(colour: ManimColor):
    return [
-       mn.interpolate_color(colour, BLACK, 2/3)
+       mn.interpolate_color(color, BLACK, 2/3)
        for color in mn.listify(colour)
    ]
 
@@ -37,7 +37,7 @@ class EPoint(EMObject, mn.Circle):
     def __init__(self, center, animate_part=None, *args, fill_color=mn.WHITE, **kwargs):
         super().__init__(
             arc_center=convert_to_coord(center),
-            radius=0.05,
+            radius=0.075,
             stroke_color=darken(mn.GREY),
             stroke_width=2,
             fill_color=fill_color,
@@ -78,6 +78,10 @@ class EPoint(EMObject, mn.Circle):
         dx = x1 - x0
         dy = y1 - y0
         return math.sqrt(dx**2 + dy**2)
+
+    @classmethod
+    def distance_between(cls, p1: EPoint | Vect3, p2: EPoint | Vect3):
+        return mn.get_dist(convert_to_coord(p1), convert_to_coord(p2))
 
     def highlight(self, color=RED, scale=2.0, **args):
         target = self.animate(rate_func=mn.there_and_back, **args)

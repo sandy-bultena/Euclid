@@ -14,7 +14,7 @@ import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 
 from euclidlib.Objects import CustomAnimation as CA
-from typing import Sized, Self, Callable, Tuple
+from typing import Sized, Self, Callable, Tuple, Iterable
 from contextlib import contextmanager
 
 DEFAULT_FADE_OPACITY = 0.15
@@ -603,7 +603,25 @@ def {name}(self, *args):
         yield
         self.unfreeze()
 
+    def e_fill(self, color: ManimColor = None, opacity=0.5):
+        self.scene.play(
+            self.animate.set_fill(color=color, opacity=opacity * self.cached_fade, recurse=False)
+        )
+        self.cached_opacity = opacity
+        return self
 
+    def e_unfill(self):
+        return self.e_fill(opacity=0)
+
+    def set_e_fill(
+            self,
+            color: ManimColor | Iterable[ManimColor] = None,
+            opacity: float | Iterable[float] | None = None,
+            border_width: float | None = None,
+            recurse: bool = True
+    ) -> Self:
+        self.cached_fade = opacity
+        return self.set_fill(color, opacity * self.cached_opacity, border_width, recurse)
 
     def __getstate__(self):
         state = super().__getstate__().copy()
@@ -629,13 +647,15 @@ def {name}(self, *args):
                  label_args: Tuple[str, ...] | str | None = None,
                  label: Tuple[str, ...] | str | None = None,
                  **kwargs):
+        self.cached_opacity = 0
+        self.cached_fade = 1
         label_args = label_args or label
         self._debug = debug
         self._freeze = False
         scene = scene or find_scene()
         if scene is None:
             raise Exception("Could Not Find Scene Object")
-        self.animate_part = ['set_stroke'] if animate_part is None else animate_part
+        self.animate_part = ['set_stroke', 'set_e_fill'] if animate_part is None else animate_part
         self.old_fill_opacity = 0.0
         self.scene = scene
         self.animation_objects: List[mn.Mobject] = []
