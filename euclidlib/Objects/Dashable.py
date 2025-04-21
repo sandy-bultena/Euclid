@@ -1,4 +1,4 @@
-from typing import Self, List
+from typing import Self, List, Type
 import manimlib as mn
 import numpy as np
 from euclidlib.Objects import EucidMObject as EM, EGroup, PsuedoGroup, mn_scale
@@ -48,18 +48,18 @@ class Dashable(PsuedoGroup):
             dash_ref.become(DashPath(self, dash_length, positive_space_ratio, delay_anim=True))
         self.dash_ref.add_updater(updater, call=False)
 
-    def transform_to(self, other: Self, *sub_animations):
+    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
         animations = []
         if self.dash_ref is not None:
             if other.dash_ref is None:
                 other.dash(**self.dash_options, delay_anim=True)
-            animations.append(mn.TransformFromCopy(self.dash_ref, other.dash_ref))
+            animations.append(anim(self.dash_ref, other.dash_ref))
         if len(self.tick_marks) > 0:
             if not other.tick_marks:
                 for a, t in zip(self.tick_mark_alphas, self.tick_marks):
                     other.tick_prop(a, t.get_length(), delay_anim=True)
-            animations.append(mn.TransformFromCopy(self.tick_marks, other.tick_marks))
-        return super().transform_to(other, *animations, *sub_animations)
+            animations.append(anim(self.tick_marks, other.tick_marks))
+        return super().transform_to(other, *animations, *sub_animations, anim=anim)
 
     def _find_tangent_vec(
             self,

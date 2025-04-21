@@ -128,7 +128,7 @@ class Prop0(BookScene):
             pie = la.create_pie()
             pie.e_fill(BLUE)
 
-        @self.push_step
+        # @self.push_step
         def arc_intersection_test():
             la = EArc(2, LEFT * 3 + UP, ORIGIN, big=False)
             lb = EArc(2, UP * 2, DOWN * 2, big=False)
@@ -146,3 +146,31 @@ class Prop0(BookScene):
 
             la.bisect(speed=1)
             lb.bisect()
+
+        # @self.push_step
+        def pentagon_test():
+            pent = RegularPolygons.pentagon(ORIGIN, 2)
+            self.wait()
+            pent.e_remove()
+            pent = RegularPolygons.pentagon(ORIGIN, 2, speed=1)
+
+        # @self.push_step
+        def copy_para_to_point_test():
+            para = EParallelogram(LEFT, ORIGIN, UR)
+            point = EPoint(DL*2 + RIGHT)
+            res = para.copy_to_point(point)
+            res.e_remove()
+            para.copy_to_point(point, speed=1)
+
+        @self.push_step
+        def reposition_test():
+            para = EParallelogram(DL * 3, DOWN * 3, UR * 3, fill=[RED])
+            up_tracker = mn.ValueTracker(3)
+            para.f_always.reposition(
+                lambda: DL * 3,
+                lambda: DOWN * 3,
+                lambda: RIGHT * 3 + UP * up_tracker.get_value(),
+                lambda: UP * up_tracker.get_value()
+            )
+            self.play(up_tracker.animate(run_time=6, rate_func=mn.linear).set_value(-2.5))
+            para.clear_updaters()

@@ -135,8 +135,6 @@ class PropScene(InteractiveScene):
             if not currently_skipping:
                 self.force_skipping()
             super().play(*anims, **kwargs)
-            self.update_frame(force_draw=True)
-            self.file_writer.write_frame(self.camera)
             if not currently_skipping:
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
@@ -146,6 +144,15 @@ class PropScene(InteractiveScene):
         if self.animateState[-1] != AnimState.PAUSED:
             super().add(*mobjects)
         return self
+
+    def is_paused(self):
+        for x in reversed(self.animateState):
+            if x == AnimState.PAUSED:
+                return True
+            if x == AnimState.STORING:
+                continue
+            return False
+        return False
 
     @contextmanager
     def simultaneous(self, **kwargs):

@@ -37,7 +37,7 @@ class OPTIONS(TypedDict):
     point_labels: LABEL_ARG
     labels: LABEL_ARG
     angles: FULL_ANGLES_ARG
-    fill: mn.Color
+    fill: Tuple[mn.Color, float] | None
 
 
 class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
@@ -135,12 +135,12 @@ setattr(cls, 'p{i}', property(p))
 
         assert all(p is not None for p in points)
 
+
         self.options: OPTIONS = {
             k: locals()[k]
             for k in ('point_labels', 'labels', 'angles', 'fill')
             if locals()[k] is not None
         }
-        self._sub_group = G.EGroup()
         self.speed = speed
         self.vertices = [convert_to_coord(p) for p in points]
         self.sides = len(self.vertices)
@@ -159,13 +159,17 @@ setattr(cls, 'p{i}', property(p))
             self.angles: List[A.EAngleBase | None] = _angles
         else:
             self.angles: List[A.EAngleBase | None] = [None] * self.sides
-        self._sub_group.add(*(an for an in self.angles if an is not None))
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
                          delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
         if self.sides:
             self.vertices.append(self.vertices[0])
         self.define_sub_objs(delay_anim, skip_anim)
+        if 'fill' in self.options:
+            if delay_anim:
+                self.set_fill(*self.options['fill'])
+            else:
+                self.e_fill(*self.options['fill'])
 
         if _assemble_flag:
             with self.scene.simultaneous():
@@ -182,8 +186,17 @@ setattr(cls, 'p{i}', property(p))
                         if a is not None:
                             a.e_normal()
 
+
+    def e_fill(self, color: ManimColor = None, opacity=0.5):
+        self.options['fill'] = (color, opacity)
+        super().e_fill(color, opacity)
+
+    def e_unfill(self):
+        del self.options['fill']
+        super().e_unfill()
+
     def get_group(self):
-        return mn.VGroup(*self._sub_group)
+        return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
 
     def _filter_point_labels(self, args: LABEL_ARG):
         if args is None:
@@ -256,7 +269,6 @@ setattr(cls, 'p{i}', property(p))
         self.define_points(delay_anim=delay_anim, skip_anim=skip_anim)
         self.define_lines(delay_anim=delay_anim, skip_anim=skip_anim)
 
-        self._sub_group.add(*self.lines, *self.points)
         with self.scene.simultaneous_speed(self.speed):
             if 'angles' in self.options:
                 self.set_angles(*self.options['angles'], delay_anim=delay_anim, skip_anim=skip_anim)
@@ -286,7 +298,6 @@ setattr(cls, 'p{i}', property(p))
                 for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
                 if name is not None
             ]
-            self._sub_group.add(*self.angles)
         else:
             for i, ((l1, l2), (name, size)) in enumerate(zip(line_pairs, names_and_sizes)):
                 if not name:
@@ -294,9 +305,7 @@ setattr(cls, 'p{i}', property(p))
                 old = self.angles[i]
                 if old is not None:
                     old.e_remove()
-                    self._sub_group.remove(old)
                 self.angles[i] = A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene)
-                self._sub_group.add(self.angles[i])
         return self
 
     def remove_angles(self):
@@ -352,12 +361,10 @@ setattr(cls, 'p{i}', property(p))
     def replace_line(self, index, newline: L.ELine):
         self.lines[index].e_delete()
         self.lines[index] = newline
-        self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
 
     def replace_point(self, index, newpoint: P.EPoint):
         self.points[index].e_delete()
         self.points[index] = newpoint
-        self._sub_group.set_submobjects([*self.lines, *self.points, *(a for a in self.angles if a is not None)])
 
     def move_point_to(self, index: int, dest: P.EPoint | Vect3):
         if hasattr(self, '_angle_values'):
@@ -408,13 +415,14 @@ setattr(cls, 'p{i}', property(p))
     def intersect_selection(self, other: mn.Rectangle):
         return False
 
-    def transform_to(self, other: Self, *sub_animations):
-        line_transforms = [us.transform_to(them) for us, them in zip(self.l, other.lines)]
-        point_transforms = [us.transform_to(them) for us, them in zip(self.p, other.points)]
-        angle_transforms = [us.transform_to(them)
+    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
+        line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(self.l, other.lines)]
+        point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(self.p, other.points)]
+        angle_transforms = [us.transform_to(them, anim=anim)
                             for us, them in zip(self.a, other.angles) 
                             if us is not None and them is not None]
-        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations)
+        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations, anim=anim)
+
 
     @log
     @copy_transform()
@@ -537,6 +545,22 @@ setattr(cls, 'p{i}', property(p))
         rect = EPolygon(*p, delay_anim=True)
         self.scene.play(mn.ReplacementTransform(pll, rect))
         return rect
+
+    def reposition(self, *new_coords, anim=False):
+        assert(len(self.points) == len(new_coords))
+        new_poly = EPolygon(*new_coords, **self.options, delay_anim=True)
+        if anim:
+            self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
+        else:
+            self.scene.remove(*self.get_e_family())
+        self.lines = new_poly.lines
+        self.angles = new_poly.angles
+        self.points = new_poly.points
+        self.become(new_poly)
+        self.scene.add(*self.get_e_family())
+        if anim:
+            self.scene.remove(new_poly)
+
 
     def area(self) -> float:
         return self.get_arc_length()

@@ -14,7 +14,7 @@ import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 
 from euclidlib.Objects import CustomAnimation as CA
-from typing import Sized, Self, Callable, Tuple, Iterable
+from typing import Sized, Self, Callable, Tuple, Iterable, Type
 from contextlib import contextmanager
 
 DEFAULT_FADE_OPACITY = 0.15
@@ -257,21 +257,25 @@ def convert_to_coord(obj: mn.Mobject | Sized[float]):
 def animate(func):
     @wraps(func)
     def animate_change(self: EMObject, *args, rate_func=mn.smooth, **kwargs):
-        if self.scene.animateState[-1] != ps.AnimState.PAUSED:
+        if not self.scene.is_paused():
             an = self.animate(rate_func=rate_func)
             func(self, an, *args, **kwargs)
             self.scene.play(e_animate(an))
             return self
         else:
             return func(self, self, *args, **kwargs)
+
     return animate_change
+
 
 def log(func):
     @wraps(func)
     def logMethodName(self, *args, **kwargs):
         with self.scene.trace(self, f"{type(self).__name__}:{func.__name__}"):
             return func(self, *args, **kwargs)
+
     return logMethodName
+
 
 def freezable(func):
     @wraps(func)
@@ -282,11 +286,13 @@ def freezable(func):
 
     return dontIfFrozen
 
+
 def anim_speed(func):
     @wraps(func)
-    def animate_change(self: EMObject, *args, speed=-1, no_anim=False, **kwargs):
-        with self.scene.animation_speed(speed) as draw:
-            x = func(self, *args, **kwargs)
+    def animate_change(*args, speed=-1, no_anim=False, **kwargs):
+        scene = find_scene()
+        with scene.animation_speed(speed) as draw:
+            x = func(*args, **kwargs)
             if not no_anim:
                 if isinstance(x, (tuple, list)):
                     draw.extend(x)
@@ -295,6 +301,7 @@ def anim_speed(func):
         return x
 
     return animate_change
+
 
 def copy_transform(*, index=None):
     def inner(func):
@@ -319,8 +326,11 @@ def copy_transform(*, index=None):
                 return x
             else:
                 return func(self, *args, **kwargs)
+
         return animate_change
+
     return inner
+
 
 def class_anim_speed(func):
     @wraps(func)
@@ -359,6 +369,7 @@ def find_scene():
             return f_self.scene
         if isinstance(f_self, ps.PropScene):
             return f_self
+
 
 @contextmanager
 def with_objects(head, *rest):
@@ -404,10 +415,10 @@ class EMObject(mn.VMobject):
         def e_rotate(self, about: Vect3, angle: float) -> EMObjectPlayer: ...
 
         def e_scale(self,
-                scale: float,
-                min_scale_factor: float = 1e-8,
-                about_point: Vect3 | None = None,
-                about_edge: Vect3 = ORIGIN) -> EMObjectPlayer: ...
+                    scale: float,
+                    min_scale_factor: float = 1e-8,
+                    about_point: Vect3 | None = None,
+                    about_edge: Vect3 = ORIGIN) -> EMObjectPlayer: ...
 
     for name in EMObjectPlayer._properties():
         exec(f'''
@@ -474,9 +485,9 @@ def {name}(self, *args):
         if label:
             return Text.Label(label, self, *args, **extra_args)
 
-    def transform_to(self, other: Self, *sub_animations):
+    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
         return mn.AnimationGroup(
-            mn.TransformFromCopy(self, other),
+            anim(self, other),
             *sub_animations
         )
 

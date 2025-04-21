@@ -15,12 +15,6 @@ Numbers.pm
     find_plane_from_proportional
 
 
-RegularPolygons.pm
-    hexagon
-
-Parallelogram.pm
-    copy_to_point
-
 CalculatePoints.pm
     right_triangle
     equilateral_triangle
@@ -28,7 +22,6 @@ CalculatePoints.pm
     are_points
 
 Polygon.pm
-    reposition
     area
     copy_to_polygon_shape
     copy_to_similar_shape

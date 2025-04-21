@@ -124,3 +124,52 @@ class EParallelogram(Polygon.EPolygon):
             p7.e_remove()
 
         return y
+
+    @log
+    @copy_transform()
+    def copy_to_point(self, point: EMObject | Vect3):
+        np2 = point
+
+        # create a starting line, starting at point $point
+        xy = convert_to_coord(point)
+        # l2 = Line.ELine(xy, xy + 1.2 * self.l1.get_vector()).e_fade()
+        # l2 = Line.ELine(
+        #     xy + LEFT * 1.2 * self.l1.get_length(),
+        #     xy + RIGHT * 1.2 * self.l1.get_length()).e_fade()
+        l2 = self.l1.parallel(point).extend(self.l1.get_length() * 1.2)
+
+        # copy line 2 to the baseline
+        nl2, np3 = self.l1.copy_to_line(np2, l2)
+        l2.e_remove()
+        nl2.e_fade()
+
+        # copy angle2 to line2
+        flag = False
+        if self.a1 is None:
+            self.set_angles(None, ' ')
+            flag = True
+
+        l1, a2 = self.a1.copy_to_line(np2, nl2, negative=True)
+        l1.extend(self.l0.get_length()).e_fade()
+        if flag:
+            self._sub_group.remove(self.a1)
+            self.a1.e_remove()
+            self.angles[1] = None
+
+        # copy side 1
+        l0tmp = Line.ELine(*reversed(self.l0.get_start_and_end()), skip_anim=True)
+        nl1, np1 = l0tmp.copy_to_line(np2, l1)
+        l0tmp.e_delete()
+        nl1.e_fade()
+        l1.e_remove()
+
+        coords = [convert_to_coord(x) for x in (np1, np2, np3)]
+        paral = EParallelogram(*coords)
+
+        with self.scene.simultaneous():
+            for o in (l1, a2, nl1, np1, nl2, np3):
+                o.e_remove()
+
+        return paral
+
+

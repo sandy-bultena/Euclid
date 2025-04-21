@@ -281,7 +281,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     @log
     @copy_transform(index=0)
     def copy_to_line(self, target: P.EPoint, target_line: ELine):
-        lx, px = self.copy_to_point(target, speed=-1)
+        target_coord = convert_to_coord(target)
+        lx, px = self.copy_to_point(target, speed=0)
         if lx is None or px is None:
             raise Exception("Failed To Copy To Point")
 
@@ -305,7 +306,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 clone.e_remove()
             return lx, px
 
-        np = P.EPoint(p[0])
+        ref_p = min(p, key=lambda x:
+            abs(mn.angle_of_vector(x - target_coord) -
+                mn.angle_of_vector(self.get_vector())))
+        np = P.EPoint(ref_p)
         nl = ELine(target, np)
 
         if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
