@@ -18,6 +18,7 @@ from euclidlib.Objects import Dashable as Da
 from euclidlib.Objects import Arc
 from euclidlib.Objects.EucidMObject import *
 
+
 class ELine(Da.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
@@ -65,6 +66,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         self.e_end = self.pointify(end)
         super().__init__(self.e_start, self.e_end, *args, **kwargs)
 
+    def invert_start_and_end(self):
+        self.reverse_points()
+        return self
+
     def e_label_point(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
         try:
             point = self.point_from_proportion(alpha)
@@ -75,6 +80,16 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         elif outside:
             direction = self.OUT()
         return point + (buff or self.LabelBuff) * direction
+
+    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
+        if np.dot(self.get_unit_vector(), other.get_unit_vector()) < 0:
+            if anim is mn.TransformFromCopy:
+                cpy = self.copy().invert_start_and_end()
+            else:
+                cpy = self.invert_start_and_end()
+            return super(ELine, cpy).transform_to(other, *sub_animations, anim=mn.ReplacementTransform)
+        else:
+            return super().transform_to(other, *sub_animations)
 
     def point(self, r: float):
         vec = self.get_unit_vector()
@@ -691,6 +706,248 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             pA.e_remove()
 
         return line3
+
+    @classmethod
+    @log
+    @anim_speed
+    def third_proportional(cls,
+                           l1: ELine,
+                           l2: ELine,
+                           pt: P.EPoint,
+                           angle: float):
+        scene: ps.PropScene = find_scene()
+        # -------------------------------------------------------------------------
+        # Place both lines on a common vertex
+        # -------------------------------------------------------------------------
+        pA = P.EPoint(l1.get_end())
+        pB = P.EPoint(l1.get_start())
+        lAC, pC = l2.copy_to_point(pA)
+
+        # -------------------------------------------------------------------------
+        # Extend AB to D, where BD is equal to AC
+        # -------------------------------------------------------------------------
+        lAD = l1.prepend_cpy(lAC.get_length())
+        pD = P.EPoint(lAD.get_end())
+
+        # -------------------------------------------------------------------------
+        # Draw a line from BC, and draw a line parallel to BC from point D
+        # -------------------------------------------------------------------------
+        lBC = ELine(pB, pC)
+        lDEx = lBC.parallel(pD).dash()
+
+        # -------------------------------------------------------------------------
+        # Extend line AC and define the intercept of AC and the previous parallel
+        # line as point E
+        # -------------------------------------------------------------------------
+        p = lAC.intersect(lDEx)
+        pE = P.EPoint(p)
+        lCE = ELine(pC, pE)
+        lDEx.e_remove()
+
+        # -------------------------------------------------------------------------
+        # Copy CE to the desired point, and set the required angle
+        # -------------------------------------------------------------------------
+        with VirtualLine(pt, convert_to_coord(pt) + np.array([np.cos(angle), np.sin(angle), 0])) as vB:
+            line3, px = lCE.copy_to_line(pt, vB)
+
+        # -------------------------------------------------------------------------
+        # Clean up
+        # -------------------------------------------------------------------------
+        with scene.simultaneous():
+            px.e_remove()
+            lCE.e_remove()
+            pE.e_remove()
+            lBC.e_remove()
+            pD.e_remove()
+            lAD.e_remove()
+            lAC.e_remove()
+            pC.e_remove()
+            pB.e_remove()
+            pA.e_remove()
+
+        return line3
+
+    third_mean = third_proportional
+
+    @classmethod
+    @log
+    @anim_speed
+    def fourth_proportional(cls,
+                            l1: ELine,
+                            l2: ELine,
+                            l3: ELine,
+                            pt: P.EPoint,
+                            angle: float,
+                            D=mn_coord(30, 350)):
+        scene: ps.PropScene = find_scene()
+        # -------------------------------------------------------------------------
+        # Draw two arbitrary lines, set out at any angle at D
+        # -------------------------------------------------------------------------
+        pD = P.EPoint(D)
+        ld1 = ELine(D, D + mn_scale(900) * RIGHT).dash()
+        ld2 = ELine(D, D + mn_scale(900) * RIGHT + DOWN * mn_scale(580-350)).dash()
+
+        # -------------------------------------------------------------------------
+        # Define points such that DG is equal to line1,
+        # GE is equal to line2, and DH is equal to line3
+        # -------------------------------------------------------------------------
+        lDG, pG = l1.copy_to_line(pD, ld2)
+        lEG, pE = l2.copy_to_line(pG, ld2)
+        lDH, pH = l3.copy_to_line(pD, ld1)
+
+        # -------------------------------------------------------------------------
+        # Draw line GH, and draw another line EF, parallel to GH
+        # -------------------------------------------------------------------------
+        lGH = ELine(pG, pH)
+        lEFx = lGH.parallel(pE).prepend(mn_scale(200))
+        p = lEFx.intersect(ld1)
+        pF = P.EPoint(p)
+
+        # -------------------------------------------------------------------------
+        # HF is the fourth proportional ... copy it to where the user wants it
+        # -------------------------------------------------------------------------
+        lHF = ELine(pH, pF)
+
+        with VirtualLine(pt, convert_to_coord(pt) + np.array([np.cos(angle), np.sin(angle), 0])) as vB:
+            line4, px = lHF.copy_to_line(pt, vB)
+
+        # -------------------------------------------------------------------------
+        # Clean up
+        # -------------------------------------------------------------------------
+        with scene.simultaneous():
+            lHF.e_remove()
+            px.e_remove()
+            pF.e_remove()
+            lEFx.e_remove()
+            lGH.e_remove()
+
+            lDH.e_remove()
+            lEG.e_remove()
+            lDG.e_remove()
+
+            pH.e_remove()
+            pG.e_remove()
+            pE.e_remove()
+
+            pD.e_remove()
+            ld1.e_remove()
+            ld2.e_remove()
+
+        return line4
+
+
+    @log
+    @copy_transform()
+    def subtract(self, l2: ELine):
+        if self.get_length() < l2.get_length():
+            return self.copy()
+
+        ps = P.EPoint(self.get_end())
+        lc, pe = l2.copy_to_line(ps, self)
+        subtracted = ELine(self.get_start(), pe)
+        with self.scene.simultaneous():
+            lc.e_remove()
+            ps.e_remove()
+            pe.e_remove()
+        return subtracted
+
+    @log
+    @anim_speed
+    def square(self, negative=False):
+        l2 = self
+        p2 = P.EPoint(l2.get_start())
+        p3 = P.EPoint(l2.get_end())
+        if negative:
+            p2, p3 = p3, p2
+
+        # draw line perpendicular to line 2, at point2
+        l11 = l2.perpendicular(p2)
+
+        # define 1st point at correct distance, and make line 1
+        c = Circle.ECircle(p2, p3)
+        p1 = P.EPoint(c.intersect(l11)[0])
+        l1, l11 = l11.e_split(p1)
+        l11.e_remove()
+        c.e_remove()
+
+        # draw line perpendicular to line 2, at point3
+        l33 = l2.perpendicular(p3, negative=True)
+
+        # define 4th point at correct distance, and make line 3
+        c = Circle.ECircle(p3, p2)
+        p4 = P.EPoint(c.intersect(l33)[0])
+        tl3, l33 = l33.e_split(p4)
+        l33.e_remove()
+        c.e_remove()
+
+        l3 = ELine(p3, p4)
+        l4 = ELine(p4, p1)
+
+        with self.scene.simultaneous():
+            tl3.e_remove()
+            p1.e_remove()
+            p2.e_remove()
+            p3.e_remove()
+            p4.e_remove()
+
+        return l3, l4, l1
+
+    @log
+    @anim_speed
+    def show_parts(self,
+                   num: int,
+                   offset: float = mn_scale(6),
+                   edge: Vect3 = RIGHT,
+                   color: mn.Color = GREY):
+        if num < 0:
+            raise ValueError(f"Line:show_parts: you idjit, num ({num}) is less than zero")
+        if num == 0:
+            raise ValueError(f"Line:show_parts: you idjit, num ({num}) is equal to zero")
+
+        # get line endpoints
+        start, end = self.get_start_and_end()
+
+        # length of "part"
+        r = self.get_length()/num
+
+        # need to know if we are adding/subtracting, etc
+        sign = -1
+        if all(edge == LEFT) or all(edge == UP):
+            sign = 1
+
+        phi_vec = self.get_unit_vector()
+        theta_vec = mn.rotate_vector(phi_vec, PI/2)
+
+        # adjust shift parameter if necessary
+        shift = mn_scale(5)
+        if r < mn_scale(30):
+            shift = mn_scale(3)
+        if r < mn_scale(20):
+            shift = mn_scale(2)
+
+        # loop over each "part"
+        line_parts = []
+
+        colors = mn.color_gradient([color, BLACK], num+4)
+        for i, clr in zip(range(num), colors):
+            cs = self._coord_dist(start, r * i)
+            ce = self._coord_dist(start, r * (i+1))
+
+            end1 = cs + (-sign * offset * theta_vec) + (shift * phi_vec)
+            end2 = ce + (-sign * offset * theta_vec) - (shift * phi_vec)
+            line_parts.append(ELine(end1, end2, stroke_color=clr))
+
+        return line_parts
+
+
+
+    def _coord_dist(self, pt: Vect3, radius: float):
+        delta = self.get_end() - pt
+        norm_delta = mn.get_norm(delta)
+        if norm_delta == 0:
+            return self.get_end()
+
+        return (radius/norm_delta) * delta + pt
 
 
 class EDashedLine(ELine, mn.DashedLine):

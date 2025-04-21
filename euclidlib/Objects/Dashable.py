@@ -23,6 +23,7 @@ class Dashable(PsuedoGroup):
         if self.dash_ref is not None:
             self.dash_ref.e_remove()
             self.dash_options = dict()
+        return self
 
     def dash(self,
              dash_length: float = mn.DEFAULT_DASH_LENGTH,
@@ -47,6 +48,15 @@ class Dashable(PsuedoGroup):
         def updater(dash_ref: DashPath):
             dash_ref.become(DashPath(self, dash_length, positive_space_ratio, delay_anim=True))
         self.dash_ref.add_updater(updater, call=False)
+        return self
+
+    def copy(self, deep: bool = False) -> Self:
+        cpy: Dashable = super().copy(deep)
+        if self.dash_ref is not None:
+            cpy.dash_ref = self.dash_ref.copy(deep)
+        cpy.tick_marks = self.tick_marks.copy(deep)
+        return cpy
+
 
     def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
         animations = []

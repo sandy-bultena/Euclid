@@ -241,3 +241,63 @@ class Prop0(BookScene):
             print(f'{square.true_area()=}')
             print(f'   {new.true_area()=}')
 
+        # @self.push_step
+        def line_subtract():
+            l1 = ELine(ORIGIN, RIGHT * 4, stroke_color=RED)
+            l2 = ELine(ORIGIN, RIGHT * 1.5)
+
+            self.play(e_animate(l1.animate.to_corner(UL, buff=1)))
+            self.play(e_animate(l2.animate.next_to(l1, DOWN, aligned_edge=LEFT)))
+
+            l3 = l1.subtract(l2).blue()
+            l3.subtract(l2, speed=1/2).green()
+
+
+        # @self.push_step
+        def line_third_proportional_test():
+            l1 = ELine(ORIGIN, RIGHT)
+            l2 = ELine(ORIGIN, RIGHT * 2)
+            p = EPoint(ORIGIN)
+
+            # l1.to_corner(UL, buff=1)
+            l1.shift(LEFT)
+            l2.next_to(l1, DOWN, aligned_edge=LEFT)
+            p.move_to(l1.get_start() + DOWN)
+            p2 = p.copy().shift(DOWN * MED_SMALL_BUFF)
+            self.add(p2)
+
+            l3 = ELine.third_proportional(l1, l2, p2, 0, speed=1)
+            l4 = ELine.third_proportional(l1, l2, p, 0)
+
+            print(f'{l2.get_length()/l1.get_length()=}')
+            print(f'{l3.get_length()/l2.get_length()=}')
+
+
+        # @self.push_step
+        def line_forth_proportional_test():
+            l1 = ELine(LEFT, ORIGIN)
+            l2 = ELine(LEFT + DOWN/2, RIGHT + DOWN/2)
+            l3 = ELine(LEFT+ DOWN, LEFT/2+ DOWN)
+            p = EPoint(l1.get_start() + DOWN*1.5)
+            p2 = p.copy().shift(DOWN * MED_SMALL_BUFF)
+            self.add(p2)
+
+            l4 = ELine.fourth_proportional(l1, l2, l3, p2, 0, speed=1)
+            l5 = ELine.fourth_proportional(l1, l2, l3, p, 0)
+
+            print(f'{l2.get_length()/l1.get_length()=}')
+            print(f'{l4.get_length()/l3.get_length()=}')
+
+
+        # @self.push_step
+        def line_square_test():
+            l1 = ELine(LEFT, ORIGIN)
+            l2, l3, l4 = l1.square(speed=1)
+            l2, l3, l4 = l1.square(negative=True)
+
+
+        @self.push_step
+        def line_parts():
+            l1 = ELine(np.array([3, -3]), np.array([-3, 2]))
+            l1.show_parts(5, color=RED, speed=1)
+            l1.show_parts(5, color=BLUE, edge=UP)

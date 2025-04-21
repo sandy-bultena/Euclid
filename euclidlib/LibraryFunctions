@@ -21,26 +21,6 @@ CalculatePoints.pm
     isosceles_triangle
     are_points
 
-Polygon.pm
-    angle_value
-    scale
-    scale_inner
-    poly
-
-Line.pm
-    subtract
-    third_proportional
-    third_mean
-    fourth_proportional
-    mean_proportional
-    square
-    parts
-    show_parts
-    int_coords
-    angle
-    length_from_end
-    length_from_start
-
 NormalText.pm
     new
     title
