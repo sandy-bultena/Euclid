@@ -34,10 +34,10 @@ class EPoint(EMObject, mn.Circle):
 
         raise Exception(f"Can't find point(s) {', '.join( n for p, n in zip(points, names) if p is None)}")
 
-    def __init__(self, center, animate_part=None, *args, fill_color=mn.WHITE, **kwargs):
+    def __init__(self, center, animate_part=None, *args, fill_color=mn.WHITE, radius=0.075, **kwargs):
         super().__init__(
             arc_center=convert_to_coord(center),
-            radius=0.075,
+            radius=radius,
             stroke_color=darken(mn.GREY),
             stroke_width=2,
             fill_color=fill_color,

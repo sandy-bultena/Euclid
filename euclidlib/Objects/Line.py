@@ -15,6 +15,7 @@ from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple, Set
 
 from euclidlib.Objects import Dashable as Da
+from euclidlib.Objects import Arc
 from euclidlib.Objects.EucidMObject import *
 
 class ELine(Da.Dashable, EMObject, mn.Line):
@@ -45,16 +46,16 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             return vlines
         except Exception as e:
             raise Exception(
-                f"Can't find line(s) {', '.join( n for p, n in zip(lines, parts) if p is None)}\n" +
+                f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
                 e.args[0])
 
     def IN(self):
         vec = self.get_unit_vector()
-        return mn.rotate_vector(vec, PI/2)
+        return mn.rotate_vector(vec, PI / 2)
 
     def OUT(self):
         vec = self.get_unit_vector()
-        return mn.rotate_vector(vec, -PI/2)
+        return mn.rotate_vector(vec, -PI / 2)
 
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
         if isinstance(start, str):
@@ -64,7 +65,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         self.e_end = self.pointify(end)
         super().__init__(self.e_start, self.e_end, *args, **kwargs)
 
-    def e_label_point(self, direction: mn.Vect3=None, inside=None, outside=None, alpha=0.5, buff=None):
+    def e_label_point(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
         try:
             point = self.point_from_proportion(alpha)
         except AssertionError:
@@ -87,13 +88,13 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         if dx == dy == 0:
             return xs, ys
 
-        x = r / math.sqrt(dy**2 + dx**2) * dx + xs
-        y = r / math.sqrt(dy**2 + dx**2) * dy + ys
+        x = r / math.sqrt(dy ** 2 + dx ** 2) * dx + xs
+        y = r / math.sqrt(dy ** 2 + dx ** 2) * dy + ys
         return x, y
 
     def highlight(self, color=RED, scale=3.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
-                    .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
+                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
     def intersect(self, other: Mobject, reverse=True):
         if isinstance(other, mn.Line):
@@ -107,7 +108,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             other = mn.Rectangle(0.2, 0.2).move_to(other)
         corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
         return any(self.intersect_bound_line(mn.Line(x, y)) for x, y in pairwise(corners)) or (
-            other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
+                other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
         )
 
     def intersect_bound_line(self, l2: mn.Line):
@@ -158,7 +159,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 return math.inf
             return -math.inf
 
-        return (y2-y1)/(x2-x1)
+        return (y2 - y1) / (x2 - x1)
 
     def _extend(self, anim: ELine, r: float):
         self.e_end = self.point(r + self.get_length())
@@ -189,7 +190,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         self.e_start = self.point(-r)
         anim.set_points_by_ends(self.e_start, self.e_end)
         return self
-
 
     def extend_cpy(self, r: float):
         if r < 0:
@@ -294,9 +294,9 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             if p is not None and len(p):
                 break
             if target_line.length_from_end(target) > target_line.length_from_start(target):
-                clone.extend(c.get_radius()/2)
+                clone.extend(c.get_radius() / 2)
             else:
-                clone.prepend(c.get_radius()/2)
+                clone.prepend(c.get_radius() / 2)
         else:
             print("Circle didn't intercept!!!\n")
             with self.scene.simultaneous():
@@ -307,8 +307,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             return lx, px
 
         ref_p = min(p, key=lambda x:
-            abs(mn.angle_of_vector(x - target_coord) -
-                mn.angle_of_vector(self.get_vector())))
+        abs(mn.angle_of_vector(x - target_coord) -
+            mn.angle_of_vector(self.get_vector())))
         np = P.EPoint(ref_p)
         nl = ELine(target, np)
 
@@ -325,10 +325,13 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 clone.e_remove()
         return nl, np
 
+    @log
     def e_rotate_to(self, angle: float):
         theta = angle - self.get_angle()
         if theta > PI:
             theta -= TAU
+        if theta < -PI:
+            theta += TAU
         return self.e_rotate(self.get_start(), theta)
 
     def e_split(self, *points: Mobject | Vect3):
@@ -429,10 +432,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             if inside:
                 l2, l1 = l1, l2
 
-            if abs(a1 - PI/2) < 0.1 * DEGREES:
+            if abs(a1 - PI / 2) < 0.1 * DEGREES:
                 l['CF'] = l1
                 l2.e_delete()
-            elif abs(a2 - PI/2) < 0.1 * DEGREES:
+            elif abs(a2 - PI / 2) < 0.1 * DEGREES:
                 l['CF'] = l2
                 l1.e_delete()
             else:
@@ -483,18 +486,18 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             ln.e_remove()
             return clone
 
-        with self.scene.trace(ln ,"create point D on the line"):
+        with self.scene.trace(ln, "create point D on the line"):
             pD = P.EPoint(ln.point_from_proportion(0.5))
             lBD, lDC = ln.e_split(pD)
             lAD = ELine(A, pD, stroke_color=BLUE)
 
-        with self.scene.trace(mn.VGroup(lDC, lAD) ,"copy angle"):
+        with self.scene.trace(mn.VGroup(lDC, lAD), "copy angle"):
             aADC = Angel.EAngle(lDC, lAD)
             lEA, angle = aADC.copy_to_line(p, lAD, negative=True, speed=0)
-        with self.scene.trace(lEA ,"extend the line"):
+        with self.scene.trace(lEA, "extend the line"):
             lEA.prepend(mn_scale(200))
 
-        #cleanup
+        # cleanup
         with self.scene.delayed():
             aADC.e_remove()
             angle.e_remove()
@@ -562,7 +565,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         p = c.intersect(self)
         pH = P.EPoint(p[0])
 
-        #cleanup
+        # cleanup
         with self.scene.simultaneous():
             pE.e_remove()
             c.e_remove()
@@ -594,7 +597,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             raise ValueError("your input line does not fit in the circle")
 
         # if original line equals the diameter, we are done, cleanup and return
-        if abs( lBC.get_length() - self.get_length()) < 1:
+        if abs(lBC.get_length() - self.get_length()) < 1:
             if new_point:
                 p.e_remove()
             return lBC
@@ -615,7 +618,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         # draw line AC, it is equal to the original line
         lAC = ELine(pA, p)
 
-        #cleanup
+        # cleanup
         with self.scene.simultaneous():
             if new_point:
                 p.e_remove()
@@ -628,12 +631,66 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
         return lAC
 
+    @classmethod
+    @log
+    @anim_speed
+    def mean_proportional(cls,
+                          l1: ELine,
+                          l2: ELine,
+                          pt: P.EPoint,
+                          angle: float,
+                          A=mn_coord(50, 450)):
+        scene: ps.PropScene = find_scene()
+        # -------------------------------------------------------------------------
+        # Position the two lines so that they form a straight line (redraw both lines)
+        # -------------------------------------------------------------------------
+        pA = P.EPoint(A)
+        with VirtualLine(pA, convert_to_coord(pA) + RIGHT) as vA:
+            lA, pB = l1.copy_to_line(pA, vA)
+        with VirtualLine(pB, convert_to_coord(pB) + RIGHT) as vB:
+            lB, pC = l2.copy_to_line(pB, vB)
 
+        # -------------------------------------------------------------------------
+        # Draw a semi-circle on line AC
+        # -------------------------------------------------------------------------
+        C = lB.get_end()
+        aD = Arc.EArc.semi_circle(A, C, clockwise=True)
 
+        # -------------------------------------------------------------------------
+        # Draw a line perpendicular to AC, from point B, intersecting
+        # the semi-circle at point D
+        # -------------------------------------------------------------------------
+        with lA.perpendicular(pB, inside=True) as lBDx:
+            p = aD.intersect(lBDx)
+            for inc in range(20):
+                if p:
+                    break
+                lBDx.extend_and_prepend(mn_scale(100))
+                p = aD.intersect(lBDx)
+            pD = P.EPoint(p[0])
+            lBD = cls(pB, pD)
 
+        # -------------------------------------------------------------------------
+        # BD is the mean proportional to AB, BC ... copy it to where the user wants it
+        # -------------------------------------------------------------------------
+        with VirtualLine(pt, pt.get_center() + np.array([np.cos(angle), np.sin(angle), 0])) as vt:
+            line3, px = lBD.copy_to_line(pt, vt)
 
+        # -------------------------------------------------------------------------
+        # Clean up
+        # -------------------------------------------------------------------------
+        with scene.simultaneous():
+            lBD.e_remove()
+            pD.e_remove()
+            px.e_remove()
+            pB.e_remove()
+            lA.e_remove()
+            aD.e_remove()
+            pC.e_remove()
+            lB.e_remove()
+            pA.e_remove()
 
-
+        return line3
 
 
 class EDashedLine(ELine, mn.DashedLine):
@@ -642,16 +699,14 @@ class EDashedLine(ELine, mn.DashedLine):
         self.positive_space_ratio = positive_space_ratio
         super().__init__(*args, dash_length=dash_length, positive_space_ratio=positive_space_ratio, **kwargs)
 
-
     def get_start_and_end(self) -> tuple[Vect3, Vect3]:
         return self.get_start(), self.get_end()
 
-
     def set_points_by_ends(self,
-        start: Vect3,
-        end: Vect3,
-        buff: float = 0,
-        path_arc: float = 0):
+                           start: Vect3,
+                           end: Vect3,
+                           buff: float = 0,
+                           path_arc: float = 0):
         if len(self.submobjects) == 0:
             return mn.Line.set_points_by_ends(self, start, end, buff, path_arc)
 
@@ -662,7 +717,6 @@ class EDashedLine(ELine, mn.DashedLine):
         self.become(ref)
         return self
 
-
     def calculate_num_dashes(self, dash_length: float, positive_space_ratio: float, length=0) -> int:
         length = length or self.get_length()
         try:
@@ -670,7 +724,6 @@ class EDashedLine(ELine, mn.DashedLine):
             return int(np.ceil(length / full_length))
         except ZeroDivisionError:
             return 1
-
 
     def _extend(self, anim: ELine, r: float):
         self.e_end = self.point(r + self.get_length())

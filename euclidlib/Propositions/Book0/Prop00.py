@@ -162,7 +162,7 @@ class Prop0(BookScene):
             res.e_remove()
             para.copy_to_point(point, speed=1)
 
-        @self.push_step
+        # @self.push_step
         def reposition_test():
             para = EParallelogram(DL * 3, DOWN * 3, UR * 3, fill=[RED])
             up_tracker = mn.ValueTracker(3)
@@ -174,3 +174,70 @@ class Prop0(BookScene):
             )
             self.play(up_tracker.animate(run_time=6, rate_func=mn.linear).set_value(-2.5))
             para.clear_updaters()
+
+        # @self.push_step
+        def line_mean_proportional_test():
+            l1 = ELine(ORIGIN, RIGHT * 2)
+            l2 = ELine(ORIGIN, RIGHT * 4)
+            p = EPoint(ORIGIN)
+
+            l1.to_corner(UL, buff=1)
+            l2.next_to(l1, DOWN, aligned_edge=LEFT)
+            p.move_to(l1.get_start() + DOWN)
+            p2 = p.copy().shift(DOWN * MED_SMALL_BUFF)
+            self.add(p2)
+
+            l3 = ELine.mean_proportional(l1, l2, p2, 0, speed=1)
+            l4 = ELine.mean_proportional(l1, l2, p, 0)
+
+        # @self.push_step
+        def poly_copy_similar_bug():
+            poly = EPolygon(
+                np.array([-1, 0]),
+                np.array([0, 0]),
+                np.array([1, 2]),
+                np.array([0, 1]),
+                np.array([-2, 2]),
+            )
+            ln = ELine(
+                np.array([-1, -3]), np.array([-0.5, -2.5])
+            )
+            new = poly.copy_to_similar_shape(ln, speed=1)
+            self.wait()
+            new.e_remove()
+            new = poly.copy_to_similar_shape(ln)
+
+        # @self.push_step
+        def poly_copy_similar_test():
+            poly = EPolygon(
+                np.array([-1, 0]),
+                np.array([0, 0]),
+                np.array([1, 2]),
+                np.array([-0.5, 1.25]),
+                np.array([-2, 2]),
+            )
+            ln = ELine(
+                np.array([-1, -3]), np.array([-0.5, -2.5])
+            )
+            new = poly.copy_to_similar_shape(ln, speed=1)
+            self.wait()
+            new.e_remove()
+            new = poly.copy_to_similar_shape(ln)
+
+        # @self.push_step
+        def poly_copy_to_polygon_shape_test():
+            poly = EPolygon(
+                np.array([-1, 0]),
+                np.array([0, 0]),
+                np.array([1, 2]),
+                np.array([-0.5, 1.25]),
+                np.array([-2, 2]),
+            )
+            square = ESquare(ORIGIN, RIGHT).e_move(RIGHT * 2 + UP)()
+            pt = EPoint([-3, -2])
+            # new = square.copy_to_polygon_shape(pt, poly, speed=1)
+            # new.e_remove()
+            new = square.copy_to_polygon_shape(pt, poly)
+            print(f'{square.true_area()=}')
+            print(f'   {new.true_area()=}')
+

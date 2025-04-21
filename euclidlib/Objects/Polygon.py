@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing_extensions import Unpack
 
-from itertools import pairwise, zip_longest
+from itertools import pairwise, zip_longest, chain, repeat
 from typing import Tuple, Iterable, Any, Dict, TypedDict
 
 from euclidlib.Objects.EucidMObject import *
@@ -41,6 +41,8 @@ class OPTIONS(TypedDict):
 
 
 class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
+    _area: float | None
+
     MAX_SIZE = 0
 
     def IN(self, v: Vect3):
@@ -105,7 +107,7 @@ setattr(cls, 'p{i}', property(p))
             labels: LABEL_ARG | None = None,
             angles: ANGLE_ARGS | None = None,
             angle_sizes: ANGLE_SIZE_ARGS | None = None,
-            fill: mn.Color = None,
+            fill: Tuple[mn.Color, float] | None = None,
             z_index=-1,
             animate_part=('set_e_fill',),
             delay_anim=False,
@@ -134,7 +136,6 @@ setattr(cls, 'p{i}', property(p))
                     points.append(s1)
 
         assert all(p is not None for p in points)
-
 
         self.options: OPTIONS = {
             k: locals()[k]
@@ -185,7 +186,6 @@ setattr(cls, 'p{i}', property(p))
                     for a in _angles:
                         if a is not None:
                             a.e_normal()
-
 
     def e_fill(self, color: ManimColor = None, opacity=0.5):
         self.options['fill'] = (color, opacity)
@@ -416,13 +416,14 @@ setattr(cls, 'p{i}', property(p))
         return False
 
     def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
-        line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(self.l, other.lines)]
-        point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(self.p, other.points)]
+        repeat_last = lambda a: chain(a[:-1], repeat(a[-1]))
+        line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.l), other.lines)]
+        point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.p), other.points)]
         angle_transforms = [us.transform_to(them, anim=anim)
-                            for us, them in zip(self.a, other.angles) 
+                            for us, them in zip(self.a, other.angles)
                             if us is not None and them is not None]
-        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations, anim=anim)
-
+        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
+                                    anim=anim)
 
     @log
     @copy_transform()
@@ -439,7 +440,7 @@ setattr(cls, 'p{i}', property(p))
         # ------------------------------------------------------------------------
         # get a list of triangles that make up the polygon
         # ------------------------------------------------------------------------
-        triangles = self.copy_to_triangles(speed=0)
+        triangles = self.copy_to_triangles()
 
         # ------------------------------------------------------------------------
         # convert each triangle to a parallelogram
@@ -450,8 +451,7 @@ setattr(cls, 'p{i}', property(p))
         coords = current_line.get_start_and_end()
         for tri in triangles:
             tri.e_fill(RED)
-            with self.scene.pause_animations_for():
-                parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle, speed=0))
+            parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle))
 
             with self.scene.simultaneous():
                 parallels[-1].e_draw()
@@ -478,10 +478,10 @@ setattr(cls, 'p{i}', property(p))
         new = EPolygon(*coords)
         while sides > 3:
             # calculate the index with the most 'narrow' extension
-            min_index, min_angle = min(enumerate(self.angle_values), key=lambda a: a[1])
+            min_index, min_angle = min(enumerate(new.angle_values), key=lambda a: a[1])
 
             # chop this section off - step 1 calculate points
-            if min_index == self.sides - 1:
+            if min_index == new.sides - 1:
                 triangle_points = [new.p[min_index - 1], new.p[min_index], new.p[0]]
                 new_points = new.p[:-1]
             elif min_index == 0:
@@ -509,12 +509,20 @@ setattr(cls, 'p{i}', property(p))
             self._calculate_angle_values()
         return self._angle_values
 
+    @property
+    def is_clockwise(self):
+        if not hasattr(self, '_is_clockwise'):
+            self._calculate_angle_values()
+        return self._is_clockwise
+
     def _calculate_angle_values(self):
         # clockwise
         values = list(A.calculateAngle(l1, l2) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
+        self._is_clockwise = True
 
         # counter_clockwise
-        if sum(values) > (self.sides - 2) * PI:
+        if sum(values) > (self.sides - 2) * PI + 0.0001:
+            self._is_clockwise = False
             values = list(A.calculateAngle(l2, l1) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
         self._angle_values = values
 
@@ -546,8 +554,99 @@ setattr(cls, 'p{i}', property(p))
         self.scene.play(mn.ReplacementTransform(pll, rect))
         return rect
 
+    @log
+    @copy_transform()
+    def copy_to_similar_shape(self, line: L.ELine):
+        from . import Triangle as Tri
+        # array of points for new polygon
+        first_vec = self.l0.get_unit_vector()
+        ref_line = line.get_unit_vector()
+
+        if np.dot(first_vec, ref_line) >= 0:
+            points: List[P.EPoint] = [P.EPoint(line.get_start()), P.EPoint(line.get_end())]
+        else:
+            points: List[P.EPoint] = [P.EPoint(line.get_end()), P.EPoint(line.get_start())]
+
+        # --------------------------------------------------------------------------
+        # create individual triangles and copy them
+        # --------------------------------------------------------------------------
+        line_to_draw_on = L.ELine(*points, skip_anim=True).red()
+        for third_point in self.p[2:]:
+            # create new triangle
+            t = Tri.ETriangle(self.p0, self.p1, third_point, fill=(PINK, 0.5))
+
+            # create two new angles
+            with self.scene.simultaneous():
+                a1 = A.EAngle(t.l0, t.l2)
+                a2 = A.EAngle(t.l1, t.l0)
+
+            # copy these angles to the line to draw on
+            with self.scene.simultaneous():
+                pt1 = P.EPoint(line_to_draw_on.get_start())
+                pt2 = P.EPoint(line_to_draw_on.get_end())
+            with self.scene.simultaneous():
+                l1, a1tmp = a1.copy_to_line(pt1, line_to_draw_on)
+                l2, a2tmp = a2.copy_to_line(pt2, line_to_draw_on, negative=True)
+
+            # find the intersection of the new lines
+            pt3 = P.EPoint(l1.intersect(l2))
+            points.append(pt3)
+
+            # clean up
+            with self.scene.simultaneous():
+                t.e_remove()
+                a1.e_remove()
+                a2.e_remove()
+                l1.e_remove()
+                l2.e_remove()
+                a1tmp.e_remove()
+                a2tmp.e_remove()
+                pt1.e_remove()
+                pt2.e_remove()
+            # if third_point is not self.p[-1]:
+            #     line_to_draw_on = L.ELine(pt1, pt3).red()
+
+        line_to_draw_on.e_remove()
+        poly = EPolygon.assemble(points=points)
+        return poly
+
+    @log
+    @copy_transform()
+    def copy_to_polygon_shape(self, point: EMObject | Vect3, poly: EPolygon):
+        # need a right angle
+        l1 = L.VirtualLine(mn_coord(10, 40), mn_coord(40, 40))
+        l2 = L.VirtualLine(mn_coord(10, 40), mn_coord(10, 10))
+        right = A.EAngle(l1, l2, delay_anim=True)
+
+        # Create a rectangle equal in area to other BCLE (I.45)
+        # drawn on it's base
+        t1 = poly.copy_to_parallelogram_on_line(poly.l0, right)
+
+        # copy self to rectangle alongside of previous CFME
+        if self.is_clockwise == t1.is_clockwise:
+            t2 = self.copy_to_parallelogram_on_line(t1.l1, right)
+        else:
+            t2 = self.copy_to_parallelogram_on_line(t1.l3, right)
+        t2.blue()
+
+        # create a line GH (starting at point $pt) such that it is
+        # the mean proportional of BC, CF (VI.13)
+        line3 = L.ELine.mean_proportional(t1.l0, t2.l1, point, 0)
+
+        # finally, draw a copy of the polygon onto the new line
+        # (the final polygon will be the size of self, but similar to polygon)
+        final = poly.copy_to_similar_shape(line3)
+
+        # cleanup
+        with self.scene.simultaneous():
+            t1.e_remove()
+            t2.e_remove()
+            line3.e_remove()
+
+        return final
+
     def reposition(self, *new_coords, anim=False):
-        assert(len(self.points) == len(new_coords))
+        assert (len(self.points) == len(new_coords))
         new_poly = EPolygon(*new_coords, **self.options, delay_anim=True)
         if anim:
             self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
@@ -561,6 +660,16 @@ setattr(cls, 'p{i}', property(p))
         if anim:
             self.scene.remove(new_poly)
 
-
     def area(self) -> float:
         return self.get_arc_length()
+
+    def true_area(self) -> float:
+        if hasattr(self, '_area'):
+            return self._area
+        with self.scene.pause_animations_for():
+            triangles = self.copy_to_triangles()
+            area = sum(t.true_area() for t in triangles)
+            for t in triangles:
+                t.e_delete()
+        self._area = area
+        return area

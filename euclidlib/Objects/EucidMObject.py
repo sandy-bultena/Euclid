@@ -271,7 +271,7 @@ def animate(func):
 def log(func):
     @wraps(func)
     def logMethodName(self, *args, **kwargs):
-        with self.scene.trace(self, f"{type(self).__name__}:{func.__name__}"):
+        with find_scene().trace(self, f"{type(self).__name__}:{func.__name__}"):
             return func(self, *args, **kwargs)
 
     return logMethodName

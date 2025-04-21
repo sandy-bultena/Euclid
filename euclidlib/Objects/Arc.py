@@ -161,22 +161,30 @@ class AbstractArc(Da.Dashable, mn.Arc):
         base = Ln.VirtualLine(self.center, p2, scene=self.scene, stroke_color=BLUE)
         d = base.get_length()
 
+        # divide d into d1, d2,
+        # corresponding to the horizontal position of the vertex
         d1 = 1 / (2 * d) * (d ** 2 + self.radius ** 2 - r2 ** 2)
         d2 = d - d1
 
+        # calculate the height of the triangle
         hsqr = r2 ** 2 - d2 ** 2
         if abs(hsqr) < mn_scale(0.2):
             hsqr = 0
 
+        # if hsqr is negative, then the circles don't intersect
         if hsqr < 0:
             base.e_remove()
             return None
 
         h = math.sqrt(hsqr)
 
+        # ------------------------------------------------------------------------
+        # find x,y coordinates for d1 and h
+        # ------------------------------------------------------------------------
         sx, sy, *_ = base.get_start()
-        if d1 < 1:
+        if d1 < mn_scale(1):
             sx, sy, *_ = base.get_end()
+
         px, py, _ = base.point(d1)
 
         p4x = px + py - sy
@@ -280,10 +288,10 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
 class EArc(AbstractArc):
     @classmethod
-    def semi_circle(cls, p1: P.EPoint | Vect3, p2: P.EPoint | Vect3):
+    def semi_circle(cls, p1: P.EPoint | Vect3, p2: P.EPoint | Vect3, clockwise=False):
         with Ln.VirtualLine(p1, p2) as d:
             r = d.get_length() / 2 + mn_scale(0.0001)
-        return cls(r, p1, p2)
+        return cls(r, p1, p2, clockwise=clockwise)
 
     def create_pie(self, **kwargs):
         pie = EMObject(stroke_width=0, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
@@ -317,10 +325,7 @@ class EArc(AbstractArc):
         c = self.center
         with Cir.VirtualCircle(c, c + RIGHT * self.radius) as virt:
             results = []
-            start_angle = self.e_start_angle % TAU
-            if self.e_start_angle > self.e_end_angle:
-                start_angle -= TAU
-            end_angle = self.e_end_angle % TAU
+            start_angle, end_angle = sorted((x+0.0001*DEG) % TAU for x in (self.e_start_angle, self.e_end_angle))
 
             if not isinstance(pts, (list, tuple)):
                 pts = [pts]
@@ -335,15 +340,21 @@ class EArc(AbstractArc):
                  radius: float,
                  point1: EMObject | Vect3,
                  point2: EMObject | Vect3,
-                 big=False,
+                 big=None,
+                 clockwise=False,
                  **kwargs):
+
+        if isinstance(big, bool):
+            mn.log.warn("big is deprecated, use clockwise=bool")
 
         point1 = convert_to_coord(point1)
         point2 = convert_to_coord(point2)
 
         d = Ln.VirtualLine(point1, point2)
         if radius < d.get_length() / 2:
-            raise ValueError(f"radius of curvature too small for points\n\tneed at least {d.get_length() / 2}")
+            raise ValueError(f"radius of curvature too small for points\n\t"
+                             f"need at least {d.get_length() / 2}\n\t"
+                             f"radius given is {radius}")
 
         c1 = Cir.VirtualCircle(point1, point1 + radius * RIGHT)
         c2 = Cir.VirtualCircle(point2, point2 + radius * RIGHT)
@@ -352,14 +363,21 @@ class EArc(AbstractArc):
         v1 = point1 - center
         v2 = point2 - center
         diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
-        diff %= TAU
 
-        if (big and diff < PI) or (diff > PI and not big):
-            center = ps[1]
-            v1 = point1 - center
-            v2 = point2 - center
-            diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
+        if isinstance(big, bool):
             diff %= TAU
+            if (big and diff < PI) or (diff > PI and not big):
+                center = ps[1]
+                v1 = point1 - center
+                v2 = point2 - center
+                diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
+                diff %= TAU
+        else:
+            if clockwise and diff > 0:
+                diff -= TAU
+            elif not clockwise and diff < 0:
+                diff += TAU
+
 
         super().__init__(
             mn.angle_of_vector(v1),

@@ -22,16 +22,12 @@ CalculatePoints.pm
     are_points
 
 Polygon.pm
-    area
-    copy_to_polygon_shape
-    copy_to_similar_shape
     angle_value
     scale
     scale_inner
     poly
 
 Line.pm
-    rotateTo
     subtract
     third_proportional
     third_mean

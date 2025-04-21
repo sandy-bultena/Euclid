@@ -127,7 +127,6 @@ class ETriangle(EPolygon):
     @anim_speed
     def parallelogram(self, angle: A.EAngleBase):
         point = self.l[1].bisect(speed=0)
-        point.add_label('P_1', UP)
         l = L.ELine(self.p[1], self.p[2])
         l.e_fade()
         l1, l2 = l.e_split(point)
@@ -144,13 +143,13 @@ class ETriangle(EPolygon):
         with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
             line2 = self.l[1].parallel(self.p[0], speed=0)
             line2.blue()
-            point2 = P.EPoint(line2.intersect(side1), label=("P_2", UP))
+            point2 = P.EPoint(line2.intersect(side1))
 
         # Draw a line through triangle point 3, parallel to side 1
         with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
             line3 = side1.parallel(self.p[2], speed=0)
             line3.green()
-            point3 = P.EPoint(line3.intersect(line2), label=("P_3", UP))
+            point3 = P.EPoint(line3.intersect(line2))
 
         # construct polygon
         poly = Para.EParallelogram(point2, point, self.p[2], point3)
@@ -168,7 +167,7 @@ class ETriangle(EPolygon):
         return poly, angle2
 
     @log
-    @anim_speed
+    @copy_transform()
     def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
         # create parallelogram equal in size to triangle (I.42)
         s1, a2 = self.parallelogram(angle, speed=0)
@@ -230,10 +229,18 @@ class ETriangle(EPolygon):
     @log
     @copy_transform()
     def copy_to_circle(self, circle: C.ECircle) -> ETriangle:
-        angles: G.EGroup[A.EAngleBase] = G.EGroup(
-            A.EAngle(l1, l2, delay_anim=True)
-            for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
-        )
+        if self.is_clockwise:
+            angles: G.EGroup[A.EAngleBase] = G.EGroup(
+                A.EAngle(l2, l1, delay_anim=True)
+                for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
+            )
+            a1, a2 = angles[2], angles[1]
+        else:
+            angles: G.EGroup[A.EAngleBase] = G.EGroup(
+                A.EAngle(l1, l2, delay_anim=True)
+                for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
+            )
+            a1, a2 = angles[1], angles[2]
 
         # Draw a line GH tangent to the circle at point A
         pA = circle.e_point_at_angle(PI/2)
@@ -243,13 +250,13 @@ class ETriangle(EPolygon):
         lAH = lGA.prepend_cpy(2 * circle.radius)
 
         # Copy the angle E to line GH, at point A (I.23)
-        with with_objects(*angles[1].copy_to_line(pA, lAH)) as (la1, a1):
+        with with_objects(*a1.copy_to_line(pA, lAH)) as (la1, a1):
             la1.extend(2 * circle.radius)
             pts = circle.intersect(la1)
             pC = P.EPoint(pts[0])
 
         # Copy the angle L to line GH, at point A (I.23)
-        with with_objects(*angles[2].copy_to_line(pA, lGA, negative=True)) as (la2, a2):
+        with with_objects(*a2.copy_to_line(pA, lGA, negative=True)) as (la2, a2):
             la2.extend(2 * circle.radius)
             pts = circle.intersect(la2)
             pB = P.EPoint(pts[1])

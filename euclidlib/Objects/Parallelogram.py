@@ -73,7 +73,7 @@ class EParallelogram(Polygon.EPolygon):
             self.set_angles(None, " ", None)
             flag += 1
 
-        l2, a2 = self.a[1].copy_to_line(point2, l1, negative=True, speed=0)
+        l2, a2 = self.a[1].copy_to_line(point2, l1, negative=True)
         if flag:
             self.a[1].e_remove()
         l2.e_fade()
@@ -152,7 +152,6 @@ class EParallelogram(Polygon.EPolygon):
         l1, a2 = self.a1.copy_to_line(np2, nl2, negative=True)
         l1.extend(self.l0.get_length()).e_fade()
         if flag:
-            self._sub_group.remove(self.a1)
             self.a1.e_remove()
             self.angles[1] = None
 
