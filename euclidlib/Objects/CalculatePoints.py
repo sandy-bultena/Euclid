@@ -29,3 +29,27 @@ def square(*coords: EMObject | Vect3) -> Tuple[Vect3, Vect3, Vect3, Vect3]:
     x, y, z = map(convert_to_coord, coords)
     diff = y - x
     return z, x, y, z + diff
+
+def right_triangle(*coords: EMObject | Vect3, height=mn_scale(25)):
+    assert len(coords) == 2
+    p2, p3 = coords
+    delta = p3 - p2
+    p4 = mn.normalize(delta) * height + p3
+    return *coords, p4
+
+def equilateral_triangle(*coords: EMObject | Vect3, height=mn_scale(25)):
+    assert len(coords) == 2
+    p1, p2 = coords
+    h = math.sqrt(3)/2 * mn.get_norm(p2 - p1)
+    m = mn.midpoint(p1, p2)
+    right = right_triangle(p1, m, height=h)
+    return *coords, right[-1]
+
+def isosceles_triangle(*coords: EMObject | Vect3, radius=mn_scale(25)):
+    assert len(coords) == 2
+    p1, p2 = coords
+    m = mn.midpoint(p1, p2)
+    delta = m - p1
+    p4 = mn.normalize(delta) * radius + m
+    return *coords, p4
+
