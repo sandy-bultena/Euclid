@@ -147,7 +147,7 @@ class Prop0(BookScene):
             la.bisect(speed=1)
             lb.bisect()
 
-        # @self.push_step
+        @self.push_step
         def pentagon_test():
             pent = RegularPolygons.pentagon(ORIGIN, 2)
             self.wait()
@@ -223,6 +223,8 @@ class Prop0(BookScene):
             self.wait()
             new.e_remove()
             new = poly.copy_to_similar_shape(ln)
+            self.wait()
+            self.e_remove(poly, ln, new)
 
         # @self.push_step
         def poly_copy_to_polygon_shape_test():
@@ -235,8 +237,8 @@ class Prop0(BookScene):
             )
             square = ESquare(ORIGIN, RIGHT).e_move(RIGHT * 2 + UP)()
             pt = EPoint([-3, -2])
-            # new = square.copy_to_polygon_shape(pt, poly, speed=1)
-            # new.e_remove()
+            new = square.copy_to_polygon_shape(pt, poly, speed=1)
+            new.e_remove()
             new = square.copy_to_polygon_shape(pt, poly)
             print(f'{square.true_area()=}')
             print(f'   {new.true_area()=}')
@@ -296,7 +298,7 @@ class Prop0(BookScene):
             l2, l3, l4 = l1.square(negative=True)
 
 
-        @self.push_step
+        # @self.push_step
         def line_parts():
             l1 = ELine(np.array([3, -3]), np.array([-3, 2]))
             l1.show_parts(5, color=RED, speed=1)

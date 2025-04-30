@@ -11,7 +11,7 @@ from . import CustomAnimation as CA
 from contextlib import contextmanager
 import sys
 
-from euclidlib.Propositions.PropScene import PropScene
+from euclidlib.Propositions import PropScene as ps
 
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
@@ -76,7 +76,7 @@ class TextBox(EGroup[T.EStringObj]):
 
     def __init__(self,
                  absolute_position: Tuple[float, float, float],
-                 scene: PropScene | None = None,
+                 scene: ps.PropScene | None = None,
                  *args,
                  line_width: float = None,
                  stroke_width=0,

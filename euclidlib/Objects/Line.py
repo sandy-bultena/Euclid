@@ -23,6 +23,12 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
 
+    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+        if isinstance(start, str):
+            start, end = P.EPoint.find_in_frame(start)
+        self.basic_interpolate = False;
+        super().__init__(start,end, *args, **kwargs)
+
     @staticmethod
     def find_in_frame(name, loop=False):
         if loop:
@@ -50,6 +56,9 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
                 e.args[0])
 
+    # =======================================
+    # LABEL DIRECTIONS
+    # =======================================
     def IN(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, PI / 2)
@@ -57,18 +66,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     def OUT(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -PI / 2)
-
-    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
-        if isinstance(start, str):
-            start, end = P.EPoint.find_in_frame(start)
-
-        self.e_start = self.pointify(start)
-        self.e_end = self.pointify(end)
-        super().__init__(self.e_start, self.e_end, *args, **kwargs)
-
-    def invert_start_and_end(self):
-        self.reverse_points()
-        return self
 
     def e_label_point(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
         try:
@@ -81,31 +78,68 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             direction = self.OUT()
         return point + (buff or self.LabelBuff) * direction
 
-    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
-        if np.dot(self.get_unit_vector(), other.get_unit_vector()) < 0:
-            if anim is mn.TransformFromCopy:
-                cpy = self.copy().invert_start_and_end()
-            else:
-                cpy = self.invert_start_and_end()
-            return super(ELine, cpy).transform_to(other, *sub_animations, anim=mn.ReplacementTransform)
+    def invert_start_and_end(self):
+        self.reverse_points()
+        return self
+
+    def interpolate(
+            self,
+            mobject1: ELine,
+            mobject2: Mobject,
+            alpha: float,
+            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    ) -> Self:
+        if not isinstance(mobject2, ELine) or self.basic_interpolate:
+            return super().interpolate(mobject1, mobject2, alpha, path_func)
+
+        CENTER = 0
+        START = 1
+        END = 2
+
+        self.become(mobject1)
+        if np.dot(self.get_unit_vector(), mobject2.get_unit_vector()) < 0:
+            self.reverse_points()
+
+        methods: List[Callable[[ELine], Vect3]] = [mn.Mobject.get_center, mn.Line.get_start, mn.Line.get_end]
+        candidates = [mn.norm_squared(f(self) - f(mobject2)) for f in methods]
+        candid = min(zip(candidates, (CENTER, START, END), methods))
+
+        mid_center = mn.interpolate(candid[2](self), candid[2](mobject2), alpha)
+        mid_length = mn.interpolate(self.get_length(), mobject2.get_length(), alpha)
+        a1 = self.get_angle()
+        a2 = mobject2.get_angle()
+        if abs(a2 - a1) > PI:
+            mid_angle = mn.interpolate(a1 % TAU, a2 % TAU, alpha)
         else:
-            return super().transform_to(other, *sub_animations)
+            mid_angle = mn.interpolate(a1, a2, alpha)
+        vec = np.array([np.cos(mid_angle), np.sin(mid_angle), 0])
+        old_colors = mobject1.get_stroke_colors()
+        if candid[1] == CENTER:
+            self.set_points_by_ends(mid_center - vec * mid_length / 2, mid_center + vec * mid_length / 2)
+        elif candid[1] == START:
+            self.set_points_by_ends(mid_center, mid_center + vec * mid_length)
+        else:
+            self.set_points_by_ends(mid_center - vec * mid_length, mid_center)
+
+        self.set_stroke(old_colors)
+        self.locked_data_keys.add('point')
+        super().interpolate(mobject1, mobject2, alpha, path_func)
+        self.locked_data_keys.remove('point')
+        return self
+
+    # def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
+    #     if np.dot(self.get_unit_vector(), other.get_unit_vector()) < 0:
+    #         if anim is mn.TransformFromCopy:
+    #             cpy = self.copy().invert_start_and_end()
+    #         else:
+    #             cpy = self.invert_start_and_end()
+    #         return super(ELine, cpy).transform_to(other, *sub_animations, anim=mn.ReplacementTransform)
+    #     else:
+    #         return super().transform_to(other, *sub_animations)
 
     def point(self, r: float):
         vec = self.get_unit_vector()
         return self.get_start() + r * vec
-
-    def old_point(self, r: float):
-        p3x, p3y, *_ = self.get_end()
-        xs, ys, *_ = self.get_start()
-        dx = p3x - xs
-        dy = p3y - ys
-        if dx == dy == 0:
-            return xs, ys
-
-        x = r / math.sqrt(dy ** 2 + dx ** 2) * dx + xs
-        y = r / math.sqrt(dy ** 2 + dx ** 2) * dy + ys
-        return x, y
 
     def highlight(self, color=RED, scale=3.0, **args):
         return (self.animate(rate_func=mn.there_and_back, **args)
@@ -116,7 +150,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             return self.intersect_line(other)
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
-        super().intersect(other)
+        return super().intersect(other)
 
     def intersect_selection(self, other: mn.Rectangle):
         if other.get_arc_length() < 1e-3:
@@ -167,8 +201,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
     def get_e_slope(self) -> float:
         (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
-        if abs(x2 - x1) < mn_scale(0.01):
-            if abs(y2 - y1) < mn_scale(0.01):
+        if abs(x2 - x1) < mn_scale(1):
+            if abs(y2 - y1) < mn_scale(1):
                 return math.nan
             if y2 > y1:
                 return math.inf
@@ -177,13 +211,13 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         return (y2 - y1) / (x2 - x1)
 
     def _extend(self, anim: ELine, r: float):
-        self.e_end = self.point(r + self.get_length())
-        anim.set_points_by_ends(self.get_start(), self.e_end)
+        e_end = self.point(r + self.get_length())
+        anim.set_points_by_ends(self.get_start(), e_end)
         return self
 
     def _prepend(self, anim: ELine, r: float):
-        self.e_start = self.point(-r)
-        anim.set_points_by_ends(self.e_start, self.get_end())
+        e_start = self.point(-r)
+        anim.set_points_by_ends(e_start, self.get_end())
         return self
 
     @animate
@@ -201,9 +235,9 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     @animate
     def extend_and_prepend(self, anim: ELine, r: float):
         r = abs(r)
-        self.e_end = self.point(r + self.get_length())
-        self.e_start = self.point(-r)
-        anim.set_points_by_ends(self.e_start, self.e_end)
+        e_end = self.point(r + self.get_length())
+        e_start = self.point(-r)
+        anim.set_points_by_ends(e_start, e_end)
         return self
 
     def extend_cpy(self, r: float):
@@ -785,7 +819,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         # -------------------------------------------------------------------------
         pD = P.EPoint(D)
         ld1 = ELine(D, D + mn_scale(900) * RIGHT).dash()
-        ld2 = ELine(D, D + mn_scale(900) * RIGHT + DOWN * mn_scale(580-350)).dash()
+        ld2 = ELine(D, D + mn_scale(900) * RIGHT + DOWN * mn_scale(580 - 350)).dash()
 
         # -------------------------------------------------------------------------
         # Define points such that DG is equal to line1,
@@ -834,7 +868,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             ld2.e_remove()
 
         return line4
-
 
     @log
     @copy_transform()
@@ -908,7 +941,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         start, end = self.get_start_and_end()
 
         # length of "part"
-        r = self.get_length()/num
+        r = self.get_length() / num
 
         # need to know if we are adding/subtracting, etc
         sign = -1
@@ -916,7 +949,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             sign = 1
 
         phi_vec = self.get_unit_vector()
-        theta_vec = mn.rotate_vector(phi_vec, PI/2)
+        theta_vec = mn.rotate_vector(phi_vec, PI / 2)
 
         # adjust shift parameter if necessary
         shift = mn_scale(5)
@@ -928,10 +961,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         # loop over each "part"
         line_parts = []
 
-        colors = mn.color_gradient([color, BLACK], num+4)
+        colors = mn.color_gradient([color, BLACK], num + 4)
         for i, clr in zip(range(num), colors):
             cs = self._coord_dist(start, r * i)
-            ce = self._coord_dist(start, r * (i+1))
+            ce = self._coord_dist(start, r * (i + 1))
 
             end1 = cs + (-sign * offset * theta_vec) + (shift * phi_vec)
             end2 = ce + (-sign * offset * theta_vec) - (shift * phi_vec)
@@ -939,15 +972,13 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
         return line_parts
 
-
-
     def _coord_dist(self, pt: Vect3, radius: float):
         delta = self.get_end() - pt
         norm_delta = mn.get_norm(delta)
         if norm_delta == 0:
             return self.get_end()
 
-        return (radius/norm_delta) * delta + pt
+        return (radius / norm_delta) * delta + pt
 
 
 class EDashedLine(ELine, mn.DashedLine):

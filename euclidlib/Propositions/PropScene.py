@@ -154,6 +154,11 @@ class PropScene(InteractiveScene):
             return False
         return False
 
+    def e_remove(self, *obj):
+        with self.simultaneous():
+            for o in obj:
+                o.e_remove()
+
     @contextmanager
     def simultaneous(self, **kwargs):
         self.animateState.append(AnimState.STORING)
@@ -279,20 +284,23 @@ class PropScene(InteractiveScene):
         self.steps.append(func)
 
     def title_page(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def reset(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def runFull(self):
         max_step_name = max(len(step.__name__ )for step in self.steps)
         preformat = f" Running func = {{:-<{max_step_name}}} | anim={{}}"
         with self.animation_speed(self._speed or 1):
-            if not self.debug:
-                self.title_page()
-                self.wait(3)
-            self.reset()
-            self.wait()
+            try:
+                if not self.debug:
+                    self.title_page()
+                    self.wait(3)
+                    self.reset()
+                    self.wait()
+            except NotImplementedError:
+                pass
             for step in self.steps:
                 if self.debug:
                     print(preformat.format(step.__name__, self.num_plays))

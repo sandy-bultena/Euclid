@@ -1,3 +1,4 @@
+from __future__ import annotations
 from euclidlib.Objects import Circle, find_scene
 from euclidlib.Objects import ps, mn
 from euclidlib.Objects import Line as L
