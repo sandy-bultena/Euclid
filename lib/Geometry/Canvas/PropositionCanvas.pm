@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use Data::Dumper;
 
 package PropositionCanvas;
 
@@ -13,7 +14,7 @@ PropositionCanvas - create a canvas for showing Euclid's Propositions
     use Geometry::Canvas::PropositionCanvas;
     my $pn = PropositionCanvas->new(-title=>"Example");
     my $t = $pn->text_box( 700, 50, -anchor => "c", -width => 1000 );
-    
+
     my @A = ( 200, 500 );
     my @B = ( 450, 500 );
     my @subs;
@@ -91,7 +92,7 @@ see documentation in C<Geometry::Bitmap::NormalText>
 
 =head2 Package Variables
 
-C<@CARP_NOT> See "Carp" module for its use 
+C<@CARP_NOT> See "Carp" module for its use
 
 C<$PDF = $ENV{EUCLID_CREATE_PDF}> to create the PDF, or not;
 
@@ -102,6 +103,9 @@ C<$CopyRight> subroutine that when executed, creates the copyright info;
 
 =cut
 
+# ===========================================================================
+# using Tcl/Tk instead of Perl/Tk
+# ===========================================================================
 use Tcl::Tk;
 my $int = new Tcl::Tk;
 
@@ -113,7 +117,6 @@ use Carp;
 our @CARP_NOT;
 our $PDF = $ENV{EUCLID_CREATE_PDF} || 0;
 
-use Tk::Canvas;
 my ( $lx, $ly );
 my $Hand;
 my $Width  = 1400;
@@ -142,7 +145,7 @@ our $overrideWindowsRefresh = 0;
 
 Create the PropositionCanvas, and write the title if there is one.
 
-Executes the copyright sub if it has been defined 
+Executes the copyright sub if it has been defined
 (set package variable C<$PropositionCanvas::CopyRight> to an
 anonymous sub)
 
@@ -151,12 +154,15 @@ Returns object
 =cut
 
 sub new {
+    print "in new ";
     my $class = shift;
+    print $class,"\n";
     my $self = { -page => 0, -lastpage => 0, @_ };
     bless $self, $class;
     $self->_pdf( $self->_create_pdf_doc ) if $PDF;
     $self->set_animatable(0) if $PDF;
 
+    # create the main window, and the canvas on top
     $self->_make_canvas();
     if ( exists $self->{-title} && exists $self->{-number} ) {
         $self->title( $self->{-number}, $self->{-title} );
@@ -187,9 +193,9 @@ sub _pdf {
 
 =head2 set_animatable
 
-Sets the flag that allows any animation to take place.  
+Sets the flag that allows any animation to take place.
 
-Note that this is different than any parameters set in the Shape 
+Note that this is different than any parameters set in the Shape
 module, in that this flag affects when and if the canvas is refreshed
 
 =cut
@@ -206,9 +212,9 @@ sub set_animatable {
 
 =head2 is_animatable
 
-Determines if the flag that allows any animation to take place has been set  
+Determines if the flag that allows any animation to take place has been set
 
-Note that this is different than any parameters set in the Shape 
+Note that this is different than any parameters set in the Shape
 module, in that this flag affects when and if the canvas is refreshed
 
 =cut
@@ -259,6 +265,8 @@ sub _make_canvas {
     $self->{-cn}     = $self;
     $self->{-mw}     = $mw;
     $self->{-realcn} = $cn;
+
+
 
     # --------------------------------------------------------------
     # setbindings & make grid
@@ -326,7 +334,7 @@ Inputs:
 
 =item C<$title> Title of the Proposition
 
-=item C<$book> Book number (I .. XIII) 
+=item C<$book> Book number (I .. XIII)
 
 =back
 
@@ -628,9 +636,10 @@ sub _save_state {
     my $canvas_objs = [];
 
     my $objects = $cn->find( 'withtag', 'all' );
+    my @objects = split(" ",$objects);
 
     # get all important objects, and save configuration
-    foreach my $obj (@$objects) {
+    foreach my $obj (@objects) {
 
         my $option;
         my $type = $cn->type($obj);
@@ -669,7 +678,7 @@ sub _save_state {
 
 # ==================================================================
 # parse_options
-# take the options of the canvas options, and convert it into 
+# take the options of the canvas options, and convert it into
 # something useful
 # ==================================================================
 sub parse_options {
@@ -885,7 +894,7 @@ Returns: NormalText object
 sub text_box {
     my $self = shift;
     my $cn   = $self->Tk_canvas;
-    return unless $cn;
+        return unless $cn;
     my $x    = shift;
     my $y    = shift;
     my @opts = @_;
@@ -1058,7 +1067,10 @@ sub clear {
     my $self = shift;
     my $page = $self->{-page};
     my $objs = $self->Tk_canvas->find( 'withtag', 'all' );
-    foreach my $obj (@$objs) {
+    print ("Clearing, this are my objects: <$objs>\n");
+    my @objs = split( " ",$objs);
+    print ("Clearing, this are my objects: <@objs>\n");
+    foreach my $obj (@objs) {
         $self->delete($obj);
     }
     $self->grid();
@@ -1166,11 +1178,10 @@ Sandy Bultena
 
 This module is copyright (c) 2014 Sandy Bultena. All rights reserved.
 
-This library is free software; you may redistribute and/or modify it under 
-the terms of either the GNU General Public License 
+This library is free software; you may redistribute and/or modify it under
+the terms of either the GNU General Public License
 or the Perl Artistic License, as specified in the Perl 5.10.0 README file.
 
 =cut
 
 1;
-

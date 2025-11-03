@@ -710,7 +710,7 @@ sub deep_clone {
     my $self   = shift;
     my $copy = {};
     bless $copy, ref($self);
-    foreach my $key (keys $self) {
+    foreach my $key (keys %$self) {
         if ($key eq '-cn') {
             $copy->{-cn} = $self->{-cn}
         }

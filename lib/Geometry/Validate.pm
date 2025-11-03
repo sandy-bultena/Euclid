@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Validate;
-use Tk;
+#use Tk;
 our $DEBUG_MODE                 = 1;
 our $NO_COMPLAIN                = 1;
 our $VALIDATE_DIE               = 0;

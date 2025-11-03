@@ -438,32 +438,32 @@ sub superscript_subscript {
                          "\N{U+2076}", "\N{U+2077}",
                          "\N{U+2078}", "\N{U+2079}",
     );
-    while ( $text =~ /\\{^([0-9])}/ ) {
+    while ( $text =~ /\\\{^([0-9])\}/ ) {
         my $superscript = $superscripts[$1];
-        $text =~ s/\\{^([0-9])}/$superscript/;
+        $text =~ s/\\\{^([0-9])\}/$superscript/;
     }
-    while ( $text =~ /\\{(.*?)\^([0-9])}/ ) {
+    while ( $text =~ /\\\{(.*?)\^([0-9])\}/ ) {
         my $superscript = $superscripts[$2];
-        $text =~ s/\\{([^{}]*?)\^([0-9])}/$1$superscript/;
+        $text =~ s/\\\{([^{}]*?)\^([0-9])\}/$1$superscript/;
     }
 
     if ( $ENV{EUCLID_CREATE_PDF} && $type eq "explain" ) {
-        while ( $text =~ /\\{_([0-9])}/ ) {
-            $text =~ s/\\{_([0-9])}/[$1]/;
+        while ( $text =~ /\\\{_([0-9])\}/ ) {
+            $text =~ s/\\\{_([0-9])\}/[$1]/;
         }
-        while ( $text =~ /\\{(.*?)\_([0-9])}/ ) {
-            $text =~ s/\\{([^{}]?)\_([0-9])}/$1[$2]/;
+        while ( $text =~ /\\\{(.*?)\_([0-9])\}/ ) {
+            $text =~ s/\\\{([^{}]?)\_([0-9])\}/$1[$2]/;
         }
 
     }
 
-    while ( $text =~ /\\{_([0-9])}/ ) {
+    while ( $text =~ /\\\{_([0-9])\}/ ) {
         my $subscript = $subscripts[$1];
-        $text =~ s/\\{_([0-9])}/$subscript/;
+        $text =~ s/\\\{_([0-9])\}/$subscript/;
     }
-    while ( $text =~ /\\{(.*?)\_([0-9])}/ ) {
+    while ( $text =~ /\\\{(.*?)\_([0-9])\}/ ) {
         my $subscript = $subscripts[$2];
-        $text =~ s/\\{(.*?)\_([0-9])}/$1$subscript/;
+        $text =~ s/\\\{(.*?)\_([0-9])\}/$1$subscript/;
     }
     return $text;
 }
@@ -473,74 +473,74 @@ sub _resolve_special_chars {
     
     
     $text =~ s/-/\N{U+2011}/gi unless $ENV{EUCLID_CREATE_PDF};
-    $text =~ s/\\{arc}/\N{U+21BA}/gi;
-    $text =~ s/\\{circle}/\N{U+2299}/gi;
-    $text =~ s/\\{notpara}/\\{notequal}\\{parallel}/gi;
-    $text =~ s/\\{polygon}/\\{square}/gi;
-    $text =~ s/\\{rectangle}/\\{square}/gi;
-    $text =~ s/\\{parallelogram}/\\{square}/gi;
+    $text =~ s/\\\{arc}/\N{U+21BA}/gi;
+    $text =~ s/\\\{circle}/\N{U+2299}/gi;
+    $text =~ s/\\\{notpara}/\\\{notequal}\\\{parallel}/gi;
+    $text =~ s/\\\{polygon}/\\\{square}/gi;
+    $text =~ s/\\\{rectangle}/\\\{square}/gi;
+    $text =~ s/\\\{parallelogram}/\\\{square}/gi;
 
-    $text =~ s/\\{equivalent}/\N{U+2261}/gi;
-    $text =~ s/\\{sum}/\N{U+2211}/gi;
-    $text =~ s/\\{forall}/\N{U+2200}/gi;
-    $text =~ s/\\{elementof}/\N{U+2208}/gi;
-    $text =~ s/\\{natural}/\N{U+2115}/gi;
-    $text =~ s/\\{real}/\N{U+211D}/gi;
-    $text =~ s/\\{prime}/\N{U+2119}/gi;
+    $text =~ s/\\\{equivalent}/\N{U+2261}/gi;
+    $text =~ s/\\\{sum}/\N{U+2211}/gi;
+    $text =~ s/\\\{forall}/\N{U+2200}/gi;
+    $text =~ s/\\\{elementof}/\N{U+2208}/gi;
+    $text =~ s/\\\{natural}/\N{U+2115}/gi;
+    $text =~ s/\\\{real}/\N{U+211D}/gi;
+    $text =~ s/\\\{prime}/\N{U+2119}/gi;
     $text =~ s/:/\N{U+2236}/gi;
-    $text =~ s/\\{alpha}/\N{U+03B1}/gi;
-    $text =~ s/\\{eta}/\N{U+03B7}/gi;
-    $text =~ s/\\{angle}/\N{U+2220}/gi;
-    $text =~ s/\\{beta}/\N{U+03B2}/gi;
-    $text =~ s/\\{br}/\n/gi;
-    $text =~ s/\\{correct}/\N{U+2713}/gi;
-    $text =~ s/\\{degrees}/\N{U+030A}/gi;
-    $text =~ s/\\{delta}/\N{U+03B4}/gi;
-    $text =~ s/\\{dot}/\N{U+22C5}/gi;
-    $text =~ s/\\{epsilon}/\N{U+03B5}/gi;
-    $text =~ s/\\{gamma}/\N{U+03B3}/gi;
-    $text =~ s/\\{half}/\N{U+00BD}/gi;
-    $text =~ s/\\{lambda}/\N{U+03BB}/gi;
-    $text =~ s/\\{nb}/\N{U+00A0}/gi;
-    $text =~ s/\\{notpara}/\N{U+2224}/gi;
-    $text =~ s/\\{nb}/\N{U+00A0}/gi;
+    $text =~ s/\\\{alpha}/\N{U+03B1}/gi;
+    $text =~ s/\\\{eta}/\N{U+03B7}/gi;
+    $text =~ s/\\\{angle}/\N{U+2220}/gi;
+    $text =~ s/\\\{beta}/\N{U+03B2}/gi;
+    $text =~ s/\\\{br}/\n/gi;
+    $text =~ s/\\\{correct}/\N{U+2713}/gi;
+    $text =~ s/\\\{degrees}/\N{U+030A}/gi;
+    $text =~ s/\\\{delta}/\N{U+03B4}/gi;
+    $text =~ s/\\\{dot}/\N{U+22C5}/gi;
+    $text =~ s/\\\{epsilon}/\N{U+03B5}/gi;
+    $text =~ s/\\\{gamma}/\N{U+03B3}/gi;
+    $text =~ s/\\\{half}/\N{U+00BD}/gi;
+    $text =~ s/\\\{lambda}/\N{U+03BB}/gi;
+    $text =~ s/\\\{nb}/\N{U+00A0}/gi;
+    $text =~ s/\\\{notpara}/\N{U+2224}/gi;
+    $text =~ s/\\\{nb}/\N{U+00A0}/gi;
 
-    $text =~ s/\\{parallel}/\N{U+2016}/gi;
-    $text =~ s/\\{parallel}/\N{U+2225}/gi;
+    $text =~ s/\\\{parallel}/\N{U+2016}/gi;
+    $text =~ s/\\\{parallel}/\N{U+2225}/gi;
 
-    $text =~ s/\\{parallelogram}/\N{U+2662}/gi;
-    $text =~ s/\\{parallelogram}/\N{U+25B1}/gi;
-    $text =~ s/\\{parallelogram}/\N{U+27E0}/gi;
-    $text =~ s/\\{perp}/\N{U+22A5}/gi;
-    $text =~ s/\\{perp}/\N{U+22A5}/gi;
-    $text =~ s/\\{phi}/\N{U+03C6}/gi;
+    $text =~ s/\\\{parallelogram}/\N{U+2662}/gi;
+    $text =~ s/\\\{parallelogram}/\N{U+25B1}/gi;
+    $text =~ s/\\\{parallelogram}/\N{U+27E0}/gi;
+    $text =~ s/\\\{perp}/\N{U+22A5}/gi;
+    $text =~ s/\\\{perp}/\N{U+22A5}/gi;
+    $text =~ s/\\\{phi}/\N{U+03C6}/gi;
 
-    $text =~ s/\\{right}/\N{U+221F}/gi;
+    $text =~ s/\\\{right}/\N{U+221F}/gi;
 
-    # $text =~ s/\\{right}/\N{U+02E9}/gi;
-    # $text =~ s/\\{right}/\N{U+A716}/gi;
-    # $text =~ s/\\{right}/\N{U+21F2}/gi;
-    # $text =~ s/\\{right}/\N{U+22BE}/gi;
+    # $text =~ s/\\\{right}/\N{U+02E9}/gi;
+    # $text =~ s/\\\{right}/\N{U+A716}/gi;
+    # $text =~ s/\\\{right}/\N{U+21F2}/gi;
+    # $text =~ s/\\\{right}/\N{U+22BE}/gi;
 
-    $text =~ s/\\{sigma}/\N{U+03C3}/gi;
-    $text =~ s/\\{square}/\N{U+25A1}/gi;
-    $text =~ s/\\{squared}/\N{U+00B2}/gi;
-    $text =~ s/\\{cubed}/\N{U+00B3}/gi;
-    $text =~ s/\\{therefore}/\N{U+2234}/gi;
-    $text =~ s/\\{theta}/\N{U+03B8}/gi;
-    $text =~ s/\\{triangle}/\N{U+0394}/gi;
-    $text =~ s/\\{wrong}/\N{U+2717}/gi;
-    $text =~ s/\\{notequal}/\N{U+2260}/gi;
-    $text =~ s/\\{then}/\N{U+2192}/gi;
-    $text =~ s/\\{times}/\N{U+00D7}/gi;
+    $text =~ s/\\\{sigma}/\N{U+03C3}/gi;
+    $text =~ s/\\\{square}/\N{U+25A1}/gi;
+    $text =~ s/\\\{squared}/\N{U+00B2}/gi;
+    $text =~ s/\\\{cubed}/\N{U+00B3}/gi;
+    $text =~ s/\\\{therefore}/\N{U+2234}/gi;
+    $text =~ s/\\\{theta}/\N{U+03B8}/gi;
+    $text =~ s/\\\{triangle}/\N{U+0394}/gi;
+    $text =~ s/\\\{wrong}/\N{U+2717}/gi;
+    $text =~ s/\\\{notequal}/\N{U+2260}/gi;
+    $text =~ s/\\\{then}/\N{U+2192}/gi;
+    $text =~ s/\\\{times}/\N{U+00D7}/gi;
     $text =~ s/\.\.\./\N{U+2026}/gi;
-    $text =~ s/\\{lessthanorequal}/\N{U+2264}/gi;
-    $text =~ s/\\{greaterthanorequal}/\N{U+2265}/gi;
-    $text =~ s/\\{(.+?)_(.+?)}/$1[$2]/gi;
-    $text =~ s/\\{_(.+?)}/[$1]/gi;
-    $text =~ s/\\{gnomon}//gi;
-    $text =~ s/\\{thereexists}/\N{U+2203}/gi;
-    $text =~ s/\\{(.*?)}/$1/gi;
+    $text =~ s/\\\{lessthanorequal}/\N{U+2264}/gi;
+    $text =~ s/\\\{greaterthanorequal}/\N{U+2265}/gi;
+    $text =~ s/\\\{(.+?)_(.+?)}/$1[$2]/gi;
+    $text =~ s/\\\{_(.+?)}/[$1]/gi;
+    $text =~ s/\\\{gnomon}//gi;
+    $text =~ s/\\\{thereexists}/\N{U+2203}/gi;
+    $text =~ s/\\\{(.*?)}/$1/gi;
     return $text;
 }
 
@@ -592,19 +592,18 @@ sub _write_text {
 
     # separate into sections based on subscripts (if math)
     if ( $type eq 'math' ) {
-        $text =~ s/\\{sum\((.+?),(.+?)\)}\s*/$2\\{dot}/gi;
+        $text =~ s/\\\{sum\((.+?),(.+?)\)}\s*/$2\\\{dot}/gi;
 
-        # $text =~ s/\\{sum\((.+?),(.+?)\)}/\\{sum}\\{_$1}\\{^$2} /gi;
-        @texts = split( /(\\{[^\{\}]*?[_^].+?})/, $text );
+        # $text =~ s/\\\{sum\((.+?),(.+?)\)}/\\\{sum}\\\{_$1}\\\{^$2} /gi;
+        @texts = split( /(\\\{[^\{\}]*?[_^].+?})/, $text );
     }
-
+    use Data::Dumper;
     # loop over every part of the text
     foreach my $t (@texts) {
         my $xinit = $self->x;
 
         # not subscript or super script
-        if ( $t !~ /\\{(.*?)([_^])(.+?)}/ || $type ne 'math' ) {
-
+        if ( $t !~ /\\\{(.*?)([_^])(.+?)}/ || $type ne 'math' ) {
             # make text substitutions as required
             $t = _resolve_special_chars($t);
 
@@ -617,14 +616,16 @@ sub _write_text {
                 $t = _ligatures($t);
             }
 
+
             # create the actual text object
             my $to =
               $real_cn->createText(
-                                    $xinit, $yinit,
-                                    -text   => $t,
-                                    -anchor => $anchor,
-                                    -width  => $width,
-                                    -font   => $font{$type} || "explain",
+                  $xinit, $yinit,
+                  -text   => $t,
+                  -anchor => $anchor,
+                  -width  => $width,
+                  -font   => $font{$type} || "explain",
+                  -fill   => "black"
               );
 
             # save text bit
@@ -890,7 +891,7 @@ sub spell_check {
           or die "Cannot open data\n";
         print $dh "#!/usr/bin/perl\nuse strict;",
           "\nuse warnings;\npackage Dictionary;\n1;\n__END__\n";
-        print $dh join( "\n", sort keys $Dictionary ), "\n";
+        print $dh join( "\n", sort keys %$Dictionary ), "\n";
         close $dh;
     }
 }

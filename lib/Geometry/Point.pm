@@ -16,7 +16,7 @@ Point - create and manipulate Point objects
 
 =head1 SYNOPSIS
 
-    use Tk;
+    # use Tk;
     use Geometry::Geometry;
     
     # create a canvas object
@@ -127,7 +127,7 @@ sub draw {
     # draw the point
     $self->{-objects} = [];
     foreach my $width (@Shape::shape_sizes ) {
-        push $self->{-objects},
+        push @{$self->{-objects}},
                           $cn->createOval(
                                            $x - $width-1, $y - $width-1, $x + $width+1, $y + $width+1,
                                            -fill    => $cs[4-$width],

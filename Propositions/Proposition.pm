@@ -11,7 +11,7 @@ use lib "$FindBin::Bin/..";
 use Colour;
 
 my $year = "2021";
-my $copyright_msg = "Copyright © $year by Sandy Bultena";
+my $copyright_msg = "Copyright $year by Sandy Bultena";
 
 
 require Exporter;
@@ -74,7 +74,8 @@ sub init {
         $cn->createText(
                          25, 750,
                          -text   => $copyright_msg,
-                         -anchor => 'nw'
+                         -anchor => 'nw',
+                         -fill => 'black',
         );
     };
 }
@@ -154,33 +155,39 @@ sub last_page {
         $cn->createText(
                          700, 110,
                          -text => "Reference:",
-                         -font => 'title'
+                         -font => 'title',
+                         -fill => 'black'
         );
         $cn->createText(
               700, 150,
               -text =>
                 "Euclid's Elements - all thirteen books complete in one volume",
-              -font => 'title'
+              -font => 'title',
+              -fill => 'black',
         );
         $cn->createText(
               700, 180,
               -text => "The Thomas L Heath Translation,  Dana Densmore, Editor",
-              -font => 'explain'
+              -font => 'explain',
+              -fill => 'black',
         );
         $cn->createText(
                          700, 210,
                          -text => "Green Lion Press (c) 2013",
-                         -font => 'explain'
+                         -font => 'explain',
+                         -fill => 'black',
         );
         $cn->createText(
                          700, 240,
                          -text => "ISBN 978-1-888009-19-4",
-                         -font => 'explain'
+                         -font => 'explain',
+                         -fill => 'black',
         );
         $cn->createText(
                          700, 325,
                          -text => " ",
-                         -font => 'explain'
+                         -font => 'explain',
+                         -fill => 'black',
         );
 
         if (1) {
@@ -204,22 +211,26 @@ sub last_page {
             $cn->createText(
                              300, 450,
                              -text => "Previous",
-                             -font => 'explain'
+                             -font => 'explain',
+                             -fill => 'black',
             );
             $cn->createText(
                              1100, 450,
                              -text => "Next",
-                             -font => 'explain'
+                             -font => 'explain',
+                             -fill => 'black',
             );
             $cn->createText(
                              1100, 500,
                              -text => "$next_text",
-                             -font => 'explain'
+                             -font => 'explain',
+                             -fill => 'black',
             );
             $cn->createText(
                              300, 500,
                              -text => "$prev_text",
-                             -font => 'explain'
+                             -font => 'explain',
+                             -fill => 'black',
             );
             $cn->bind(
                 $n,
@@ -268,12 +279,14 @@ sub last_page {
         $cn->createText(
                          700, 150,
                          -text => "Youtube Videos",
-                         -font => 'title'
+                         -font => 'title',
+                         -fill => 'black',
         );
         $cn->createText(
                          700, 200,
                          -text => "https://www.youtube.com/c/SandyBultena",
-                         -font => 'explain'
+                         -font => 'explain',
+                         -fill => 'black',
         );
 
     }
@@ -286,16 +299,19 @@ sub last_page {
           -text => "Except where otherwise noted, this work is licensed under\n"
             . "http://creativecommons.org/licenses/by-nc/3.0",
           -font => 'cc_font',
+          -fill => 'black',
     );
     $cn->createText(
                      700, 600,
                      -text => $copyright_msg,
-                     -font => 'signature'
+                     -font => 'signature',
+                     -fill => 'black',
     );
     $cn->createText(
                      700, 650,
                      -text => " ",
-                     -font => 'explain'
+                     -font => 'explain',
+                     -fill => 'black',
     );
 }
 
@@ -323,12 +339,14 @@ sub title_page {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book I",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             pythagorus($pn);
@@ -359,12 +377,14 @@ sub title_page2 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book II",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             square_polygon($pn);
@@ -426,12 +446,14 @@ sub title_page3 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book III",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
@@ -495,12 +517,14 @@ sub title_page4 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book IV",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
@@ -577,12 +601,14 @@ sub title_page5 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book V",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
@@ -657,12 +683,14 @@ sub title_page6 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book VI",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
@@ -755,12 +783,14 @@ sub title_page7 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book VII",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
@@ -839,12 +869,14 @@ sub title_page8 {
             $cn->createText(
                              $x + 50, $y - 300,
                              -text => "Euclid's Elements",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
             $cn->createText(
                              $x + 50, $y - 200,
                              -text => "Book VIII",
-                             -font => "intro"
+                             -font => "intro",
+                             -fill => 'black',
             );
 
             my ( $xc, $yc ) = $pn->center_coords();
