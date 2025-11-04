@@ -6,7 +6,7 @@ from euclidlib.Objects import Point
 from euclidlib.Objects import Line
 from euclidlib.Objects import Circle as Cir
 from euclidlib.Objects import EucidGroupMObject as Gr
-from euclidlib.Objects import Angel as An
+from euclidlib.Objects import Angle as An
 from euclidlib.Objects.EucidMObject import *
 
 @anim_speed

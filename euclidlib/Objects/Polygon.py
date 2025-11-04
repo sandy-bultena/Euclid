@@ -8,7 +8,7 @@ from euclidlib.Objects.EucidMObject import *
 from . import EucidGroupMObject as G
 from . import Line as L
 from . import Point as P
-from . import Angel as A
+from . import Angle as A
 
 EPSILON = mn_scale(1)
 

@@ -12,7 +12,7 @@ from . import EucidGroupMObject as G
 from . import Parallelogram as Para
 from . import Line as L
 from . import Point as P
-from . import Angel as A
+from . import Angle as A
 from . import Circle as C
 
 

@@ -247,10 +247,13 @@ class EMObjectPlayer:
         return self.eobj
 
 
-def convert_to_coord(obj: mn.Mobject | Sized[float]):
+def convert_to_coord(obj: mn.Mobject | Sized[float])->Vect3:
+
+    # if this is a manim object, then just get the center of all the points
     if isinstance(obj, mn.Mobject):
         return obj.get_center()
     else:
+        # if array size is not size 3, then pad with zeros so that we always return x,y,z
         return np.array([*obj, *((0.0,) * (3 - len(obj)))])
 
 
@@ -696,3 +699,5 @@ def {name}(self, *args):
 
         if not delay_anim:
             self.e_draw(skip_anim)
+    def validate_markup_string(self,*args,**kwargs):
+        return True

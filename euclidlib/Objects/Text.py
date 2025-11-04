@@ -57,6 +57,7 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
     def __init__(self, txt, *args, write_simultaneous=False, style=None | str, animate_part=None, **kwargs):
         self.style = style
         self.write_simultaneous = write_simultaneous
+        print("APPLY RULES:", self.apply_rules(txt))
         super().__init__(
             self.apply_rules(txt),
             *args,

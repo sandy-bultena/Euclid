@@ -1,7 +1,7 @@
 from .EucidMObject import *
 from .EucidGroupMObject import *
-from .Angel import EAngle, EAngleBase
-from . import Angel as Angle
+from .Angle import EAngle, EAngleBase
+from . import Angle as Angle
 from .Arc import EArc, AbstractArc
 from .Circle import ECircle, VirtualCircle
 from .Line import ELine, EDashedLine, VirtualLine

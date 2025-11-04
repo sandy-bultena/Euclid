@@ -2,7 +2,7 @@ from __future__ import annotations
 from euclidlib.Objects import Circle, find_scene
 from euclidlib.Objects import ps, mn
 from euclidlib.Objects import Line as L
-from euclidlib.Objects import Angel
+from euclidlib.Objects import Angle
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Triangle as T
 

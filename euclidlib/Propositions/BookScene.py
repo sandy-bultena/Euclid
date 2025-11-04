@@ -1,10 +1,16 @@
+"""
+BookScene contains the table of contents and first image for a specific book
+
+inherits from PropScene
+
+"""
 from __future__ import annotations
 
 import re
 from enum import Enum
 from itertools import pairwise
 
-from manimlib import *
+import manimlib as mn
 from typing import Callable
 from euclidlib.Objects import *
 from functools import cache
@@ -18,12 +24,12 @@ class AnimState(Enum):
     PAUSED = 2
 
 
-@cache_on_disk
+@mn.cache_on_disk
 def get_TOC(toc):
     entries = TextBox(ORIGIN)
     for i, title in enumerate(toc, start=1):
         entries.explain(f"Proposition {i}: {title}", skip_anim=True)
-    return VGroup(*entries.submobjects)
+    return mn.VGroup(*entries.submobjects)
 
 
 class AttrDict[K, T](dict[K, T]):
@@ -38,20 +44,20 @@ class BookScene(PropScene):
     TOC: List[str]
 
     @staticmethod
-    def extract_lines(lines: Dict[str, ELine], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+    def extract_lines(lines: dict[str, ELine], triangles: dict[str, EPolygon], label: str, tri_name=None):
         tri_name = tri_name or label
         label2 = label + label[0]
         for l_label, line in zip(pairwise(label2), triangles[tri_name].l):
-            lines[op.add(*l_label)] = line
+            lines[mn.op.add(*l_label)] = line
 
     @staticmethod
-    def extract_points(points: Dict[str, EPoint], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+    def extract_points(points: dict[str, EPoint], triangles: dict[str, EPolygon], label: str, tri_name=None):
         tri_name = tri_name or label
         for p_label, point in zip(label, triangles[tri_name].p):
             points[p_label] = point
 
     @staticmethod
-    def extract_angles(angles: Dict[str, EAngleBase], triangles: Dict[str, EPolygon], label: str, tri_name=None):
+    def extract_angles(angles: dict[str, EAngleBase], triangles: dict[str, EPolygon], label: str, tri_name=None):
         tri_name = tri_name or label
         label2 = label[-1] + label + label[0]
         for i, angle in enumerate(triangles[tri_name].a):
@@ -72,7 +78,7 @@ class BookScene(PropScene):
                     )
 
         t.title_screen("Euclid's Elements", write_simultaneous=True)
-        t.title_screen(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
+        t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
 
     def reset(self):
         with self.simultaneous(run_time=1):
@@ -90,7 +96,7 @@ class BookScene(PropScene):
                 entries.next_to(self.frame.get_corner(DL), DR)
 
                 distance_diff = entries.get_center() - entries[self.prop - 1].get_center()
-                self.play(entries.animate(run_time=1, rate_func=rush_from).move_to(distance_diff, coor_mask=UP))
+                self.play(entries.animate(run_time=1, rate_func=mn.rush_from).move_to(distance_diff, coor_mask=UP))
 
                 line = entries[self.prop - 1]
                 entries.remove(line)
@@ -98,8 +104,8 @@ class BookScene(PropScene):
 
                 title = t.title(f"Proposition {self.prop} of Book {self.book}", delay_anim=True)
                 self.play(
-                    TransformMatchingStrings(line, title),
-                    entries.animate(run_time=1, rate_func=rush_into).next_to(self.frame.get_corner(UL), UR)
+                    mn.TransformMatchingStrings(line, title),
+                    entries.animate(run_time=1, rate_func=mn.rush_into).next_to(self.frame.get_corner(UL), UR)
                 )
             else:
                 t.title(f"Proposition {self.prop} of Book {self.book}")
@@ -117,7 +123,7 @@ class BookScene(PropScene):
             faded_line_style=line_options,
         )
         grid.fix_in_frame()
-        self.play(FadeIn(grid))
+        self.play(mn.FadeIn(grid))
 
     @classmethod
     def get_prop_number(cls):

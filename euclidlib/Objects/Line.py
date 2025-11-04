@@ -9,7 +9,7 @@ import numpy as np
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
-from euclidlib.Objects import Angel
+from euclidlib.Objects import Angle
 import math
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple, Set
@@ -23,8 +23,14 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
 
-    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+    def __init__(self, start: str| EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+        """create a new line"""
+        print(f"Init Line: <{start}>, <{end}>")
+
+        # if start is a string, then it is the label of the line
+        # Not sure what the hell this is!!
         if isinstance(start, str):
+            print("######## LINE: start is a string", start)
             start, end = P.EPoint.find_in_frame(start)
         self.basic_interpolate = False;
         super().__init__(start,end, *args, **kwargs)
@@ -475,8 +481,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         if mn.get_norm(A - C) < mn_scale(.1) or mn.get_norm(B - C) < mn_scale(.1):
             l1 = ELine(C, pts[1], delay_anim=True)
             l2 = ELine(C, pts[0], delay_anim=True)
-            a1 = Angel.calculateAngle(self, l1)
-            a2 = Angel.calculateAngle(self, l2)
+            a1 = Angle.calculateAngle(self, l1)
+            a2 = Angle.calculateAngle(self, l2)
 
             if inside:
                 l2, l1 = l1, l2
@@ -541,7 +547,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             lAD = ELine(A, pD, stroke_color=BLUE)
 
         with self.scene.trace(mn.VGroup(lDC, lAD), "copy angle"):
-            aADC = Angel.EAngle(lDC, lAD)
+            aADC = Angle.EAngle(lDC, lAD)
             lEA, angle = aADC.copy_to_line(p, lAD, negative=True, speed=0)
         with self.scene.trace(lEA, "extend the line"):
             lEA.prepend(mn_scale(200))
@@ -635,12 +641,14 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             p = c.point_at_angle(0)
             new_point = 1
         vl.e_remove()
+
         # draw diameter of circle BC
         lBC = ELine(p, c).extend(c.radius).e_fade()
 
         # if original line is too big, abort
         if lBC.get_length() - self.get_length() < mn_scale(1):
             if new_point:
+                print(type(p))
                 p.e_remove()
             lBC.e_remove()
             raise ValueError("your input line does not fit in the circle")

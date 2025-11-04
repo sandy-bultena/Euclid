@@ -134,6 +134,8 @@ class TextBox(EGroup[T.EStringObj]):
             kwargs['line_width'] = self.line_width
         decor = None
         with self.scene.simultaneous():
+            print(f"WITH SCENE SIMULTANEOUS {text}, {kwargs}")
+            print(f"{cls}, {type(cls)}")
             newline = cls(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
             if align_str:
