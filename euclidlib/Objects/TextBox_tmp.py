@@ -29,18 +29,9 @@ class Prop0(BookScene):
         t2.explain("This is more explanation text_str")
         t2.math(r'\angle ACD < \angle BCD')
         t2.math(r'\alpha<\beta', align_str='<')
-        eq = t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',
+        t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',
                 break_into_parts=('c_1 + b_1', r'>\ c_2 + c_3 + b_4'),
                 delay_anim=True)
-        eq[1].align_to(eq[1][1], LEFT)
-        t2.indent()
-        t2.set_bullet_symbol()
-        t2.explain('This is a bulletted note')
-
-        with self.simultaneous():
-            eq[0].transform_from(eq[2][0])
-            eq[1].transform_from(eq[2][1])
-
         t2.fancy("fancy text_str")
 
         self.wait()

@@ -209,7 +209,7 @@ sub SetSystemColours {
     $mw->optionAdd( '*EasyDir.foreground',     $colours{DataForeground} );
     $mw->optionAdd( '*EasyDir.background',     $colours{DataBackground} );
 
-    # text boxes
+    # text_str boxes
     $mw->optionAdd( '*Text.foreground',   $colours{DataForeground} );
     $mw->optionAdd( '*Text.background',   $colours{DataBackground} );
     $mw->optionAdd( '*ROText.foreground', $colours{DataForeground} );
@@ -317,7 +317,7 @@ sub _read_gtk_palette {
                     $colours->{DataBackground} = $1
                       if /base\[NORMAL\]\s*=\s*"(.*)"/;
                     $colours->{DataForeground} = $1
-                      if /text\[NORMAL\]\s*=\s*"(.*)"/;
+                      if /text_str\[NORMAL\]\s*=\s*"(.*)"/;
                     $colours->{WorkspaceColour} = $1
                       if /bg\[NORMAL\]\s*=\s*"(.*)"/;
                     $colours->{ButtonBackground} = $1

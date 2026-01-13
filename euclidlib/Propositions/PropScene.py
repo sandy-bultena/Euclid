@@ -1,5 +1,8 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
+
+from time import sleep
+
 import manimlib as mn
 
 import traceback
@@ -9,6 +12,8 @@ from euclidlib.Objects import *
 from euclidlib.Objects import EucidMObject as EM
 from os import getenv
 
+from euclidlib.debugging import print_debug
+DEFAULT_SPEED = 3
 
 class AnimState(Enum):
     NORMAL = 0
@@ -22,18 +27,22 @@ class PropScene(mn.InteractiveScene):
     Base class for all the propositions
     """
     title: str = ''
-    steps: List[Callable[[], None]] = []
+    steps: list[Callable[[], None]] = []
     animationCountObject: mn.DecimalNumber
 
     def __init__(self, *args, **kwargs):
-        self.animateState: List[AnimState] = [AnimState.NORMAL]
+        self.animateState: list[AnimState] = [AnimState.NORMAL]
         self.animationsStored = []
-        self.animationSpeedStack: List[float] = []
-        self.traceStack: List[Text] = []
+        self.animationSpeedStack: list[float] = []
+        self.traceStack: list[Text] = []
         self.debug = getenv('DEBUG') or ''
-        self._speed = float(getenv('SPEED', 1))
+        self._speed = float(getenv('SPEED', DEFAULT_SPEED))
         self.drawing = False
         self.drawings = mn.VGroup(z_index=10)
+        self.is_selecting = False
+        self.to_highlight = []
+        self.paused = False
+
         super().__init__(*args, **kwargs)
 
     # =================================================================================================================
@@ -55,19 +64,21 @@ class PropScene(mn.InteractiveScene):
         with self.animation_speed(self._speed or 1):
             try:
                 if not self.debug:
+                    print_debug(txt="TITLE PAGE")
                     self.title_page()
-                    self.wait(3)
-                    self.reset()
-                    self.wait()
+                    self.next_page()
+                    print_debug(txt="Finished TITLE PAGE")
             except NotImplementedError:
                 pass
 
+            print_debug(txt="Running prop scene")
             self.go()
 
-    # # =================================================================================================================
-    # # selection tools
-    # # =================================================================================================================
-    # def gather_selection_euclid(self):
+    # =================================================================================================================
+    # selection tools
+    # =================================================================================================================
+    def gather_selection_euclid(self):
+        pass
     #     self.is_selecting = False
     #     self.to_highlight = []
     #     if self.selection_rectangle in self.mobjects:
@@ -92,42 +103,51 @@ class PropScene(mn.InteractiveScene):
     #                 log.warn(str(e))
     #                 pass
     #
-    # def on_key_press(self, symbol: int, modifiers: int) -> None:
-    #     super().on_key_press(symbol, modifiers)
-    #     char = chr(symbol)
-    #     if char == 'z' and (modifiers & mn.ALL_MODIFIERS) == 0:
-    #         self.enable_selection()
-    #     elif char == 'x' and (modifiers & mn.ALL_MODIFIERS) == 0:
-    #         self.drawing = True
-    #         self.drawings.add(mn.VMobject())
-    #         self.add(self.drawings[-1])
-    #     elif char == 'c' and (modifiers & mn.ALL_MODIFIERS) == 0:
-    #         self.remove(self.drawings)
-    #         self.drawings.clear()
-    #     else:
-    #         super().on_key_press(symbol, modifiers)
-    #
-    # def on_key_release(self, symbol: int, modifiers: int) -> None:
-    #     char = chr(symbol)
-    #     if char == 'z':
-    #         self.gather_selection_euclid()
-    #         anims = [t.highlight() for t in self.to_highlight]
-    #         if anims:
-    #             self.play(*anims)
-    #         self.to_highlight = []
-    #     elif char == 'x':
-    #         self.drawing = False
-    #     else:
-    #         super().on_key_press(symbol, modifiers)
-    #
-    # def on_mouse_motion(self, point: Vect3, d_point: Vect3) -> None:
-    #     if self.drawing:
-    #         latest = self.drawings[-1]
-    #         if not latest.has_points():
-    #             latest.set_points_as_corners([point - d_point, point])
-    #         else:
-    #             latest.add_line_to(point)
-    #     return super().on_mouse_motion(point, d_point)
+    # =================================================================================================================
+    # handling all keyboard inputs
+    # =================================================================================================================
+    def on_key_press(self, symbol: int, modifiers: int) -> None:
+        char = chr(symbol)
+        super().on_key_press(symbol, modifiers)
+        if self.paused:
+            self.paused = False
+            self.reset()
+            return
+
+        if char == 'z':
+            self.enable_selection()
+        elif char == 'x':
+            self.drawing = True
+            self.drawings.add(mn.VMobject())
+            self.add(self.drawings[-1])
+        elif char == 'c':
+            self.remove(self.drawings)
+            self.drawings.clear()
+
+    def on_key_release(self, symbol: int, modifiers: int) -> None:
+        char = chr(symbol)
+        if char == 'z':
+            self.gather_selection_euclid()
+            anims = [t.highlight() for t in self.to_highlight]
+            if anims:
+                self.play(*anims)
+            self.to_highlight = []
+        elif char == 'x':
+            self.drawing = False
+        else:
+            super().on_key_press(symbol, modifiers)
+
+    # =================================================================================================================
+    # if drawing mode is on, moving mouse creates a drawing
+    # =================================================================================================================
+    def on_mouse_motion(self, point: Vect3, d_point: Vect3) -> None:
+        if self.drawing:
+            latest = self.drawings[-1]
+            if not latest.has_points():
+                latest.set_points_as_corners([point - d_point, point])
+            else:
+                latest.add_line_to(point)
+        return super().on_mouse_motion(point, d_point)
     #
     # # ================================================================================================================
     # # adds a counter defining which scene is currently being played
@@ -154,11 +174,19 @@ class PropScene(mn.InteractiveScene):
     # ================================================================================================================
     # not sure why wait time should be dependent on the current speed
     # ================================================================================================================
-    def wait(self, duration: float = None, *args, **kwargs):
-        if not duration:
-            duration = self.default_wait_time
+    def wait(self, duration: float = 3, *args, **kwargs):
         super().wait(duration / self.get_current_speed(), *args, **kwargs)
 
+    # ================================================================================================================
+    # wait for user before printing next page
+    # ================================================================================================================
+    def next_page(self):
+        print("\nHit key for next page")
+        self.paused = True
+        self.wait_until(lambda : not self.paused, 600)
+
+
+    # still to comment
     def play(self, *anims: mn.AnimationType, **kwargs):
         if self.animateState[-1] == AnimState.NORMAL:
             speed = self.get_current_speed()

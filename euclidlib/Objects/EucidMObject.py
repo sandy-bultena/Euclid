@@ -23,6 +23,7 @@ DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
+
 def mn_coord(x: int | float, y: int | float, z: int | float = 0):
     return np.array([
         (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
@@ -190,14 +191,14 @@ class EMObjectPlayer:
 
     def e_to_edge(self,
                   edge: Vect3 = LEFT,
-                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFF):
+                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
         self.main_animate = True
         self.anim.to_edge(edge, buff)
         return self
 
     def e_to_corner(self,
                     corner: Vect3 = DL,
-                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFF):
+                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
         self.main_animate = True
         self.anim.to_to_corner(corner, buff)
         return self

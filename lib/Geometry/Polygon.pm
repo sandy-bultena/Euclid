@@ -182,7 +182,7 @@ sub new {
                                   -points     => 'array',
                                   -labels     => 'array',
                                   -angles     => 'array',
-                                  -fill       => 'text',
+                                  -fill       => 'text_str',
                                   -anglesizes => 'array'
                                }
                              );
@@ -430,7 +430,7 @@ sub assemble {
                                   -points => 'array',
                                   -lines  => 'array',
                                   -angles => 'array',
-                                  -fill   => 'text',
+                                  -fill   => 'text_str',
                                }
                              );
     my $cn     = shift;
@@ -581,7 +581,7 @@ sub set_points {
     my $self = shift;
 
     my $sides = $self->{-sides};
-    Validate::Inputs( \@_, [], [ ( qw(text where) x $sides ) ] );
+    Validate::Inputs( \@_, [], [ ( qw(text_str where) x $sides ) ] );
     my @labels = @_;
 
     my $side = 0;
@@ -629,7 +629,7 @@ sub set_labels {
     my $self = shift;
 
     my $sides = $self->{-sides};
-    Validate::Inputs( \@_, [], [ ( qw(text where) x $sides ) ] );
+    Validate::Inputs( \@_, [], [ ( qw(text_str where) x $sides ) ] );
     my @labels = @_;
 
     # draw labels if defined for each line
@@ -677,7 +677,7 @@ sub set_angles {
     my $self  = shift;
     my $sides = $self->{-sides};
 
-    Validate::Inputs( \@_, [], [ (qw(text)) x $sides, (qw(number)) x $sides ] );
+    Validate::Inputs( \@_, [], [ (qw(text_str)) x $sides, (qw(number)) x $sides ] );
     my @names = splice( @_, 0, $sides );
     my @sizes = splice( @_, 0, $sides );
     my $cn    = $self->{-cn};
@@ -2480,8 +2480,8 @@ B<Returns>
 # -----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text)] );
-    my $text = shift || "";
+    Validate::Inputs( \@_, [], [qw(text_str)] );
+    my $text_str = shift || "";
 
     # ------------------------------------------------------------------------
     # get info from the object data
@@ -2510,7 +2510,7 @@ sub label {
     # ------------------------------------------------------------------------
     # create the label
     # ------------------------------------------------------------------------
-    $self->SUPER::_draw_label( $cn, $x, $y, $text, 'exactly' );
+    $self->SUPER::_draw_label( $cn, $x, $y, $text_str, 'exactly' );
     return $self;
 }
 

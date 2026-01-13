@@ -75,7 +75,7 @@ $Shape::AniSpeed = 50000;
 $Shape::DefaultSpeed = 1;
 {
     $cn->toplevel->update;
-    $cn->createText(10,10,-text=>"Fast?");
+    $cn->createText(10,10,-text_str=>"Fast?");
     @pt1 = ( 100, 20 );
     @pt2 = ( 100, 100 );
     my $l = 80;

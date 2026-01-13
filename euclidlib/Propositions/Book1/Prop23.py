@@ -99,7 +99,7 @@ class Prop23(Book1Scene):
             t1.explain("Copy this triangle onto line segment AB, using the methods "
                        "described in I.22")
             t1.indent()
-            t1.decorate()
+            t1.set_bullet_symbol()
             t1.explain('Copy length CE to AF (I.2)')
             t2.math('AF = CE')
             l['AF'], p['F'] = l['CE'].copy_to_line(p['A'], l['AB'])
@@ -143,7 +143,7 @@ class Prop23(Book1Scene):
             l['AG'] = ELine('AG', label=('c', dict(inside=True)))
             l['FG'] = ELine('FG', label=('e', dict(outside=True)))
             t1.unindent()
-            t1.reset_decoration()
+            t1.reset_bullet_symbol()
 
         @self.push_step
         def _c8():

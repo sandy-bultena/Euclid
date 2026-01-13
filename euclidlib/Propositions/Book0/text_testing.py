@@ -12,8 +12,19 @@ class Prop0(BookScene):
     title = ""
 
     def go(self):
-        t1 = TextBox(mn_coord(800, 50), line_width=mn_h_scale(550))
+        tr = TextBox(mn_coord(0,0))
+        tl = TextBox(mn_coord(1400,0), line_width=mn_h_scale(200), alignment='e')
+        br = TextBox(mn_coord(0,780))
+        bl = TextBox(mn_coord(800,1400))
+
+        tr.explain("Top Right")
+        tl.explain("Top Left")
+        br.explain("Bottom Right")
+
+        t1 = TextBox(mn_coord(20, 50), line_width=mn_h_scale(1400))
         t2 = TextBox(mn_coord(500, 430))
+        t3 = TextBox(mn_coord(1300, 430))
+
 
         l: dict[str | int, ELine] = {}
         p: dict[str | int, EPoint] = {}
@@ -24,7 +35,14 @@ class Prop0(BookScene):
         eq: dict[str | int, EStringObj] = {}
         ex: dict[str | int, Mobject] = {}
 
+        t3.explain("right side")
         t1.title("Testing Text")
+        t1.explain("This is a very long text, which should wrap around, but I am not sure if it does "
+                   "This is a very long text, which should wrap around, but I am not sure if it does "
+                   "This is a very long text, which should wrap around, but I am not sure if it does "
+                   "This is a very long text, which should wrap around, but I am not sure if it does "
+                   "This is a very long text, which should wrap around, but I am not sure if it does ")
+
         t2.title("This is title text_str")
         t2.explain("This is more explanation text_str")
         t2.math(r'\angle ACD < \angle BCD')
@@ -32,6 +50,7 @@ class Prop0(BookScene):
         eq = t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',
                 break_into_parts=('c_1 + b_1', r'>\ c_2 + c_3 + b_4'),
                 delay_anim=True)
+        print(f"{eq=}")
         eq[1].align_to(eq[1][1], LEFT)
         t2.indent()
         t2.set_bullet_symbol()
@@ -42,8 +61,15 @@ class Prop0(BookScene):
             eq[1].transform_from(eq[2][1])
 
         t2.fancy("fancy text_str")
+        t2.math(r'\angle CGE = \angle CGF = \gamma')
 
         self.wait()
+        t2.e_update(-1, r'\angle CGE = \angle CGF = \rightangle',
+                    fill_color=BLUE,
+                    transform_args=dict(
+                        matched_keys=[r'\angle CGE = \angle CGF = '],
+                        key_map={r'\gamma': r'\rightangle'},
+                    ))
 
         # la = ELine(DL * 2, ORIGIN)
         # t1.title("Make Dashed")

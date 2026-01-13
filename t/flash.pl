@@ -8,7 +8,7 @@ my $int = new Tcl::Tk;
   my $c  = $mw->Canvas->pack;
 
   #my $w  = $c->createWindow(50, 50,
-  #             -window => $c->Label(-text => 'Hello'),
+  #             -window => $c->Label(-text_str => 'Hello'),
    #            -state  => 'hidden',
    #          );
 

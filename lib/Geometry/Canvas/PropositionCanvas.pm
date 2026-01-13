@@ -701,12 +701,12 @@ sub parse_options {
 
     # --------------------------------------------------------------
     # foreach option, must break string into 5 groups
-    # rules... if no spaces, then just the text
+    # rules... if no spaces, then just the text_str
     # ... if spaces, then string is enclosed between {...}
     # again, assume no dangling "{" or "}"
     #
     #  sample input option:
-    # {-text {} {} {} {Copyright \x{a9} 2019 by Sandy Bultena}}
+    # {-text_str {} {} {} {Copyright \x{a9} 2019 by Sandy Bultena}}
     # --------------------------------------------------------------
 
     my %option_hashes;
@@ -748,7 +748,7 @@ sub parse_options {
         else {
             use Data::Dumper;
             print "\nERROR:\n$txt\n";
-            print Dumper \@options if $type eq "text";
+            print Dumper \@options if $type eq "text_str";
             print Dumper \@tmp;
         }
     }
@@ -927,7 +927,7 @@ sub createText {
     $opts{-anchor} = $opts{-anchor} || "c";
 
     my $t = $self->text_box( $x, $y, %opts );
-    $t->label( $opts{-text} ) if $opts{-text};
+    $t->label( $opts{-text_str} ) if $opts{-text_str};
     return $t;
 }
 

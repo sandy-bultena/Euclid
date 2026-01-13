@@ -23,7 +23,7 @@ my $cn = $mw->Canvas( -bg => "white", -width => 800, -height => 700 )->pack();
 $cn->configure( "-scrollregion" => [ 0, 0, 800, 700 ], -closeenough => 2.0 );
 
 # is my canvas a canvas? ... why do I need to call this before it is a real canvas?
-$cn->createText(30,30,-text=>"hello");
+$cn->createText(30,30,-text_str=>"hello");
     $cn->toplevel->update;
     $cn->delete('all');
 

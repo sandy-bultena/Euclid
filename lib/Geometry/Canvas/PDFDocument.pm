@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 #TODO:
-# the cr in a middle of a text does not work!!!
+# the cr in a middle of a text_str does not work!!!
 
 package PDFDocument;
 use PDF::API2;
@@ -54,7 +54,7 @@ my %font_map = (
                  other_mono => { -font => "dejavuMono",     -size => 24 },
                  signature  => { -font => "zapfino",        -size => 18 },
                  point      => { -font => "dejavuMono",     -size => 16 },
-                 text       => { -font => "arial",          -size => 16 },
+                 text_str       => { -font => "arial",          -size => 16 },
                  smalltext  => { -font => "arial",          -size => 12 },
                  sidenote   => { -font => "arial_slant",    -size => 14 },
                  explain    => { -font => "arial",          -size => 18 },
@@ -249,7 +249,7 @@ sub image {
 }
 
 # ==================================================================
-# get the pdf content for text, includes getting font info, etc.
+# get the pdf content for text_str, includes getting font info, etc.
 # ==================================================================
 sub _get_text_content {
     my $self = shift;
@@ -257,7 +257,7 @@ sub _get_text_content {
     my @font_info = $self->get_font( $details->{-options}{-font} );
 
     my $page        = $self->PDF_page;
-    my $pdf_content = $page->text();
+    my $pdf_content = $page->text_str();
     $pdf_content->font(@font_info);
 
     my $lead = $pdf_content->lead( 1.15 * $font_info[1] );
@@ -267,26 +267,26 @@ sub _get_text_content {
 }
 
 # ==================================================================
-# text
+# text_str
 # ==================================================================
-sub text {
+sub text_str {
     my $self        = shift;
     my $details     = shift;
 
     my $original_width = $details->{-options}{-width} || 0;
     my $width = $original_width;
-    my $text  = $details->{-options}{-text}  || "";
+    my $text_str  = $details->{-options}{-text_str}  || "";
 
 
-    # break text into separate bits if there are carriage returns
+    # break text_str into separate bits if there are carriage returns
     # NB: THIS IS VERY FRAGILE, AND NOT VERY GOOD!
-    foreach my $para ( split( "\n", $text ) ) {
+    foreach my $para ( split( "\n", $text_str ) ) {
 
         my $pdf_content = $self->_get_text_content($details);
 
         # if there is a width, treat it as a paragraph,
         # only if it exceeds the width
-        if ( $width && $pdf_content->advancewidth($text) < $width ) {
+        if ( $width && $pdf_content->advancewidth($text_str) < $width ) {
             $width = 0;
             $details->{-options}{-width} = $width;
         }
@@ -316,15 +316,15 @@ sub text {
 # ==================================================================
 sub _write_paragraph {
     my $self        = shift;
-    my $text        = shift;
+    my $text_str        = shift;
     my $details     = shift;
     my $width       = $details->{-options}{-width};
     my $margin      = $details->{-options}{-margins} || 15;
 
     # convert into lines
     my @lines;
-    my @words = split( /( +|\n\t)/, $text );
-    my $line  = shift @words;              # maybe text starts with spaces?
+    my @words = split( /( +|\n\t)/, $text_str );
+    my $line  = shift @words;              # maybe text_str starts with spaces?
     my $try   = $line;
     my $done  = @words;
 
@@ -373,19 +373,19 @@ sub _write_line {
     use Encode qw(encode decode);
     my $self        = shift;
     my $pdf_content = shift;
-    my $text        = shift;
+    my $text_str        = shift;
     my $details     = shift;
     
-    my $type = "text";
-    $type = $details->{-options}->{-type} || $text;
+    my $type = "text_str";
+    $type = $details->{-options}->{-type} || $text_str;
 
     my @list        = Encode->encodings();
     my $width = $details->{-options}{-width} || 0;
     my $margin = $details->{-options}{-margins} || 15;
     my $lead = $details->{-options}{-lead};
 
-    # location of text
-    my ( $x1, $y1 ) = _location_of_text($pdf_content,$details,$text);
+    # location of text_str
+    my ( $x1, $y1 ) = _location_of_text($pdf_content,$details,$text_str);
 
     # new page if necessary and required
     if ($details->{-options}{-make_new_page}) {
@@ -393,7 +393,7 @@ sub _write_line {
             $details->{-coords} = [ $x1, $Height-$margin ];
             $self->new_page();
             $pdf_content = $self->_get_text_content($details);
-            ( $x1, $y1 ) = _location_of_text($pdf_content,$details,$text);
+            ( $x1, $y1 ) = _location_of_text($pdf_content,$details,$text_str);
         }
     }
 
@@ -403,36 +403,36 @@ sub _write_line {
     $pdf_content->fillcolor($colour);
 
     # special characters, don't know how to get pdf to show them
-    $text =~ s/\x{2236}/:/g;
-    $text =~ s/\N{U+22C5}/\N{U+00B7}/g;
-    $text =~ s/\N{U+2221}/\N{U+2220}/g;
+    $text_str =~ s/\x{2236}/:/g;
+    $text_str =~ s/\N{U+22C5}/\N{U+00B7}/g;
+    $text_str =~ s/\N{U+2221}/\N{U+2220}/g;
 
     # undo "use non-breaking '.' for references to other propositions"
-    $text =~ s/([VIX])\N{U+22C5}(\d)/$1.$2/g;
-    $text =~ s/([VIX])\N{U+22C5}def\N{U+22C5}(\d)/$1.def.$2/g;
+    $text_str =~ s/([VIX])\N{U+22C5}(\d)/$1.$2/g;
+    $text_str =~ s/([VIX])\N{U+22C5}def\N{U+22C5}(\d)/$1.def.$2/g;
 
     # stupid arial font isn't supporting some ligatures!!!
-    $text =~ s/\x{fb00}/ff/g;
+    $text_str =~ s/\x{fb00}/ff/g;
 
-    # if the type of text is code, then minimal syntax highlighting
+    # if the type of text_str is code, then minimal syntax highlighting
     if ($type eq 'code') {
-        $text =~ /^(.*?)(\#.*|\/\/.*)*$/;
+        $text_str =~ /^(.*?)(\#.*|\/\/.*)*$/;
         my $code = $1 || "";
         my $comment = $2 || "";
         if ($code =~ /^\s*(function\s|sub\s)/) {
           $pdf_content->fillcolor("#de0909");
         }
-        $pdf_content->text($code);
+        $pdf_content->text_str($code);
         my $comment_pos = $pdf_content->advancewidth($code);
         $pdf_content->translate( $x1+$comment_pos, $y1 );
         $pdf_content->fillcolor("#006600");
-        $pdf_content->text($comment);
+        $pdf_content->text_str($comment);
         $pdf_content->fillcolor($colour);
 
     }
     else {
-        # write the text
-        $pdf_content->text($text);
+        # write the text_str
+        $pdf_content->text_str($text_str);
     }
 
     # adjust the y position for the next line
@@ -443,12 +443,12 @@ sub _write_line {
 }
 
 # ==================================================================
-# get location of text
+# get location of text_str
 # ==================================================================
 sub _location_of_text {
     my $pdf_content = shift;
     my $details = shift;
-    my $text = shift;
+    my $text_str = shift;
 
     my ( $x1, $y1 ) = @{ $details->{-coords} }[ 0, 1 ];
     my $width = $details->{-options}{-width} || 0;
@@ -464,16 +464,16 @@ sub _location_of_text {
     }
 
     if ( $anchor =~ /^[ns]?e/ ) {
-        $x1 = $x1 - $pdf_content->advancewidth($text) if !$width;
+        $x1 = $x1 - $pdf_content->advancewidth($text_str) if !$width;
         $x1 = $x1 - $width if $width;
     }
     elsif ( $anchor !~ /^[ns][we]/ ) {
-        $x1      = $x1 - $pdf_content->advancewidth($text) / 2;
+        $x1      = $x1 - $pdf_content->advancewidth($text_str) / 2;
         $justify = "center";
     }
 
     if ( $width && $justify =~ /^r/ ) {
-        $x1 = $x1 + ( $width - $pdf_content->advancewidth($text) );
+        $x1 = $x1 + ( $width - $pdf_content->advancewidth($text_str) );
 
     }
     $pdf_content->translate( $x1, $y1 );
@@ -725,7 +725,7 @@ __END__
 sub _line_with_possible_non_printable_characters {
     my $self = shift;
     my $pdf_content = shift;
-    my $text = shift;
+    my $text_str = shift;
     use Encode;
     {
         my %special = ( 8756 => "abcdefghijiklmlnlk" );
@@ -733,7 +733,7 @@ sub _line_with_possible_non_printable_characters {
         # my %special = ();
         foreach my $ord ( keys %special ) {
             my $special = $special{$ord};
-            my @line_bits = split( /($special)/, $text );
+            my @line_bits = split( /($special)/, $text_str );
 
        # if (@line_bits > 1) {print "\n ===================== special char \n";}
             my $offset = 0;
@@ -747,7 +747,7 @@ sub _line_with_possible_non_printable_characters {
                 }
                 else {
                     print "Not special characters $line\n";
-                    $pdf_content->text($line);
+                    $pdf_content->text_str($line);
                     $pdf_content->distance( $pdf_content->advancewidth($line), 0 );
                     $offset = $offset + $pdf_content->advancewidth($line);
                 }

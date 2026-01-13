@@ -450,8 +450,8 @@ B<Returns>
 # -----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text text)] );
-    my $text = shift || "";
+    Validate::Inputs( \@_, [], [qw(text_str text_str)] );
+    my $text_str = shift || "";
     my $size;
     eval { no warnings; $size = shift || ''; $size = int($size) };
 
@@ -494,7 +494,7 @@ sub label {
     # ------------------------------------------------------------------------
     # create the label
     # ------------------------------------------------------------------------
-    $self->SUPER::_draw_label( $cn, $x, $y, $text, 'exactly' );
+    $self->SUPER::_draw_label( $cn, $x, $y, $text_str, 'exactly' );
     return $self;
 }
 

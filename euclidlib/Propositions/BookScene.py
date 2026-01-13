@@ -14,6 +14,8 @@ import manimlib as mn
 from typing import Callable
 from euclidlib.Objects import *
 from functools import cache
+
+from euclidlib.debugging import print_debug
 from euclidlib.Propositions.PropScene import PropScene
 import roman
 
@@ -24,7 +26,6 @@ class AnimState(Enum):
     PAUSED = 2
 
 
-@mn.cache_on_disk
 def get_TOC(toc):
     entries = TextBox(ORIGIN)
     for i, title in enumerate(toc, start=1):
@@ -41,7 +42,7 @@ class AttrDict[K, T](dict[K, T]):
 class BookScene(PropScene):
     book: int
     prop: int
-    TOC: List[str]
+    TOC: list[str]
 
     @staticmethod
     def extract_lines(lines: dict[str, ELine], triangles: dict[str, EPolygon], label: str, tri_name=None):
@@ -78,6 +79,7 @@ class BookScene(PropScene):
                     )
 
         t.title_screen("Euclid's Elements", write_simultaneous=True)
+        print_debug(2,f"book number: {self.book=}")
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
 
     def reset(self):
@@ -128,6 +130,8 @@ class BookScene(PropScene):
     @classmethod
     def get_prop_number(cls):
         match = re.search(r"Book(\d+).Prop(\d+)", cls.__module__)
+        if not match:
+            return 0,0
         return int(match.group(1)), int(match.group(2))
 
     def __init__(self, *args, **kwargs):

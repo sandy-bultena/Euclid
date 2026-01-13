@@ -275,7 +275,7 @@ sub toc2 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x, $y - 350,
-                             -text   => "Table of Contents, Chapter 2",
+                             -text_str   => "Table of Contents, Chapter 2",
                              -font   => "title",
                              -anchor => "n",
             );
@@ -737,7 +737,7 @@ sub toc8 {
 {
     my ( $t2, $t3 );
     my $borderwidth = 30;              # borderwidth
-    my $xs          = $borderwidth;    # current "w" location of text box
+    my $xs          = $borderwidth;    # current "w" location of text_str box
     my $ys          = 125;
     my $leftwidth   = 110;             # column separation
     my $cn_width     = PropositionCanvas::Width();
@@ -755,7 +755,7 @@ sub toc8 {
   # reset the toc for next page
   # ============================================================================
     sub toc_reset {
-        $xs = $borderwidth;    # current "w" location of text box
+        $xs = $borderwidth;    # current "w" location of text_str box
         $ys = 125;
         undef $t2;
         undef $t3;
@@ -771,7 +771,7 @@ sub toc8 {
         my $image   = shift;
         my $current = shift || 0;
 
-        # define text boxes if not already defined
+        # define text_str boxes if not already defined
         unless ( defined $t2 && defined $t3 ) {
             $t2 = $pn->text_box( $xs, $ys, -anchor => "w", -width => $width );
             $t3 =
@@ -851,7 +851,7 @@ sub toc_sub {
         my $cn = $pn->Tk_canvas();
         $cn->createText(
                          $x, $y - 350,
-                         -text   => "Table of Contents, Chapter $chapter",
+                         -text_str   => "Table of Contents, Chapter $chapter",
                          -font   => "title",
                          -anchor => "n",
         );

@@ -289,7 +289,7 @@ B<Returns>
 # ----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text where)] );
+    Validate::Inputs( \@_, [], [qw(text_str where)] );
     my $what = shift;
     my $where = shift || "top";
 
