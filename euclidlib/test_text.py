@@ -1,6 +1,8 @@
 from manimlib import *
 class TextExample(Scene):
     def construct(self):
+        self.camera.background_color = WHITE
+
         # To run this scene properly, you should have "Consolas" font in your computer
         # for full usage, you can see https://github.com/3b1b/manim/pull/680
         text = Text("Here is a text_str", font="Apple Symbols", font_size=90)

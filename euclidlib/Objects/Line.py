@@ -73,7 +73,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -PI / 2)
 
-    def e_label_point(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
+    def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
         try:
             point = self.point_from_proportion(alpha)
         except AssertionError:

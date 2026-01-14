@@ -137,7 +137,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         vec = t_point - self.v
         return t_point, t_point + mn.rotate_vector(vec / 2, rotation)
 
-    def e_label_point(self, index=0, alpha=0.5, buff=None):
+    def e_label_location(self, index=0, alpha=0.5, buff=None):
         if index == 0:
             bisect_dir = self.get_bisect_dir(alpha)
             try:

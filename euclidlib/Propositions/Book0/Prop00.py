@@ -1,74 +1,60 @@
 import itertools
 import sys
 import os
+from random import shuffle
 
 sys.path.append(os.getcwd())
 from euclidlib.Propositions.BookScene import BookScene
 from euclidlib.Objects import *
+from typing import Dict
 from euclidlib.Objects.utils import *
 from euclidlib.Objects.CustomAnimation import EAnimationOf
 
+
 class Prop0(BookScene):
+    steps = []
     title = ""
 
-    def go(self):
+    def define_steps(self):
         t1 = TextBox(mn_coord(800, 50), line_width=mn_h_scale(550))
-        t2 = TextBox(mn_coord(500, 430))
 
-        l: dict[str | int, ELine] = {}
-        p: dict[str | int, EPoint] = {}
-        c: dict[str | int, ECircle] = {}
-        t: dict[str | int, ETriangle] = {}
-        s: dict[str | int, EPolygon] = {}
-        a: dict[str | int, EAngleBase] = {}
-        eq: dict[str | int, EStringObj] = {}
-        ex: dict[str | int, Mobject] = {}
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        s: Dict[str | int, EPolygon] = {}
+        a: Dict[str | int, EAngleBase] = {}
+        eq: Dict[str | int, EStringObj] = {}
+        ex: Dict[str | int, Mobject] = {}
 
-        t1.title("Testing Text")
-        t2.title("This is title text_str")
-        t2.explain("This is more explanation text_str")
-        t2.math(r'\angle ACD < \angle BCD')
-        t2.math(r'\alpha<\beta', align_str='<')
-        eq = t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',
-                break_into_parts=('c_1 + b_1', r'>\ c_2 + c_3 + b_4'),
-                delay_anim=True)
-        eq[1].align_to(eq[1][1], LEFT)
-        t2.indent()
-        t2.set_bullet_symbol()
-        t2.explain('This is a bulletted note')
+        @self.push_step
+        def dashed_test():
+            t1.title("Draw Line")
+            # la = ELine(DL * 2, ORIGIN)
+            # t1.title("Make Dashed")
+            # la.dash(final_opacity=0)
+            # t1.title("Extend")
+            # la.extend(1)
+            # t1.title("Un dash")
+            # la.un_dash()
+            # self.wait(1)
+            # la.e_remove()
+            # t1.e_remove()
 
-        with self.simultaneous():
-            eq[0].transform_from(eq[2][0])
-            eq[1].transform_from(eq[2][1])
-
-        t2.fancy("fancy text_str")
-
-        self.wait()
-
-        # la = ELine(DL * 2, ORIGIN)
-        # t1.title("Make Dashed")
-        # la.dash(final_opacity=0)
-        # t1.title("Extend")
-        # la.extend(1)
-        # t1.title("Un dash")
-        # la.un_dash()
-        # self.wait(1)
-        # la.e_remove()
-        # t1.e_remove()
+        # # @self.push_step
+        # def tickmark_test():
+        #     t1.title("Draw Line")
+        #     la = EArc(2, LEFT * 3 + UP, UP, big=True)
+        #     t1.title("Mark Ticks")
+        #     la.dash()
+        #     la.even_ticks(la.get_arc_length() / 15, labels=map(str, itertools.count()))
+        #     self.wait()
+        #     la.e_fade()
+        #     self.wait()
+        #     la.e_normal()
+        #     self.wait()
+        #     la.e_remove()
         #
-        # # ============================================================================================================
-        # t1.title("Draw Line")
-        # la = EArc(2, LEFT * 3 + UP, UP, big=True)
-        # t1.title("Mark Ticks")
-        # la.dash()
-        # la.even_ticks(la.get_arc_length() / 15, labels=map(str, itertools.count()))
-        # self.wait()
-        # la.e_fade()
-        # self.wait()
-        # la.e_normal()
-        # self.wait()
-        # la.e_remove()
-
         # # @self.push_step
         # def triangle_circumscribe():
         #     t = ETriangle(UP, LEFT, DR)
@@ -161,7 +147,7 @@ class Prop0(BookScene):
         #     la.bisect(speed=1)
         #     lb.bisect()
         #
-        # # @self.push_step
+        # @self.push_step
         # def pentagon_test():
         #     pent = RegularPolygons.pentagon(ORIGIN, 2)
         #     self.wait()

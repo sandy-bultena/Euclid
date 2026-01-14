@@ -31,7 +31,7 @@ class ECircle(mn.Circle, Arc.AbstractArc):
                 tmpLine.e_label.enable_updaters()
         return super().CreationOf(*args, **kwargs)
 
-    def e_label_point(self, angle: float, outside=True, buff=None):
+    def e_label_location(self, angle: float, outside=True, buff=None):
         direction = np.array([np.cos(angle), np.sin(angle), 0.0])
         try:
             edge = self.point_at_angle(angle)

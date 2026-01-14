@@ -14,7 +14,7 @@ import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
 
 from euclidlib.Objects import CustomAnimation as CA
-from typing import Sized, Self, Callable, Tuple, Iterable, Type
+from typing import Sized, Self, Callable, Tuple, Iterable, Type, TYPE_CHECKING
 from contextlib import contextmanager
 
 DEFAULT_FADE_OPACITY = 0.15
@@ -22,24 +22,27 @@ DEFAULT_TEXT_FADE_OPACITY = 0.3
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
-
+E_WIDTH = 1400
+E_HEIGHT = 800
+E_TO_M_SCALE = 8.0/800
 
 def mn_coord(x: int | float, y: int | float, z: int | float = 0):
+    """convert old euclid canvas coordinates to manim coordinates"""
     return np.array([
-        (x - 700) * (8.0 / 800),  # (x - 700) * (8.0 * 16 / 1400 / 9),
-        (400 - y) * (8.0 / 800),
-        z * (8.0 / 800)
+        (x - E_WIDTH/2) * E_TO_M_SCALE,  # (x - 700) * (8.0 * 16 / 1400 / 9),
+        (E_HEIGHT/2 - y) * E_TO_M_SCALE,
+        z * E_TO_M_SCALE
     ])
 
 
 def mn_scale(f, *rest):
     if rest:
-        return np.array([i * (8.0 / 800) for i in (f, *rest)])
-    return f * (8.0 / 800)
+        return np.array([i * E_TO_M_SCALE for i in (f, *rest)])
+    return f * E_TO_M_SCALE
 
 
 def mn_h_scale(x):
-    return x * (8.0 * 16 / 1400 / 9)
+    return x * E_TO_M_SCALE
 
 
 def un_create_version(anim: mn.Animation):
@@ -473,7 +476,7 @@ def {name}(self, *args):
             self.scene.play(mn.FadeOut(self.e_label))
         return self
 
-    def e_label_point(self, *args, **kwargs):
+    def e_label_location(self, *args, **kwargs):
         raise NotImplementedError()
 
     def highlight(self):
@@ -544,9 +547,9 @@ def {name}(self, *args):
             l0 = self.e_label
             l1 = mobject1.e_label
             l2 = mobject2.e_label
-            curr_pos = l0.ref.e_label_point(l1.direction)
-            start_pos = l1.ref.e_label_point(l1.direction)
-            end_pos = l2.ref.e_label_point(l2.direction)
+            curr_pos = l0.ref.e_label_location(l1.direction)
+            start_pos = l1.ref.e_label_location(l1.direction)
+            end_pos = l2.ref.e_label_location(l2.direction)
             self.e_label.direction = path_func(start_pos + l1.direction, end_pos + l2.direction, alpha) - curr_pos
         return super().interpolate(mobject1, mobject2, alpha, path_func)
 
@@ -673,7 +676,7 @@ def {name}(self, *args):
         self.animate_part = ['set_stroke', 'set_e_fill'] if animate_part is None else animate_part
         self.old_fill_opacity = 0.0
         self.scene = scene
-        self.animation_objects: List[mn.Mobject] = []
+        self.animation_objects: list[mn.Mobject] = []
         kwargs['stroke_width'] = stroke_width
 
         if self.Virtual:

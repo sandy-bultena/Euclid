@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing_extensions import Unpack
 
 from itertools import pairwise, zip_longest, chain, repeat
-from typing import Tuple, Iterable, Any, Dict, TypedDict
+from typing import  Any,  TypedDict, TYPE_CHECKING, Optional
 
 from euclidlib.Objects.EucidMObject import *
 from . import EucidGroupMObject as G
@@ -13,7 +13,7 @@ from . import Angle as A
 EPSILON = mn_scale(1)
 
 LABEL_ARG = (None | str |
-             Tuple[str, Unpack[tuple[Any, ...]], Dict[str, Any]] |
+             Tuple[str, Unpack[tuple[Any, ...]], dict[str, Any]] |
              Tuple[str, Unpack[tuple[Any, ...]]])
 
 LABEL_ARGS = Iterable[LABEL_ARG]
@@ -75,9 +75,9 @@ setattr(cls, 'p{i}', property(p))
 
     @classmethod
     def assemble(cls,
-                 lines: None | List[L.ELine] | str = None,
-                 points: None | List[P.EPoint] | str = None,
-                 angles: None | List[A.EAngleBase] = None,
+                 lines: Optional[list[L.ELine] | str] = None,
+                 points: Optional[ list[P.EPoint] | str] = None,
+                 angles: Optional[ list[A.EAngleBase]] = None,
                  **kwargs):
         if points:
             if isinstance(points, str):
@@ -113,9 +113,9 @@ setattr(cls, 'p{i}', property(p))
             delay_anim=False,
             skip_anim=False,
             _assemble_flag=False,
-            _lines: List[L.ELine] | None = None,
-            _points: List[P.EPoint] | None = None,
-            _angles: List[A.EAngleBase | None] | None = None,
+            _lines: list[L.ELine] | None = None,
+            _points: list[P.EPoint] | None = None,
+            _angles: list[A.EAngleBase | None] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
@@ -147,19 +147,19 @@ setattr(cls, 'p{i}', property(p))
         self.sides = len(self.vertices)
         self.update_size(self.sides)
         if _assemble_flag and _lines:
-            self.lines: List[L.ELine] = _lines
+            self.lines: list[L.ELine] = _lines
         else:
-            self.lines: List[L.ELine] = []
+            self.lines: list[L.ELine] = []
 
         if _assemble_flag and _points:
-            self.points: List[P.EPoint] = _points
+            self.points: list[P.EPoint] = _points
         else:
-            self.points: List[P.EPoint] = []
+            self.points: list[P.EPoint] = []
 
         if _assemble_flag and _angles:
-            self.angles: List[A.EAngleBase | None] = _angles
+            self.angles: list[A.EAngleBase | None] = _angles
         else:
-            self.angles: List[A.EAngleBase | None] = [None] * self.sides
+            self.angles: list[A.EAngleBase | None] = [None] * self.sides
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
                          delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
@@ -563,9 +563,9 @@ setattr(cls, 'p{i}', property(p))
         ref_line = line.get_unit_vector()
 
         if np.dot(first_vec, ref_line) >= 0:
-            points: List[P.EPoint] = [P.EPoint(line.get_start()), P.EPoint(line.get_end())]
+            points: list[P.EPoint] = [P.EPoint(line.get_start()), P.EPoint(line.get_end())]
         else:
-            points: List[P.EPoint] = [P.EPoint(line.get_end()), P.EPoint(line.get_start())]
+            points: list[P.EPoint] = [P.EPoint(line.get_end()), P.EPoint(line.get_start())]
 
         # --------------------------------------------------------------------------
         # create individual triangles and copy them

@@ -1,5 +1,4 @@
 from euclidlib.Objects import convert_to_coord
-import manimlib as mn
 import numpy as np
 
 

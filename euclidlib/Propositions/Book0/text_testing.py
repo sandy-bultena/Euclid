@@ -21,7 +21,7 @@ class Prop0(BookScene):
         tl.explain("Top Left")
         br.explain("Bottom Right")
 
-        t1 = TextBox(mn_coord(20, 50), line_width=mn_h_scale(1400))
+        t1 = TextBox(mn_coord(20, 50), line_width=mn_h_scale(1380))
         t2 = TextBox(mn_coord(500, 430))
         t3 = TextBox(mn_coord(1300, 430))
 

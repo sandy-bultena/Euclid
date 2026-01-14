@@ -69,7 +69,8 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
 
         self.style = style
         self.write_simultaneous = write_simultaneous
-        self.em_object: Optional[E.EMObject] = None
+        if not hasattr(self, 'em_object'):
+            self.em_object: Optional[E.EMObject] = None
         self.text = self.apply_rules(txt)
 
         super().__init__(
@@ -224,6 +225,7 @@ class ETex(EStringObj, mn.Tex):
     REPLACEMENT_RULES = TEX_REPLACE
 
     def __init__(self, text, *args, **kwargs):
+        print(f"Etex init: {self.em_object=}")
         super().__init__(
             text,
             *args,
@@ -253,20 +255,25 @@ class Label(ETex):
         self.extra_args = extra_args
         self.align = align
         super().__init__(text, font_size=20, scene=em_object.scene, delay_anim=True)
+
+        # if you move the object, you move the label text
         self.f_always.move_to(
-            lambda: em_object.e_label_point(*self.args, **self.extra_args),
+            lambda: em_object.e_label_location(*self.args, **self.extra_args),
             aligned_edge=lambda: self.align
         )
 
     # -----------------------------------------------------------------------------------------------------------------
-    # overload CreationOf by specifying
+    # overload CreationOf ... no idea what this is for
     # -----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
-        kwargs['run_time'] = self.em_object.CONSTRUCTION_TIME
+        if self.em_object is not None:
+            kwargs['run_time'] = self.em_object.CONSTRUCTION_TIME
         return super().CreationOf(*args, **kwargs, stroke_color=mn.GREY,
                                   rate_func=mn.squish_rate_func(mn.smooth, 0.1, 1))
 
     def RemovalOf(self, *args, **kwargs):
+        if self.em_object is not None:
+            kwargs['run_time'] = self.em_object.CONSTRUCTION_TIME
         kwargs['run_time'] = self.em_object.AUX_CONSTRUCTION_TIME
         return super().RemovalOf(*args, **kwargs, rate_func=mn.squish_rate_func(mn.smooth, 1, 0.9))
 

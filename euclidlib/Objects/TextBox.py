@@ -240,7 +240,6 @@ class TextBox(EGroup[T.EStringObj]):
 
         with self.scene.simultaneous():
             # create the text_str and fix the text_str in frame (is always displayed at a fixed position on the screen)
-
             newline = cls(text_str, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
 
