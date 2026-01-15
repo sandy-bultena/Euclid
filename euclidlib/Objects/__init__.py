@@ -1,5 +1,5 @@
-from .EucidMObject import *
-from .EucidGroupMObject import *
+from .EuclidMObject import *
+from .EuclidGroupMObject import *
 from .Angle import EAngle, EAngleBase
 from . import Angle as Angle
 from .Arc import EArc, AbstractArc

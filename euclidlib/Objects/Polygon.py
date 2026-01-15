@@ -4,8 +4,8 @@ from typing_extensions import Unpack
 from itertools import pairwise, zip_longest, chain, repeat
 from typing import  Any,  TypedDict, TYPE_CHECKING, Optional
 
-from euclidlib.Objects.EucidMObject import *
-from . import EucidGroupMObject as G
+from euclidlib.Objects.EuclidMObject import *
+from . import EuclidGroupMObject as G
 from . import Line as L
 from . import Point as P
 from . import Angle as A

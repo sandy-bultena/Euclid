@@ -5,8 +5,8 @@ import manimlib as mn
 import numpy as np
 from euclidlib.debugging import print_debug
 
-from .EucidMObject import EMObject
-from .EucidGroupMObject import EGroup, PsuedoGroup
+from .EuclidMObject import EMObject
+from .EuclidGroupMObject import EGroup, PsuedoGroup
 from . import Text as T
 from . import CustomAnimation as CA
 from contextlib import contextmanager

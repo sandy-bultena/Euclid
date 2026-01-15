@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from euclidlib.Objects import Line
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 
 def parallelogram(*coords: EMObject | Vect3) -> Tuple[Vect3, Vect3, Vect3, Vect3]:
     assert len(coords) == 3

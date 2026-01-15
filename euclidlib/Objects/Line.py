@@ -1,70 +1,44 @@
 from __future__ import annotations
 
-from enum import EnumType, Enum
 from itertools import pairwise
 from typing_extensions import deprecated
 
-import numpy as np
 
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
 from euclidlib.Objects import Angle
-import math
 from euclidlib.Objects import EquilateralTriangle
 from typing import Dict, Tuple, Set
 
 from euclidlib.Objects import Dashable as Da
 from euclidlib.Objects import Arc
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 
-
+# =====================================================================================================================
+# Line
+# =====================================================================================================================
 class ELine(Da.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 0.5
     LabelBuff = 0.15
 
-    def __init__(self, start: str| EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+    # -----------------------------------------------------------------------------------------------------------------
+    # init
+    # -----------------------------------------------------------------------------------------------------------------
+    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
         """create a new line"""
-        print(f"Init Line: <{start}>, <{end}>")
-
-        # if start is a string, then it is the label of the line
-        # Not sure what the hell this is!!
-        if isinstance(start, str):
-            print("######## LINE: start is a string", start)
-            start, end = P.EPoint.find_in_frame(start)
-        self.basic_interpolate = False;
+        # # if start is a string, then it is the label of the line
+        # # Not sure what the hell this is!!
+        # if isinstance(start, str):
+        #     print("######## LINE: start is a string", start)
+        #     start, end = P.EPoint.find_in_frame(start)
+        self.basic_interpolate = False
         super().__init__(start,end, *args, **kwargs)
 
-    @staticmethod
-    def find_in_frame(name, loop=False):
-        if loop:
-            name = name + name[0]
-        parts = [''.join(x) for x in pairwise(name)]
-        from inspect import currentframe
-        f = currentframe()
-        while f.f_back:
-            f = f.f_back
-            if 'l' in f.f_locals:
-                break
-        if f.f_back is None:
-            raise Exception("Can't Find Line Dict")
-        lines = f.f_locals.get('l', {})
 
-        lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
-        if all(l is not None for l in lines):
-            return lines
-        try:
-            points = [P.EPoint.find_in_frame(part) for part in parts]
-            vlines = [VirtualLine(*p) for p in points]
-            return vlines
-        except Exception as e:
-            raise Exception(
-                f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
-                e.args[0])
-
-    # =======================================
-    # LABEL DIRECTIONS
-    # =======================================
+    # -----------------------------------------------------------------------------------------------------------------
+    # where to put the label
+    # -----------------------------------------------------------------------------------------------------------------
     def IN(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, PI / 2)
@@ -74,16 +48,24 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         return mn.rotate_vector(vec, -PI / 2)
 
     def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
+        """By default, finds the middle of the line, calculates the position where the label should go"""
+
+        # get mid-point (or the alpha percentage of the line) - uses manimlib stuff
         try:
             point = self.point_from_proportion(alpha)
         except AssertionError:
             point = self.get_start()
+
+        # calculate the position
         if inside:
             direction = self.IN()
         elif outside:
             direction = self.OUT()
         return point + (buff or self.LabelBuff) * direction
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # change direction of line
+    # -----------------------------------------------------------------------------------------------------------------
     def invert_start_and_end(self):
         self.reverse_points()
         return self
@@ -106,7 +88,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         if np.dot(self.get_unit_vector(), mobject2.get_unit_vector()) < 0:
             self.reverse_points()
 
-        methods: List[Callable[[ELine], Vect3]] = [mn.Mobject.get_center, mn.Line.get_start, mn.Line.get_end]
+        methods: list[Callable[[ELine], Vect3]] = [mn.Mobject.get_center, mn.Line.get_start, mn.Line.get_end]
         candidates = [mn.norm_squared(f(self) - f(mobject2)) for f in methods]
         candid = min(zip(candidates, (CENTER, START, END), methods))
 
@@ -1050,6 +1032,33 @@ class EDashedLine(ELine, mn.DashedLine):
         self.e_start = self.point(-r)
         anim.set_points_by_ends(self.e_start, self.e_end)
         return self
+
+    @staticmethod
+    def find_in_frame(name, loop=False):
+        if loop:
+            name = name + name[0]
+        parts = [''.join(x) for x in pairwise(name)]
+        from inspect import currentframe
+        f = currentframe()
+        while f.f_back:
+            f = f.f_back
+            if 'l' in f.f_locals:
+                break
+        if f.f_back is None:
+            raise Exception("Can't Find Line Dict")
+        lines = f.f_locals.get('l', {})
+
+        lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
+        if all(l is not None for l in lines):
+            return lines
+        try:
+            points = [P.EPoint.find_in_frame(part) for part in parts]
+            vlines = [VirtualLine(*p) for p in points]
+            return vlines
+        except Exception as e:
+            raise Exception(
+                f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
+                e.args[0])
 
 
 class VirtualLine(ELine):

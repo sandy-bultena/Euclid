@@ -9,7 +9,7 @@ import traceback
 from enum import Enum
 
 from euclidlib.Objects import *
-from euclidlib.Objects import EucidMObject as EM
+from euclidlib.Objects import EuclidMObject as EM
 from os import getenv
 
 from euclidlib.debugging import print_debug

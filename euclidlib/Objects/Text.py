@@ -5,9 +5,9 @@ import itertools
 from abc import ABC
 from typing import Optional
 
-from . import EucidMObject as E
+from . import EuclidMObject as E
 from . import CustomAnimation as CA
-from . import EucidGroupMObject as G
+from . import EuclidGroupMObject as G
 import re
 import manimlib as mn
 from functools import reduce, partial

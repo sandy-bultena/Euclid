@@ -7,8 +7,8 @@ from typing import Sized, Tuple, Any, List
 import numpy as np
 
 from euclidlib.Objects.Polygon import EPolygon, LABEL_ARGS
-from euclidlib.Objects.EucidMObject import *
-from . import EucidGroupMObject as G
+from euclidlib.Objects.EuclidMObject import *
+from . import EuclidGroupMObject as G
 from . import Parallelogram as Para
 from . import Line as L
 from . import Point as P

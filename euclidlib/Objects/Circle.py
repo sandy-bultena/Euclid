@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from itertools import pairwise
 
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 from euclidlib.Objects import Line as L
 from euclidlib.Objects import Arc
 from euclidlib.Objects import Point

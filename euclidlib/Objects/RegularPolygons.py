@@ -5,9 +5,9 @@ from euclidlib.Objects import CalculatePoints
 from euclidlib.Objects import Point
 from euclidlib.Objects import Line
 from euclidlib.Objects import Circle as Cir
-from euclidlib.Objects import EucidGroupMObject as Gr
+from euclidlib.Objects import EuclidGroupMObject as Gr
 from euclidlib.Objects import Angle as An
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 
 @anim_speed
 def pentagon(center: Point.EPoint | Vect3, radius: float):

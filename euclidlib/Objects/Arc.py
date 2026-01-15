@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 from euclidlib.Objects import Circle as Cir
 from manimlib import TAU
 from . import Line as Ln

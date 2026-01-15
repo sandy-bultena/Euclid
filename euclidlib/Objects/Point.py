@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .EucidMObject import *
+from .EuclidMObject import *
 from .utils import call_or_get
 import manimlib as mn
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 
 DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5

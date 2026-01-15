@@ -6,7 +6,7 @@ from euclidlib.Objects import CalculatePoints
 from euclidlib.Objects import Point
 from euclidlib.Objects import Line
 from euclidlib.Objects import Circle
-from euclidlib.Objects.EucidMObject import *
+from euclidlib.Objects.EuclidMObject import *
 
 class ESquare(Parallelogram.EParallelogram):
     def __init__(self, *points: EMObject | Vect3, **kwargs):

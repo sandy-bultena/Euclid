@@ -1,7 +1,7 @@
 from typing import Self, List, Type
 import manimlib as mn
 import numpy as np
-from euclidlib.Objects import EucidMObject as EM, EGroup, PsuedoGroup, mn_scale
+from euclidlib.Objects import EuclidMObject as EM, EGroup, PsuedoGroup, mn_scale
 from euclidlib.Objects import Line as Line
 
 

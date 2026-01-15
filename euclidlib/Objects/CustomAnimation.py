@@ -4,7 +4,7 @@ import manimlib as mn
 from manimlib import Scene
 from typing import Callable
 
-from . import EucidMObject as E
+from . import EuclidMObject as E
 
 @cache
 def EAnimationOf(anim_type: type):
