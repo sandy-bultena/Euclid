@@ -1,0 +1,24 @@
+NormalText.pm
+    new
+    title
+    footnote
+    sidenote
+    math
+    mathsmall
+    wide_math
+    fraction_equation
+    label
+    fancy
+    canvas
+    explain
+    bold
+    point
+    indent
+    normal
+    down
+    delete
+    delete_item
+    clear
+    erase
+    scale
+    superscript_subscript
