@@ -17,9 +17,9 @@ from euclidlib.Objects import CustomAnimation as CA
 from typing import Sized, Self, Callable, Tuple, Iterable, Type, TYPE_CHECKING
 from contextlib import contextmanager
 
-DEFAULT_FADE_OPACITY = 0.15
+DEFAULT_FADE_OPACITY = 0.30
 DEFAULT_TEXT_FADE_OPACITY = 0.3
-DEFAULT_CONSTRUCTION_RUNTIME = 0.5
+DEFAULT_CONSTRUCTION_RUNTIME = 1.0
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 E_WIDTH = 1400
@@ -52,203 +52,10 @@ def un_create_version(anim: mn.Animation):
     anim.rate_func = lambda t: curr_rate(1 - t)
     return anim
 
-
-class NullAnimationBuilder:
-    def __getattr__(self, item):
-        return self
-
-    def __call__(self, *args, **kwargs):
-        return self
-
-
-class NullPlayer:
-    def __init__(self, obj):
-        self.obj = obj
-
-    def __getattr__(self, item):
-        return self
-
-    def __call__(self, *args, **kwargs):
-        return self.obj
-
-
 def e_animate(anim):
     if anim.overridden_animation:
         return anim.overridden_animation
     return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
-
-
-class EMObjectPlayer:
-    def __init__(self, eobj: EMObject):
-        self.rotating = False
-        self.eobj = eobj
-
-        if eobj.is_frozen:
-            self.anim = NullAnimationBuilder()
-        else:
-            self.anim = eobj.animate
-
-        if eobj.is_frozen or eobj.e_label is None or eobj.e_label.is_frozen:
-            self.label_anim = NullAnimationBuilder()
-        else:
-            self.label_anim = eobj.e_label.animate
-
-        self.o_animate_part = eobj.animate_part
-        self.l_animate_part = eobj.e_label.animate_part if eobj.e_label is not None else []
-
-        self.fade_out_flag = False
-        self.fade_in_flag = False
-        self.main_animate = False
-        self.label_animate = False
-        self.rotation = []
-
-    @property
-    def _fade_opacity(self):
-        from euclidlib.Objects import Text
-        return DEFAULT_TEXT_FADE_OPACITY if isinstance(self.eobj, Text.EStringObj) else DEFAULT_FADE_OPACITY
-
-    @classmethod
-    def _properties(cls):
-        for name, val in cls.__dict__.items():
-            if name.startswith('_'):
-                continue
-            if isinstance(val, property):
-                yield name
-
-    @classmethod
-    def _methods(cls):
-        for name, val in cls.__dict__.items():
-            if name.startswith('_'):
-                continue
-            if isinstance(val, property):
-                continue
-            if callable(val):
-                yield name
-
-    @property
-    def e_fade(self):
-        self.main_animate = self.label_animate = True
-        for meth in self.o_animate_part:
-            getattr(self.anim, meth)(opacity=self._fade_opacity)
-        for meth in self.l_animate_part:
-            getattr(self.label_anim, meth)(opacity=0.0)
-        return self
-
-    @property
-    def e_normal(self):
-        self.main_animate = self.label_animate = True
-        for meth in self.o_animate_part:
-            getattr(self.anim, meth)(opacity=1.0)
-        for meth in self.l_animate_part:
-            getattr(self.label_anim, meth)(opacity=1.0)
-        return self
-
-    def _e_color(self, color: mn.Color):
-        self.main_animate = True
-        self.e_normal.anim.set_color(color=color)
-        return self
-
-    @property
-    def green(self):
-        return self._e_color(mn.GREEN)
-
-    @property
-    def blue(self):
-        return self._e_color(mn.BLUE)
-
-    @property
-    def red(self):
-        return self._e_color(mn.RED)
-
-    @property
-    def white(self):
-        return self._e_color(mn.WHITE)
-
-    @property
-    def grey(self):
-        return self._e_color(mn.GREY)
-
-    @property
-    def lift(self):
-        if self.eobj.visible():
-            self.eobj.scene.add(self.eobj)
-        return self
-
-    @property
-    def notice(self):
-        self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED))
-        return self
-
-    def e_move_to(self,
-                  point_or_mobject: mn.Mobject | Vect3,
-                  aligned_edge: Vect3 = ORIGIN,
-                  coor_mask: Vect3 = np.array([1, 1, 1])):
-        self.main_animate = True
-        self.anim.move_to(point_or_mobject, aligned_edge, coor_mask)
-        return self
-
-    def e_move(self, vector: Vect3):
-        self.main_animate = True
-        self.anim.shift(vector)
-        return self
-
-    def e_to_edge(self,
-                  edge: Vect3 = LEFT,
-                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
-        self.main_animate = True
-        self.anim.to_edge(edge, buff)
-        return self
-
-    def e_to_corner(self,
-                    corner: Vect3 = DL,
-                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
-        self.main_animate = True
-        self.anim.to_to_corner(corner, buff)
-        return self
-
-    def e_rotate(self, about: Vect3, angle: float):
-        self.main_animate = True
-        self.anim.rotate(angle, about_point=about)
-        self.rotating = angle
-        return self
-
-    def e_scale(self,
-                scale: float,
-                min_scale_factor: float = 1e-8,
-                about_point: Vect3 | None = None,
-                about_edge: Vect3 = ORIGIN):
-        self.main_animate = True
-        self.anim.scale(scale, min_scale_factor, about_point, about_edge)
-        return self
-
-    def _build_anim(self, anim, obj: mn.VMobject, flag, **kwargs):
-        if obj is None or not flag:
-            return None
-        if isinstance(anim, NullAnimationBuilder):
-            return None
-        if 'run_time' not in kwargs:
-            kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
-
-        if self.rotating:
-            kwargs['path_arc'] = self.rotating
-
-        anim_built = e_animate(anim(**kwargs))
-        return anim_built
-
-    def __call__(self, *args, **kwargs):
-        anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
-        label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
-
-        if self.eobj.in_scene():
-            anims = [an for an in (anim_built, label_built) if an is not None]
-            if anims:
-                self.eobj.scene.play(*anims)
-        else:
-            if self.main_animate:
-                self.eobj.become(self.eobj.target)
-            if self.eobj.e_label is not None and self.label_animate:
-                self.eobj.e_label.become(self.eobj.e_label.target)
-        return self.eobj
 
 
 def convert_to_coord(obj: mn.Mobject | Sized[float])->Vect3:
@@ -388,6 +195,214 @@ def with_objects(head, *rest):
             yield head,
 
 
+# =====================================================================================================================
+# NullAnimationBuilder ??
+# =====================================================================================================================
+class NullAnimationBuilder:
+    def __getattr__(self, item):
+        return self
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+
+# =====================================================================================================================
+# NullPlayer ??
+# =====================================================================================================================
+class NullPlayer:
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __getattr__(self, item):
+        return self
+
+    def __call__(self, *args, **kwargs):
+        return self.obj
+
+
+# =====================================================================================================================
+# EMObjectPlayer ??
+# =====================================================================================================================
+class EMObjectPlayer:
+    def __init__(self, eobj: EMObject):
+        self.rotating = False
+        self.eobj = eobj
+
+        if eobj.is_frozen:
+            self.anim = NullAnimationBuilder()
+        else:
+            self.anim = eobj.animate
+
+        if eobj.is_frozen or eobj.e_label is None or eobj.e_label.is_frozen:
+            self.label_anim = NullAnimationBuilder()
+        else:
+            self.label_anim = eobj.e_label.animate
+
+        self.o_animate_part = eobj.animate_part
+        self.l_animate_part = eobj.e_label.animate_part if eobj.e_label is not None else []
+
+        self.fade_out_flag = False
+        self.fade_in_flag = False
+        self.main_animate = False
+        self.label_animate = False
+        self.rotation = []
+
+    @property
+    def _fade_opacity(self):
+        from euclidlib.Objects import Text
+        return DEFAULT_TEXT_FADE_OPACITY if isinstance(self.eobj, Text.EStringObj) else DEFAULT_FADE_OPACITY
+
+    @classmethod
+    def _properties(cls):
+        for name, val in cls.__dict__.items():
+            if name.startswith('_'):
+                continue
+            if isinstance(val, property):
+                yield name
+
+    @classmethod
+    def _methods(cls):
+        for name, val in cls.__dict__.items():
+            if name.startswith('_'):
+                continue
+            if isinstance(val, property):
+                continue
+            if callable(val):
+                yield name
+
+    @property
+    def e_fade(self):
+        self.main_animate = self.label_animate = True
+        for meth in self.o_animate_part:
+            print(f"{meth=} in o_animate_part, {self} {self._fade_opacity=} ")
+            getattr(self.anim, meth)(opacity=self._fade_opacity)
+        for meth in self.l_animate_part:
+            print(f"{meth=} in l_animate_part, {self} ")
+            getattr(self.label_anim, meth)(opacity=0.0)
+        return self
+
+    @property
+    def e_normal(self):
+        self.main_animate = self.label_animate = True
+        for meth in self.o_animate_part:
+            getattr(self.anim, meth)(opacity=1.0)
+        for meth in self.l_animate_part:
+            getattr(self.label_anim, meth)(opacity=1.0)
+        return self
+
+    def _e_color(self, color: mn.Color):
+        self.main_animate = True
+        self.e_normal.anim.set_color(color=color)
+        return self
+
+    @property
+    def green(self):
+        return self._e_color(mn.GREEN)
+
+    @property
+    def blue(self):
+        return self._e_color(mn.BLUE)
+
+    @property
+    def red(self):
+        return self._e_color(mn.RED)
+
+    @property
+    def white(self):
+        return self._e_color(mn.WHITE)
+
+    @property
+    def grey(self):
+        return self._e_color(mn.GREY)
+
+    @property
+    def lift(self):
+        if self.eobj.visible():
+            self.eobj.scene.add(self.eobj)
+        return self
+
+    @property
+    def notice(self):
+        self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED))
+        return self
+
+    def e_move_to(self,
+                  point_or_mobject: mn.Mobject | Vect3,
+                  aligned_edge: Vect3 = ORIGIN,
+                  coor_mask: Vect3 = np.array([1, 1, 1])):
+        self.main_animate = True
+        self.anim.move_to(point_or_mobject, aligned_edge, coor_mask)
+        return self
+
+    def e_move(self, vector: Vect3):
+        self.main_animate = True
+        self.anim.shift(vector)
+        return self
+
+    def e_to_edge(self,
+                  edge: Vect3 = LEFT,
+                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        self.main_animate = True
+        self.anim.to_edge(edge, buff)
+        return self
+
+    def e_to_corner(self,
+                    corner: Vect3 = DL,
+                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        self.main_animate = True
+        self.anim.to_to_corner(corner, buff)
+        return self
+
+    def e_rotate(self, about: Vect3, angle: float):
+        self.main_animate = True
+        self.anim.rotate(angle, about_point=about)
+        self.rotating = angle
+        return self
+
+    def e_scale(self,
+                scale: float,
+                min_scale_factor: float = 1e-8,
+                about_point: Vect3 | None = None,
+                about_edge: Vect3 = ORIGIN):
+        self.main_animate = True
+        self.anim.scale(scale, min_scale_factor, about_point, about_edge)
+        return self
+
+    def _build_anim(self, anim, obj: mn.VMobject, flag, **kwargs):
+        if obj is None or not flag:
+            return None
+        if isinstance(anim, NullAnimationBuilder):
+            return None
+        if 'run_time' not in kwargs:
+            kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
+
+        if self.rotating:
+            kwargs['path_arc'] = self.rotating
+
+        anim_built = e_animate(anim(**kwargs))
+        return anim_built
+
+    def __call__(self, *args, **kwargs):
+        anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
+        label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
+
+        if self.eobj.in_scene():
+            anims = [an for an in (anim_built, label_built) if an is not None]
+            if anims:
+                self.eobj.scene.play(*anims)
+        else:
+            if self.main_animate:
+                self.eobj.become(self.eobj.target)
+            if self.eobj.e_label is not None and self.label_animate:
+                self.eobj.e_label.become(self.eobj.e_label.target)
+        return self.eobj
+
+
+
+# =====================================================================================================================
+# EMObject
+# =====================================================================================================================
+
 class EMObject(mn.VMobject):
     LabelBuff = mn.MED_SMALL_BUFF
     CONSTRUCTION_TIME = 1
@@ -398,11 +413,68 @@ class EMObject(mn.VMobject):
 
     Virtual = False
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # initialize
+    # -----------------------------------------------------------------------------------------------------------------
+    def __init__(self,
+                 *args,
+                 stroke_width: float = 2,
+                 animate_part=None,
+                 delay_anim=False,
+                 skip_anim=False,
+                 scene: ps.PropScene = None,
+                 debug=False,
+                 label_args: Tuple[str, ...] | str | None = None,
+                 label: Tuple[str, ...] | str | None = None,
+                 **kwargs):
+        self.cached_opacity = 0
+        self.cached_fade = 1
+        label_args = label_args or label
+        self._debug = debug
+        self._freeze = False
+        scene = scene or find_scene()
+        if scene is None:
+            raise Exception("Could Not Find Scene Object")
+        self.animate_part = ['set_stroke', 'set_e_fill'] if animate_part is None else animate_part
+        self.old_fill_opacity = 0.0
+        self.scene = scene
+        self.animation_objects: list[mn.Mobject] = []
+        kwargs['stroke_width'] = stroke_width
+
+        if self.Virtual:
+            kwargs['stroke_opacity'] = 0.5 if self.scene.debug else 0.0
+            kwargs['stroke_width'] = 2 * stroke_width
+            kwargs['stroke_color'] = mn.RED
+
+        # pp(args)
+        # pp(kwargs)
+        super().__init__(*args, **kwargs)
+        self.e_label = None
+        if label_args:
+            if isinstance(label_args, str):
+                string = label_args
+                label_args = ()
+            else:
+                string, *label_args = label_args
+
+            if label_args and isinstance(label_args[-1], dict):
+                *label_args, l_kwargs = label_args
+            else:
+                l_kwargs = {}
+            self.e_label = self.init_label(string, *label_args, **l_kwargs)
+
+        if not delay_anim:
+            self.e_draw(skip_anim)
+
+
     def CreationOf(self, *args, **kwargs):
         return [CA.EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def RemovalOf(self, *args, **kwargs):
-        return [CA.UncreatePreserve(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+        t = self.CONSTRUCTION_TIME
+        if hasattr(self, "DE_CONSTRUCTION_TIME"):
+            t = self.DE_CONSTRUCTION_TIME
+        return [CA.UncreatePreserve(self, *args, **kwargs, run_time=t)]
 
     def in_scene(self):
         return self in self.scene.mobjects
@@ -502,6 +574,7 @@ def {name}(self, *args):
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
         if self.visible():
             return
+
         anim_args = anim_args or dict()
         removal_args = anim_args if removal_args is None else removal_args
         if not skip_anim and not self.Virtual:
@@ -511,9 +584,9 @@ def {name}(self, *args):
                 if x is not None
                 for anim in x.CreationOf()
             ]
-
             if anims:
                 self.scene.play(*anims, **anim_args)
+
             if self.animation_objects:
                 for obj in self.animation_objects:
                     obj.clear_updaters()
@@ -654,54 +727,5 @@ def {name}(self, *args):
         self.scene = find_scene()
         self.shader_wrapper = None
 
-    def __init__(self,
-                 *args,
-                 stroke_width: float = 2,
-                 animate_part=None,
-                 delay_anim=False,
-                 skip_anim=False,
-                 scene: ps.PropScene = None,
-                 debug=False,
-                 label_args: Tuple[str, ...] | str | None = None,
-                 label: Tuple[str, ...] | str | None = None,
-                 **kwargs):
-        self.cached_opacity = 0
-        self.cached_fade = 1
-        label_args = label_args or label
-        self._debug = debug
-        self._freeze = False
-        scene = scene or find_scene()
-        if scene is None:
-            raise Exception("Could Not Find Scene Object")
-        self.animate_part = ['set_stroke', 'set_e_fill'] if animate_part is None else animate_part
-        self.old_fill_opacity = 0.0
-        self.scene = scene
-        self.animation_objects: list[mn.Mobject] = []
-        kwargs['stroke_width'] = stroke_width
-
-        if self.Virtual:
-            kwargs['stroke_opacity'] = 0.5 if self.scene.debug else 0.0
-            kwargs['stroke_width'] = 2 * stroke_width
-            kwargs['stroke_color'] = mn.RED
-
-        # pp(args)
-        # pp(kwargs)
-        super().__init__(*args, **kwargs)
-        self.e_label = None
-        if label_args:
-            if isinstance(label_args, str):
-                string = label_args
-                label_args = ()
-            else:
-                string, *label_args = label_args
-
-            if label_args and isinstance(label_args[-1], dict):
-                *label_args, l_kwargs = label_args
-            else:
-                l_kwargs = {}
-            self.e_label = self.init_label(string, *label_args, **l_kwargs)
-
-        if not delay_anim:
-            self.e_draw(skip_anim)
     def validate_markup_string(self,*args,**kwargs):
         return True

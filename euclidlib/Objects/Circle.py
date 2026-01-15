@@ -12,7 +12,7 @@ from euclidlib.Objects import Dashable as Da
 
 
 class ECircle(mn.Circle, Arc.AbstractArc):
-    CONSTRUCTION_TIME = 0.75
+    CONSTRUCTION_TIME = 2.00
     AUX_CONSTRUCTION_TIME = 0.25
 
     def CreationOf(self, *args, **kwargs):

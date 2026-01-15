@@ -34,11 +34,11 @@ class Fonts:
 
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, font='Menlo')),
-            explain=(T.EMarkupText, dict(font_size=18, font='Menlo')),
-            sidenote=(T.EMarkupText, dict(font_size=18, font='Menlo', slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=18, font='Menlo')),
-            normal=(T.EText, dict(font_size=16, font='Menlo')),
+            title=(T.EMarkupText, dict(font_size=30, font='Consolas')),
+            explain=(T.EMarkupText, dict(font_size=18, font='Consolas')),
+            sidenote=(T.EMarkupText, dict(font_size=18, font='Consolas', slant='ITALIC')),
+            explainM=(T.ETexText, dict(font_size=18, font='Consolas')),
+            normal=(T.EText, dict(font_size=16, font='Consolas')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=24, font='Charm')),
             title_screen=(T.EText, dict(font_size=48, font='Chalkduster')),

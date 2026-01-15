@@ -31,3 +31,11 @@ called by `PropScene` _before_ running anything in the proposition.
 # ?
 ## break into parts (TextBox)
 is used so that we can align the various parts with strings above (i.e. align '>' signs, or '=' signs)
+
+## EMObject
+
+* at creation, will call `e_draw`
+```python
+        if not delay_anim:
+            self.e_draw(skip_anim)
+```

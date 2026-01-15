@@ -67,11 +67,12 @@ class PropScene(mn.InteractiveScene):
                     print_debug(txt="TITLE PAGE")
                     self.title_page()
                     self.next_page()
+                    self.reset()
                     print_debug(txt="Finished TITLE PAGE")
             except NotImplementedError:
                 pass
 
-            print_debug(txt="Running prop scene")
+            print_debug(txt="Running prop scene", level=10)
             self.go()
 
     # =================================================================================================================
@@ -111,7 +112,6 @@ class PropScene(mn.InteractiveScene):
         super().on_key_press(symbol, modifiers)
         if self.paused:
             self.paused = False
-            self.reset()
             return
 
         if char == 'z':

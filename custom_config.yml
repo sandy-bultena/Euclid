@@ -8,7 +8,7 @@ camera_resolutions:
 directories:
   mirror_module_path: false
 fps: 30
-full_screen: true
+full_screen: false
 style:
   background_color: '#000000'
   font: Consolas

@@ -81,6 +81,7 @@ class BookScene(PropScene):
         t.title_screen("Euclid's Elements", write_simultaneous=True)
         print_debug(2,f"book number: {self.book=}")
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
+        t.fancy("Fancy quote")
 
     def reset(self):
         with self.simultaneous(run_time=1):
@@ -149,50 +150,50 @@ class Book1Scene(BookScene):
         with self.simultaneous():
             super().title_page()
             title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
-                            "you were not born to be a scientific thinker.", font_size=64, write_simultaneous=True)
-            title_box.explain("-Albert Einstein", font_size=32)
+                            "you were not born to be a scientific thinker.", font_size=24, write_simultaneous=True)
+            title_box.explain("-Albert Einstein", font_size=18)
 
-            top = 400
-            bot = top + 100
-            left = 945
-            right = 75 + left
-            A_base = np.array([right, top, 0])
-            B_base = np.array([left, bot, 0])
-
-            side = -1 * (B_base[0] - A_base[0]) / (bot - top)
-            b = A_base[1] - side * A_base[0]
-            C_base = np.array([(1 / side) * (bot - b), bot, 0])
-
-            A = mn_coord(*A_base)
-            B = mn_coord(*B_base)
-            C = mn_coord(*C_base)
-
-            tABC = ETriangle('ABC', point_labels='ABC', angles=' ')
-            sB = ESquare(B, A, point_labels=['F', None, None, 'G'])
-            sA = ESquare(A, C, point_labels=['H', None, None, 'K'])
-            sC = ESquare(C, B, point_labels=['E', None, None, 'D'])
-
-            sABD = ETriangle.assemble(lines=[tABC.l0, sC.l2, EDashedLine(A, sC.p3)])
-            sFBC = ETriangle.assemble(lines=[sB.l0, tABC.l1, EDashedLine(sB.p0, C)])
-            sBCK = ETriangle.assemble(lines=[tABC.l1, sA.l2, EDashedLine(B, sA.p3)])
-            sECA = ETriangle.assemble(lines=[sC.l0, tABC.l2, EDashedLine(A, sC.p0)])
-
-            with self.pause_animations_for():
-                lAlx = sC.l2.parallel(tABC.p0)
-            pL = EPoint(lAlx.intersect(sC.l3), label=('L', DOWN))
-
-            sBDL = EParallelogram(B, sC.p3, pL)
-            sCEL = EParallelogram(C, sC.p0, pL)
-
-            sA.e_fill(GREEN)
-            sCEL.e_fill(GREEN)
-            sECA.e_fill(GREEN_D)
-            sBCK.e_fill(GREEN_D)
-
-            sB.e_fill(BLUE)
-            sBDL.e_fill(BLUE)
-            sABD.e_fill(BLUE_D)
-            sFBC.e_fill(BLUE_D)
+            # top = 400
+            # bot = top + 100
+            # left = 945
+            # right = 75 + left
+            # A_base = np.array([right, top, 0])
+            # B_base = np.array([left, bot, 0])
+            #
+            # side = -1 * (B_base[0] - A_base[0]) / (bot - top)
+            # b = A_base[1] - side * A_base[0]
+            # C_base = np.array([(1 / side) * (bot - b), bot, 0])
+            #
+            # A = mn_coord(*A_base)
+            # B = mn_coord(*B_base)
+            # C = mn_coord(*C_base)
+            #
+            # tABC = ETriangle('ABC', point_labels='ABC', angles=' ')
+            # sB = ESquare(B, A, point_labels=['F', None, None, 'G'])
+            # sA = ESquare(A, C, point_labels=['H', None, None, 'K'])
+            # sC = ESquare(C, B, point_labels=['E', None, None, 'D'])
+            #
+            # sABD = ETriangle.assemble(lines=[tABC.l0, sC.l2, EDashedLine(A, sC.p3)])
+            # sFBC = ETriangle.assemble(lines=[sB.l0, tABC.l1, EDashedLine(sB.p0, C)])
+            # sBCK = ETriangle.assemble(lines=[tABC.l1, sA.l2, EDashedLine(B, sA.p3)])
+            # sECA = ETriangle.assemble(lines=[sC.l0, tABC.l2, EDashedLine(A, sC.p0)])
+            #
+            # with self.pause_animations_for():
+            #     lAlx = sC.l2.parallel(tABC.p0)
+            # pL = EPoint(lAlx.intersect(sC.l3), label=('L', DOWN))
+            #
+            # sBDL = EParallelogram(B, sC.p3, pL)
+            # sCEL = EParallelogram(C, sC.p0, pL)
+            #
+            # sA.e_fill(GREEN)
+            # sCEL.e_fill(GREEN)
+            # sECA.e_fill(GREEN_D)
+            # sBCK.e_fill(GREEN_D)
+            #
+            # sB.e_fill(BLUE)
+            # sBDL.e_fill(BLUE)
+            # sABD.e_fill(BLUE_D)
+            # sFBC.e_fill(BLUE_D)
 
 
 class Book2Scene(BookScene):

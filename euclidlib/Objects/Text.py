@@ -225,7 +225,6 @@ class ETex(EStringObj, mn.Tex):
     REPLACEMENT_RULES = TEX_REPLACE
 
     def __init__(self, text, *args, **kwargs):
-        print(f"Etex init: {self.em_object=}")
         super().__init__(
             text,
             *args,
