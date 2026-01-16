@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import math
 from functools import partial, wraps
 from math import isinf
@@ -170,19 +171,33 @@ def freezable_player(func):
 
     return dontIfFrozen
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+# Using inspect to traverse the frames to find which scene this object belongs to
+# ---------------------------------------------------------------------------------------------------------------------
 def find_scene():
     from inspect import currentframe
     f = currentframe()
+
+    # keep up the stack until there is no more to go
     while f.f_back:
         f = f.f_back
+
+        # if this frame is not a frame for a class object, ignore
         if 'self' not in f.f_locals:
             continue
+
+        # get the object
         f_self = f.f_locals['self']
+
+        # if object already has scene defined, then return that
         if isinstance(f_self, EMObject) and hasattr(f_self, 'scene'):
             return f_self.scene
+
+        # if this is the PropScene, then this is the scene!
         if isinstance(f_self, ps.PropScene):
             return f_self
+
+    return None
 
 
 @contextmanager
@@ -448,6 +463,7 @@ class EMObject(mn.VMobject):
         # pp(kwargs)
         super().__init__(*args, **kwargs)
         self.e_label = None
+        print(f"In EMObject creation...{type(self).__name__}")
         if label_args:
             if isinstance(label_args, str):
                 string = label_args
@@ -568,24 +584,40 @@ def {name}(self, *args):
             *sub_animations
         )
 
+    def _get_draw_animations(self):
+        return [
+            anim
+            for x in (self, self.e_label)
+            if x is not None
+            for anim in x.CreationOf()
+        ]
+
     @freezable
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
+        """draws the object on the scene"""
+        print()
+        print(f'EMOBJECT.e_draw obj="{str(self)}" {self.Virtual=} {skip_anim=}')
+        # print(f'... caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
+        # print(f'...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
+        # print(f'...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
+
         if self.visible():
             return
 
+        # setup animation and removal animation arguments
         anim_args = anim_args or dict()
         removal_args = anim_args if removal_args is None else removal_args
+
+        # if we need to animate
         if not skip_anim and not self.Virtual:
-            anims = [
-                anim
-                for x in (self, self.e_label)
-                if x is not None
-                for anim in x.CreationOf()
-            ]
+            anims = self._get_draw_animations()
+
             if anims:
                 self.scene.play(*anims, **anim_args)
 
+            # ????
             if self.animation_objects:
+                print("*********** ANIMATION OBJECTS ***********")
                 for obj in self.animation_objects:
                     obj.clear_updaters()
                 with self.scene.simultaneous(**removal_args):
@@ -595,9 +627,12 @@ def {name}(self, *args):
                         else:
                             self.scene.play(mn.Uncreate(obj))
         else:
+            print(f"adding object {type(self).__name__} to scene without animation")
             self.scene.add(self)
             if self.scene.debug:
                 self.scene.update_frame()
+        print("e_draw FINISHED")
+        print()
         return self
 
     def __enter__(self):

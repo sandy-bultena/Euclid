@@ -112,6 +112,9 @@ class TextBox(EGroup[T.EStringObj]):
         self.bullet_symbol = None
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
+    def __str__(self):
+        return f"{type(self).__name__}: {self.abs_position} {self.line_width=}"
+
     # -----------------------------------------------------------------------------------------------------------------
     # return all string objects
     # -----------------------------------------------------------------------------------------------------------------
@@ -173,6 +176,7 @@ class TextBox(EGroup[T.EStringObj]):
     def justify_text(self, newline):
         if self.alignment:
             (get_side, side) = self.alignment
+            print(f"... justifying {get_side(self)} {side=}")
             newline.align_to(get_side(self), side)
             newline.shift(mn.RIGHT * self.indent_value)
 
@@ -237,6 +241,8 @@ class TextBox(EGroup[T.EStringObj]):
         cls, kwargs = self._setup_kwargs(style, other_options)
         bullet = None
         parts = None
+        print()
+        print(f"Generate text '{text_str}'")
 
         with self.scene.simultaneous():
             # create the text_str and fix the text_str in frame (is always displayed at a fixed position on the screen)
@@ -247,31 +253,41 @@ class TextBox(EGroup[T.EStringObj]):
             if align_str:
                 self.align_string_with_other_string(newline, align_str, align_index)
                 self.next_buff = 0
+                print(f"... aligned with other string {align_str=}")
             else:
                 newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
                 self.next_buff = 0
                 self.justify_text(newline)
+                print(f"... next_to {self.get_bottom()} + {self.buff_size + self.next_buff}")
 
             # add bullet_symbol (i.e. bullet marker)
             if self.bullet_symbol:
                 bullet = cls(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
                 bullet.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
                 bullet.e_draw(skip_anim)
+                print(f"... adding bullet symbol {self.bullet_symbol=}")
 
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
                 parts = self.break_into_parts(newline,break_into_parts,bullet, delay_anim, skip_anim)
+                print(f"broken into parts {parts=}")
 
             # not delaying the animation...
             elif not delay_anim:
+
                 if transform_from is not None:
+                    print(f"... transform from {str(newline)} {transform_args=} {transform_from=}")
                     self.e_transform_to(newline, transform_args, transform_from)
                 else:
+                    print(f"... e_draw({skip_anim=})")
                     newline.e_draw(skip_anim)
 
         # save the text object in the VGroup
         self.add(newline)
+
+        print("GENERATE TEXT finished")
+        print()
 
         if parts is not None:
             return *parts, newline

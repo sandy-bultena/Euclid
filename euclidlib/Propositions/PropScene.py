@@ -1,6 +1,6 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
-
+import inspect
 from time import sleep
 
 import manimlib as mn
@@ -42,6 +42,7 @@ class PropScene(mn.InteractiveScene):
         self.is_selecting = False
         self.to_highlight = []
         self.paused = False
+        print("PropScene initialized, calling super")
 
         super().__init__(*args, **kwargs)
 
@@ -49,6 +50,7 @@ class PropScene(mn.InteractiveScene):
     # starting point of the the animation
     # =================================================================================================================
     def construct(self) -> None:
+        print("PropScene.construct called")
         try:
             self.animationCountObject = mn.DecimalNumber(num_decimal_places=0).to_corner(mn.DR)
             if self.debug:
@@ -110,9 +112,8 @@ class PropScene(mn.InteractiveScene):
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         char = chr(symbol)
         super().on_key_press(symbol, modifiers)
-        if self.paused:
+        if self.paused and char == "n":
             self.paused = False
-            return
 
         if char == 'z':
             self.enable_selection()
@@ -188,12 +189,23 @@ class PropScene(mn.InteractiveScene):
 
     # still to comment
     def play(self, *anims: mn.AnimationType, **kwargs):
+        print()
+        print(f"PropScene play {self.animateState}")
+        print()
+        print(f'...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
+        # print(f'...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
+        # print(f'...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
+
         if self.animateState[-1] == AnimState.NORMAL:
+            for z in anims:
+                print(f"play {z=} {z.get_run_time()}")
+
             speed = self.get_current_speed()
             if 'run_time' in kwargs:
                 kwargs['run_time'] /= speed
             else:
                 anims = [self.update_runtime(anim, speed) for anim in anims]
+
             super().play(*anims, **kwargs)
             for anim in anims:
                 if isinstance(anim, mn.LaggedStart):
@@ -202,9 +214,15 @@ class PropScene(mn.InteractiveScene):
                             self.remove(subanim.mobject)
                         else:
                             self.add(subanim.mobject)
+
+        # if `play` is being called within a simultaneous context manager, then the state will have been
+        # set to STORING.  So just store the animations until later
         elif self.animateState[-1] == AnimState.STORING:
             self.animationsStored[-1].extend(anims)
+
+
         elif self.animateState[-1] == AnimState.SKIP:
+            print("****** WE ARE SKIPPING")
             currently_skipping = self.skip_animations
             if not currently_skipping:
                 self.force_skipping()
@@ -213,8 +231,13 @@ class PropScene(mn.InteractiveScene):
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
             pass
+        print("END PLAY")
+        print()
 
     def add(self, *mobjects: mn.Mobject):
+
+        o = [str(o) for o in mobjects]
+        print(f'PropScene.add {o}')
         if self.animateState[-1] != AnimState.PAUSED:
             super().add(*mobjects)
         return self

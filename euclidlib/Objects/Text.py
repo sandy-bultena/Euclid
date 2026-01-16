@@ -140,6 +140,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
                            lag_ratio=lag_ratio,
                            **kwargs)]
 
+    def __str__(self):
+        return f"{type(self).__name__}: {self.text}"
+
     # -----------------------------------------------------------------------------------------------------------------
     # get and set state - not sure what this is for
     # -----------------------------------------------------------------------------------------------------------------
@@ -277,7 +280,7 @@ class Label(ETex):
         return super().RemovalOf(*args, **kwargs, rate_func=mn.squish_rate_func(mn.smooth, 1, 0.9))
 
     # -----------------------------------------------------------------------------------------------------------------
-    # manim stuff
+    # manim stuff maybe?
     # -----------------------------------------------------------------------------------------------------------------
     def enable_updaters(self):
         # print(f"START {self.em_object} -> {self}:{self.string}")

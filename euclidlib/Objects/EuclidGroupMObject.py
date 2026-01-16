@@ -76,6 +76,7 @@ class PsuedoGroup(EMObject):
 
     @freezable
     def e_remove(self):
+        print("PsuedoGroup.e_remove")
         with self.scene.simultaneous():
             for obj in self.get_group():
                 if obj.in_scene():
@@ -85,6 +86,7 @@ class PsuedoGroup(EMObject):
 
     @freezable
     def remove_labels(self):
+        print("PsuedoGroup.remove_labels")
         for x in self.get_group():
             x.remove_label()
         return self
