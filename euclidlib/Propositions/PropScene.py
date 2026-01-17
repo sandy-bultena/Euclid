@@ -1,7 +1,6 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
 import inspect
-from time import sleep
 
 import manimlib as mn
 
@@ -9,7 +8,6 @@ import traceback
 from enum import Enum
 
 from euclidlib.Objects import *
-from euclidlib.Objects import EuclidMObject as EM
 from os import getenv
 
 from euclidlib.debugging import print_debug
@@ -21,7 +19,10 @@ class AnimState(Enum):
     PAUSED = 2
     SKIP = 3
 
-
+# =====================================================================================================================
+# PropScene
+# - this is the basis for all propositions, inherits from manim's InteractiveScene
+# =====================================================================================================================
 class PropScene(mn.InteractiveScene):
     """
     Base class for all the propositions
@@ -30,6 +31,23 @@ class PropScene(mn.InteractiveScene):
     steps: list[Callable[[], None]] = []
     animationCountObject: mn.DecimalNumber
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # required methods for PropScene inheritors
+    # -----------------------------------------------------------------------------------------------------------------
+    def title_page(self):
+        raise NotImplementedError()
+
+    def reset(self):
+        raise NotImplementedError()
+
+
+    @mn.abstractmethod
+    def go(self) -> None:
+        pass
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # initialization
+    # -----------------------------------------------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
         self.animateState: list[AnimState] = [AnimState.NORMAL]
         self.animationsStored = []
@@ -42,15 +60,13 @@ class PropScene(mn.InteractiveScene):
         self.is_selecting = False
         self.to_highlight = []
         self.paused = False
-        print("PropScene initialized, calling super")
 
         super().__init__(*args, **kwargs)
 
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # starting point of the the animation
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def construct(self) -> None:
-        print("PropScene.construct called")
         try:
             self.animationCountObject = mn.DecimalNumber(num_decimal_places=0).to_corner(mn.DR)
             if self.debug:
@@ -59,9 +75,9 @@ class PropScene(mn.InteractiveScene):
         except Exception:
             traceback.print_exc()
 
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # go through all the steps, and run them
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def run_full(self):
         with self.animation_speed(self._speed or 1):
             try:
@@ -77,9 +93,9 @@ class PropScene(mn.InteractiveScene):
             print_debug(txt="Running prop scene", level=10)
             self.go()
 
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # selection tools
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def gather_selection_euclid(self):
         pass
     #     self.is_selecting = False
@@ -105,10 +121,10 @@ class PropScene(mn.InteractiveScene):
     #             except NotImplementedError as e:
     #                 log.warn(str(e))
     #                 pass
-    #
-    # =================================================================================================================
+
+    # -----------------------------------------------------------------------------------------------------------------
     # handling all keyboard inputs
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         char = chr(symbol)
         super().on_key_press(symbol, modifiers)
@@ -138,9 +154,9 @@ class PropScene(mn.InteractiveScene):
         else:
             super().on_key_press(symbol, modifiers)
 
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # if drawing mode is on, moving mouse creates a drawing
-    # =================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def on_mouse_motion(self, point: Vect3, d_point: Vect3) -> None:
         if self.drawing:
             latest = self.drawings[-1]
@@ -150,65 +166,72 @@ class PropScene(mn.InteractiveScene):
                 latest.add_line_to(point)
         return super().on_mouse_motion(point, d_point)
     #
-    # # ================================================================================================================
+    # # -----------------------------------------------------------------------------------------------------------------
     # # adds a counter defining which scene is currently being played
-    # # ================================================================================================================
+    # # -----------------------------------------------------------------------------------------------------------------
     # def post_play(self):
     #     super().post_play()
     #     self.animationCountObject.increment_value().to_corner(DR)
-    #
-    # ================================================================================================================
+
+    # -----------------------------------------------------------------------------------------------------------------
     # adjust the run time so that it moves at a given speed (larger objects will take longer to draw)
-    # ================================================================================================================
-    def update_runtime(self, anim: mn.AnimationType, speed: float):
+    # -----------------------------------------------------------------------------------------------------------------
+    def _update_runtime(self, anim: mn.AnimationType, speed: float):
         if not isinstance(anim, mn.Animation):
+            print(f"****** anim is not an mn.Animation type, instead {type(anim)}")
             anim = anim.build()
         anim.set_run_time(anim.get_run_time() / speed)
         return anim
 
-    # ================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # average? the speed over all the specified speeds
-    # ================================================================================================================
-    def get_current_speed(self):
+    # -----------------------------------------------------------------------------------------------------------------
+    def _get_current_speed(self):
         return mn.reduce(mn.op.mul, self.animationSpeedStack, 1.0)
 
-    # ================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # not sure why wait time should be dependent on the current speed
-    # ================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def wait(self, duration: float = 3, *args, **kwargs):
-        super().wait(duration / self.get_current_speed(), *args, **kwargs)
+        super().wait(duration / self._get_current_speed(), *args, **kwargs)
 
-    # ================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     # wait for user before printing next page
-    # ================================================================================================================
+    # -----------------------------------------------------------------------------------------------------------------
     def next_page(self):
         print("\nHit key for next page")
         self.paused = True
         self.wait_until(lambda : not self.paused, 600)
 
 
-    # still to comment
+    # -----------------------------------------------------------------------------------------------------------------
+    # play animations
+    #   - typically called by the creation of an EuclidObject, via their version of `e_draw`
+    #        but can be called by manim directly
+    # -----------------------------------------------------------------------------------------------------------------
     def play(self, *anims: mn.AnimationType, **kwargs):
         print()
-        print(f"PropScene play {self.animateState}")
-        print()
-        print(f'...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
-        # print(f'...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
-        # print(f'...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
+        print(f"  PropScene play {anims} {self.animateState}")
+        # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
+        # print(f'  ...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
+        # print(f'  ...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
 
+        # if the animation state is normal, then play the animation (makes sense)
         if self.animateState[-1] == AnimState.NORMAL:
-            for z in anims:
-                print(f"play {z=} {z.get_run_time()}")
 
-            speed = self.get_current_speed()
+            # adjust the speed as required
+            speed = self._get_current_speed()
             if 'run_time' in kwargs:
                 kwargs['run_time'] /= speed
             else:
-                anims = [self.update_runtime(anim, speed) for anim in anims]
+                anims = [self._update_runtime(anim, speed) for anim in anims]
 
+            # using manim, play the animation
             super().play(*anims, **kwargs)
+
             for anim in anims:
                 if isinstance(anim, mn.LaggedStart):
+                    print(f"************ WTF is this 'LaggedStart'")
                     for subanim in anim.animations:
                         if subanim.is_remover():
                             self.remove(subanim.mobject)
@@ -231,17 +254,22 @@ class PropScene(mn.InteractiveScene):
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
             pass
-        print("END PLAY")
-        print()
+        print("  END PLAY")
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # and the em objects to the collection of objects in this scene
+    # -----------------------------------------------------------------------------------------------------------------
     def add(self, *mobjects: mn.Mobject):
 
         o = [str(o) for o in mobjects]
-        print(f'PropScene.add {o}')
+        print(f'      PropScene.add {o}')
         if self.animateState[-1] != AnimState.PAUSED:
             super().add(*mobjects)
         return self
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # is the animation in a paused state?
+    # -----------------------------------------------------------------------------------------------------------------
     def is_paused(self):
         for x in reversed(self.animateState):
             if x == AnimState.PAUSED:
@@ -251,11 +279,18 @@ class PropScene(mn.InteractiveScene):
             return False
         return False
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # not sure
+    # -----------------------------------------------------------------------------------------------------------------
     def e_remove(self, *obj):
+        print(f"******** called e_romove {obj}")
         with self.simultaneous():
             for o in obj:
                 o.e_remove()
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # context for running animations simultaneously as opposed to one at a time
+    # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
     def simultaneous(self, **kwargs):
         self.animateState.append(AnimState.STORING)
@@ -266,59 +301,9 @@ class PropScene(mn.InteractiveScene):
         if stored_anims:
             self.play(*stored_anims, **kwargs)
 
-    @mn.contextmanager
-    def delayed(self, **kwargs):
-        self.animateState.append(AnimState.STORING)
-        self.animationsStored.append([])
-        yield
-        self.animateState.pop()
-        stored_anims = self.animationsStored.pop()
-        if stored_anims:
-            self.play(mn.LaggedStart(*stored_anims, **kwargs))
-
-    @mn.contextmanager
-    def freeze(self, *args: EMObject):
-        for a in args:
-            a.freeze()
-        yield
-        for a in args:
-            a.unfreeze()
-
-    @mn.contextmanager
-    def skip_animations_for(self, stop=True):
-        if stop:
-            self.animateState.append(AnimState.SKIP)
-            yield
-            self.animateState.pop()
-        else:
-            yield
-
-    @mn.contextmanager
-    def pause_animations_for(self, stop=True):
-        if stop:
-            to_draw = []
-            self.animateState.append(AnimState.PAUSED)
-            yield to_draw
-            self.animateState.pop()
-            if len(to_draw) > 1:
-                with self.simultaneous():
-                    for x in to_draw:
-                        x.e_draw()
-            if len(to_draw) == 1:
-                to_draw[0].e_draw()
-
-        else:
-            yield []
-
-    @mn.contextmanager
-    def run_animations_for(self, stop=True):
-        if stop:
-            self.animateState.append(AnimState.NORMAL)
-            yield
-            self.animateState.pop()
-        else:
-            yield
-
+    # -----------------------------------------------------------------------------------------------------------------
+    # set the animation speed to be the same for everyone
+    # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
     def animation_speed(self, run_time: float):
         if run_time > 0:
@@ -331,58 +316,104 @@ class PropScene(mn.InteractiveScene):
         else:
             yield []
 
-
-    @mn.contextmanager
-    def simultaneous_speed(self, run_time: float, **kwargs):
-        with self.animation_speed(run_time):
-            with self.simultaneous(**kwargs):
-                yield
-
-    @mn.contextmanager
-    def trace(self, *data, font_size=16, **kwargs):
-        if 'trace' not in self.debug:
-            yield
-            return
-
-        name = data[-1]
-
-        function = mn.Text(name, font_size=font_size)
-        if self.traceStack:
-            function.next_to(self.traceStack[-1], UP, buff=SMALL_BUFF, aligned_edge=RIGHT)
-        else:
-            function.next_to(self.animationCountObject, UP, aligned_edge=RIGHT)
-        self.traceStack.append(function)
-        with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
-            self.play(
-                mn.Write(function),
-                run_time=1
-            )
-        yield
-        with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
-            self.play(
-                mn.Write(function, rate_func=lambda a: mn.smooth(1-a), remover=True),
-                run_time=1
-            )
-        self.traceStack.pop()
+    # -----------------------------------------------------------------------------------------------------------------
+    # context for freezing certain objects during the context
+    # -----------------------------------------------------------------------------------------------------------------
+    # @mn.contextmanager
+    # def freeze(self, *args: EMObject):
+    #     for a in args:
+    #         a.freeze()
+    #     yield
+    #     for a in args:
+    #         a.unfreeze()
 
 
-    def animations_off(self):
-        self.animateState[0] = AnimState.PAUSED
-
-    def animations_off_on(self):
-        self.animateState[0] = AnimState.NORMAL
-
-    def set_base_animation_speed(self, speed: float):
-        self.animationSpeedStack[0] = speed
-
-    def title_page(self):
-        raise NotImplementedError()
-
-    def reset(self):
-        raise NotImplementedError()
-
-
-    @mn.abstractmethod
-    def go(self) -> None:
-        pass
+    # @mn.contextmanager
+    # def delayed(self, **kwargs):
+    #     self.animateState.append(AnimState.STORING)
+    #     self.animationsStored.append([])
+    #     yield
+    #     self.animateState.pop()
+    #     stored_anims = self.animationsStored.pop()
+    #     if stored_anims:
+    #         self.play(mn.LaggedStart(*stored_anims, **kwargs))
+    #
+    # @mn.contextmanager
+    # def skip_animations_for(self, stop=True):
+    #     if stop:
+    #         self.animateState.append(AnimState.SKIP)
+    #         yield
+    #         self.animateState.pop()
+    #     else:
+    #         yield
+    #
+    # @mn.contextmanager
+    # def pause_animations_for(self, stop=True):
+    #     if stop:
+    #         to_draw = []
+    #         self.animateState.append(AnimState.PAUSED)
+    #         yield to_draw
+    #         self.animateState.pop()
+    #         if len(to_draw) > 1:
+    #             with self.simultaneous():
+    #                 for x in to_draw:
+    #                     x.e_draw()
+    #         if len(to_draw) == 1:
+    #             to_draw[0].e_draw()
+    #
+    #     else:
+    #         yield []
+    #
+    # @mn.contextmanager
+    # def run_animations_for(self, stop=True):
+    #     if stop:
+    #         self.animateState.append(AnimState.NORMAL)
+    #         yield
+    #         self.animateState.pop()
+    #     else:
+    #         yield
+    #
+    #
+    # @mn.contextmanager
+    # def simultaneous_speed(self, run_time: float, **kwargs):
+    #     with self.animation_speed(run_time):
+    #         with self.simultaneous(**kwargs):
+    #             yield
+    #
+    # @mn.contextmanager
+    # def trace(self, *data, font_size=16, **kwargs):
+    #     if 'trace' not in self.debug:
+    #         yield
+    #         return
+    #
+    #     name = data[-1]
+    #
+    #     function = mn.Text(name, font_size=font_size)
+    #     if self.traceStack:
+    #         function.next_to(self.traceStack[-1], UP, buff=SMALL_BUFF, aligned_edge=RIGHT)
+    #     else:
+    #         function.next_to(self.animationCountObject, UP, aligned_edge=RIGHT)
+    #     self.traceStack.append(function)
+    #     with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
+    #         self.play(
+    #             mn.Write(function),
+    #             run_time=1
+    #         )
+    #     yield
+    #     with self.skip_animations_for(self.animateState[-1] == AnimState.PAUSED):
+    #         self.play(
+    #             mn.Write(function, rate_func=lambda a: mn.smooth(1-a), remover=True),
+    #             run_time=1
+    #         )
+    #     self.traceStack.pop()
+    #
+    #
+    # def animations_off(self):
+    #     self.animateState[0] = AnimState.PAUSED
+    #
+    # def animations_off_on(self):
+    #     self.animateState[0] = AnimState.NORMAL
+    #
+    # def set_base_animation_speed(self, speed: float):
+    #     self.animationSpeedStack[0] = speed
 

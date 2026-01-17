@@ -94,7 +94,7 @@ class MoveToAndReplace(mn.MoveToTarget):
 
 
 class EShowCreation(mn.ShowCreation, EuclidAnimation):
-    print("Custom Animation... passed")
+    '''default animation, uses animation from manim, but has EuclidAnimation properties'''
     pass
 
 

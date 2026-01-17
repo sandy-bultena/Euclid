@@ -13,12 +13,13 @@ from itertools import pairwise
 import manimlib as mn
 from typing import Callable
 from euclidlib.Objects import *
-from functools import cache
+
 
 from euclidlib.debugging import print_debug
 from euclidlib.Propositions.PropScene import PropScene
 import roman
 
+DEG = 180/math.pi
 
 class AnimState(Enum):
     NORMAL = 0
@@ -44,33 +45,33 @@ class BookScene(PropScene):
     prop: int
     TOC: list[str]
 
-    @staticmethod
-    def extract_lines(lines: dict[str, ELine], triangles: dict[str, EPolygon], label: str, tri_name=None):
-        tri_name = tri_name or label
-        label2 = label + label[0]
-        for l_label, line in zip(pairwise(label2), triangles[tri_name].l):
-            lines[mn.op.add(*l_label)] = line
-
-    @staticmethod
-    def extract_points(points: dict[str, EPoint], triangles: dict[str, EPolygon], label: str, tri_name=None):
-        tri_name = tri_name or label
-        for p_label, point in zip(label, triangles[tri_name].p):
-            points[p_label] = point
-
-    @staticmethod
-    def extract_angles(angles: dict[str, EAngleBase], triangles: dict[str, EPolygon], label: str, tri_name=None):
-        tri_name = tri_name or label
-        label2 = label[-1] + label + label[0]
-        for i, angle in enumerate(triangles[tri_name].a):
-            if angle is not None:
-                angles[label2[i:i + 3]] = angle
-
-    @staticmethod
-    def extract_all(lines, points, angles, triangles, label, tri_name=None):
-        tri_name = tri_name or label
-        BookScene.extract_lines(lines, triangles, label, tri_name)
-        BookScene.extract_points(points, triangles, label, tri_name)
-        BookScene.extract_angles(angles, triangles, label, tri_name)
+    # @staticmethod
+    # def extract_lines(lines: dict[str, ELine], triangles: dict[str, EPolygon], label: str, tri_name=None):
+    #     tri_name = tri_name or label
+    #     label2 = label + label[0]
+    #     for l_label, line in zip(pairwise(label2), triangles[tri_name].l):
+    #         lines[mn.op.add(*l_label)] = line
+    #
+    # @staticmethod
+    # def extract_points(points: dict[str, EPoint], triangles: dict[str, EPolygon], label: str, tri_name=None):
+    #     tri_name = tri_name or label
+    #     for p_label, point in zip(label, triangles[tri_name].p):
+    #         points[p_label] = point
+    #
+    # @staticmethod
+    # def extract_angles(angles: dict[str, EAngleBase], triangles: dict[str, EPolygon], label: str, tri_name=None):
+    #     tri_name = tri_name or label
+    #     label2 = label[-1] + label + label[0]
+    #     for i, angle in enumerate(triangles[tri_name].a):
+    #         if angle is not None:
+    #             angles[label2[i:i + 3]] = angle
+    #
+    # @staticmethod
+    # def extract_all(lines, points, angles, triangles, label, tri_name=None):
+    #     tri_name = tri_name or label
+    #     BookScene.extract_lines(lines, triangles, label, tri_name)
+    #     BookScene.extract_points(points, triangles, label, tri_name)
+    #     BookScene.extract_angles(angles, triangles, label, tri_name)
 
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
@@ -83,41 +84,54 @@ class BookScene(PropScene):
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
         t.fancy("Fancy quote")
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # table of contents
+    # -----------------------------------------------------------------------------------------------------------------
+    def table_of_contents(self, tb: TextBox):
+        entries = get_TOC(self.TOC)
+        self.add(entries)
+        entries.next_to(self.frame.get_corner(DL), DR)
+
+        distance_diff = entries.get_center() - entries[self.prop - 1].get_center()
+        self.play(entries.animate(run_time=1, rate_func=mn.rush_from).move_to(distance_diff, coor_mask=UP))
+
+        line = entries[self.prop - 1]
+        entries.remove(line)
+        self.play(line.animate.set_fill(BLUE))
+
+        title = tb.title(f"Proposition {self.prop} of Book {self.book}", delay_anim=True)
+        self.play(
+            mn.TransformMatchingStrings(line, title),
+            entries.animate(run_time=1, rate_func=mn.rush_into).next_to(self.frame.get_corner(UL), UR)
+        )
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # reset
+    #  - clears all the objects in the scene, and then  sets the title
+    #  - (shows table of contents if desired)
+    # -----------------------------------------------------------------------------------------------------------------
     def reset(self):
         with self.simultaneous(run_time=1):
             gg = EGroup((sub for sub in self.mobjects if isinstance(sub, EMObject)), scene=self)
             gg.e_remove()
 
+        # print the title (and maybe table of contents)
         if self.title and self.prop:
             t = TextBox(mn_coord(700, 50),
                         line_width=mn_h_scale(1000),
                         alignment='n'
                         )
             if False and not self.debug:
-                entries = get_TOC(self.TOC)
-                self.add(entries)
-                entries.next_to(self.frame.get_corner(DL), DR)
-
-                distance_diff = entries.get_center() - entries[self.prop - 1].get_center()
-                self.play(entries.animate(run_time=1, rate_func=mn.rush_from).move_to(distance_diff, coor_mask=UP))
-
-                line = entries[self.prop - 1]
-                entries.remove(line)
-                self.play(line.animate.set_fill(BLUE))
-
-                title = t.title(f"Proposition {self.prop} of Book {self.book}", delay_anim=True)
-                self.play(
-                    mn.TransformMatchingStrings(line, title),
-                    entries.animate(run_time=1, rate_func=mn.rush_into).next_to(self.frame.get_corner(UL), UR)
-                )
+                self.table_of_contents(t)
             else:
                 t.title(f"Proposition {self.prop} of Book {self.book}")
             t.normal(self.title)
 
+        # draw the grid
         line_options = dict(
             stroke_color=WHITE,
             stroke_width=0.5,
-            stroke_opacity=0.2,
+            stroke_opacity=0.5,
         )
 
         grid = mn.NumberPlane(

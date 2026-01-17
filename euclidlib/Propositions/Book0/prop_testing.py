@@ -12,7 +12,6 @@ class Prop(PropScene):
 
     def reset(self):
         for sub in self.mobjects:
-            print(f"{sub=}")
             if isinstance(sub, EMObject):
                sub.e_remove()
 
@@ -25,19 +24,30 @@ class Prop(PropScene):
         D = mn_coord(450+100, 500+100)
 
         t = t1.explain("standard animation")
-        # l: dict[str | int, ELine] = {}
-        # p: dict[str | int, EPoint] = {}
-        #p['x'] = EPoint(A, scene=self)
+        l: dict[str | int, ELine] = {}
+        p: dict[str | int, EPoint] = {}
+        p['x'] = EPoint(A, label_args=("X", RIGHT))
 
-        # p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
-        # p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
-        # l['AB'] = ELine(p['A'], p['B'], scene=self)
-        # p['C'] = EPoint(C, scene=self, label_args=('A', LEFT))
-        # p['D'] = EPoint(D, scene=self, label_args=('B', RIGHT))
-        # l['CD'] = ELine(p['C'], p['D'], scene=self)
-        #
-        # self.next_page()
-        # self.reset()
+
+        p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
+        p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+        l['AB'] = ELine(p['A'], p['B'], scene=self)
+        p['C'] = EPoint(C, scene=self, label_args=('A', LEFT))
+        p['D'] = EPoint(D, scene=self, label_args=('B', RIGHT))
+        l['CD'] = ELine(p['C'], p['D'], scene=self)
+
+        self.next_page()
+        self.reset()
+
+        t = t1.explain("simultaneous animation")
+
+        with self.simultaneous():
+            p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
+            p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+            l['AB'] = ELine(p['A'], p['B'], scene=self)
+            p['C'] = EPoint(C, scene=self, label_args=('A', LEFT))
+            p['D'] = EPoint(D, scene=self, label_args=('B', RIGHT))
+            l['CD'] = ELine(p['C'], p['D'], scene=self)
 
 
 

@@ -59,3 +59,4 @@ if `with simultaneous` used, the animation state is set to STORING and `scene.pl
 Although `PropScene.add` can be called anytime, it is also called by `manim.scene.play` which is called by `PropScene.play` _if_ the state is normal.
 
 If `scene` is not defined, it is found by calling `find_scene` which works it way up the stack until it finds PropScene
+

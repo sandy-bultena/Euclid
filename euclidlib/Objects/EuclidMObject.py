@@ -481,7 +481,11 @@ class EMObject(mn.VMobject):
             self.e_draw(skip_anim)
 
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # default animation
+    # -----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
+        '''default animation for a EMObject - override if you want something different'''
         return [CA.EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def RemovalOf(self, *args, **kwargs):
@@ -584,6 +588,9 @@ def {name}(self, *args):
             *sub_animations
         )
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # get all the animations necessary for this object
+    # -----------------------------------------------------------------------------------------------------------------
     def _get_draw_animations(self):
         return [
             anim

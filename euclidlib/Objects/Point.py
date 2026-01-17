@@ -113,6 +113,9 @@ class EPoint(EMObject, mn.Circle):
     def intersect_selection(self, other: mn.Rectangle):
         return other.is_touching(self)
 
+    def __str__(self):
+        return f"Point: ({self.get_arc_center()}) radius = {self.get_radius()}"
+
     # # ================================================================================================================
     # # given names of points, return the point objects
     # # ================================================================================================================

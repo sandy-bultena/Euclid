@@ -7,6 +7,7 @@ from euclidlib.Propositions.BookScene import Book1Scene
 from euclidlib.Objects import *
 from typing import Dict
 
+# ********* What does freeze do? ******************
 
 class Prop16(Book1Scene):
     steps = []
