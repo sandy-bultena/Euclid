@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
+DEFAULT_TEXT_FADE_OPACITY = 0.3
+
 
 
 # class TextBuffer(EMObject, mn.Square):
@@ -28,20 +30,21 @@ DELAYED_INCREASE = 20
 #     def __init__(self, size, scene, **kwargs):
 #         super().__init__(size, stroke_opacity=0, **kwargs, scene=scene)
 
-
+# Font Contenders:
+# Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana
 class Fonts:
     fonts: dict[str, tuple[type[T.EStringObj], dict]]
 
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, font='Consolas')),
-            explain=(T.EMarkupText, dict(font_size=18, font='Consolas')),
-            sidenote=(T.EMarkupText, dict(font_size=18, font='Consolas', slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=18, font='Consolas')),
-            normal=(T.EText, dict(font_size=16, font='Consolas')),
+            title=(T.EMarkupText, dict(font_size=30, font='Gotu')),
+            explain=(T.EMarkupText, dict(font_size=16, font='Lucida Grande')),
+            sidenote=(T.EMarkupText, dict(font_size=16, font='Lucida Grande', slant='ITALIC')),
+            explainM=(T.ETexText, dict(font_size=16, font='Lucida Grande')),
+            normal=(T.EText, dict(font_size=14, font='Lucida Grande')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=24, font='Charm')),
-            title_screen=(T.EText, dict(font_size=48, font='Chalkduster')),
+            title_screen=(T.EText, dict(font_size=48, font='Bradley Hand')),
         )
 
     elif sys.platform == 'linux':
@@ -147,6 +150,43 @@ class TextBox(EGroup[T.EStringObj]):
         newline = cls(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
         newline.fix_in_frame()
         return newline
+
+    # # -----------------------------------------------------------------------------------------------------------------
+    # # change colour of specific EStringObj
+    # # -----------------------------------------------------------------------------------------------------------------
+    # def _get_objs_from_index(self, index: Optional[int | T.EStringObj] = None):
+    #     if index is not None:
+    #         return ( index if isinstance(index, T.EStringObj) else self[index])
+    #     return *self,
+    #
+    # def blue(self, index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         o.blue
+    #
+    # def green(self, index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         o.green
+    #
+    # def red(self, index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         o.red
+    #
+    # def white(self, index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         o.white
+    #
+    # def grey(self, index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         o.grey
+    #
+    # def fade_in(self,  index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         self.scene.play(mn.FadeIn(o))
+    #
+    # def fade_out(self,  index: Optional[int | T.EStringObj] = None):
+    #     for o in self._get_objs_from_index(index):
+    #         self.scene.play(mn.FadeOut(o),opacity=self.DEFAULT_TEXT_FADE_OPACITY)
+
 
     # -----------------------------------------------------------------------------------------------------------------
     # where to put the text_str with respect to another string

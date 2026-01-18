@@ -13,7 +13,7 @@ from itertools import pairwise
 import manimlib as mn
 from typing import Callable
 from euclidlib.Objects import *
-
+GRID_OPACITY = 0
 
 from euclidlib.debugging import print_debug
 from euclidlib.Propositions.PropScene import PropScene
@@ -131,7 +131,7 @@ class BookScene(PropScene):
         line_options = dict(
             stroke_color=WHITE,
             stroke_width=0.5,
-            stroke_opacity=0.5,
+            stroke_opacity=GRID_OPACITY,
         )
 
         grid = mn.NumberPlane(

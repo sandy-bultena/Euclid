@@ -317,6 +317,17 @@ class PropScene(mn.InteractiveScene):
             yield []
 
     # -----------------------------------------------------------------------------------------------------------------
+    # set the animation speed same for everyone, and draw simultaneously
+    # -----------------------------------------------------------------------------------------------------------------
+    @mn.contextmanager
+    def simultaneous_speed(self, run_time: float, **kwargs):
+        with self.animation_speed(run_time):
+            with self.simultaneous(**kwargs):
+                yield
+
+
+
+    # -----------------------------------------------------------------------------------------------------------------
     # context for freezing certain objects during the context
     # -----------------------------------------------------------------------------------------------------------------
     # @mn.contextmanager
@@ -374,12 +385,12 @@ class PropScene(mn.InteractiveScene):
     #         yield
     #
     #
-    # @mn.contextmanager
-    # def simultaneous_speed(self, run_time: float, **kwargs):
-    #     with self.animation_speed(run_time):
-    #         with self.simultaneous(**kwargs):
-    #             yield
-    #
+    @mn.contextmanager
+    def trace(self, *data, font_size=16, **kwargs):
+        if 'trace' not in self.debug:
+            yield
+            return
+
     # @mn.contextmanager
     # def trace(self, *data, font_size=16, **kwargs):
     #     if 'trace' not in self.debug:

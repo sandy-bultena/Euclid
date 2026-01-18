@@ -227,7 +227,9 @@ class EMarkupText(EStringObj, mn.MarkupText):
 class ETex(EStringObj, mn.Tex):
     REPLACEMENT_RULES = TEX_REPLACE
 
-    def __init__(self, text, *args, **kwargs):
+    def __init__(self, text, *args, is_axiom=False,  **kwargs):
+        if is_axiom:
+            kwargs['fill_color'] = mn.BLUE
         super().__init__(
             text,
             *args,
@@ -240,7 +242,7 @@ class ETex(EStringObj, mn.Tex):
             ]),
             **kwargs)
 
-    pass
+
 
 
 # =====================================================================================================================
@@ -265,7 +267,7 @@ class Label(ETex):
         )
 
     # -----------------------------------------------------------------------------------------------------------------
-    # overload CreationOf ... no idea what this is for
+    # CreationOf and RemovalOf are used to define the animations for the manim 'play'
     # -----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
         if self.em_object is not None:

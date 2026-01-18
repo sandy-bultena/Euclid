@@ -8,6 +8,7 @@ from euclidlib.Objects import Circle
 from euclidlib.Objects import Triangle as T
 from euclidlib.Objects import Angle
 from euclidlib.Objects import EquilateralTriangle
+from euclidlib.Objects.utils import get_dist
 from typing import Dict, Tuple, Set
 
 from euclidlib.Objects import Dashable as Da
@@ -257,7 +258,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 if pts and not find_min:
                     break
                 if pts and find_min:
-                    minim = min(abs(self.get_length() - mn.get_dist(a, C)) for a in pts)
+                    print(f"{pts=} {C=}")
+                    minim = min(abs(self.get_length() - get_dist(a, C)) for a in pts)
                     if minim < mn_scale(0.1):
                         break
                 l[line].extend(mn_scale(100 * extend_dir), rate_func=mn.linear)
@@ -276,7 +278,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         else:
             F = [p['E'].get_center()]
 
-        new_end = min(F, key=lambda a: abs(self.get_length() - mn.get_dist(a, C)))
+        new_end = min(F, key=lambda a: abs(self.get_length() - get_dist(a, C)))
         pF = P.EPoint(new_end)
         lCF = ELine(C, new_end)
 
@@ -499,7 +501,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     @anim_speed
     def parallel(self, p: P.EPoint):
         B, C = self.get_start_and_end()
-        A = self.pointify(p)
 
         # make sure line goes from left to right
         if B[0] > C[0]:
@@ -507,7 +508,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
 
         with self.scene.trace(self, "define a new line"):
             tempC = C
-            if mn.get_dist(B, C) < mn_scale(100):
+            if get_dist(B, C) < mn_scale(100):
                 tempC = C + mn.normalize(C - B) * mn_scale(100)
             ln = ELine(B, tempC, stroke_color=GREEN)
 

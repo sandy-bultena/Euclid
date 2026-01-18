@@ -105,5 +105,5 @@ class Book1Prop1(Book1Scene):
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t2.down()
-        t2.math(r"\therefore Equilateral Triangle!")
+        t2.math(r"\therefore\quad Equilateral\quad Triangle!")
 

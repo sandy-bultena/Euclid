@@ -10,39 +10,22 @@ from euclidlib.Objects import Point
 import manimlib as mn
 from euclidlib.Objects import Dashable as Da
 
-
+# =====================================================================================================================
+# Circle
+# =====================================================================================================================
 class ECircle(mn.Circle, Arc.AbstractArc):
     CONSTRUCTION_TIME = 2.00
     AUX_CONSTRUCTION_TIME = 0.25
 
-    def CreationOf(self, *args, **kwargs):
-        tmpLine = L.ELine(self.e_center, self.get_end(),
-                          stroke_color=mn.RED,
-                          label=self.temp_line_label,
-                          delay_anim=True)
-        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
-            self.animation_objects.append(tmpLine)
-            tmpLine.e_draw(
-                anim_args=dict(
-                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
-                ))
-            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
-            if tmpLine.e_label is not None:
-                tmpLine.e_label.enable_updaters()
-        return super().CreationOf(*args, **kwargs)
-
-    def e_label_location(self, angle: float, outside=True, buff=None):
-        direction = np.array([np.cos(angle), np.sin(angle), 0.0])
-        try:
-            edge = self.point_at_angle(angle)
-        except AssertionError:
-            try:
-                edge = self.point_from_proportion((angle%TAU)/TAU)
-            except AssertionError:
-                edge = self.get_right()
-        return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
-
+    # -----------------------------------------------------------------------------------------------------------------
+    # initialization
+    # -----------------------------------------------------------------------------------------------------------------
     def __init__(self, center, point, temp_line_label=None, *args, **kwargs):
+        """
+        :param center: centre of circle
+        :param point: point on circle circumference
+        :param temp_line_label: maybe initial line has a label?
+        """
         self.e_center = convert_to_coord(center)
         self.e_point = convert_to_coord(point)
         self.temp_line_label = temp_line_label
@@ -61,6 +44,46 @@ class ECircle(mn.Circle, Arc.AbstractArc):
             *args,
             **kwargs
         )
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # CreationOf - how to animate the drawing of a circle
+    # -----------------------------------------------------------------------------------------------------------------
+    def CreationOf(self, *args, **kwargs):
+        tmpLine = L.ELine(self.e_center, self.get_end(),
+                          stroke_color=mn.RED,
+                          label=self.temp_line_label,
+                          delay_anim=True)
+
+        # normal animation
+        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
+
+            # draw the line to create the 'swoop' of drawing a circle
+            self.animation_objects.append(tmpLine)
+            tmpLine.e_draw(
+                anim_args=dict(
+                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+                ))
+
+            # at every frame, set the points of the line to the animation of the drawing circle
+            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+
+            # don't know wtf this is
+            if tmpLine.e_label is not None:
+                tmpLine.e_label.enable_updaters()
+
+        return super().CreationOf(*args, **kwargs)
+
+    def e_label_location(self, angle: float, outside=True, buff=None):
+        direction = np.array([np.cos(angle), np.sin(angle), 0.0])
+        try:
+            edge = self.point_at_angle(angle)
+        except AssertionError:
+            try:
+                edge = self.point_from_proportion((angle%TAU)/TAU)
+            except AssertionError:
+                edge = self.get_right()
+        return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
+
 
     def angle_of_point(self, point: Point.EPoint | Vect3):
         p = convert_to_coord(point)

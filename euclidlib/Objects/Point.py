@@ -52,6 +52,8 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # get the point where the label should be drawn
     # ----------------------------------------------------------------------------------------------------------------
+    # this is a callback routine from the lambda that is used for Label, to keep the label in the correct position
+    # if this point is moved
     def e_label_location(self,
                          direction: mn.Vect3 = None,
                          buff: float = None,

@@ -6,8 +6,13 @@ from euclidlib.Objects import Angle
 from euclidlib.Objects import Point as P
 from euclidlib.Objects import Triangle as T
 
+# =====================================================================================================================
+# build an equilateral triangle given two points
+# =====================================================================================================================
 def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
     scene = scene or find_scene()
+
+    # have everything drawn at the same speed
     with scene.animation_speed(speed):
         c1 = Circle.ECircle(p1, p2, scene=scene).e_fade()
         c2 = Circle.ECircle(p2, p1, scene=scene).e_fade()
@@ -16,7 +21,7 @@ def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
         l1 = L.VirtualLine(p1, p2)
         l2 = L.VirtualLine(p2, pts[0])
 
-        th = Angel.calculateAngle(l2, l1)
+        th = Angle.calculateAngle(l2, l1)
         if th < mn.PI:
             C = pts[0]
         else:

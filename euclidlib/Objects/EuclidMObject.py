@@ -58,8 +58,11 @@ def e_animate(anim):
         return anim.overridden_animation
     return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+# convert 2d to 3d, or return centre of manim object
+# ---------------------------------------------------------------------------------------------------------------------
 def convert_to_coord(obj: mn.Mobject | Sized[float])->Vect3:
+    """convert 2d to 3d, or return centre of manim object"""
 
     # if this is a manim object, then just get the center of all the points
     if isinstance(obj, mn.Mobject):
@@ -336,7 +339,7 @@ class EMObjectPlayer:
 
     @property
     def notice(self):
-        self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED))
+        self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED, scale_factor=1.5, run_time=10))
         return self
 
     def e_move_to(self,

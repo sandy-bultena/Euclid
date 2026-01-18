@@ -60,3 +60,9 @@ Although `PropScene.add` can be called anytime, it is also called by `manim.scen
 
 If `scene` is not defined, it is found by calling `find_scene` which works it way up the stack until it finds PropScene
 
+## Other
+
+* `center_of_mass` is a manim method
+
+## Don't Know
+what are `updaters` - see circle animation
