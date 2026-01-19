@@ -4,6 +4,10 @@ from euclidlib.Objects.EuclidMObject import *
 DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
+# *********************************************************************************************************************
+# code required for objects that are collections via VGroup or similar things
+# *********************************************************************************************************************
+
 
 
 class EGroupPlayer:

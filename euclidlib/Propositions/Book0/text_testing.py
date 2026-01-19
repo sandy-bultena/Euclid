@@ -45,6 +45,7 @@ class Prop0(BookScene):
 
         t2.title("This is title text_str")
         t2.explain("This is more explanation text_str")
+        t2.blue(13)
         t2.math(r'\angle ACD < \angle BCD')
         t2.math(r'\alpha<\beta', align_str='<')
         eq = t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',

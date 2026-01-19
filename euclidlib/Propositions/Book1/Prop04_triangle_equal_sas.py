@@ -83,7 +83,7 @@ class Book1Prop4(Book1Scene):
 
         # ------------------------------------------------------------------------
         # Proof
-        # ----------------------------------------------
+        # ------------------------------------------------------------------------
         t1.down()
         t2.e_remove()
         with self.simultaneous():
@@ -94,9 +94,9 @@ class Book1Prop4(Book1Scene):
             t['ABC'].a[2].e_remove()
             t['DEF'].a[2].e_remove()
         t1.title("Proof:")
-        t2.math("AB = DE", is_axiom = True)
-        t2.math("AC = DF", is_axiom = True)
-        t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
+        eq1 = t2.math("AB = DE", is_axiom = True)
+        eq2 = t2.math("AC = DF", is_axiom = True)
+        eq3 = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -152,10 +152,9 @@ class Book1Prop4(Book1Scene):
         # t['ABC'].p[1].notice()
         # t['DEF'].p[1].notice()
 
-        #t2.e_fade()
-        t2.e_normal
-        t2.math("A = D")
-        t2.math("B = E")
+        t2.fade()
+        eq4 = t2.math("A = D")
+        eq5 = t2.math("B = E")
         self.next_page()
 
         # ------------------------------------------------------------------------

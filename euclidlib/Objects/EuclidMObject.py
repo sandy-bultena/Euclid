@@ -1,23 +1,17 @@
 from __future__ import annotations
-
-import inspect
-import math
-from functools import partial, wraps
-from math import isinf
-from os import remove
-from pprint import pp
-
+from functools import  wraps
 import manimlib as mn
-import numpy as np
-from manimlib import Mobject
-
-import euclidlib.Propositions.PropScene as ps
 from manimlib.constants import *
-
-from euclidlib.Objects import CustomAnimation as CA
 from typing import Sized, Self, Callable, Tuple, Iterable, Type, TYPE_CHECKING
 from contextlib import contextmanager
+import numpy.typing as npt
 
+import euclidlib.Propositions.PropScene as ps
+from euclidlib.Objects import CustomAnimation as CA
+
+# =====================================================================================================================
+# Constants
+# =====================================================================================================================
 DEFAULT_FADE_OPACITY = 0.30
 DEFAULT_TEXT_FADE_OPACITY = 0.3
 DEFAULT_CONSTRUCTION_RUNTIME = 1.0
@@ -27,8 +21,21 @@ E_WIDTH = 1400
 E_HEIGHT = 800
 E_TO_M_SCALE = 8.0/800
 
-def mn_coord(x: int | float, y: int | float, z: int | float = 0):
-    """convert old euclid canvas coordinates to manim coordinates"""
+# =====================================================================================================================
+# Useful generic functions
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Conversions between the old Euclid coordinates and the manim coordinates
+# ---------------------------------------------------------------------------------------------------------------------
+def mn_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDArray[float]:
+    """
+    convert euclid coordinates to manim coordinates
+    :param x:
+    :param y:
+    :param z:
+    :return: a numpy array with the appropriate coordinates
+    """
     return np.array([
         (x - E_WIDTH/2) * E_TO_M_SCALE,  # (x - 700) * (8.0 * 16 / 1400 / 9),
         (E_HEIGHT/2 - y) * E_TO_M_SCALE,
@@ -36,27 +43,16 @@ def mn_coord(x: int | float, y: int | float, z: int | float = 0):
     ])
 
 
-def mn_scale(f, *rest):
+def mn_scale(f, *rest) -> float | npt.NDArray[float]:
+    """
+    changes the euclid length and converts to the appropriate manim length
+    :param f: a single number
+    :param rest: the rest of the numbers (if there are any)
+    :return: either a single float, or a numpy array of floats
+    """
     if rest:
         return np.array([i * E_TO_M_SCALE for i in (f, *rest)])
     return f * E_TO_M_SCALE
-
-
-def mn_h_scale(x):
-    return x * E_TO_M_SCALE
-
-
-def un_create_version(anim: mn.Animation):
-    anim.remover = True
-    anim.should_match_start = True
-    curr_rate = anim.rate_func
-    anim.rate_func = lambda t: curr_rate(1 - t)
-    return anim
-
-def e_animate(anim):
-    if anim.overridden_animation:
-        return anim.overridden_animation
-    return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # convert 2d to 3d, or return centre of manim object
@@ -72,6 +68,16 @@ def convert_to_coord(obj: mn.Mobject | Sized[float])->Vect3:
         return np.array([*obj, *((0.0,) * (3 - len(obj)))])
 
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# animation functions
+# ---------------------------------------------------------------------------------------------------------------------
+def e_animate(anim):
+    if anim.overridden_animation:
+        return anim.overridden_animation
+    return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
+
+
 def animate(func):
     @wraps(func)
     def animate_change(self: EMObject, *args, rate_func=mn.smooth, **kwargs):
@@ -85,7 +91,9 @@ def animate(func):
 
     return animate_change
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+# debugging option by setting up a trace
+# ---------------------------------------------------------------------------------------------------------------------
 def log(func):
     @wraps(func)
     def logMethodName(self, *args, **kwargs):
@@ -239,7 +247,8 @@ class NullPlayer:
 
 
 # =====================================================================================================================
-# EMObjectPlayer ??
+# EMObjectPlayer
+# - methods to pass into 'play' ??
 # =====================================================================================================================
 class EMObjectPlayer:
     def __init__(self, eobj: EMObject):
@@ -466,7 +475,6 @@ class EMObject(mn.VMobject):
         # pp(kwargs)
         super().__init__(*args, **kwargs)
         self.e_label = None
-        print(f"In EMObject creation...{type(self).__name__}")
         if label_args:
             if isinstance(label_args, str):
                 string = label_args
@@ -605,8 +613,8 @@ def {name}(self, *args):
     @freezable
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
         """draws the object on the scene"""
-        print()
-        print(f'EMOBJECT.e_draw obj="{str(self)}" {self.Virtual=} {skip_anim=}')
+        # print()
+        # print(f'EMOBJECT.e_draw obj="{str(self)}" {self.Virtual=} {skip_anim=}')
         # print(f'... caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
         # print(f'...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
         # print(f'...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
@@ -637,12 +645,9 @@ def {name}(self, *args):
                         else:
                             self.scene.play(mn.Uncreate(obj))
         else:
-            print(f"adding object {type(self).__name__} to scene without animation")
             self.scene.add(self)
             if self.scene.debug:
                 self.scene.update_frame()
-        print("e_draw FINISHED")
-        print()
         return self
 
     def __enter__(self):
@@ -772,3 +777,17 @@ def {name}(self, *args):
 
     def validate_markup_string(self,*args,**kwargs):
         return True
+
+
+# ====================================================================================================================
+# rejects
+# ====================================================================================================================
+
+
+
+# def un_create_version(anim: mn.Animation):
+#     anim.remover = True
+#     anim.should_match_start = True
+#     curr_rate = anim.rate_func
+#     anim.rate_func = lambda t: curr_rate(1 - t)
+#     return anim

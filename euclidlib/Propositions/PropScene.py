@@ -210,8 +210,8 @@ class PropScene(mn.InteractiveScene):
     #        but can be called by manim directly
     # -----------------------------------------------------------------------------------------------------------------
     def play(self, *anims: mn.AnimationType, **kwargs):
-        print()
-        print(f"  PropScene play {anims} {self.animateState}")
+        # print()
+        # print(f"  PropScene play {anims} {self.animateState}")
         # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
         # print(f'  ...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
         # print(f'  ...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
@@ -254,7 +254,6 @@ class PropScene(mn.InteractiveScene):
                 self.revert_to_original_skipping_status()
         elif self.animateState[-1] == AnimState.PAUSED:
             pass
-        print("  END PLAY")
 
     # -----------------------------------------------------------------------------------------------------------------
     # and the em objects to the collection of objects in this scene
@@ -262,7 +261,6 @@ class PropScene(mn.InteractiveScene):
     def add(self, *mobjects: mn.Mobject):
 
         o = [str(o) for o in mobjects]
-        print(f'      PropScene.add {o}')
         if self.animateState[-1] != AnimState.PAUSED:
             super().add(*mobjects)
         return self
@@ -283,7 +281,6 @@ class PropScene(mn.InteractiveScene):
     # not sure
     # -----------------------------------------------------------------------------------------------------------------
     def e_remove(self, *obj):
-        print(f"******** called e_romove {obj}")
         with self.simultaneous():
             for o in obj:
                 o.e_remove()

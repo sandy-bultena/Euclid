@@ -113,6 +113,7 @@ class TextBox(EGroup[T.EStringObj]):
         self.abs_position = absolute_position
         self.alignment = self.ALIGNMENT[alignment]
         self.bullet_symbol = None
+        self.text_to_index = {}
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def __str__(self):
@@ -151,43 +152,6 @@ class TextBox(EGroup[T.EStringObj]):
         newline.fix_in_frame()
         return newline
 
-    # # -----------------------------------------------------------------------------------------------------------------
-    # # change colour of specific EStringObj
-    # # -----------------------------------------------------------------------------------------------------------------
-    # def _get_objs_from_index(self, index: Optional[int | T.EStringObj] = None):
-    #     if index is not None:
-    #         return ( index if isinstance(index, T.EStringObj) else self[index])
-    #     return *self,
-    #
-    # def blue(self, index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         o.blue
-    #
-    # def green(self, index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         o.green
-    #
-    # def red(self, index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         o.red
-    #
-    # def white(self, index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         o.white
-    #
-    # def grey(self, index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         o.grey
-    #
-    # def fade_in(self,  index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         self.scene.play(mn.FadeIn(o))
-    #
-    # def fade_out(self,  index: Optional[int | T.EStringObj] = None):
-    #     for o in self._get_objs_from_index(index):
-    #         self.scene.play(mn.FadeOut(o),opacity=self.DEFAULT_TEXT_FADE_OPACITY)
-
-
     # -----------------------------------------------------------------------------------------------------------------
     # where to put the text_str with respect to another string
     # -----------------------------------------------------------------------------------------------------------------
@@ -216,7 +180,6 @@ class TextBox(EGroup[T.EStringObj]):
     def justify_text(self, newline):
         if self.alignment:
             (get_side, side) = self.alignment
-            print(f"... justifying {get_side(self)} {side=}")
             newline.align_to(get_side(self), side)
             newline.shift(mn.RIGHT * self.indent_value)
 
@@ -281,8 +244,6 @@ class TextBox(EGroup[T.EStringObj]):
         cls, kwargs = self._setup_kwargs(style, other_options)
         bullet = None
         parts = None
-        print()
-        print(f"Generate text '{text_str}'")
 
         with self.scene.simultaneous():
             # create the text_str and fix the text_str in frame (is always displayed at a fixed position on the screen)
@@ -293,41 +254,32 @@ class TextBox(EGroup[T.EStringObj]):
             if align_str:
                 self.align_string_with_other_string(newline, align_str, align_index)
                 self.next_buff = 0
-                print(f"... aligned with other string {align_str=}")
             else:
                 newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
                 self.next_buff = 0
                 self.justify_text(newline)
-                print(f"... next_to {self.get_bottom()} + {self.buff_size + self.next_buff}")
 
             # add bullet_symbol (i.e. bullet marker)
             if self.bullet_symbol:
                 bullet = cls(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
                 bullet.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
                 bullet.e_draw(skip_anim)
-                print(f"... adding bullet symbol {self.bullet_symbol=}")
 
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
                 parts = self.break_into_parts(newline,break_into_parts,bullet, delay_anim, skip_anim)
-                print(f"broken into parts {parts=}")
 
             # not delaying the animation...
             elif not delay_anim:
 
                 if transform_from is not None:
-                    print(f"... transform from {str(newline)} {transform_args=} {transform_from=}")
                     self.e_transform_to(newline, transform_args, transform_from)
                 else:
-                    print(f"... e_draw({skip_anim=})")
                     newline.e_draw(skip_anim)
 
         # save the text object in the VGroup
         self.add(newline)
-
-        print("GENERATE TEXT finished")
-        print()
 
         if parts is not None:
             return *parts, newline
@@ -484,6 +436,7 @@ class TextBox(EGroup[T.EStringObj]):
     for style in Fonts.fonts:
         exec(f"""
 def {style}(self, text: str, **kwargs):
+    self.text_to_index[text] = len(self)
     return self.generate_text(text, '{style}', **kwargs)
 """)
 
