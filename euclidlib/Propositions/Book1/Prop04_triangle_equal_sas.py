@@ -18,9 +18,8 @@ class Book1Prop4(Book1Scene):
     )
 
     def go(self):
-        t1 = TextBox(mn_coord(800, 200), line_width=mn_h_scale(550))
-        t2 = TextBox(mn_coord(40, 400), line_width=mn_h_scale(550))
-        t3 = TextBox(mn_coord(100, 500), line_width=mn_h_scale(800))
+        t1 = TextBox(mn_coord(800, 200), line_width=mn_scale(550))
+        t2 = TextBox(mn_coord(40, 400), line_width=mn_scale(550))
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}
@@ -39,7 +38,7 @@ class Book1Prop4(Book1Scene):
 
         # ------------------------------------------------------------------------
         # In Other Words
-        # ----------------------------------------------
+        # ------------------------------------------------------------------------
         t1.title("In other words:")
         t1.explain(
             "If two triangles have two sides which are "
@@ -94,9 +93,9 @@ class Book1Prop4(Book1Scene):
             t['ABC'].a[2].e_remove()
             t['DEF'].a[2].e_remove()
         t1.title("Proof:")
-        eq1 = t2.math("AB = DE", is_axiom = True)
-        eq2 = t2.math("AC = DF", is_axiom = True)
-        eq3 = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
+        eq1, = t2.math("AB = DE", is_axiom = True)
+        eq2, = t2.math("AC = DF", is_axiom = True)
+        eq3, = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -147,14 +146,9 @@ class Book1Prop4(Book1Scene):
             t['ABC'].p[2].e_fade()
             t['DEF'].p[2].e_fade()
 
-        # t['ABC'].p[0].notice()
-        # t['DEF'].p[0].notice()
-        # t['ABC'].p[1].notice()
-        # t['DEF'].p[1].notice()
-
-        t2.fade()
-        eq4 = t2.math("A = D")
-        eq5 = t2.math("B = E")
+        t2.fade_text_objs(eq2, eq3)
+        eq4, = t2.math("A = D")
+        eq5, = t2.math("B = E")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -170,21 +164,17 @@ class Book1Prop4(Book1Scene):
             t['ABC'].p[2].e_normal()
             t['DEF'].p[2].e_normal()
 
-        t2.e_fade()
-        t2.blue(1, 2)
-        t2.math("C = F")
-        t2.math("AC = DF")
+        t2.fade_text_objs(eq1, eq4, eq5)
+        t2.normalize_text_objs(eq2, eq3)
+        eq6, = t2.math("C = F")
+        eq7, = t2.math("AC = DF")
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Since the points B coincides with E and C with F, "
                    "then the lines BC coincides with EF"
                    "... based on the implicit  understanding that there is only one "
-                   "straight path"
-                   " between two points")
-
-        t2.e_fade()
-        t2.white(4, 5)
+                   "straight path between two points")
 
         with self.simultaneous():
             a['ABC'].e_fade()
@@ -214,18 +204,16 @@ class Book1Prop4(Book1Scene):
             t['ABC'].l[1].e_normal()
             t['DEF'].l[1].e_normal()
 
-        t2.e_fade()
-        t2.blue(1, 2)
-        t2.math("C = F")
-        t2.math("AC = DF")
+        t2.fade_text_objs(eq1,eq2,eq3,eq4,eq7)
+        t2.normalize_text_objs(eq6, eq5)
+        eq8, = t2.math("BC = EF")
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("From common notion 4, things which coincide "
                    "with one another, equal one another")
 
-        t2.e_normal.white()
-        t2.blue(*range(3))
+        t2.normalize_text_objs()
 
         with self.simultaneous():
             t['ABC'].e_fade.white()

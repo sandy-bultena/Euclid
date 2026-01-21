@@ -1,3 +1,4 @@
+import math
 import sys
 import os
 
@@ -13,7 +14,7 @@ class Book1Prop3(Book1Scene):
              "given unequal straight lines a straight line equal to the less.")
 
     def go(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(600, 430))
         A = mn_coord(150, 450)
         B = mn_coord(250, 450)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from .EuclidMObject import *
 from .utils import call_or_get
 import manimlib as mn
@@ -103,7 +105,7 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # two points overlap?
     # ----------------------------------------------------------------------------------------------------------------
-    def intersect(self, other: Mobject, reverse=True):
+    def intersect(self, other: mn.Mobject, reverse=True):
         print(f"intercept: {self} {other}")
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
@@ -116,7 +118,7 @@ class EPoint(EMObject, mn.Circle):
         return other.is_touching(self)
 
     def __str__(self):
-        return f"Point: ({self.get_arc_center()}) radius = {self.get_radius()}"
+        return f"Point: ({self.get_arc_center()[0]:6.2f},{self.get_arc_center()[1]:6.2f})"
 
     # # ================================================================================================================
     # # given names of points, return the point objects

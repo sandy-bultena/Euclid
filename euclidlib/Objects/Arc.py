@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import itertools
+import math
 
 from euclidlib.Objects.EuclidMObject import *
 from euclidlib.Objects import Circle as Cir
-from manimlib import TAU
+from manimlib import TAU, PI
 from . import Line as Ln
 from . import Text as T
 from . import Point as P
 from euclidlib.Objects import Dashable as Da
+DEG = TAU/360
 
 class AbstractArc(Da.Dashable, mn.Arc):
     size: float
@@ -110,7 +112,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return (self.animate(rate_func=mn.there_and_back, **args)
                 .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
 
-    def init_label(self, labels: str | List[str], *args, **extra_args):
+    def init_label(self, labels: str | list[str], *args, **extra_args):
         if isinstance(labels, str):
             return super().init_label(labels, *args, **extra_args)
         return T.LabelGroup(
@@ -128,7 +130,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         dir = PI / 2 if self.e_angle > 0 else -PI / 2
         return self.vector_of_angle(self.e_end_angle + dir)
 
-    def tangent_points(self, angle_or_point: float | Mobject | Vect3, negative=False):
+    def tangent_points(self, angle_or_point: float | mn.Mobject | Vect3, negative=False):
         if isinstance(angle_or_point, (float, np.float32, np.float64)):
             t_point = self.point_at_angle(angle_or_point)
         else:
@@ -276,7 +278,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
         return any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners))
 
-    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | List[Vect3] | None:
+    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | list[Vect3] | None:
         if isinstance(other, AbstractArc):
             return self.intersect_circle(other)
         if isinstance(other, Ln.ELine):
@@ -306,7 +308,7 @@ class EArc(AbstractArc):
         perp = line.perpendicular(p3)
         perp.extend_and_prepend(2 * self.radius)
         
-        pts : List[Vect3] | None = self.intersect(perp)
+        pts : list[Vect3] | None = self.intersect(perp)
         results = None
         if pts:
             results = P.EPoint(pts[0])

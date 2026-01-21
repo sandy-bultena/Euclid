@@ -177,9 +177,12 @@ class PropScene(mn.InteractiveScene):
     # adjust the run time so that it moves at a given speed (larger objects will take longer to draw)
     # -----------------------------------------------------------------------------------------------------------------
     def _update_runtime(self, anim: mn.AnimationType, speed: float):
+
         if not isinstance(anim, mn.Animation):
-            print(f"****** anim is not an mn.Animation type, instead {type(anim)}")
+            # if the animation type is part of the animation builder (ex: obj.animate.set_fill(...)), then
+            # create the animation (via the build command)
             anim = anim.build()
+
         anim.set_run_time(anim.get_run_time() / speed)
         return anim
 
@@ -199,7 +202,7 @@ class PropScene(mn.InteractiveScene):
     # wait for user before printing next page
     # -----------------------------------------------------------------------------------------------------------------
     def next_page(self):
-        print("\nHit key for next page")
+        # print("\nHit key for next page")
         self.paused = True
         self.wait_until(lambda : not self.paused, 600)
 

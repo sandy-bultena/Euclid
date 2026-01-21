@@ -70,6 +70,9 @@ class Fonts:
             title_screen=(T.EText, dict(font_size=128))
         )
 
+
+
+
 # =====================================================================================================================
 # Text Box - inherits from EGroup with StringObj
 # =====================================================================================================================
@@ -113,7 +116,7 @@ class TextBox(EGroup[T.EStringObj]):
         self.abs_position = absolute_position
         self.alignment = self.ALIGNMENT[alignment]
         self.bullet_symbol = None
-        self.text_to_index = {}
+        self.obj_to_index = {}
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def __str__(self):
@@ -153,6 +156,66 @@ class TextBox(EGroup[T.EStringObj]):
         return newline
 
     # -----------------------------------------------------------------------------------------------------------------
+    # generate the text_str
+    # -----------------------------------------------------------------------------------------------------------------
+    def generate_text(self,
+                      text_str: str,
+                      style: str = '',
+                      /,
+                      align_index: int | T.EStringObj = -1,
+                      align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                      transform_from: T.EStringObj | int = None,
+                      transform_args: dict = None,
+                      delay_anim=False,
+                      skip_anim=False,
+                      break_into_parts: tuple[str, ...] | str | None = None,
+                      **other_options) -> tuple[EStringObj, ...]:
+        cls, kwargs = self._setup_kwargs(style, other_options)
+        bullet = None
+        parts = None
+
+        with self.scene.simultaneous():
+            # create the text_str and fix the text_str in frame (is always displayed at a fixed position on the screen)
+            newline = cls(text_str, **kwargs, scene=self.scene, delay_anim=True)
+            newline.fix_in_frame()
+
+            # place the text_str
+            if align_str:
+                self.align_string_with_other_string(newline, align_str, align_index)
+                self.next_buff = 0
+            else:
+                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
+                self.next_buff = 0
+                self.justify_text(newline)
+
+            # add bullet_symbol (i.e. bullet marker)
+            if self.bullet_symbol:
+                bullet = cls(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
+                bullet.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
+                bullet.e_draw(skip_anim)
+
+            # break the text into parts (so that later we can use individual parts for animation)
+            # and do no further processing
+            if break_into_parts:
+                parts = self._break_into_parts(newline, break_into_parts, bullet, delay_anim, skip_anim)
+
+            # not delaying the animation...
+            elif not delay_anim:
+
+                if transform_from is not None:
+                    self.e_transform_to(newline, transform_args, transform_from)
+                else:
+                    newline.e_draw(skip_anim)
+
+        # save the text object in the VGroup
+        self.add(newline)
+        self.obj_to_index[newline] = len(self)-1
+
+        if parts is not None:
+            return *parts, newline
+        return newline,
+
+    # -----------------------------------------------------------------------------------------------------------------
     # where to put the text_str with respect to another string
     # -----------------------------------------------------------------------------------------------------------------
     def align_string_with_other_string(self, original_str: EStringObj,
@@ -186,13 +249,13 @@ class TextBox(EGroup[T.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # break the text_str into parts (purpose: so that you can use the different parts for transform_from later on
     # -----------------------------------------------------------------------------------------------------------------
-    def break_into_parts(self,
-                         text_obj:EStringObj,
-                         break_into_parts: Optional[tuple[str, ...] | str],
-                         bullet: EStringObj,
-                         delay_anim,
-                         skip_anim,
-                         ):
+    def _break_into_parts(self,
+                          text_obj:EStringObj,
+                          break_into_parts: Optional[tuple[str, ...] | str],
+                          bullet: EStringObj,
+                          delay_anim,
+                          skip_anim,
+                          ):
         text_str: str = text_obj.text
 
         # if the break_into_parts is a string instead of an array, use that to break text into its parts
@@ -205,9 +268,9 @@ class TextBox(EGroup[T.EStringObj]):
 
         # align the parts next to each other
         for p, t in zip(parts, break_into_parts):
-            p.next_to(text_obj[t], mn.ORIGIN, buff=0)
+            p[-1].next_to(text_obj[t], mn.ORIGIN, buff=0)
             if not delay_anim:
-                p.e_draw(skip_anim)
+                p[-1].e_draw(skip_anim)
 
         return *parts,
 
@@ -225,65 +288,6 @@ class TextBox(EGroup[T.EStringObj]):
             text_obj,
             **transform_args,
         ))
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # generate the text_str
-    # -----------------------------------------------------------------------------------------------------------------
-    def generate_text(self,
-                      text_str: str,
-                      style: str = '',
-                      /,
-                      align_index: int | T.EStringObj = -1,
-                      align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
-                      transform_from: T.EStringObj | int = None,
-                      transform_args: dict = None,
-                      delay_anim=False,
-                      skip_anim=False,
-                      break_into_parts: tuple[str, ...] | str | None = None,
-                      **other_options):
-        cls, kwargs = self._setup_kwargs(style, other_options)
-        bullet = None
-        parts = None
-
-        with self.scene.simultaneous():
-            # create the text_str and fix the text_str in frame (is always displayed at a fixed position on the screen)
-            newline = cls(text_str, **kwargs, scene=self.scene, delay_anim=True)
-            newline.fix_in_frame()
-
-            # place the text_str
-            if align_str:
-                self.align_string_with_other_string(newline, align_str, align_index)
-                self.next_buff = 0
-            else:
-                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
-                self.next_buff = 0
-                self.justify_text(newline)
-
-            # add bullet_symbol (i.e. bullet marker)
-            if self.bullet_symbol:
-                bullet = cls(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
-                bullet.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
-                bullet.e_draw(skip_anim)
-
-            # break the text into parts (so that later we can use individual parts for animation)
-            # and do no further processing
-            if break_into_parts:
-                parts = self.break_into_parts(newline,break_into_parts,bullet, delay_anim, skip_anim)
-
-            # not delaying the animation...
-            elif not delay_anim:
-
-                if transform_from is not None:
-                    self.e_transform_to(newline, transform_args, transform_from)
-                else:
-                    newline.e_draw(skip_anim)
-
-        # save the text object in the VGroup
-        self.add(newline)
-
-        if parts is not None:
-            return *parts, newline
-        return newline
 
     # -----------------------------------------------------------------------------------------------------------------
     # managing items
@@ -356,6 +360,25 @@ class TextBox(EGroup[T.EStringObj]):
 
     def reset_bullet_symbol(self):
         self.bullet_symbol = None
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # fade/normalize specific objects
+    # -----------------------------------------------------------------------------------------------------------------
+
+    def fade_text_objs(self, *objs):
+        with self.scene.simultaneous():
+            if not objs:
+                objs = self.get_group()
+            for text_obj in objs:
+                text_obj.e_fade()
+
+
+    def normalize_text_objs(self, *objs):
+        with self.scene.simultaneous():
+            if not objs:
+                objs = self.get_group()
+            for text_obj in objs:
+                text_obj.e_normal()
 
     # ----------------------------------------------------------------------------------------------------------------
     # create functions for all of the text_str styles
@@ -436,8 +459,8 @@ class TextBox(EGroup[T.EStringObj]):
     for style in Fonts.fonts:
         exec(f"""
 def {style}(self, text: str, **kwargs):
-    self.text_to_index[text] = len(self)
-    return self.generate_text(text, '{style}', **kwargs)
+    objs, *rest = self.generate_text(text, '{style}', **kwargs)
+    return (objs,*rest)
 """)
 
 

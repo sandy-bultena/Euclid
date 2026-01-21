@@ -71,6 +71,7 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         self.write_simultaneous = write_simultaneous
         if not hasattr(self, 'em_object'):
             self.em_object: Optional[E.EMObject] = None
+        self.original_text = txt
         self.text = self.apply_rules(txt)
 
         super().__init__(

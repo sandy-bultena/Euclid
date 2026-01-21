@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import inspect
 from functools import  wraps
 import manimlib as mn
 from manimlib.constants import *
@@ -70,14 +72,25 @@ def convert_to_coord(obj: mn.Mobject | Sized[float])->Vect3:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# animation functions
+# get the animation methods
 # ---------------------------------------------------------------------------------------------------------------------
 def e_animate(anim):
+    """
+    for the specific object that can be animated, find the animation methods for that object
+    :param anim: Mobject
+    :return: methods ??
+    """
     if anim.overridden_animation:
         return anim.overridden_animation
     return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
 
+# =====================================================================================================================
+# decorators
+# =====================================================================================================================
 
+# ---------------------------------------------------------------------------------------------------------------------
+# decorator - animate whatever changes happen in the function
+# ---------------------------------------------------------------------------------------------------------------------
 def animate(func):
     @wraps(func)
     def animate_change(self: EMObject, *args, rate_func=mn.smooth, **kwargs):
@@ -92,7 +105,7 @@ def animate(func):
     return animate_change
 
 # ---------------------------------------------------------------------------------------------------------------------
-# debugging option by setting up a trace
+# decorator - debugging option by setting up a trace
 # ---------------------------------------------------------------------------------------------------------------------
 def log(func):
     @wraps(func)
@@ -103,6 +116,9 @@ def log(func):
     return logMethodName
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# decorator - allows objects to be frozen against animation
+# ---------------------------------------------------------------------------------------------------------------------
 def freezable(func):
     @wraps(func)
     def dontIfFrozen(self, *args, **kwargs):
@@ -112,11 +128,15 @@ def freezable(func):
 
     return dontIfFrozen
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+# decorator - sets the animation speed for all animations happening during the function (this is a guess :( )
+# ---------------------------------------------------------------------------------------------------------------------
 def anim_speed(func):
     @wraps(func)
     def animate_change(*args, speed=-1, no_anim=False, **kwargs):
         scene = find_scene()
+
+        # Note: draw is a list
         with scene.animation_speed(speed) as draw:
             x = func(*args, **kwargs)
             if not no_anim:
@@ -129,6 +149,11 @@ def anim_speed(func):
     return animate_change
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# I think I know what this does, but not sure of its workings.
+# * if speed > 0, animate all the changes at the same speed
+# * if speed < 0, ???
+# ---------------------------------------------------------------------------------------------------------------------
 def copy_transform(*, index=None):
     def inner(func):
         @wraps(func)
@@ -273,6 +298,8 @@ class EMObjectPlayer:
         self.main_animate = False
         self.label_animate = False
         self.rotation = []
+    def __str__(self):
+        return f"EMObjectPlayer obj={str(self.eobj)}"
 
     @property
     def _fade_opacity(self):
@@ -613,12 +640,6 @@ def {name}(self, *args):
     @freezable
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
         """draws the object on the scene"""
-        # print()
-        # print(f'EMOBJECT.e_draw obj="{str(self)}" {self.Virtual=} {skip_anim=}')
-        # print(f'... caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
-        # print(f'...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
-        # print(f'...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
-
         if self.visible():
             return
 
@@ -633,11 +654,17 @@ def {name}(self, *args):
             if anims:
                 self.scene.play(*anims, **anim_args)
 
-            # ????
+            # If there are additional elements being animated (via f_always for example)
+            # example: the line object in drawing a circle is updated every frame to keep pace with the
+            #          animation of the circle.  To do this, an updater was constructed and it needs to be
+            #          removed
             if self.animation_objects:
-                print("*********** ANIMATION OBJECTS ***********")
+
+                # remove the updaters
                 for obj in self.animation_objects:
                     obj.clear_updaters()
+
+                # after the updaters have been removed, this additional animated object needs to be removed
                 with self.scene.simultaneous(**removal_args):
                     for obj in self.animation_objects:
                         if isinstance(obj, EMObject):
@@ -743,6 +770,15 @@ def {name}(self, *args):
         self.unfreeze()
 
     def e_fill(self, color: ManimColor = None, opacity=0.5):
+        # print(f"EMObject.e_fill obj={str(self)}")
+        # print(f'  ...  caller name:', inspect.stack()[0][3], inspect.stack()[0][1], inspect.stack()[0][2])
+        # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1], inspect.stack()[1][2])
+        # print(f'  ...  caller name:', inspect.stack()[2][3], inspect.stack()[2][1], inspect.stack()[2][2])
+        # print(f'  ...  caller name:', inspect.stack()[3][3], inspect.stack()[3][1], inspect.stack()[3][2])
+        # print(f'  ...  caller name:', inspect.stack()[4][3], inspect.stack()[4][1], inspect.stack()[4][2])
+        # print(f'  ...  caller name:', inspect.stack()[5][3], inspect.stack()[5][1], inspect.stack()[5][2])
+        # print(f'  ...  caller name:', inspect.stack()[6][3], inspect.stack()[6][1], inspect.stack()[6][2])
+
         self.scene.play(
             self.animate.set_fill(color=color, opacity=opacity * self.cached_fade, recurse=False)
         )

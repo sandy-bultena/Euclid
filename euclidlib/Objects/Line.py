@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from itertools import pairwise
 from typing_extensions import deprecated
 
@@ -9,7 +10,6 @@ from euclidlib.Objects import Triangle as T
 from euclidlib.Objects import Angle
 from euclidlib.Objects import EquilateralTriangle
 from euclidlib.Objects.utils import get_dist
-from typing import Dict, Tuple, Set
 
 from euclidlib.Objects import Dashable as Da
 from euclidlib.Objects import Arc
@@ -29,16 +29,28 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
         """create a new line"""
+        if isinstance(start, P.EPoint):
+            start = start.get_arc_center()
+        if isinstance(end,P.EPoint):
+            end = end.get_arc_center()
+
         super().__init__(start, end, *args, **kwargs)
+
+    def __str__(self):
+        return f"Line: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
+            f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.get_slope():.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
     # where to put the label
+    # - this is called by the Label object as part of an updater (wo it can be called many times so keep it simple.
+    # - options for e_label_location should be passed when calling 'add_label'
+    #
     # -----------------------------------------------------------------------------------------------------------------
-    def IN(self):
+    def OUT(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, PI / 2)
 
-    def OUT(self):
+    def IN(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -PI / 2)
 
@@ -52,6 +64,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             point = self.get_start()
 
         # calculate the position
+        direction = self.OUT()
         if inside:
             direction = self.IN()
         elif outside:
@@ -82,7 +95,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between two lines, or lines and a rectangle
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect(self, other: Mobject, reverse=True):
+    def intersect(self, other: mn.Mobject, reverse=True):
         if isinstance(other, mn.Line):
             return self.intersect_line(other)
         if isinstance(other, mn.Rectangle):
@@ -218,10 +231,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         B = self.get_end()
         C = self.pointify(target)
 
-        l: Dict[str | int, ELine] = {}
-        p: Dict[str | int, P.EPoint] = {}
-        c: Dict[str | int, Circle.ECircle] = {}
-        t: Dict[str | int, T.ETriangle] = {}
+        l: dict[str | int, ELine] = {}
+        p: dict[str | int, P.EPoint] = {}
+        c: dict[str | int, Circle.ECircle] = {}
+        t: dict[str | int, T.ETriangle] = {}
 
         # ------------------------------------------------------------------------
         # If point is already on the line, just make a clone, and return results
@@ -244,7 +257,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         l['AD'] = t[1].l[2]
         l['CD'] = t[1].l[1]
         with self.scene.simultaneous():
-            parts: Dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
+            parts: dict[int, EMObject] = {id(x): x for x in t[1].get_e_family()}
             del parts[id(l['AD'])]
             del parts[id(l['CD'])]
             for part in parts.values():
@@ -258,7 +271,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                 if pts and not find_min:
                     break
                 if pts and find_min:
-                    print(f"{pts=} {C=}")
                     minim = min(abs(self.get_length() - get_dist(a, C)) for a in pts)
                     if minim < mn_scale(0.1):
                         break
@@ -283,7 +295,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         lCF = ELine(C, new_end)
 
         with self.scene.simultaneous():
-            mobjs: Dict[int, EMObject] = {id(x): x for group in (p, l, c) for x in group.values()}
+            mobjs: dict[int, EMObject] = {id(x): x for group in (p, l, c) for x in group.values()}
             mobjs |= {id(x): x for x in t[1].get_e_family()}
             for obj in mobjs.values():
                 obj.e_remove()
@@ -321,8 +333,11 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             return lx, px
 
         ref_p = min(p, key=lambda x:
-        abs(mn.angle_of_vector(x - target_coord) -
-            mn.angle_of_vector(self.get_vector())))
+                                    abs(
+                                        mn.angle_of_vector(x - target_coord) -
+                                        mn.angle_of_vector(self.get_vector())
+                                        )
+                    )
         np = P.EPoint(ref_p)
         nl = ELine(target, np)
 
@@ -354,7 +369,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # split string into parts
     # -----------------------------------------------------------------------------------------------------------------
-    def e_split(self, *points: Mobject | Vect3):
+    def e_split(self, *points: mn.Mobject | Vect3):
         cls = type(self)
         coords = [self.get_start(), *map(self.pointify, points), self.get_end()]
         lines = [
@@ -390,8 +405,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     def _perp_off_line(self, p: P.EPoint, dist_end: float, dist_start: float):
         A, B = self.get_start_and_end()
         C = self.pointify(p)
-        p: Dict[str, P.EPoint] = {}
-        c: Dict[str, C.ECircle] = {}
+        p: dict[str, P.EPoint] = {}
+        c: dict[str, C.ECircle] = {}
         l: ELine = self.copy().e_fade()
         l.extend_and_prepend(mn_scale(40))
 
@@ -429,9 +444,9 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     def _perp_on_line(self, p: P.EPoint, dist_end: float, dist_start: float, /, inside=False):
         A, B = self.get_start_and_end()
         C = self.pointify(p)
-        l: Dict[str, ELine] = {}
-        p: Dict[str, P.EPoint] = {}
-        c: Dict[str, Circle.ECircle] = {}
+        l: dict[str, ELine] = {}
+        p: dict[str, P.EPoint] = {}
+        c: dict[str, Circle.ECircle] = {}
         ln: ELine = self.copy().e_fade()
 
         radius = max(dist_start, dist_end)
@@ -633,7 +648,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
         # if original line is too big, abort
         if lBC.get_length() - self.get_length() < mn_scale(1):
             if new_point:
-                print(type(p))
                 p.e_remove()
             lBC.e_remove()
             raise ValueError("your input line does not fit in the circle")
@@ -1128,7 +1142,7 @@ class EDashedLine(ELine, mn.DashedLine):
             if 'l' in f.f_locals:
                 break
         if f.f_back is None:
-            raise Exception("Can't Find Line Dict")
+            raise Exception("Can't Find Line dict")
         lines = f.f_locals.get('l', {})
 
         lines = [lines.get(p, lines.get(p[::-1])) for p in parts]

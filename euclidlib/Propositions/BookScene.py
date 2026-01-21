@@ -19,7 +19,7 @@ from euclidlib.debugging import print_debug
 from euclidlib.Propositions.PropScene import PropScene
 import roman
 
-DEG = 180/math.pi
+DEG = 180/mn.PI
 
 class AnimState(Enum):
     NORMAL = 0
@@ -118,7 +118,7 @@ class BookScene(PropScene):
         # print the title (and maybe table of contents)
         if self.title and self.prop:
             t = TextBox(mn_coord(700, 50),
-                        line_width=mn_h_scale(1000),
+                        line_width=mn_scale(1000),
                         alignment='n'
                         )
             if False and not self.debug:
@@ -158,7 +158,7 @@ class BookScene(PropScene):
 class Book1Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_h_scale(550),
+                            line_width=mn_scale(550),
                             alignment='w'
                             )
         with self.simultaneous():
@@ -213,7 +213,7 @@ class Book1Scene(BookScene):
 class Book2Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_h_scale(600),
+                            line_width=mn_scale(600),
                             alignment='e'
                             )
         with self.simultaneous():
@@ -288,7 +288,7 @@ class Book2Scene(BookScene):
 class Book3Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_h_scale(600),
+                            line_width=mn_scale(600),
                             alignment='e'
                             )
         with self.simultaneous():

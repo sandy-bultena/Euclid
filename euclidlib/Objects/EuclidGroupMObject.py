@@ -8,8 +8,6 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 # code required for objects that are collections via VGroup or similar things
 # *********************************************************************************************************************
 
-
-
 class EGroupPlayer:
     def __init__(self, group: PsuedoGroup[EMObject]):
         self.obj = group
@@ -17,6 +15,23 @@ class EGroupPlayer:
         self.manager = group.get_manager()
         self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, EMObject)]
         self.indices = None
+
+    def __str__(self):
+        return ", ".join(str(g) for g in self.group)
+
+    def __call__(self, *index, **kwargs):
+        to_exec = self.indices or self.players
+        if index:
+            to_exec = [self.players[i] for i in index]
+
+        with self.obj.scene.simultaneous():
+            for player in to_exec:
+                player(**kwargs)
+        return self.obj
+
+    def __getitem__(self, item: int | slice):
+        self.indices = self.players[item]
+        return self
 
     for name in EMObjectPlayer._properties():
         exec(f'''
@@ -35,20 +50,6 @@ def {name}(self, *args):
     return self
 '''.strip())
 
-    def __call__(self, *index, **kwargs):
-        to_exec = self.indices or self.players
-
-        if index:
-            to_exec = [self.players[i] for i in index]
-
-        with self.obj.scene.simultaneous():
-            for player in to_exec:
-                player(**kwargs)
-        return self.obj
-
-    def __getitem__(self, item: int | slice):
-        self.indices = self.players[item]
-        return self
 
 
 class PsuedoGroup(EMObject):
@@ -80,7 +81,6 @@ class PsuedoGroup(EMObject):
 
     @freezable
     def e_remove(self):
-        print("PsuedoGroup.e_remove")
         with self.scene.simultaneous():
             for obj in self.get_group():
                 if obj.in_scene():
@@ -90,7 +90,6 @@ class PsuedoGroup(EMObject):
 
     @freezable
     def remove_labels(self):
-        print("PsuedoGroup.remove_labels")
         for x in self.get_group():
             x.remove_label()
         return self

@@ -189,7 +189,7 @@ setattr(cls, 'p{i}', property(p))
 
     def e_fill(self, color: ManimColor = None, opacity=0.5):
         self.options['fill'] = (color, opacity)
-        super().e_fill(color, opacity)
+        return super().e_fill(color, opacity)
 
     def e_unfill(self):
         del self.options['fill']
@@ -258,9 +258,13 @@ setattr(cls, 'p{i}', property(p))
         if self.lines:
             return
         with self.scene.simultaneous_speed(self.speed):
-            self.lines = [L.ELine(p0, p1, delay_anim=True) for p0, p1 in pairwise(self.vertices)]
-            if 'labels' in self.options:
-                self.set_labels(*self.options['labels'])
+            labels = self.options.get('labels', [()] * self.sides)
+            line_points = [(p0,p1) for p0,p1 in pairwise(self.vertices)]
+            self.lines = [L.ELine(*pts,
+                                  delay_anim=True,
+                                  label_args=self._filter_side_labels(args)
+                                  )
+                          for pts,args in zip(line_points,labels)]
             if not delay_anim:
                 for l in self.lines:
                     l.e_draw(skip_anim=skip_anim)
@@ -407,7 +411,7 @@ setattr(cls, 'p{i}', property(p))
     def RemovalOf(self, *args, **kwargs):
         return [mn.FadeOut(self)]
 
-    def intersect(self, other: Mobject, reverse=True):
+    def intersect(self, other: mn.Mobject, reverse=True):
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
         super().intersect(other)
