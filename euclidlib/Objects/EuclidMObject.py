@@ -139,34 +139,44 @@ def anim_speed(func):
         # Note: draw is a list
         with scene.animation_speed(speed) as draw:
             x = func(*args, **kwargs)
-            if not no_anim:
-                if isinstance(x, (tuple, list)):
-                    draw.extend(x)
-                else:
-                    draw.append(x)
+            # This looks like it doesn't do anything, except keep a list of what was drawn in an array
+            # that is never used
+            # if not no_anim:
+            #     if isinstance(x, (tuple, list)):
+            #         draw.extend(x)
+            #     else:
+            #         draw.append(x)
         return x
 
     return animate_change
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# I think I know what this does, but not sure of its workings.
-# * if speed > 0, animate all the changes at the same speed
-# * if speed < 0, ???
+# copy and transform?? (bad name)
+# - the 'func' that is decorated should return objects that need to be drawn 'if' speed < 0
 # ---------------------------------------------------------------------------------------------------------------------
 def copy_transform(*, index=None):
     def inner(func):
         @wraps(func)
         def animate_change(self: EMObject, *args, speed=-1, no_anim=False, **kwargs):
+
             if speed > 0:
+                # call function after setting the speed for all animations
                 return anim_speed(func)(self, *args, speed=speed, no_anim=no_anim, **kwargs)
+
             elif speed < 0:
+
+                # pause all animations
                 with self.scene.pause_animations_for():
                     x = func(self, *args, **kwargs)
+
                 if index is None:
+                    # transform self into objects returned from calling func
                     if not no_anim:
                         self.scene.play(self.transform_to(x))
+
                 else:
+                    # transform self to x[index], and then draw the remainder of the objects in 'x'
                     tmp = list(x)
                     if not no_anim:
                         with self.scene.simultaneous():
@@ -175,7 +185,9 @@ def copy_transform(*, index=None):
                             for y in tmp:
                                 y.e_draw()
                 return x
+
             else:
+                # default if speed = 0
                 return func(self, *args, **kwargs)
 
         return animate_change

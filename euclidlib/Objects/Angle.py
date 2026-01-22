@@ -101,7 +101,7 @@ class EAngleBase(Arc.AbstractArc):
         return self.l1, self.l2
 
     @log
-    @copy_transform(index=1)
+    @copy_transform(index=1)  ### WHY INDEX, WHAT DOES IT DO?
     def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
         start, end = line.get_start_and_end()
         if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):

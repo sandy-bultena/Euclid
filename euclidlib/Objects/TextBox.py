@@ -38,10 +38,10 @@ class Fonts:
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
             title=(T.EMarkupText, dict(font_size=30, font='Gotu')),
-            explain=(T.EMarkupText, dict(font_size=16, font='Lucida Grande')),
-            sidenote=(T.EMarkupText, dict(font_size=16, font='Lucida Grande', slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=16, font='Lucida Grande')),
-            normal=(T.EText, dict(font_size=14, font='Lucida Grande')),
+            explain=(T.EMarkupText, dict(font_size=16, font='Gotu')),
+            sidenote=(T.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
+            explainM=(T.ETexText, dict(font_size=16, font='Gotu')),
+            normal=(T.EText, dict(font_size=14, font='Gotu')),
             math=(T.ETex, dict(font_size=20)),
             fancy=(T.EText, dict(font_size=24, font='Charm')),
             title_screen=(T.EText, dict(font_size=48, font='Bradley Hand')),

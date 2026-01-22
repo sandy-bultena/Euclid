@@ -325,6 +325,32 @@ class PropScene(mn.InteractiveScene):
             with self.simultaneous(**kwargs):
                 yield
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # pause animation until code block is completed,
+    # -----------------------------------------------------------------------------------------------------------------
+    @mn.contextmanager
+    def pause_animations_for(self, stop=True):
+        if stop:
+            # pause animations
+            to_draw = []
+            self.animateState.append(AnimState.PAUSED)
+
+            yield to_draw
+
+            # reset animation
+            self.animateState.pop()
+
+            # draw all the objects that need to be drawn
+            if len(to_draw) > 1:
+                with self.simultaneous():
+                    for x in to_draw:
+                        x.e_draw()
+            if len(to_draw) == 1:
+                to_draw[0].e_draw()
+
+        else:
+            yield []
+
 
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -357,23 +383,6 @@ class PropScene(mn.InteractiveScene):
     #         self.animateState.pop()
     #     else:
     #         yield
-    #
-    # @mn.contextmanager
-    # def pause_animations_for(self, stop=True):
-    #     if stop:
-    #         to_draw = []
-    #         self.animateState.append(AnimState.PAUSED)
-    #         yield to_draw
-    #         self.animateState.pop()
-    #         if len(to_draw) > 1:
-    #             with self.simultaneous():
-    #                 for x in to_draw:
-    #                     x.e_draw()
-    #         if len(to_draw) == 1:
-    #             to_draw[0].e_draw()
-    #
-    #     else:
-    #         yield []
     #
     # @mn.contextmanager
     # def run_animations_for(self, stop=True):

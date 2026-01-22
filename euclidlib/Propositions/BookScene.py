@@ -45,33 +45,38 @@ class BookScene(PropScene):
     prop: int
     TOC: list[str]
 
-    # @staticmethod
-    # def extract_lines(lines: dict[str, ELine], triangles: dict[str, EPolygon], label: str, tri_name=None):
-    #     tri_name = tri_name or label
-    #     label2 = label + label[0]
-    #     for l_label, line in zip(pairwise(label2), triangles[tri_name].l):
-    #         lines[mn.op.add(*l_label)] = line
-    #
-    # @staticmethod
-    # def extract_points(points: dict[str, EPoint], triangles: dict[str, EPolygon], label: str, tri_name=None):
-    #     tri_name = tri_name or label
-    #     for p_label, point in zip(label, triangles[tri_name].p):
-    #         points[p_label] = point
-    #
-    # @staticmethod
-    # def extract_angles(angles: dict[str, EAngleBase], triangles: dict[str, EPolygon], label: str, tri_name=None):
-    #     tri_name = tri_name or label
-    #     label2 = label[-1] + label + label[0]
-    #     for i, angle in enumerate(triangles[tri_name].a):
-    #         if angle is not None:
-    #             angles[label2[i:i + 3]] = angle
-    #
-    # @staticmethod
-    # def extract_all(lines, points, angles, triangles, label, tri_name=None):
-    #     tri_name = tri_name or label
-    #     BookScene.extract_lines(lines, triangles, label, tri_name)
-    #     BookScene.extract_points(points, triangles, label, tri_name)
-    #     BookScene.extract_angles(angles, triangles, label, tri_name)
+    def __init__(self, *args, **kwargs):
+        cls = type(self)
+        self.l: dict[str | int, ELine] = {}
+        self.p: dict[str | int, EPoint] = {}
+        self.c: dict[str | int, ECircle] = {}
+        self.t: dict[str | int, ETriangle] = {}
+        self.a: dict[str | int, EAngleBase] = {}
+        cls.book, cls.prop = cls.get_prop_number()
+        super().__init__(*args, **kwargs)
+
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get objects from object names
+    # -----------------------------------------------------------------------------------------------------------------
+    def points(self, name:str):
+        pts = []
+        for c in name:
+            if c not in self.p:
+                raise IndexError(f"{name=} p[{c}] does not exists")
+            pts.append(self.p[c])
+        return [self.p.get(a,None) for a in name if a in self.p]
+
+    def lines(self, name: str):
+        lines = []
+        for c1,c2 in pairwise(name):
+            if f"{c1}{c2}" not in self.l or f"{c2}{c1}" not in self.l:
+                raise IndexError(f"neither l[{c1}{c2}] nor l[{c2}{c1}] exists")
+            if f"{c1}{c2}" in self.l:
+                lines.append(self.l[f"{c1}{c2}"])
+            else:
+                lines.append(self.l[f"{c2}{c1}"])
+        return lines
 
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
@@ -149,10 +154,6 @@ class BookScene(PropScene):
             return 0,0
         return int(match.group(1)), int(match.group(2))
 
-    def __init__(self, *args, **kwargs):
-        cls = type(self)
-        cls.book, cls.prop = cls.get_prop_number()
-        super().__init__(*args, **kwargs)
 
 
 class Book1Scene(BookScene):
