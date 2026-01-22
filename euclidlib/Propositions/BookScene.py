@@ -69,8 +69,9 @@ class BookScene(PropScene):
 
     def lines(self, name: str):
         lines = []
+        print(f"{self.l.keys()}")
         for c1,c2 in pairwise(name):
-            if f"{c1}{c2}" not in self.l or f"{c2}{c1}" not in self.l:
+            if f"{c1}{c2}" not in self.l and f"{c2}{c1}" not in self.l:
                 raise IndexError(f"neither l[{c1}{c2}] nor l[{c2}{c1}] exists")
             if f"{c1}{c2}" in self.l:
                 lines.append(self.l[f"{c1}{c2}"])

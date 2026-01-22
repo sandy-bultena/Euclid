@@ -100,8 +100,11 @@ class EAngleBase(Arc.AbstractArc):
     def lines(self):
         return self.l1, self.l2
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # copy to line (index = 1 means transform into final angle, but still display the created line)
+    # -----------------------------------------------------------------------------------------------------------------
     @log
-    @copy_transform(index=1)  ### WHY INDEX, WHAT DOES IT DO?
+    @copy_transform(index=1)
     def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
         start, end = line.get_start_and_end()
         if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):

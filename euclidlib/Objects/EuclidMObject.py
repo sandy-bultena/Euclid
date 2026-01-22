@@ -154,6 +154,9 @@ def anim_speed(func):
 # ---------------------------------------------------------------------------------------------------------------------
 # copy and transform?? (bad name)
 # - the 'func' that is decorated should return objects that need to be drawn 'if' speed < 0
+# - if the speed is less than zero, then don't show intermediate animations,
+# - if index is not none, and speed less than zero
+#     transform into the 'indexth' returned object from func, and display the rest
 # ---------------------------------------------------------------------------------------------------------------------
 def copy_transform(*, index=None):
     def inner(func):

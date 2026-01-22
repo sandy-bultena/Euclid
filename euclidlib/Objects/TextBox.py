@@ -37,7 +37,7 @@ class Fonts:
 
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, font='Gotu')),
+            title=(T.EMarkupText, dict(font_size=24, font='Gotu')),
             explain=(T.EMarkupText, dict(font_size=16, font='Gotu')),
             sidenote=(T.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
             explainM=(T.ETexText, dict(font_size=16, font='Gotu')),
