@@ -263,14 +263,15 @@ class TextBox(EGroup[T.EStringObj]):
             break_into_parts = text_str.split(break_into_parts)
 
         # create the text objects for each part
-        parts = [self.generate_text(part, text_obj.style, delay_anim=True)
-                 for part in break_into_parts]
+        parts = []
+        for part in break_into_parts:
+            parts.extend(self.generate_text(part, text_obj.style, delay_anim=True))
 
         # align the parts next to each other
         for p, t in zip(parts, break_into_parts):
-            p[-1].next_to(text_obj[t], mn.ORIGIN, buff=0)
+            p.next_to(text_obj[t], mn.ORIGIN, buff=0)
             if not delay_anim:
-                p[-1].e_draw(skip_anim)
+                p.e_draw(skip_anim)
 
         return *parts,
 
