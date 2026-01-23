@@ -42,7 +42,7 @@ class Fonts:
             sidenote=(T.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
             explainM=(T.ETexText, dict(font_size=16, font='Gotu')),
             normal=(T.EText, dict(font_size=14, font='Gotu')),
-            math=(T.ETex, dict(font_size=20)),
+            math=(T.ETex, dict(font_size=22)),
             fancy=(T.EText, dict(font_size=24, font='Charm')),
             title_screen=(T.EText, dict(font_size=48, font='Bradley Hand')),
         )
