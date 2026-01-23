@@ -303,6 +303,11 @@ class PropScene(mn.InteractiveScene):
 
     # -----------------------------------------------------------------------------------------------------------------
     # set the animation speed to be the same for everyone
+    #
+    # yields a list,
+    #   if run_time > 0 then list is not used for anything
+    #   if the run_time < 0
+    #       add any objects to this list, which will be drawn after the code block is completed
     # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
     def animation_speed(self, run_time: float):
@@ -311,8 +316,8 @@ class PropScene(mn.InteractiveScene):
             yield []
             self.animationSpeedStack.pop()
         elif run_time < 0:
-            with self.pause_animations_for() as l:
-                yield l
+            with self.pause_animations_for() as to_draw:
+                yield to_draw
         else:
             yield []
 

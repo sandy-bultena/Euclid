@@ -136,16 +136,15 @@ def anim_speed(func):
     def animate_change(*args, speed=-1, no_anim=False, **kwargs):
         scene = find_scene()
 
-        # Note: draw is a list
-        with scene.animation_speed(speed) as draw:
+        # Note: draw is a list, so need to save all the objects to be drawn to this list
+        #       ... drawing occurs in scene.animation_speed
+        with scene.animation_speed(speed) as to_draw:
             x = func(*args, **kwargs)
-            # This looks like it doesn't do anything, except keep a list of what was drawn in an array
-            # that is never used
-            # if not no_anim:
-            #     if isinstance(x, (tuple, list)):
-            #         draw.extend(x)
-            #     else:
-            #         draw.append(x)
+            if not no_anim:
+                if isinstance(x, (tuple, list)):
+                    to_draw.extend(x)
+                else:
+                    to_draw.append(x)
         return x
 
     return animate_change
@@ -591,13 +590,17 @@ def {name}(self, *args):
     @freezable
     def add_label(self, *args, **label_args):
         if isinstance(args[-1], dict) and not label_args:
+            print("**** EMObject.add_label: WHAT CRAZY SYNTAX IS THIS?")
             *args, label_args = args
         new_label = self.init_label(*args, **label_args)
+        print(f"new_label={new_label} for {self}")
 
         if self.visible():
             if self.e_label is not None:
+                print("Transform e_label")
                 self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
             else:
+                print("Adding e_label")
                 self.scene.play(*new_label.CreationOf())
             new_label.disable_updaters()
         self.e_label = new_label
