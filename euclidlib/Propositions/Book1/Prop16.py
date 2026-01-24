@@ -10,6 +10,8 @@ from euclidlib.Objects import *
 from typing import Dict
 
 # ********* What does freeze do? ******************
+# if removing something, it doesn't get removed if its frozen??
+# *************************************************
 
 class Prop16(Book1Scene):
     steps = []
