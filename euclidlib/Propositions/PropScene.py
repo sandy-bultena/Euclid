@@ -60,6 +60,7 @@ class PropScene(mn.InteractiveScene):
         self.is_selecting = False
         self.to_highlight = []
         self.paused = False
+        self.default_speed = DEFAULT_SPEED
 
         super().__init__(*args, **kwargs)
 
@@ -356,18 +357,20 @@ class PropScene(mn.InteractiveScene):
         else:
             yield []
 
+    def set_base_animation_speed(self, speed: float):
+        self.animationSpeedStack[0] = speed
 
 
     # -----------------------------------------------------------------------------------------------------------------
     # context for freezing certain objects during the context
     # -----------------------------------------------------------------------------------------------------------------
-    # @mn.contextmanager
-    # def freeze(self, *args: EMObject):
-    #     for a in args:
-    #         a.freeze()
-    #     yield
-    #     for a in args:
-    #         a.unfreeze()
+    @mn.contextmanager
+    def freeze(self, *args: EMObject):
+        for a in args:
+            a.freeze()
+        yield
+        for a in args:
+            a.unfreeze()
 
 
     # @mn.contextmanager
@@ -439,6 +442,4 @@ class PropScene(mn.InteractiveScene):
     # def animations_off_on(self):
     #     self.animateState[0] = AnimState.NORMAL
     #
-    # def set_base_animation_speed(self, speed: float):
-    #     self.animationSpeedStack[0] = speed
 

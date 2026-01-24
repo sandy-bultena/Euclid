@@ -593,14 +593,11 @@ def {name}(self, *args):
             print("**** EMObject.add_label: WHAT CRAZY SYNTAX IS THIS?")
             *args, label_args = args
         new_label = self.init_label(*args, **label_args)
-        print(f"new_label={new_label} for {self}")
 
         if self.visible():
             if self.e_label is not None:
-                print("Transform e_label")
                 self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
             else:
-                print("Adding e_label")
                 self.scene.play(*new_label.CreationOf())
             new_label.disable_updaters()
         self.e_label = new_label

@@ -461,6 +461,7 @@ class TextBox(EGroup[T.EStringObj]):
         exec(f"""
 def {style}(self, text: str, **kwargs):
     objs, *rest = self.generate_text(text, '{style}', **kwargs)
+    print(text)
     return (objs,*rest)
 """)
 
