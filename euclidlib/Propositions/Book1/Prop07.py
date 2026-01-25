@@ -26,8 +26,8 @@ class Prop07(Book1Scene):
         t: Dict[str | int, ETriangle] = {}
         a: Dict[str | int, EAngleBase] = {}
 
-        A = mn_coord(450, 650)
-        B = mn_coord(200, 650)
+        B = mn_coord(450, 650)
+        A = mn_coord(200, 650)
         C = mn_coord(280, 270)
         D = mn_coord(400, 270)
 
@@ -43,7 +43,7 @@ class Prop07(Book1Scene):
 
         t['ABC'] = ETriangle(A, B, C,
                              point_labels=[('A', DOWN), ('B', DOWN), ('C', UP)],
-                             labels=[(), ('r_2', RIGHT), ('r_1', LEFT)])
+                             labels=[None, 'r_2', 'r_1'],)
         p['A'], p['B'], p['C'] = t['ABC'].p
 
         self.next_page()
@@ -92,7 +92,7 @@ class Prop07(Book1Scene):
         t['CAD'].set_angles(r'\alpha', None, r'\alpha', mn_scale(20), 0, mn_scale(55))
 
         t2.e_fade(*t2.except_index(0))
-        t2.math(r'\angle ACD = \angle CDA = \alpha')
+        t2.math(r'\measuredangle ACD = \measuredangle CDA = \alpha')
 
         self.next_page()
 
@@ -106,7 +106,7 @@ class Prop07(Book1Scene):
         with self.simultaneous():
             t2.white(1)
             t2.e_fade(*t2.except_index(1))
-        t2.math(r'\angle BCD = \angle CDB = \beta')
+        t2.math(r'\measuredangle BCD = \measuredangle CDB = \beta')
 
         self.next_page()
 
@@ -127,7 +127,7 @@ class Prop07(Book1Scene):
             t2.white(2, 3)
             t2.e_fade(*t2.except_index(2, 3))
 
-        t2.math(r'\angle ACD < \angle BCD')
+        t2.math(r'\measuredangle ACD < \measuredangle BCD')
         t2.math(r'\alpha\quad<\quad\beta', align_str='<')
 
         self.next_page()
@@ -147,7 +147,7 @@ class Prop07(Book1Scene):
             t2.white(2, 3)
             t2.e_fade(*t2.except_index(2, 3))
 
-        t2.math(r'\angle CDA > \angle CDB')
+        t2.math(r'\measuredangle CDA > \measuredangle CDB')
         t2.math(r'\alpha\quad>\quad\beta', align_str='>')
 
 

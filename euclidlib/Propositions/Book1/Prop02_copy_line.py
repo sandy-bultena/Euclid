@@ -46,7 +46,7 @@ class Book1Prop2(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explain("Construct an equilateral triangle on line AC <sub>(I.1)</sub>")
+        t1.explain("Construct an equilateral triangle on line AC (I.1)")
         t[1] = EquilateralTriangle.build(A, C)
         p['D'] = t[1].p[-1]
         self.remove(l['AC'])
@@ -101,6 +101,7 @@ class Book1Prop2(Book1Scene):
         with self.simultaneous():
             l['CD'].e_normal()
             l['AD'].e_normal()
+            p['D'].e_normal()
             l['AB'].e_fade()
             p['E'].e_remove()
             p['F'].e_remove()
@@ -109,27 +110,30 @@ class Book1Prop2(Book1Scene):
         t1.explain("Line AD is equal to line DC (equilateral triangle)")
         l['CD'].add_label("x", outside=True)
         l['AD'].add_label("x", outside=True)
-        t2.math("AD = DC = x")
+        eq_ad_dc_x, = t2.math("AD = DC = x")
         self.next_page()
 
         # ------------------------------------------------------------------------
+
+        t1.explain("DE and DF are equal (radii of the same circle)")
         with self.simultaneous():
             l['AD'].green()
             l['AC'].e_fade()
             l['CD'].green()
             c['D'].e_normal()
-
-        t1.explain("DE and DF are equal (radii of the same circle)")
         with self.simultaneous():
             p['E'].e_draw()
             p['F'].e_draw()
         with self.simultaneous():
             l['DE'] = ELine(p['D'], p['E'], label_args=('y', dict(inside=True)))
             l['DF'] = ELine(p['D'], p['F'], label_args=('y', dict(outside=True)))
-        t2.math("DE = DF = y")
+        with self.simultaneous():
+            eq_ad_dc_x.e_fade()
+        eq_de_df_y, = t2.math("DE = DF = y")
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain("AE is the difference between DA and DE")
         with self.simultaneous():
             c['D'].e_fade()
             if 'AE' in l:
@@ -138,13 +142,14 @@ class Book1Prop2(Book1Scene):
             l['AD'].e_fade()
             l['DE'].e_fade()
 
-        t1.explain("AE is the difference between DA and DE")
         l['AE'] = ELine(A, p['E'], label_args=('x-y', dict(align=RIGHT, inside=True)))
-        t2.math("AE = DA - DE")
-        t2.math("AE = x  - y")
+        t2.e_normal()
+        eq_ae_eq_ad_m_de, = t2.math("AE = AD - DE")
+        eq_ae_eq_x_m_y, = t2.math("AE = x  - y")
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain("CF is the difference between DC and DF")
         with self.simultaneous():
             c['D'].e_fade()
             if l['CF'].in_scene():
@@ -152,29 +157,35 @@ class Book1Prop2(Book1Scene):
             l['CD'].e_fade()
             l['DF'].e_fade()
 
-        t1.explain("CF is the difference between DC and DF")
         l['CF'] = ELine(C, p['F'], label_args=('x-y', dict(align=LEFT, outside=True)))
-        t2.math("CF = DC - DF")
-        t2.math("CF = x  - y")
+
+        with self.simultaneous():
+            eq_ae_eq_ad_m_de.e_fade()
+            eq_ae_eq_x_m_y.e_fade()
+        eq_cf_eq_dc_m_df, = t2.math("CF = DC - DF")
+        eq_cf_eq_c_m_y, = t2.math("CF = x  - y")
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain(
+            "AE and FC are the differences of equals, "
+            "so they are equal")
         with self.simultaneous():
             l['AD'].e_fade()
             l['CD'].e_fade()
             l['DE'].e_fade()
             l['DF'].e_fade()
 
-        t1.explain(
-            "AE and FC are the differences of equals, "
-            "so they are equal")
         with self.simultaneous():
             l['AE'].add_label('z', inside=True)
             l['CF'].add_label('z', outside=True)
-        t2.math("AE = CF = z")
+
+        t2.e_fade()
+        eq_ae_cf_z, = t2.math("AE = CF = z")
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain("AB and AE are radii of the same circle")
         with self.simultaneous():
             c['A'].e_normal()
             l['AB'].e_normal()
@@ -182,9 +193,9 @@ class Book1Prop2(Book1Scene):
             l['CD'].e_fade()
             l['CF'].e_fade()
 
-        t1.explain("AB and AE are radii of the same circle")
         l['AB'].add_label('z', outside=True)
-        t2.math("AB = AE = z")
+        t2.e_fade()
+        eq_ab_ae_z, = t2.math("AB = AE = z")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -195,8 +206,17 @@ class Book1Prop2(Book1Scene):
             l['CF'].e_normal()
 
         t1.explain("AB and CF are equal")
-        t2.math("AB = CF = z")
+        with self.simultaneous():
+            eq_ae_cf_z.e_normal()
+            eq_ab_ae_z.e_normal()
+        eq_ab_cf_z, = t2.math("AB = CF = z")
         self.next_page()
+
+        # ------------------------------------------------------------------------
+        self.next_page()
+        with self.simultaneous():
+            eq_ae_cf_z.e_fade()
+            eq_ab_ae_z.e_fade()
 
         # ------------------------------------------------------------------------
         # clean and do second construction

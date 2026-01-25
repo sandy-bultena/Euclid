@@ -73,7 +73,7 @@ class Prop17(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explain("The angle ACD is greater than either angle ABC or CAB\\{nb}(I.16)")
+        t1.explain("The angle ACD is greater than either angle ABC or {nb:CAB (I.16)")
         t1.explain("Therefore the sum of either ABC or CAB with angle ACB will be "
                    "less than 2 right angles")
         t2.math(r'\beta < \alpha \quad \therefore\  \beta + \theta < \alpha + \theta')

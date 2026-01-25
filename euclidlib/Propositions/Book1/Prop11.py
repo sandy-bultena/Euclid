@@ -50,7 +50,7 @@ class Prop11(Book1Scene):
         with self.simultaneous():
             a[1] = EAngle(l[3], l[1], size=mn_scale(40))
             a[2] = EAngle(l[2], l[3], size=mn_scale(60))
-        t2.math(r'\angle ACD = \angle BCD = \rightangle \text{(right angle)}')
+        t2.math(r'\angle ACD = \angle BCD = \rightangle\ \text{(right angle)}')
         tmp = EGroup(*p.values(), *l.values(), *a.values())
         TMP.append(tmp)
 

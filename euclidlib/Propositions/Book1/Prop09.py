@@ -115,7 +115,7 @@ class Prop09(Book1Scene):
         with self.simultaneous():
             a['DAC'].e_draw()
             a['DAB'].e_draw()
-        t2.math(r'\angle DAB = \angle DAC')
+        t2.math(r'\measuredangle DAB = \measuredangle DAC')
 
         self.next_page()
 
@@ -193,9 +193,9 @@ class Prop09(Book1Scene):
             a['BDA'] = EAngle(*self.lines('BDA'), label=r'\theta')
 
         with self.simultaneous():
-            t2.math(r'\angle CAD = \angle DAB = \alpha')
-            t2.math(r'\angle ACD = \angle ABD = \beta')
-            t2.math(r'\angle CDA = \angle BDA = \theta')
+            t2.math(r'\measuredangle CAD = \measuredangle DAB = \alpha')
+            t2.math(r'\measuredangle ACD = \measuredangle ABD = \beta')
+            t2.math(r'\measuredangle CDA = \measuredangle BDA = \theta')
 
         self.next_page()
 
@@ -217,7 +217,7 @@ class Prop09(Book1Scene):
             t2.e_fade()
             t2.white(5)
         t2.math(
-            r'\angle CAB = 2 \angle CAD',
+            r'\measuredangle CAB = 2 \measuredangle CAD',
         )
 
         self.next_page()
@@ -231,10 +231,10 @@ class Prop09(Book1Scene):
 
         with self.simultaneous():
             t2.e_fade()
-            t2.math(r'\angle CAD = \frac{1}{2} \angle CAB',
+            t2.math(r'\measuredangle CAD = \frac{1}{2} \measuredangle CAB',
                     transform_from=-1,
                     transform_args=dict(
-                        matched_keys=[r'\angle CAD', r'\angle CAB', r'='],
+                        matched_keys=[r'\measuredangle CAD', r'\measuredangle CAB', r'='],
                         key_map={'2': r'\frac{1}{2}'},
                         path_arc=90 * DEGREES,
                     ))

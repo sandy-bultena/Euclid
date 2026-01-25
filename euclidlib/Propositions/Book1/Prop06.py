@@ -34,11 +34,11 @@ class Prop06(Book1Scene):
         t1.title("In other words:")
         t1.explain("Start with a triangle with equal base angles")
 
-        t['ABC'] = ETriangle(A,B,C,
-                             point_labels=['A', ('B', RIGHT), ('C', LEFT)],
+        t['ABC'] = ETriangle(A,C,B,
+                             point_labels=['A', ('C', LEFT), ('B', RIGHT)],
                              angles=[None, r'\alpha', r'\alpha']
                              )
-        t2.math(r'\angle ACB = \angle ABC', is_axiom=True)
+        t2.math(r'\measuredangle ACB = \measuredangle ABC', is_axiom=True)
 
         self.next_page()
 
@@ -59,8 +59,8 @@ class Prop06(Book1Scene):
         t1.explain("Assume that the sides are not equal, and "
                    "demonstrate that this leads to a logical inconsistency")
 
-        t['ABC'].set_labels(('r_2', dict(outside=True)), (), ('r_1', dict(outside=True))).e_fill(BLUE_D)
-        t2.math(r'\angle ACB = \angle ABC', fill_color=BLUE)
+        t['ABC'].set_labels(('r_1', dict(outside=True)), (), ('r_2', dict(outside=True))).e_fill(BLUE_D)
+        t2.math(r'\measuredangle ACB = \measuredangle ABC', fill_color=BLUE)
         t4.set_y(t2[-1].get_top()[1])
         t2.math(r"AB > AC\quad(r_2 > r_1)")
 
@@ -69,9 +69,9 @@ class Prop06(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Use the method from Propositions 2 and 3 to find a "
                    "point D such that BD equals AC")
-        l['BD'], p['D'] = t['ABC'].l[-1].copy_to_line(B, t['ABC'].l[0])
+        l['BD'], p['D'] = t['ABC'].l[0].copy_to_line(B, t['ABC'].l[-1])
         p['D'].add_label('D', RIGHT)
-        l['BD'].add_label('r_1', outside=True)
+        l['BD'].add_label('r_1', inside=True)
         with self.simultaneous():
             t2.math(r'BD = AC = r_1')[-1].shift(RIGHT * 0.5)
 
@@ -119,9 +119,9 @@ class Prop06(Book1Scene):
         t2.down()
         t2.e_fade(*t2.except_index(2, 3, 5))
         with self.simultaneous():
-            t2.math(r"BD = r_1\ \angle DBC=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
+            t2.math(r"BD = r_1\ \measuredangle DBC=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
         with self.simultaneous():
-            t2.math(r"AC=r_1\ \angle ACB=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
+            t2.math(r"AC=r_1\ \measuredangle ACB=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
 
         self.next_page()
 
@@ -132,7 +132,7 @@ class Prop06(Book1Scene):
         t['BCD'].set_angles(None, r'\alpha', None, 0, mn_scale(70), 0)
 
         with self.simultaneous():
-            t2.math(r"\therefore\quad \angle DCB = \angle ABC = \alpha")[-1].shift(RIGHT / 2)
+            t2.math(r"\therefore\quad \measuredangle DCB = \measuredangle ABC = \alpha")[-1].shift(RIGHT / 2)
 
         self.next_page()
 
@@ -151,10 +151,10 @@ class Prop06(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        a['ACD'] = EAngle(t['BCD'].l[1], t['ABC'].l[2], size=mn_scale(120), label=r'\beta')
+        a['ACD'] = EAngle(t['BCD'].l[1], t['ABC'].l[0], size=mn_scale(120), label=r'\beta')
         t2.e_fade(*t2.except_index(5,))
         with self.simultaneous():
-            t2.explainM(r'let $\angle ACD = \beta$')
+            t2.math(r'\measuredangle ACD = \beta')
         t2.math(r'\Rightarrow \beta + \alpha = \alpha')
 
         self.next_page()

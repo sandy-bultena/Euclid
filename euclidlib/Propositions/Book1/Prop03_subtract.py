@@ -34,7 +34,7 @@ class Book1Prop3(Book1Scene):
             (C[0] - D[0]) ** 2 +
             (C[1] - D[1]) ** 2
         )
-        F = (D[0], D[1] + rAB - rCD)
+        F = (D[0], D[1] - rAB + rCD)
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -126,22 +126,26 @@ class Book1Prop3(Book1Scene):
         t1.explain("Line CF and line CE are radii of the same circle")
         l['CF'].add_label('x', UP)
 
+        t2.e_fade(0)
         t2.math("CE = CF = x")
-        t2.down()
         t2.math("AB = CF = x")
+        t2.down()
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Line DF is the difference between CD and CF")
         l['DF'].add_label('y-x', UP)
+        t2.e_fade()
         t2.math("DF = CD - CF")
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain("Line DF is the difference between CD and AB")
         with self.simultaneous():
             l['CE'].e_fade()
             l['CD'].remove_label()
-            l['DF'].red.lift()
-        t1.explain("Line DF is the difference between CD and AB")
+            l['DF'].green.lift()
+        t2.e_normal(3,4)
         t2.math("DF = CD - AB")
+
         self.next_page()

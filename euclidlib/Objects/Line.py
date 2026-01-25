@@ -46,11 +46,11 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     # - options for e_label_location should be passed when calling 'add_label'
     #
     # -----------------------------------------------------------------------------------------------------------------
-    def OUT(self):
+    def IN(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, PI / 2)
 
-    def IN(self):
+    def OUT(self):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -PI / 2)
 
@@ -64,7 +64,6 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             point = self.get_start()
 
         # calculate the position
-        direction = self.OUT()
         if inside:
             direction = self.IN()
         elif outside:
@@ -309,7 +308,10 @@ class ELine(Da.Dashable, EMObject, mn.Line):
     @log
     @copy_transform(index=0)
     def copy_to_line(self, target: P.EPoint, target_line: ELine):
-        print("Line.copy_to_line")
+        tp = target
+        if not isinstance(target, P.EPoint):
+            tp = P.VirtualPoint(tp)
+
         target_coord = convert_to_coord(target)
         lx, px = self.copy_to_point(target, speed=0)
         if lx is None or px is None:
@@ -322,12 +324,11 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             p = c.intersect(clone)
             if p is not None and len(p):
                 break
-            if target_line.length_from_end(target) > target_line.length_from_start(target):
+            if target_line.length_from_end(tp) > target_line.length_from_start(tp):
                 clone.extend(c.get_radius() / 2)
             else:
                 clone.prepend(c.get_radius() / 2)
         else:
-            print("Circle didn't intercept!!!\n")
             with self.scene.simultaneous():
                 px.e_remove()
                 lx.blue()
@@ -342,7 +343,7 @@ class ELine(Da.Dashable, EMObject, mn.Line):
                                         )
                     )
         np = P.EPoint(ref_p)
-        nl = ELine(target, np)
+        nl = ELine(tp, np)
 
         if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
             np.e_remove()
@@ -353,6 +354,8 @@ class ELine(Da.Dashable, EMObject, mn.Line):
             px.e_remove()
             lx.e_remove()
             c.e_remove()
+            if tp.Virtual:
+                tp.e_remove()
             if clone.in_scene():
                 clone.e_remove()
         return nl, np

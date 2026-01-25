@@ -51,7 +51,7 @@ class Prop12(Book1Scene):
         with self.simultaneous():
             a[1] = EAngle(l[3], l[1], size=mn_scale(40))
             a[2] = EAngle(l[2], l[3], size=mn_scale(60))
-        t2.math(r'\angle ACD = \angle BCD = \rightangle \text{(right angle)}')
+        t2.math(r'\angle ACD = \angle BCD = \rightangle\ \text{(right angle)}')
         tmp = EGroup(*p.values(), *l.values(), *a.values())
         TMP.append(tmp)
 
@@ -153,8 +153,8 @@ class Prop12(Book1Scene):
             l['EF'].e_fade()
             p['G'].e_fade()
 
-        l['CE'] = ELine(C,p['E'], label=('r_1', dict(inside=True)))
-        l['CF'] = ELine(C,p['F'], label=('r_1', dict(outside=True)))
+        l['CE'] = ELine(C,p['E'], label=('r_1', dict(outside=True)))
+        l['CF'] = ELine(C,p['F'], label=('r_1', dict(inside=True)))
 
         t2.math('CE = CF = r_1')
 
@@ -171,8 +171,8 @@ class Prop12(Book1Scene):
             l['CF'].e_fade()
 
         with self.simultaneous():
-            l['EG'].add_label('r_2', dict(inside=True))
-            l['FG'].add_label('r_2', dict(inside=True))
+            l['EG'].add_label('r_2', dict(outside=True))
+            l['FG'].add_label('r_2', dict(outside=True))
 
         t2.math('EG = GF = r_2')
 

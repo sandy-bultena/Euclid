@@ -54,7 +54,7 @@ class Book1Prop4(Book1Scene):
                              scene=self,
                              point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
                                                 ('C', dict(away_from='center_f'))],
-                             labels=[('x', dict(outside=True)), (), ('y', dict(inside=True))],
+                             labels=[('x', dict(outside=True)), (), ('y', dict(outside=True))],
                              angles=[r'\alpha', None, None, mn_scale(20)]
                              )
 
@@ -62,7 +62,7 @@ class Book1Prop4(Book1Scene):
                              scene=self,
                              point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
                                                 ('F', dict(away_from='center_f'))],
-                             labels=[('x', dict(inside=True)), (), ('y', dict(outside=True))],
+                             labels=[('x', dict(outside=True)), (), ('y', dict(outside=True))],
                              angles=[r'\alpha', None, None]
                              )
         self.next_page()
@@ -71,12 +71,9 @@ class Book1Prop4(Book1Scene):
         t1.explain("... then they are equal in all respects")
         t2.math(r"\triangle ABC = \triangle DEF")
         with self.simultaneous():
-            t['ABC'].set_labels((), ('z', RIGHT), ())
-        with self.simultaneous():
-            t['DEF'].set_labels((), ('z', LEFT), ())
-        with self.simultaneous():
+            t['ABC'].set_labels((), ('z', LEFT), ())
+            t['DEF'].set_labels((), ('z', RIGHT), ())
             t['ABC'].set_angles(None, r'\gamma', r'\beta')
-        with self.simultaneous():
             t['DEF'].set_angles(None, r'\gamma', r'\beta')
         self.next_page()
 
@@ -113,6 +110,8 @@ class Book1Prop4(Book1Scene):
         t1.explain("... diagram is offset a bit so we can see more clearly")
 
         t['DEF'].l[0].red()
+        t['ABC'].l[2].add_label('y', inside=True)
+
         with self.simultaneous():
             t['DEF'].remove_labels()
 
@@ -121,6 +120,7 @@ class Book1Prop4(Book1Scene):
 
         with self.simultaneous():
             t['ABC'].e_move(mn_scale(20, -10, 0))(run_time=1)
+
 
         t['ABC'].l[0].red()
 

@@ -34,15 +34,15 @@ class Prop18(Book1Scene):
         t1.title("In other words:")
         t1.explain("Given a triangle ABC")
         t['ABC'] = ETriangle(
-            A,C,B,
-            point_labels='ACB',
-            angles=r'\alpha \gamma \beta '.split(),
+            A,B,C,
+            point_labels='ABC',
+            angles=r'\alpha \beta \gamma '.split(),
             angle_sizes=[None, 60, None],
-            labels=['b', 'a', None]
+            labels=[None, 'a', 'b']
         )
-        a['a'], a['c'], a['b'] = t['ABC'].a
-        l['AC'], l['BC'], l['AB'] = t['ABC'].l
-        p['A'], p['C'],p['B'] = t['ABC'].p
+        a['a'], a['b'], a['c'] = t['ABC'].a
+        l['AB'], l['BC'], l['AC'] = t['ABC'].l
+        p['A'], p['B'],p['C'] = t['ABC'].p
 
         self.next_page()
 
@@ -58,7 +58,7 @@ class Prop18(Book1Scene):
         # ----------------------------------------------
         t2.e_remove()
         #t2.down()
-        t2.math(r'a > b', is_axiom=True)
+        t2.math(r'b > a', is_axiom=True)
         t1.down()
         t1.title("Proof:")
 
@@ -71,7 +71,7 @@ class Prop18(Book1Scene):
         p['D'] = EPoint(pts[0], label=('D', l['AC'].OUT()))
         D=p['D'].coordinates
         c['C'].e_remove()
-        l['AD'], l['CD'] = l['AC'].e_split(p['D'])
+        l['CD'], l['AD'] = l['AC'].e_split(p['D'])
         with self.simultaneous():
             l['CD'].add_label('a', outside=True)
             l['AC'].remove_label()

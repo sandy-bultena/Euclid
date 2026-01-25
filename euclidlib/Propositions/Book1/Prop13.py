@@ -56,7 +56,7 @@ class Prop13(Book1Scene):
         t1.explain("The sum of the angles ABD and ABC is equal to two right angles")
         a['alpha'] = EAngle(*self.lines('ABD'), size=mn_scale(70), label=r'\alpha')
         a['beta'] = EAngle(*self.lines('CBA'), size=mn_scale(80), label=r'\beta')
-        t2.math(r'\angle DBA + \angle ABC = 2 \rightangle')
+        t2.math(r'\measuredangle DBA + \measuredangle ABC = 2 \rightangle')
 
         t2.math(r'\alpha + ', align_str='+')
         t2.math(r'\beta = 2 \rightangle', align_str=r'= 2', align_index=-2)
@@ -218,4 +218,4 @@ class Prop13(Book1Scene):
         a['gamma'].e_fade()
         a['theta'].e_fade()
         l['BE'].e_fade()
-        t3.math(r'\angle ABC + \angle ABD = 2\ \rightangle')
+        t3.math(r'\measuredangle ABC + \measuredangle ABD = 2\ \rightangle')

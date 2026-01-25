@@ -33,13 +33,13 @@ class Prop05(Book1Scene):
         # ----------------------------------------------
         t1.title("In other words:")
         t1.explain("Given an isosceles triangle ABC")
-        t['ABC'] = ETriangle(A, B, C,
-                             point_labels=[('A', UP), ('B', RIGHT), ('C', LEFT)],
+        t['ABC'] = ETriangle(A, C, B,
+                             point_labels=[('A', UP), ('C', LEFT), ('B', RIGHT)],
                              angles=[r'\gamma', None, None],
                              labels=['r',None,'r'],
                              )
-        l['AB'], l['BC'], l['AC'] = t['ABC'].l
-        p['A'], p['B'], p['C'] = t['ABC'].p
+        l['AC'], l['BC'], l['AB'] = t['ABC'].l
+        p['A'], p['C'], p['B'] = t['ABC'].p
         t2.math("AB = AC = r", fill_color=BLUE)
         self.next_page()
 
@@ -54,21 +54,16 @@ class Prop05(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("In addition, if we extend lines AB and AC")
         with self.simultaneous():
-            l['BY'] = l['AB'].extend_cpy(mn_scale(150))
-            l['CZ'] = l['AC'].extend_cpy(mn_scale(-150))
+            l['BY'] = l['AB'].extend_cpy(mn_scale(-150))
+            l['CZ'] = l['AC'].extend_cpy(mn_scale(150))
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Then the exterior angles are equal")
-        D = l['BY'].point(mn_scale(100))
-        E = l['CZ'].point(mn_scale(100))
         with self.simultaneous():
             a['YBC'] = EAngle(l['BC'], l['BY'], label=r'\beta')
             a['ZCB'] = EAngle(l['BC'], l['CZ'], label=r'\delta')
-        with self.simultaneous():
-            p['D'] = EPoint(D, label_args=('D', dict(away_from=E)))
-            p['E'] = EPoint(E, label_args=('E', dict(away_from=D)))
         t2.math(r"\beta = \delta")
 
         self.next_page()
@@ -83,8 +78,6 @@ class Prop05(Book1Scene):
             a['ZCB'].e_remove()
             t['ABC'].a[1].e_remove()
             t['ABC'].a[2].e_remove()
-            p['E'].e_remove()
-            p['D'].e_remove()
             l['BY'].e_fade()
             l['CZ'].e_fade()
 
@@ -99,8 +92,8 @@ class Prop05(Book1Scene):
         D = l['BY'].point(mn_scale(100))
         p['D'] = EPoint(D, label_args=('D', dict(away_from=C)))
         l['BD'] = ELine(B, D)
-        l['BD'].add_label('x')
-        t2.math('BC = x')
+        l['BD'].add_label('x', inside=True)
+        t2.math('BD = x')
 
         self.next_page()
 
@@ -108,7 +101,7 @@ class Prop05(Book1Scene):
         t1.explain("Construct a line starting at C, with length BD, "
                    "on the line {nb:segment AC (I.2)}")
         l['CE'], p['E'] = l['BD'].copy_to_line(p['C'], l['CZ'], speed=2)
-        l['CE'].add_label('x',inside=True)
+        l['CE'].add_label('x',outside=True)
         p['E'].add_label('E', away_from=B)
         t2.math("BD = CE = x")
 
@@ -130,7 +123,7 @@ class Prop05(Book1Scene):
         l['BE'] = ELine(B, p['E'])
         t['AEB'] = ETriangle(p['E'], p['A'], p['B']).e_fill(BLUE_E)
         t2.e_fade()
-        t2.math(r'AE=x+r, \quad\angle EAB = \gamma, \quad AB = r')
+        t2.math(r'AE=x+r, \quad\measuredangle EAB = \gamma, \quad AB = r')
 
         self.next_page()
 
@@ -149,7 +142,7 @@ class Prop05(Book1Scene):
             l['AC'] = ELine(A, C, label_args=('r',dict(inside=True)))
             l['CD'] = ELine(C, p['D'])
         t['ADC'] = ETriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
-        t2.math(r'AD=x+r,\quad \angle DAC = \gamma,\quad AC = r')
+        t2.math(r'AD=x+r,\quad \measuredangle DAC = \gamma,\quad AC = r')
 
         self.next_page()
 
@@ -183,8 +176,8 @@ class Prop05(Book1Scene):
             l['CD'].add_label('y',inside=True, alpha=0.7 )
             l['BE'].add_label('y', outside=True, alpha=0.7)
         t2.math('CD = BE = y')
-        t2.math(r'\angle ACD = \angle ABE = \delta')
-        t2.math(r'\angle CDA = \angle BEA = \sigma')
+        t2.math(r'\measuredangle ACD = \measuredangle ABE = \delta')
+        t2.math(r'\measuredangle CDA = \measuredangle BEA = \sigma')
 
         self.next_page()
 
@@ -200,7 +193,7 @@ class Prop05(Book1Scene):
         t['CEB'] = ETriangle(p['C'], p['E'], p['B'], skip_anim=True).e_fill(PINK)
         a['CEB'].e_normal()
         t2.down()
-        t2.math(r'CE=x, \quad\angle CEB = \sigma,\quad EB=y')
+        t2.math(r'CE=x, \quad\measuredangle CEB = \sigma,\quad EB=y')
 
 
         self.next_page()
@@ -216,7 +209,7 @@ class Prop05(Book1Scene):
 
         t['CDB'] = ETriangle(p['C'], p['D'], p['B'], skip_anim=True).e_fill(PINK)
 
-        t2.math(r'BD=x,\quad \angle BDC=\sigma,\quad CD = y')
+        t2.math(r'BD=x,\quad \measuredangle BDC=\sigma,\quad CD = y')
 
         self.next_page()
 
@@ -238,7 +231,7 @@ class Prop05(Book1Scene):
             a['BCD'] = EAngle(l['BC'],l['CD'], size=mn_scale(50), label=r'\epsilon')
 
         t2.e_fade(*t2.except_index(11,12))
-        t2.math(r'\angle CBE = \angle BCD = \epsilon')
+        t2.math(r'\measuredangle CBE = \measuredangle BCD = \epsilon')
 
         self.next_page()
 
@@ -247,7 +240,7 @@ class Prop05(Book1Scene):
             a['CBD'] = EAngle(l['BC'],l['BD'], size=mn_scale(25), label=r'\beta')
             a['BCE'] = EAngle(l['BC'],l['CE'], size=mn_scale(25), label=r'\beta')
 
-        t2.math(r'\angle BCE = \angle CBD = \beta')
+        t2.math(r'\measuredangle BCE = \measuredangle CBD = \beta')
 
         self.next_page()
 
@@ -276,7 +269,7 @@ class Prop05(Book1Scene):
             t2.blue(0)
 
         t2.down(MED_SMALL_BUFF)
-        t2.math(r'\angle BCE = \angle CBD = \beta')
+        t2.math(r'\measuredangle BCE = \measuredangle CBD = \beta')
         t2.down(MED_SMALL_BUFF)
 
         self.next_page()
@@ -289,7 +282,7 @@ class Prop05(Book1Scene):
         t1.explain("Let's look now at the interior angles.  "
                    "The differences between equals are equal"
                    " so that means the interior angles are the same")
-        t2.math(r'\angle ABC = \angle ACB - \delta - \epsilon = \alpha')
+        t2.math(r'\measuredangle ABC = \measuredangle ACB = \delta - \epsilon = \alpha')
 
         self.next_page()
 
