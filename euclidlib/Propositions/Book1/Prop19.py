@@ -61,6 +61,7 @@ class Prop19(Book1Scene):
         t1.explain("Without loss of generality")
         t1.explain("If AC is not greater than AB, "
                    "then it must be less than or equal to AB")
+        t2.delete_last()
         t2.math(r'AC \le AB')
         t1.down()
 
@@ -69,7 +70,6 @@ class Prop19(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("If line AC equals AB, then the triangle would be "
                    "an isosceles triangle, where angle ABC equals angle ACB (I.5)")
-        t2.delete_last()
         t2.indent(MED_LARGE_BUFF)
         t['ABC'].move_point_to(0, E)
         t2.math('AC = AB')
