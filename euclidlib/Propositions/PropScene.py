@@ -372,6 +372,16 @@ class PropScene(mn.InteractiveScene):
         for a in args:
             a.unfreeze()
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------------
+    @mn.contextmanager
+    def skip_animations_for(self, stop=True):
+        if stop:
+            self.animateState.append(AnimState.SKIP)
+            yield
+            self.animateState.pop()
+        else:
+            yield
 
     # @mn.contextmanager
     # def delayed(self, **kwargs):
@@ -383,14 +393,6 @@ class PropScene(mn.InteractiveScene):
     #     if stored_anims:
     #         self.play(mn.LaggedStart(*stored_anims, **kwargs))
     #
-    # @mn.contextmanager
-    # def skip_animations_for(self, stop=True):
-    #     if stop:
-    #         self.animateState.append(AnimState.SKIP)
-    #         yield
-    #         self.animateState.pop()
-    #     else:
-    #         yield
     #
     # @mn.contextmanager
     # def run_animations_for(self, stop=True):
