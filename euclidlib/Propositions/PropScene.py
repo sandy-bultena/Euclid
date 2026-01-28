@@ -11,7 +11,8 @@ from euclidlib.Objects import *
 from os import getenv
 
 from euclidlib.debugging import print_debug
-DEFAULT_SPEED = 3
+DEFAULT_SPEED = 1
+DEFAULT_TEXT_SPEED = 10
 
 class AnimState(Enum):
     NORMAL = 0
@@ -299,6 +300,7 @@ class PropScene(mn.InteractiveScene):
         yield
         self.animateState.pop()
         stored_anims = self.animationsStored.pop()
+        print(f"{stored_anims=}")
         if stored_anims:
             self.play(*stored_anims, **kwargs)
 

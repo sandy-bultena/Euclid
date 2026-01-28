@@ -46,13 +46,13 @@ sub explanation {
     push @$steps, sub {
         $pn->clear;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $xc, $yc-300, -text_str => "Why Study Euclid?", -font => "intro" );
+        $cn->createText( $xc, $yc-300, -text => "Why Study Euclid?", -font => "intro" );
     };
 
     push @$steps, sub {
         my ( $x, $y ) = $pn->center_coords;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $xc, $yc-200, -text_str => "Because it's fun!", -font => "intro" );
+        $cn->createText( $xc, $yc-200, -text => "Because it's fun!", -font => "intro" );
     };
 
     push @$steps, sub {
@@ -74,7 +74,7 @@ sub explanation {
     push @$steps, sub {
         $pn->clear;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $xc, $yc-300, -text_str => "What will we do?", -font => "intro" );
+        $cn->createText( $xc, $yc-300, -text => "What will we do?", -font => "intro" );
     };
 
     push @$steps, sub {
@@ -110,7 +110,7 @@ sub explanation {
         $pn->clear;
         my ( $x, $y ) = $pn->center_coords;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $x+50, $y-300, -text_str => "Tools", -font => "intro" );
+        $cn->createText( $x+50, $y-300, -text => "Tools", -font => "intro" );
     };
 
     # -------------------------------------------------------------------------
@@ -138,7 +138,7 @@ sub explanation {
     push @$steps, sub {
         $pn->clear;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $xc, $yc-300, -text_str => "Postulates (Axioms)", -font => "intro" );
+        $cn->createText( $xc, $yc-300, -text => "Postulates (Axioms)", -font => "intro" );
     };
 
     # -------------------------------------------------------------------------
@@ -257,7 +257,7 @@ sub explanation {
     push @$steps, sub {
         $pn->clear;
         my $cn = $pn->Tk_canvas;
-        $cn->createText( $xc, $yc-300, -text_str => "Common Notions", -font => "intro" );
+        $cn->createText( $xc, $yc-300, -text => "Common Notions", -font => "intro" );
     };
 
     # -------------------------------------------------------------------------

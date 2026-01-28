@@ -36,7 +36,7 @@ sub new {
                        -ystart => $y,
                        @_
     }, $class;
-    delete $self->{-text_str};
+    delete $self->{-text};
 
     unless ($create_font) {
         my $mw = $cn->toplevel();
@@ -53,7 +53,7 @@ sub new {
                                           -size   => 16
         );
         my $text_font =
-          $mw->fontCreate( 'text_str', -family => 'Arial', -size => 16 );
+          $mw->fontCreate( 'text', -family => 'Arial', -size => 16 );
         $mw->fontCreate( 'footnote', -family => 'Arial', -size => 14 );
         $mw->fontCreate(
                          'sidenote',
@@ -96,9 +96,9 @@ sub new {
 # ============================================================================
 sub title {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "title" );
+    $self->_write_text( $text, "title" );
     $self->y( $self->y() + $tdown );
     return $self;
 }
@@ -108,9 +108,9 @@ sub title {
 # ============================================================================
 sub footnote {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "footnote" );
+    $self->_write_text( $text, "footnote" );
     $self->y( $self->y() );
     return $self;
 }
@@ -120,9 +120,9 @@ sub footnote {
 # ============================================================================
 sub sidenote {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "sidenote" );
+    $self->_write_text( $text, "sidenote" );
     $self->y( $self->y() );
     return $self;
 }
@@ -132,18 +132,18 @@ sub sidenote {
 # ============================================================================
 sub math {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "math" );
+    $self->_write_text( $text, "math" );
     $self->y( $self->y + $tdown );
     $self->y( $self->y + $tdown / 2 ) if $self->{-wide_math};
     return $self;
 }
 sub mathsmall {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "mathsmall" );
+    $self->_write_text( $text, "mathsmall" );
     $self->y( $self->y + $tdown );
     $self->y( $self->y + $tdown / 2 ) if $self->{-wide_math};
     return $self;
@@ -160,16 +160,16 @@ sub wide_math {
 # ============================================================================
 sub fraction_equation {
     my $self   = shift;
-    my $text_str   = shift;
+    my $text   = shift;
     my $top    = "";
     my $bottom = "";
     my $middle = "";
     my $lines  = "";
 
-    $text_str = _resolve_special_chars($text_str);
+    $text = _resolve_special_chars($text);
 
-    while ( length($text_str) > 0 ) {
-        if ( $text_str =~ /^!(.*?)\/(.*?)!/ ) {
+    while ( length($text) > 0 ) {
+        if ( $text =~ /^!(.*?)\/(.*?)!/ ) {
             my $t   = $1;
             my $b   = $2;
             my $max = length($t) > length($b) ? length($t) : length($b);
@@ -183,14 +183,14 @@ sub fraction_equation {
             }
             $lines  .= "_" x $max;
             $middle .= " " x $max;
-            $text_str =~ s/!.*?\/.*?!//;
+            $text =~ s/!.*?\/.*?!//;
         }
         else {
-            $middle .= substr( $text_str, 0, 1 );
+            $middle .= substr( $text, 0, 1 );
             $top    .= " ";
             $bottom .= " ";
             $lines  .= " ";
-            $text_str = substr( $text_str, 1 );
+            $text = substr( $text, 1 );
         }
 
     }
@@ -219,9 +219,9 @@ sub fraction_equation {
 # ============================================================================
 sub label {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "label" );
+    $self->_write_text( $text, "label" );
     $self->y( $self->y() + $tdown );
     return $self;
 }
@@ -231,9 +231,9 @@ sub label {
 # ============================================================================
 sub fancy {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    $self->_write_text( $text_str, "fancy" );
+    $self->_write_text( $text, "fancy" );
     $self->y( $self->y() + $tdown );
     return $self;
 }
@@ -251,8 +251,8 @@ sub canvas {
 # ============================================================================
 sub explain {
     my $self = shift;
-    my $text_str = shift;
-    $self->_write_text( $text_str, "explain" );
+    my $text = shift;
+    $self->_write_text( $text, "explain" );
     $self->y( $self->y() + $ydown );
     return $self;
 }
@@ -262,8 +262,8 @@ sub explain {
 # ============================================================================
 sub bold {
     my $self = shift;
-    my $text_str = shift;
-    $self->_write_text( $text_str, "bold" );
+    my $text = shift;
+    $self->_write_text( $text, "bold" );
     $self->y( $self->y() + $ydown );
     return $self;
 }
@@ -273,10 +273,10 @@ sub bold {
 # ============================================================================
 sub point {
     my $self   = shift;
-    my $text_str   = shift;
+    my $text   = shift;
     my $bullet = shift || "*";
 
-    # get info about current text_str
+    # get info about current text
     my $anchor = $self->{-anchor} || 'w';
     my $width  = $self->{-width}  || 20;
     my $xinit  = $self->x;
@@ -289,9 +289,9 @@ sub point {
                                 -anchor => $anchor
     );
 
-    # create the point, write the text_str, and update the y position
+    # create the point, write the text, and update the y position
     $self->explain("$bullet");
-    $temp->explain($text_str);
+    $temp->explain($text);
     $self->y( $temp->y );
 
     # save temp so that it can be erased if necessary
@@ -305,9 +305,9 @@ sub point {
 # ============================================================================
 sub indent {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
-    # get info about current text_str
+    # get info about current text
     my $anchor = $self->{-anchor} || 'w';
     my $width  = $self->{-width}  || 20;
     my $xinit  = $self->x;
@@ -320,8 +320,8 @@ sub indent {
                                 -anchor => $anchor
     );
 
-    # write the text_str, and update the y position
-    $temp->explain($text_str);
+    # write the text, and update the y position
+    $temp->explain($text);
     $self->y( $temp->y );
 
     # save temp so that it can be erased if necessary
@@ -335,8 +335,8 @@ sub indent {
 # ============================================================================
 sub normal {
     my $self = shift;
-    my $text_str = shift;
-    $self->_write_text( $text_str, "normal" );
+    my $text = shift;
+    $self->_write_text( $text, "normal" );
     $self->y( $self->y() + $ydown );
     return $self;
 }
@@ -356,10 +356,10 @@ sub down {
 sub delete {
     my $self = shift;
     my $cn   = $self->canvas;
-    foreach my $i ( @{ $self->{-text_str} } ) {
+    foreach my $i ( @{ $self->{-text} } ) {
         $cn->delete($i);
     }
-    undef @{ $self->{-text_str} };
+    undef @{ $self->{-text} };
 }
 
 # ============================================================================
@@ -370,20 +370,20 @@ sub delete_item {
     my $item = shift || 0;
     my $cn   = $self->canvas;
 
-    # if no text_str, bailout
-    return unless ref $self->{-text_str};
+    # if no text, bailout
+    return unless ref $self->{-text};
 
     # convert item to an array if it isn't already
     my @items;
     if   ( ref($item) ) { @items = @$item }
     else                { @items = ($item) }
 
-    # delete text_str item
+    # delete text item
     foreach my $item (@items) {
-        my $textbox = $self->{-text_str}->[$item];
+        my $textbox = $self->{-text}->[$item];
         if ($textbox) {
             $cn->delete($textbox);
-            undef $self->{-text_str}->[$item];
+            undef $self->{-text}->[$item];
         }
     }
 }
@@ -399,7 +399,7 @@ sub clear {
 sub erase {
     my $self = shift;
     my $cn   = $self->canvas;
-    foreach my $t_array ( @{ $self->{-text_str} } ) {
+    foreach my $t_array ( @{ $self->{-text} } ) {
         foreach my $i (@$t_array) {
             $cn->delete($i);
         }
@@ -407,7 +407,7 @@ sub erase {
     foreach my $indent ( @{ $self->{-indented} } ) {
         $indent->erase;
     }
-    undef @{ $self->{-text_str} };
+    undef @{ $self->{-text} };
     $self->y( $self->{-xstart} );
     $self->y( $self->{-ystart} );
 }
@@ -420,16 +420,16 @@ sub scale {
     my $scale = shift;
     my @orig  = @_;
     my $cn    = $self->canvas;
-    foreach my $i ( @{ $self->{-text_str} } ) {
+    foreach my $i ( @{ $self->{-text} } ) {
         $cn->scale( $i, @orig, $scale, $scale );
     }
 }
 
 # ============================================================================
-# write text_str
+# write text
 # ============================================================================
 sub superscript_subscript {
-    my $text_str = shift || "";
+    my $text = shift || "";
     my $type = shift || "";
     my @superscripts = (
                          "\N{U+2070}", "\N{U+00B9}",
@@ -438,127 +438,127 @@ sub superscript_subscript {
                          "\N{U+2076}", "\N{U+2077}",
                          "\N{U+2078}", "\N{U+2079}",
     );
-    while ( $text_str =~ /\\{^([0-9])}/ ) {
+    while ( $text =~ /\\{^([0-9])}/ ) {
         my $superscript = $superscripts[$1];
-        $text_str =~ s/\\{^([0-9])}/$superscript/;
+        $text =~ s/\\{^([0-9])}/$superscript/;
     }
-    while ( $text_str =~ /\\{(.*?)\^([0-9])}/ ) {
+    while ( $text =~ /\\{(.*?)\^([0-9])}/ ) {
         my $superscript = $superscripts[$2];
-        $text_str =~ s/\\{([^{}]*?)\^([0-9])}/$1$superscript/;
+        $text =~ s/\\{([^{}]*?)\^([0-9])}/$1$superscript/;
     }
 
     if ( $ENV{EUCLID_CREATE_PDF} && $type eq "explain" ) {
-        while ( $text_str =~ /\\{_([0-9])}/ ) {
-            $text_str =~ s/\\{_([0-9])}/[$1]/;
+        while ( $text =~ /\\{_([0-9])}/ ) {
+            $text =~ s/\\{_([0-9])}/[$1]/;
         }
-        while ( $text_str =~ /\\{(.*?)\_([0-9])}/ ) {
-            $text_str =~ s/\\{([^{}]?)\_([0-9])}/$1[$2]/;
+        while ( $text =~ /\\{(.*?)\_([0-9])}/ ) {
+            $text =~ s/\\{([^{}]?)\_([0-9])}/$1[$2]/;
         }
 
     }
 
-    while ( $text_str =~ /\\{_([0-9])}/ ) {
+    while ( $text =~ /\\{_([0-9])}/ ) {
         my $subscript = $subscripts[$1];
-        $text_str =~ s/\\{_([0-9])}/$subscript/;
+        $text =~ s/\\{_([0-9])}/$subscript/;
     }
-    while ( $text_str =~ /\\{(.*?)\_([0-9])}/ ) {
+    while ( $text =~ /\\{(.*?)\_([0-9])}/ ) {
         my $subscript = $subscripts[$2];
-        $text_str =~ s/\\{(.*?)\_([0-9])}/$1$subscript/;
+        $text =~ s/\\{(.*?)\_([0-9])}/$1$subscript/;
     }
-    return $text_str;
+    return $text;
 }
 
 sub _resolve_special_chars {
-    my $text_str = shift || "";
+    my $text = shift || "";
     
     
-    $text_str =~ s/-/\N{U+2011}/gi unless $ENV{EUCLID_CREATE_PDF};
-    $text_str =~ s/\\{arc}/\N{U+21BA}/gi;
-    $text_str =~ s/\\{circle}/\N{U+2299}/gi;
-    $text_str =~ s/\\{notpara}/\\{notequal}\\{parallel}/gi;
-    $text_str =~ s/\\{polygon}/\\{square}/gi;
-    $text_str =~ s/\\{rectangle}/\\{square}/gi;
-    $text_str =~ s/\\{parallelogram}/\\{square}/gi;
+    $text =~ s/-/\N{U+2011}/gi unless $ENV{EUCLID_CREATE_PDF};
+    $text =~ s/\\{arc}/\N{U+21BA}/gi;
+    $text =~ s/\\{circle}/\N{U+2299}/gi;
+    $text =~ s/\\{notpara}/\\{notequal}\\{parallel}/gi;
+    $text =~ s/\\{polygon}/\\{square}/gi;
+    $text =~ s/\\{rectangle}/\\{square}/gi;
+    $text =~ s/\\{parallelogram}/\\{square}/gi;
 
-    $text_str =~ s/\\{equivalent}/\N{U+2261}/gi;
-    $text_str =~ s/\\{sum}/\N{U+2211}/gi;
-    $text_str =~ s/\\{forall}/\N{U+2200}/gi;
-    $text_str =~ s/\\{elementof}/\N{U+2208}/gi;
-    $text_str =~ s/\\{natural}/\N{U+2115}/gi;
-    $text_str =~ s/\\{real}/\N{U+211D}/gi;
-    $text_str =~ s/\\{prime}/\N{U+2119}/gi;
-    $text_str =~ s/:/\N{U+2236}/gi;
-    $text_str =~ s/\\{alpha}/\N{U+03B1}/gi;
-    $text_str =~ s/\\{eta}/\N{U+03B7}/gi;
-    $text_str =~ s/\\{angle}/\N{U+2220}/gi;
-    $text_str =~ s/\\{beta}/\N{U+03B2}/gi;
-    $text_str =~ s/\\{br}/\n/gi;
-    $text_str =~ s/\\{correct}/\N{U+2713}/gi;
-    $text_str =~ s/\\{degrees}/\N{U+030A}/gi;
-    $text_str =~ s/\\{delta}/\N{U+03B4}/gi;
-    $text_str =~ s/\\{dot}/\N{U+22C5}/gi;
-    $text_str =~ s/\\{epsilon}/\N{U+03B5}/gi;
-    $text_str =~ s/\\{gamma}/\N{U+03B3}/gi;
-    $text_str =~ s/\\{half}/\N{U+00BD}/gi;
-    $text_str =~ s/\\{lambda}/\N{U+03BB}/gi;
-    $text_str =~ s/\\{nb}/\N{U+00A0}/gi;
-    $text_str =~ s/\\{notpara}/\N{U+2224}/gi;
-    $text_str =~ s/\\{nb}/\N{U+00A0}/gi;
+    $text =~ s/\\{equivalent}/\N{U+2261}/gi;
+    $text =~ s/\\{sum}/\N{U+2211}/gi;
+    $text =~ s/\\{forall}/\N{U+2200}/gi;
+    $text =~ s/\\{elementof}/\N{U+2208}/gi;
+    $text =~ s/\\{natural}/\N{U+2115}/gi;
+    $text =~ s/\\{real}/\N{U+211D}/gi;
+    $text =~ s/\\{prime}/\N{U+2119}/gi;
+    $text =~ s/:/\N{U+2236}/gi;
+    $text =~ s/\\{alpha}/\N{U+03B1}/gi;
+    $text =~ s/\\{eta}/\N{U+03B7}/gi;
+    $text =~ s/\\{angle}/\N{U+2220}/gi;
+    $text =~ s/\\{beta}/\N{U+03B2}/gi;
+    $text =~ s/\\{br}/\n/gi;
+    $text =~ s/\\{correct}/\N{U+2713}/gi;
+    $text =~ s/\\{degrees}/\N{U+030A}/gi;
+    $text =~ s/\\{delta}/\N{U+03B4}/gi;
+    $text =~ s/\\{dot}/\N{U+22C5}/gi;
+    $text =~ s/\\{epsilon}/\N{U+03B5}/gi;
+    $text =~ s/\\{gamma}/\N{U+03B3}/gi;
+    $text =~ s/\\{half}/\N{U+00BD}/gi;
+    $text =~ s/\\{lambda}/\N{U+03BB}/gi;
+    $text =~ s/\\{nb}/\N{U+00A0}/gi;
+    $text =~ s/\\{notpara}/\N{U+2224}/gi;
+    $text =~ s/\\{nb}/\N{U+00A0}/gi;
 
-    $text_str =~ s/\\{parallel}/\N{U+2016}/gi;
-    $text_str =~ s/\\{parallel}/\N{U+2225}/gi;
+    $text =~ s/\\{parallel}/\N{U+2016}/gi;
+    $text =~ s/\\{parallel}/\N{U+2225}/gi;
 
-    $text_str =~ s/\\{parallelogram}/\N{U+2662}/gi;
-    $text_str =~ s/\\{parallelogram}/\N{U+25B1}/gi;
-    $text_str =~ s/\\{parallelogram}/\N{U+27E0}/gi;
-    $text_str =~ s/\\{perp}/\N{U+22A5}/gi;
-    $text_str =~ s/\\{perp}/\N{U+22A5}/gi;
-    $text_str =~ s/\\{phi}/\N{U+03C6}/gi;
+    $text =~ s/\\{parallelogram}/\N{U+2662}/gi;
+    $text =~ s/\\{parallelogram}/\N{U+25B1}/gi;
+    $text =~ s/\\{parallelogram}/\N{U+27E0}/gi;
+    $text =~ s/\\{perp}/\N{U+22A5}/gi;
+    $text =~ s/\\{perp}/\N{U+22A5}/gi;
+    $text =~ s/\\{phi}/\N{U+03C6}/gi;
 
-    $text_str =~ s/\\{right}/\N{U+221F}/gi;
+    $text =~ s/\\{right}/\N{U+221F}/gi;
 
-    # $text_str =~ s/\\{right}/\N{U+02E9}/gi;
-    # $text_str =~ s/\\{right}/\N{U+A716}/gi;
-    # $text_str =~ s/\\{right}/\N{U+21F2}/gi;
-    # $text_str =~ s/\\{right}/\N{U+22BE}/gi;
+    # $text =~ s/\\{right}/\N{U+02E9}/gi;
+    # $text =~ s/\\{right}/\N{U+A716}/gi;
+    # $text =~ s/\\{right}/\N{U+21F2}/gi;
+    # $text =~ s/\\{right}/\N{U+22BE}/gi;
 
-    $text_str =~ s/\\{sigma}/\N{U+03C3}/gi;
-    $text_str =~ s/\\{square}/\N{U+25A1}/gi;
-    $text_str =~ s/\\{squared}/\N{U+00B2}/gi;
-    $text_str =~ s/\\{cubed}/\N{U+00B3}/gi;
-    $text_str =~ s/\\{therefore}/\N{U+2234}/gi;
-    $text_str =~ s/\\{theta}/\N{U+03B8}/gi;
-    $text_str =~ s/\\{triangle}/\N{U+0394}/gi;
-    $text_str =~ s/\\{wrong}/\N{U+2717}/gi;
-    $text_str =~ s/\\{notequal}/\N{U+2260}/gi;
-    $text_str =~ s/\\{then}/\N{U+2192}/gi;
-    $text_str =~ s/\\{times}/\N{U+00D7}/gi;
-    $text_str =~ s/\.\.\./\N{U+2026}/gi;
-    $text_str =~ s/\\{lessthanorequal}/\N{U+2264}/gi;
-    $text_str =~ s/\\{greaterthanorequal}/\N{U+2265}/gi;
-    $text_str =~ s/\\{(.+?)_(.+?)}/$1[$2]/gi;
-    $text_str =~ s/\\{_(.+?)}/[$1]/gi;
-    $text_str =~ s/\\{gnomon}//gi;
-    $text_str =~ s/\\{thereexists}/\N{U+2203}/gi;
-    $text_str =~ s/\\{(.*?)}/$1/gi;
-    return $text_str;
+    $text =~ s/\\{sigma}/\N{U+03C3}/gi;
+    $text =~ s/\\{square}/\N{U+25A1}/gi;
+    $text =~ s/\\{squared}/\N{U+00B2}/gi;
+    $text =~ s/\\{cubed}/\N{U+00B3}/gi;
+    $text =~ s/\\{therefore}/\N{U+2234}/gi;
+    $text =~ s/\\{theta}/\N{U+03B8}/gi;
+    $text =~ s/\\{triangle}/\N{U+0394}/gi;
+    $text =~ s/\\{wrong}/\N{U+2717}/gi;
+    $text =~ s/\\{notequal}/\N{U+2260}/gi;
+    $text =~ s/\\{then}/\N{U+2192}/gi;
+    $text =~ s/\\{times}/\N{U+00D7}/gi;
+    $text =~ s/\.\.\./\N{U+2026}/gi;
+    $text =~ s/\\{lessthanorequal}/\N{U+2264}/gi;
+    $text =~ s/\\{greaterthanorequal}/\N{U+2265}/gi;
+    $text =~ s/\\{(.+?)_(.+?)}/$1[$2]/gi;
+    $text =~ s/\\{_(.+?)}/[$1]/gi;
+    $text =~ s/\\{gnomon}//gi;
+    $text =~ s/\\{thereexists}/\N{U+2203}/gi;
+    $text =~ s/\\{(.*?)}/$1/gi;
+    return $text;
 }
 
 # ============================================================================
-# write text_str
+# write text
 # ============================================================================
 sub _write_text {
     my $self = shift;
-    my $text_str = shift || "";
+    my $text = shift || "";
     my $type = shift;
 
-    # create an empy array to hold text_str
-    $self->{-text_str} = [] unless $self->{-text_str};
-    push @{ $self->{-text_str} }, [];
+    # create an empy array to hold text
+    $self->{-text} = [] unless $self->{-text};
+    push @{ $self->{-text} }, [];
 
     # if spell check is on...
     if ( $Spell_check && $type !~ /^math/ && $type ne 'label' ) {
-        spell_check($text_str);
+        spell_check($text);
     }
 
     # get info from data object
@@ -578,7 +578,7 @@ sub _write_text {
                  explain   => "explain",
                  normal    => "explain",
                  title     => "title",
-                 text_str      => "text_str",
+                 text      => "text",
                  label     => "label",
                  mono      => "mono",
                  fancy     => "fancy",
@@ -587,25 +587,25 @@ sub _write_text {
                  sidenote  => "sidenote",
     );
 
-    $text_str = superscript_subscript( $text_str, $type );
-    my @texts = ($text_str);
+    $text = superscript_subscript( $text, $type );
+    my @texts = ($text);
 
     # separate into sections based on subscripts (if math)
     if ( $type eq 'math' ) {
-        $text_str =~ s/\\{sum\((.+?),(.+?)\)}\s*/$2\\{dot}/gi;
+        $text =~ s/\\{sum\((.+?),(.+?)\)}\s*/$2\\{dot}/gi;
 
-        # $text_str =~ s/\\{sum\((.+?),(.+?)\)}/\\{sum}\\{_$1}\\{^$2} /gi;
-        @texts = split( /(\\{[^\{\}]*?[_^].+?})/, $text_str );
+        # $text =~ s/\\{sum\((.+?),(.+?)\)}/\\{sum}\\{_$1}\\{^$2} /gi;
+        @texts = split( /(\\{[^\{\}]*?[_^].+?})/, $text );
     }
 
-    # loop over every part of the text_str
+    # loop over every part of the text
     foreach my $t (@texts) {
         my $xinit = $self->x;
 
         # not subscript or super script
         if ( $t !~ /\\{(.*?)([_^])(.+?)}/ || $type ne 'math' ) {
 
-            # make text_str substitutions as required
+            # make text substitutions as required
             $t = _resolve_special_chars($t);
 
             # use non-breaking '.' for references to other propositions
@@ -617,18 +617,18 @@ sub _write_text {
                 $t = _ligatures($t);
             }
 
-            # create the actual text_str object
+            # create the actual text object
             my $to =
               $real_cn->createText(
                                     $xinit, $yinit,
-                                    -text_str   => $t,
+                                    -text   => $t,
                                     -anchor => $anchor,
                                     -width  => $width,
                                     -font   => $font{$type} || "explain",
               );
 
-            # save text_str bit
-            push @{ $self->{-text_str}[-1] }, $to;
+            # save text bit
+            push @{ $self->{-text}[-1] }, $to;
 
             # save the x,y position
             my ( $left, $top, $right, $bottom ) = $cn->bbox($to);
@@ -665,7 +665,7 @@ sub _write_text {
             my $po =
               $real_cn->createText(
                                     $self->x(), $yinit,
-                                    -text_str   => $base,
+                                    -text   => $base,
                                     -anchor => $anchor,
                                     -width  => $width,
                                     -font   => $font{$type} || "explain",
@@ -675,14 +675,14 @@ sub _write_text {
             my $to =
               $real_cn->createText(
                                     $self->x() + $base_width + $nudge, $yoffset,
-                                    -text_str   => $sub_super_script,
+                                    -text   => $sub_super_script,
                                     -anchor => $anchor,
                                     -width  => $width,
                                     -font   => 'subscript',
               );
 
-            # save text_str bits
-            push @{ $self->{-text_str}[-1] }, $po, $to;
+            # save text bits
+            push @{ $self->{-text}[-1] }, $po, $to;
 
             # adjust to new location
             $self->x( $self->x +
@@ -694,9 +694,9 @@ sub _write_text {
         }
     }
 
-    # if type is normal, then center text_str
+    # if type is normal, then center text
     if ( $type eq 'normal' ) {
-        $cn->itemconfigure( $self->{-text_str}[-1][-1], -justify => 'center' );
+        $cn->itemconfigure( $self->{-text}[-1][-1], -justify => 'center' );
     }
 
     # reset x position
@@ -706,21 +706,21 @@ sub _write_text {
 }
 
 sub _ligatures {
-    my $text_str = shift;
-    $text_str =~ s/DZ/\N{U+0761}/g;
-    $text_str =~ s/DZ/\N{U+0763}/g;
-    $text_str =~ s/ffi/\x{fb03}/g;
-    $text_str =~ s/ffl/\x{fb04}/g;
-    $text_str =~ s/ff/\x{fb00}/g;
-    $text_str =~ s/fi/\x{fb01}/g;
-    $text_str =~ s/fl/\x{fb02}/g;
+    my $text = shift;
+    $text =~ s/DZ/\N{U+0761}/g;
+    $text =~ s/DZ/\N{U+0763}/g;
+    $text =~ s/ffi/\x{fb03}/g;
+    $text =~ s/ffl/\x{fb04}/g;
+    $text =~ s/ff/\x{fb00}/g;
+    $text =~ s/fi/\x{fb01}/g;
+    $text =~ s/fl/\x{fb02}/g;
 
-    #    $text_str =~ s/ft/\x{fb05}/g;
-    $text_str =~ s/LJ/\x{132}/g;
-    $text_str =~ s/lj/\x{133}/g;
-    $text_str =~ s/NJ/\x{1CA}/g;
-    $text_str =~ s/nj/\x{1cc}/g;
-    return $text_str;
+    #    $text =~ s/ft/\x{fb05}/g;
+    $text =~ s/LJ/\x{132}/g;
+    $text =~ s/lj/\x{133}/g;
+    $text =~ s/NJ/\x{1CA}/g;
+    $text =~ s/nj/\x{1cc}/g;
+    return $text;
 }
 
 sub x {
@@ -752,11 +752,11 @@ sub colour {
     my $allflag = shift || 0;
     my $cn      = $self->canvas;
 
-    # if no text_str, bailout
-    return unless ref $self->{-text_str};
+    # if no text, bailout
+    return unless ref $self->{-text};
 
     # if allflag true, set indices to everything
-    $index = [ 0 .. scalar( @{ $self->{-text_str} } ) ] if $allflag;
+    $index = [ 0 .. scalar( @{ $self->{-text} } ) ] if $allflag;
 
     # convert indices to an array if it isn't already
     my @indices;
@@ -765,7 +765,7 @@ sub colour {
 
     # loop over each one of the items and change colour
     foreach my $index (@indices) {
-        my $textbox_array = $self->{-text_str}->[$index] || [];
+        my $textbox_array = $self->{-text}->[$index] || [];
         foreach my $textbox (@$textbox_array) {
             if ($textbox) {
                 $cn->itemconfigure( $textbox, -fill => $colour );
@@ -842,9 +842,9 @@ sub allblack {
 # spell_check
 # ============================================================================
 sub spell_check {
-    my $text_str     = shift;
+    my $text     = shift;
     my $new_word = 0;
-    my $no_punc  = $text_str;
+    my $no_punc  = $text;
     $no_punc =~ s/[\(\).,'"\;\:\x{2026}]/ /g;
     $no_punc =~ s/\\\{.*?\}/ /g;
 
@@ -866,7 +866,7 @@ sub spell_check {
         close $dh;
     }
 
-    # go through each word in this text_str
+    # go through each word in this text
     my @words = split( /\s+/, $no_punc );
 
     foreach my $word (@words) {

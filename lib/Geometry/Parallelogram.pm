@@ -107,7 +107,7 @@ sub new {
                                   -points     => 'array',
                                   -labels     => 'array',
                                   -angles     => 'array',
-                                  -fill       => 'text_str',
+                                  -fill       => 'text',
                                   -anglesizes => 'array'
                                }
                              );

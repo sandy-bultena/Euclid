@@ -229,24 +229,24 @@ def find_scene():
     f = currentframe()
 
     # keep up the stack until there is no more to go
-    while f.f_back:
-        f = f.f_back
+    while f:
 
         # if this frame is not a frame for a class object, ignore
-        if 'self' not in f.f_locals:
-            continue
+        if 'self' in f.f_locals:
 
-        # get the object
-        f_self = f.f_locals['self']
+            # get the object
+            f_self = f.f_locals['self']
 
-        # if object already has scene defined, then return that
-        if isinstance(f_self, EMObject) and hasattr(f_self, 'scene'):
-            return f_self.scene
+            # if object already has scene defined, then return that
+            if isinstance(f_self, EMObject) and hasattr(f_self, 'scene'):
+                if f_self.scene is not None:
+                    return f_self.scene
 
-        # if this is the PropScene, then this is the scene!
-        if isinstance(f_self, ps.PropScene):
-            return f_self
+            # if this is the PropScene, then this is the scene!
+            if isinstance(f_self, ps.PropScene):
+                return f_self
 
+        f = f.f_back
     return None
 
 
@@ -261,7 +261,11 @@ def with_objects(head, *rest):
 
 
 # =====================================================================================================================
-# NullAnimationBuilder ??
+# NullAnimationBuilder
+# example:
+#    a=NullAnimationBuilder()
+#    a.any_method -> return self
+#    a()          -> returns self
 # =====================================================================================================================
 class NullAnimationBuilder:
     def __getattr__(self, item):
@@ -290,31 +294,48 @@ class NullPlayer:
 # - methods to pass into 'play' ??
 # =====================================================================================================================
 class EMObjectPlayer:
+    """
+    For a manim object to be animated, there are specific animators that are needed (ex. Write(TextObj)
+
+    * this class manages the 'players' that animate the objects
+    """
     def __init__(self, eobj: EMObject):
-        self.rotating = False
+        """
+        :param eobj: the object that needs a player for animation
+        """
         self.eobj = eobj
 
+        self.rotating = False
+
+        # if object is frozen, just set the animation to 'self' (not sure whey this stops animation?)
+        # otherwise set the '.anim' property to the manim lib defined animation
         if eobj.is_frozen:
             self.anim = NullAnimationBuilder()
         else:
             self.anim = eobj.animate
 
+        # if the object has no label, or either obj or label is frozen, set animation to NullAnigmation
+        # otherwise set the '.label_anim' property to the manim lib defined animation
         if eobj.is_frozen or eobj.e_label is None or eobj.e_label.is_frozen:
             self.label_anim = NullAnimationBuilder()
         else:
             self.label_anim = eobj.e_label.animate
 
-        self.o_animate_part = eobj.animate_part
-        self.l_animate_part = eobj.e_label.animate_part if eobj.e_label is not None else []
+        # what parts to animate (fill and/or stroke for example)
+        self.o_animate_part: list[str] = eobj.animate_part
+        self.l_animate_part: list[str] = eobj.e_label.animate_part if eobj.e_label is not None else []
 
-        self.fade_out_flag = False
-        self.fade_in_flag = False
+        # ??
         self.main_animate = False
         self.label_animate = False
+
         self.rotation = []
     def __str__(self):
         return f"EMObjectPlayer obj={str(self.eobj)}"
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # what is the fade opacity of the object?
+    # ----------------------------------------------------------------------------------------------------------------
     @property
     def _fade_opacity(self):
         from euclidlib.Objects import Text
@@ -341,36 +362,46 @@ class EMObjectPlayer:
     @property
     def e_fade(self):
         self.main_animate = self.label_animate = True
-        for meth in self.o_animate_part:
-            getattr(self.anim, meth)(opacity=self._fade_opacity)
-        for meth in self.l_animate_part:
-            getattr(self.label_anim, meth)(opacity=0.0)
+        for method in self.o_animate_part:
+            getattr(self.anim, method)(opacity=self._fade_opacity)
+        for method in self.l_animate_part:
+            getattr(self.label_anim, method)(opacity=0.0)
         return self
 
     @property
     def e_normal(self):
+        print("inside e_normal")
         self.main_animate = self.label_animate = True
-        for meth in self.o_animate_part:
-            getattr(self.anim, meth)(opacity=1.0)
-        for meth in self.l_animate_part:
-            getattr(self.label_anim, meth)(opacity=1.0)
+        for method in self.o_animate_part:
+            getattr(self.anim, method)(opacity=1.0)
+            print(f"... calling {method}")
+        for method in self.l_animate_part:
+            getattr(self.label_anim, method)(opacity=1.0)
+            print(f"... calling {method}")
         return self
 
     def _e_color(self, color: mn.Color):
+        print(f"EMObjectPlayer._e_color({self}, {color}")
         self.main_animate = True
+        print("Set main_animate to true")
         self.e_normal.anim.set_color(color=color)
+        print("Color has been set")
+        print()
         return self
 
     @property
     def green(self):
+        print("EMObjectPlayer.green", self)
         return self._e_color(mn.GREEN)
 
     @property
     def blue(self):
+        print("EMObjectPlayer.blue", self)
         return self._e_color(mn.BLUE)
 
     @property
     def red(self):
+        print("EMObjectPlayer.red", self)
         return self._e_color(mn.RED)
 
     @property
@@ -449,6 +480,7 @@ class EMObjectPlayer:
         return anim_built
 
     def __call__(self, *args, **kwargs):
+        print(f"***** EMobject {self} is being called as a function")
         anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
         label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
 
@@ -571,9 +603,11 @@ class EMObject(mn.VMobject):
 
     for name in EMObjectPlayer._properties():
         exec(f'''
+print(f"making method {name} for property")
 @property
 @freezable_player
 def {name}(self):
+    print("EMObject calling EMObjectPlayer(",self,").{name}")
     return EMObjectPlayer(self).{name}
         '''.strip())
 
@@ -590,7 +624,6 @@ def {name}(self, *args):
     @freezable
     def add_label(self, *args, **label_args):
         if isinstance(args[-1], dict) and not label_args:
-            print("**** EMObject.add_label: WHAT CRAZY SYNTAX IS THIS?")
             *args, label_args = args
         new_label = self.init_label(*args, **label_args)
 

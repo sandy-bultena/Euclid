@@ -450,7 +450,7 @@ B<Returns>
 # -----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text_str text_str)] );
+    Validate::Inputs( \@_, [], [qw(text text)] );
     my $text_str = shift || "";
     my $size;
     eval { no warnings; $size = shift || ''; $size = int($size) };

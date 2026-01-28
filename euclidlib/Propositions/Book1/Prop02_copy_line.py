@@ -110,7 +110,7 @@ class Book1Prop2(Book1Scene):
         t1.explain("Line AD is equal to line DC (equilateral triangle)")
         l['CD'].add_label("x", outside=True)
         l['AD'].add_label("x", outside=True)
-        eq_ad_dc_x, = t2.math("AD = DC = x")
+        eq_ad_dc_x = t2.math("AD = DC = x")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -129,7 +129,7 @@ class Book1Prop2(Book1Scene):
             l['DF'] = ELine(p['D'], p['F'], label_args=('y', dict(outside=True)))
         with self.simultaneous():
             eq_ad_dc_x.e_fade()
-        eq_de_df_y, = t2.math("DE = DF = y")
+        eq_de_df_y = t2.math("DE = DF = y")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -144,8 +144,8 @@ class Book1Prop2(Book1Scene):
 
         l['AE'] = ELine(A, p['E'], label_args=('x-y', dict(align=RIGHT, inside=True)))
         t2.e_normal()
-        eq_ae_eq_ad_m_de, = t2.math("AE = AD - DE")
-        eq_ae_eq_x_m_y, = t2.math("AE = x  - y")
+        eq_ae_eq_ad_m_de = t2.math("AE = AD - DE")
+        eq_ae_eq_x_m_y = t2.math("AE = x  - y")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -162,8 +162,8 @@ class Book1Prop2(Book1Scene):
         with self.simultaneous():
             eq_ae_eq_ad_m_de.e_fade()
             eq_ae_eq_x_m_y.e_fade()
-        eq_cf_eq_dc_m_df, = t2.math("CF = DC - DF")
-        eq_cf_eq_c_m_y, = t2.math("CF = x  - y")
+        eq_cf_eq_dc_m_df = t2.math("CF = DC - DF")
+        eq_cf_eq_c_m_y = t2.math("CF = x  - y")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -181,7 +181,7 @@ class Book1Prop2(Book1Scene):
             l['CF'].add_label('z', outside=True)
 
         t2.e_fade()
-        eq_ae_cf_z, = t2.math("AE = CF = z")
+        eq_ae_cf_z = t2.math("AE = CF = z")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -195,7 +195,7 @@ class Book1Prop2(Book1Scene):
 
         l['AB'].add_label('z', outside=True)
         t2.e_fade()
-        eq_ab_ae_z, = t2.math("AB = AE = z")
+        eq_ab_ae_z = t2.math("AB = AE = z")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -209,7 +209,7 @@ class Book1Prop2(Book1Scene):
         with self.simultaneous():
             eq_ae_cf_z.e_normal()
             eq_ab_ae_z.e_normal()
-        eq_ab_cf_z, = t2.math("AB = CF = z")
+        eq_ab_cf_z = t2.math("AB = CF = z")
         self.next_page()
 
         # ------------------------------------------------------------------------

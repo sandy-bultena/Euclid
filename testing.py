@@ -1,4 +1,6 @@
 from functools import wraps
+from typing import Callable, TypeVar, cast
+
 
 #from typing import Any
 
@@ -53,4 +55,44 @@ def copy_transform(*args, index=None):
 def foo(n,y):
     print(f"Foo: {n=} {y=}")
 
-foo(3,4)
+docstr = """This is the doc string for abc"""
+def abc():
+    """whatever"""
+abc.__doc__ = docstr
+
+
+
+
+CommonFunc = Callable[[str, int], bool]
+F = TypeVar("F", bound=CommonFunc)
+
+def shared_signature_and_doc(func: F) -> F:
+    """A decorator to apply a common docstring.
+        This is a shared docstring applied by a decorator.
+
+        Args:
+            name: The name parameter (str).
+            value: The value parameter (int).
+
+        Returns:
+            A boolean indicating success or failure.
+    """
+    # Cast is used here to help the type checker understand the return type
+    return cast(F, func)
+
+@shared_signature_and_doc
+def func_e(name: str, value: int) -> bool:
+    """Placeholder docstring gets replaced."""
+    return True
+
+import functools
+@functools.wraps(shared_signature_and_doc)
+def func_f(name: str, value: int) -> bool:
+    """other docstring"""
+    return False
+
+# You can now see the shared docstring is present
+# print(func_e.__doc__)
+
+
+func_f("a",3)

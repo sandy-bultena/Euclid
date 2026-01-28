@@ -58,7 +58,7 @@ class Prop16(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explainM(r"The angle $\angle{ACD}$ is larger than either $\angle{ABC}$ or $\angle{CAB}$")
+        t1.explainM(r"The angle $\measuredangle{ACD}$ is larger than either $\measuredangle{ABC}$ or $\measuredangle{CAB}$")
         a['a'] = EAngle(*self.lines('ACD'), size=mn_scale(20), label=(r'\alpha',))
         a['g'] = EAngle(*self.lines('CBA'), size=mn_scale(40), label=r'\gamma')
         a['b'] = EAngle(*self.lines('BAC'), label=r'\beta')
@@ -123,7 +123,7 @@ class Prop16(Book1Scene):
         with self.simultaneous():
             a['th1'] = EAngle(*self.lines('AEB'), label=r'\theta', no_right=True)
             a['th2'] = EAngle(*self.lines('CEF'), label=r'\theta', no_right=True)
-        t2.math(r'\angle{AEB} = \angle{CEF} = \theta')
+        t2.math(r'\measuredangle{AEB} = \measuredangle{CEF} = \theta')
 
         self.next_page()
 
@@ -147,7 +147,7 @@ class Prop16(Book1Scene):
         t1.explain("Thus, angles BAE and ECF are equal (I.4)")
         a['b'].e_normal()
         t['CEF'].set_angles(r'\beta', None, None, mn_scale(40))  # Look Out For
-        t2.math(r'\angle{BAE} = \angle{ECF} = \beta')
+        t2.math(r'\measuredangle{BAE} = \measuredangle{ECF} = \beta')
 
         self.next_page()
 
@@ -166,7 +166,7 @@ class Prop16(Book1Scene):
             a['a'].e_normal()
             l['CD'].e_normal()
 
-        t2.math(r'\angle{ECF} = \angle{BAC} < \angle{ACD}')
+        t2.math(r'\measuredangle{ECF} = \measuredangle{BAC} < \measuredangle{ACD}')
         t2.math(r'\alpha > \beta')
 
         self.next_page()

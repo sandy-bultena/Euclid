@@ -51,7 +51,7 @@ class Prop12(Book1Scene):
         with self.simultaneous():
             a[1] = EAngle(l[3], l[1], size=mn_scale(40))
             a[2] = EAngle(l[2], l[3], size=mn_scale(60))
-        t2.math(r'\angle ACD = \angle BCD = \rightangle\ \text{(right angle)}')
+        t2.math(r'\measuredangle ACD = \measuredangle BCD = \rightangle\ \text{(right angle)}')
         tmp = EGroup(*p.values(), *l.values(), *a.values())
         TMP.append(tmp)
 
@@ -201,7 +201,7 @@ class Prop12(Book1Scene):
             a['CGE'] = EAngle(*self.lines('CGE'), label=r'\gamma', size=mn_scale(30))
             a['CGF'] = EAngle(*self.lines('CGF'), label=r'\gamma')
 
-        t2.math(r'\angle CGE = \angle CGF = \gamma')
+        t2.math(r'\measuredangle CGE = \measuredangle CGF = \gamma')
 
         self.next_page()
 
@@ -226,9 +226,9 @@ class Prop12(Book1Scene):
             a['CGE'].remove_label()
             a['CGF'].remove_label()
 
-        t2.e_update(-1, r'\angle CGE = \angle CGF = \rightangle',
+        t2.e_update(-1, r'\measuredangle CGE = \measuredangle CGF = \rightangle',
                 fill_color=BLUE,
                 transform_args=dict(
-                    matched_keys=[r'\angle CGE = \angle CGF = '],
+                    matched_keys=[r'\measuredangle CGE = \measuredangle CGF = '],
                     key_map={r'\gamma': r'\rightangle'},
                 ))

@@ -58,8 +58,8 @@ class Prop13(Book1Scene):
         a['beta'] = EAngle(*self.lines('CBA'), size=mn_scale(80), label=r'\beta')
         t2.math(r'\measuredangle DBA + \measuredangle ABC = 2 \rightangle')
 
-        t2.math(r'\alpha + ', align_str='+')
-        t2.math(r'\beta = 2 \rightangle', align_str=r'= 2', align_index=-2)
+        t2.math(r'\alpha\quad + ', align_str='+')
+        t2.math(r'\beta\quad = 2 \rightangle', align_str=r'= 2', align_index=-2)
 
         self.next_page()
 
@@ -79,7 +79,7 @@ class Prop13(Book1Scene):
         a['gamma'] = EAngle(*self.lines('CBE'), label=r'\gamma')
         a['epsilon'] = EAngle(*self.lines('EBD'), size=mn_scale(20), label=r'\epsilon')
         t1.explainM(r'1. Angles $\gamma$ and $\epsilon$ are right angles')
-        eq['1'], = t3.math(r'1.\quad\quad\quad\epsilon = \gamma')
+        eq['1'] = t3.math(r'1.\quad\quad\quad\epsilon = \gamma')
 
         self.next_page()
 
@@ -92,17 +92,17 @@ class Prop13(Book1Scene):
             l['AB'].e_normal()
         a['theta'] = EAngle(*self.lines('ABE'), size=mn_scale(90), label=r'\theta')
 
-        eq['2-1'], = t3.math(r'2.')
-        eq['2-2'], = t3.math(r'\gamma = \beta + \theta', align_str=r'=', align_index=-2)
+        eq['2-1'] = t3.math(r'2.')
+        eq['2-2'] = t3.math(r'\gamma = \beta + \theta', align_str=r'=', align_index=-2)
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explainM(r'3. Add angle $\epsilon$ to $\gamma$ and to $\theta$ plus $\beta$')
         a['epsilon'].e_normal()
-        eq['3-1'], = t3.math(r'3.')
+        eq['3-1'] = t3.math(r'3.')
         with self.simultaneous():
-            eq['3-2'], = t3.math(
+            eq['3-2'] = t3.math(
                 r'\epsilon + \gamma',
                 align_str=r'\gamma',
                 align_index=eq['2-2'],
@@ -111,7 +111,7 @@ class Prop13(Book1Scene):
                     matched_keys=[r'\gamma'],
                 ),
                 )
-            eq['3-3'], = t3.math(
+            eq['3-3'] = t3.math(
                 r'= \beta + \theta + \epsilon',
                 align_str=r'=',
                 align_index=eq['2-2'],
@@ -133,7 +133,7 @@ class Prop13(Book1Scene):
         t3.down()
 
         t1.explainM(r'4. Angle $\alpha$ is the sum of angles $\theta$ and $\epsilon$')
-        eq['4-1'], = t3.math(r'4.')
+        eq['4-1'] = t3.math(r'4.')
         print(f"Equation 4-1 = {eq['4-1']}")
         with self.simultaneous():
             eq['4-3'] = t3.math(r'= \theta + \epsilon',
@@ -141,11 +141,11 @@ class Prop13(Book1Scene):
                                 align_index=eq['3-3'],
                                 #transform_from=eq['3-3'],
                                 #transform_args=dict(matched_keys=[r'\theta + \epsilon', '='], ),
-                                )[-1].next_to(eq['4-1'], RIGHT, coor_mask=UP)
+                                ).next_to(eq['4-1'], RIGHT, coor_mask=UP)
             eq['4-2'] = t3.math(r'\alpha',
                                 align_str=(r'\gamma', r'\alpha'),
                                 align_index=eq['3-2'],
-                                )[-1].align_to(eq['4-3'], DOWN)
+                                ).align_to(eq['4-3'], DOWN)
 
         self.next_page()
 
@@ -153,15 +153,15 @@ class Prop13(Book1Scene):
         a['beta'].e_normal()
 
         t1.explainM(r'5. Add angle $\beta$ to $\alpha$ and to $\theta$ plus $\epsilon$')
-        eq['5-1'], = t3.math(r'5.')
+        eq['5-1'] = t3.math(r'5.')
         with self.simultaneous():
-            eq['5-2'], = t3.math(
+            eq['5-2'] = t3.math(
                 r'\beta + \alpha', align_str=r'\alpha',
                 align_index=eq['4-2'],
                 transform_from=eq['4-2'],
                 transform_args=dict(matched_keys=[r'\alpha']),
                 )
-            eq['5-3'], = t3.math(
+            eq['5-3'] = t3.math(
                 r'= \beta + \theta + \epsilon',
                 align_str=r'=',
                 align_index=eq['4-3'],
@@ -191,8 +191,8 @@ class Prop13(Book1Scene):
 
 
         with self.simultaneous():
-            eq['6-1'], = t3.math(r'6.')
-            eq['6-2'], = t3.math(
+            eq['6-1'] = t3.math(r'6.')
+            eq['6-2'] = t3.math(
                 r'\beta + \alpha', align_str=r'\alpha',
                 align_index=-3,
                 transform_from=eq['5-2'],
@@ -205,10 +205,10 @@ class Prop13(Book1Scene):
                 align_index=eq['5-3'],
                 transform_from=eq['3-2'],
                 t2c={r'\epsilon + \gamma': BLUE},
-                )[-1].align_to(eq['6-2'], DOWN)
+                ).align_to(eq['6-2'], DOWN)
             eq['6-4'] = t3.math(
                 r'= 2\ \rightangle',
-                )[-1].next_to(eq['6-3'], RIGHT, buff=SMALL_BUFF)
+                ).next_to(eq['6-3'], RIGHT, buff=SMALL_BUFF)
 
         self.next_page()
 

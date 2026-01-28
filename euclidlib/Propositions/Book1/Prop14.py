@@ -68,9 +68,11 @@ class Prop14(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("If the sum of the angles ABC and ABD equals "
                    "the sum of two right angles...")
-        eq['a+b'], _, eq['2R-1'], _ = \
-            t2.math(r'\alpha + \beta = \rightangle + \rightangle',
+
+        f = t2.math(r'\alpha + \beta = \rightangle + \rightangle',
                     break_into_parts=(r'\alpha + \beta', '=', r'\rightangle + \rightangle'))
+        eq['a+b'],eq['2R-1'] = f.parts[0], f.parts[2]
+
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -107,9 +109,10 @@ class Prop14(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explainM(r"If CBE is a straight line, then the sum of $\alpha$ and $\theta$ "
                     r" equals two right angles (I.13)")
-        eq['a+t'], _, eq['2R-2'], _ = (
-            t2.math(r'\alpha + \theta = \rightangle + \rightangle',
-                    break_into_parts=(r'\alpha + \theta', '=', r'\rightangle + \rightangle')))
+
+        f = t2.math(r'\alpha + \theta = \rightangle + \rightangle',
+                    break_into_parts=(r'\alpha + \theta', '=', r'\rightangle + \rightangle'))
+        eq['a+t'], eq['2R-2'] = f.parts[0], f.parts[2]
 
         self.next_page()
 
@@ -124,9 +127,9 @@ class Prop14(Book1Scene):
             mn.Indicate(eq['2R-1']),
             mn.Indicate(eq['2R-2']),
         )
-        at, q, ab, full = t2.math(r'\alpha + \theta = \alpha + \beta',
+        at, q, ab = t2.math(r'\alpha + \theta = \alpha + \beta',
                                   break_into_parts=(r'\alpha + \theta', '=', r'\alpha + \beta'),
-                                  delay_anim=True)
+                                  delay_anim=True).parts
         with self.simultaneous():
             at.transform_from(eq['a+t'])
             ab.transform_from(eq['a+b'])

@@ -19,13 +19,29 @@ class EGroupPlayer:
     def __str__(self):
         return ", ".join(str(g) for g in self.group)
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # this allows an EGroupPlayer instance to be called directly,
+    # -----------------------------------------------------------------------------------------------------------------
     def __call__(self, *index, **kwargs):
+        print(f"EGroupPlayer.__call__ obj={str(self)}, index = {index}")
+        # print(f'  ...  caller name:', inspect.stack()[0][3], inspect.stack()[0][1], inspect.stack()[0][2])
+        # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1], inspect.stack()[1][2])
+        # print(f'  ...  caller name:', inspect.stack()[2][3], inspect.stack()[2][1], inspect.stack()[2][2])
+        # print(f'  ...  caller name:', inspect.stack()[3][3], inspect.stack()[3][1], inspect.stack()[3][2])
+        # print(f'  ...  caller name:', inspect.stack()[4][3], inspect.stack()[4][1], inspect.stack()[4][2])
+        # print(f'  ...  caller name:', inspect.stack()[5][3], inspect.stack()[5][1], inspect.stack()[5][2])
+        # print(f'  ...  caller name:', inspect.stack()[6][3], inspect.stack()[6][1], inspect.stack()[6][2])
+
         to_exec = self.indices or self.players
+        print()
+        print(f"to_exec=")
         if index:
             to_exec = [self.players[i] for i in index]
 
+        print(f"to_exec=")
         with self.obj.scene.simultaneous():
             for player in to_exec:
+                print(f"{player}")
                 player(**kwargs)
         return self.obj
 
@@ -37,7 +53,10 @@ class EGroupPlayer:
         exec(f'''
 @property
 def {name}(self):
+    print()
+    print("In EGroupPlayer {name}")
     for player in self.players:
+        print("In EGroupPlayer: player=",player, "{name} property")
         player.{name}
     return self
 '''.strip())

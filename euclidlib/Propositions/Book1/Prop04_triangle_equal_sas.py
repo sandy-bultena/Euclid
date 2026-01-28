@@ -90,9 +90,9 @@ class Book1Prop4(Book1Scene):
             t['ABC'].a[2].e_remove()
             t['DEF'].a[2].e_remove()
         t1.title("Proof:")
-        eq1, = t2.math("AB = DE", is_axiom = True)
-        eq2, = t2.math("AC = DF", is_axiom = True)
-        eq3, = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
+        eq1 = t2.math("AB = DE", is_axiom = True)
+        eq2 = t2.math("AC = DF", is_axiom = True)
+        eq3 = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -147,8 +147,8 @@ class Book1Prop4(Book1Scene):
             t['DEF'].p[2].e_fade()
 
         t2.fade_text_objs(eq2, eq3)
-        eq4, = t2.math("A = D")
-        eq5, = t2.math("B = E")
+        eq4 = t2.math("A = D")
+        eq5 = t2.math("B = E")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -166,8 +166,8 @@ class Book1Prop4(Book1Scene):
 
         t2.fade_text_objs(eq1, eq4, eq5)
         t2.normalize_text_objs(eq2, eq3)
-        eq6, = t2.math("C = F")
-        eq7, = t2.math("AC = DF")
+        eq6 = t2.math("C = F")
+        eq7 = t2.math("AC = DF")
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -206,7 +206,7 @@ class Book1Prop4(Book1Scene):
 
         t2.fade_text_objs(eq1,eq2,eq3,eq4,eq7)
         t2.normalize_text_objs(eq6, eq5)
-        eq8, = t2.math("BC = EF")
+        eq8 = t2.math("BC = EF")
         self.next_page()
 
         # ------------------------------------------------------------------------

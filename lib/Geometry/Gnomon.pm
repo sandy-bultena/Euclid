@@ -286,7 +286,7 @@ B<Returns>
 # -----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text_str number)] );
+    Validate::Inputs( \@_, [], [qw(text number)] );
     my $text_str = shift || "";
     my $size = shift;
 

@@ -7,7 +7,7 @@ import manimlib as mn
 import numpy as np
 from euclidlib.debugging import print_debug
 
-from .EuclidMObject import EMObject, find_scene, EMObjectPlayer, freezable
+from .EuclidMObject import EMObject
 from .EuclidGroupMObject import EGroup, PsuedoGroup
 from . import Text as T
 from . import CustomAnimation as CA
@@ -131,8 +131,6 @@ class TextBox(EGroup[T.EStringObj]):
 
         self.abs_position = absolute_position
         self.scene = scene
-        # if not scene:
-        #     self.scene=find_scene()
         self.line_width = line_width
         self.alignment = self.ALIGNMENT[alignment]
         self._buff_size = buff_size
@@ -151,8 +149,8 @@ class TextBox(EGroup[T.EStringObj]):
     # generate the text
     # -----------------------------------------------------------------------------------------------------------------
     def generate_text(self,
-                      style: str,
-                      text: str,
+                      text_str: str,
+                      style: str = '',
                       /,
                       align_index: int | T.EStringObj = -1,
                       align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
@@ -161,7 +159,6 @@ class TextBox(EGroup[T.EStringObj]):
                       delay_anim=False,
                       skip_anim=False,
                       break_into_parts: tuple[str, ...] | str | None = None,
-                      is_a_part: bool = False,
                       **other_options) -> EStringObj:
         """
         Writes `text` to the scene in the font style `style`
@@ -171,7 +168,7 @@ class TextBox(EGroup[T.EStringObj]):
         Will align the `str_obj` underneath of a previously defined object (`self[aligned_index]`)
         The strings will be aligned such that `align_str[1]` is underneath of `align_str[0]`
 
-        :param text: the string to draw
+        :param text_str: the string to draw
         :param style: what style font?
 
         :param align_index: either the index of a EStringObj in self, or the name of the sub-object to be based for aligning
@@ -185,14 +182,14 @@ class TextBox(EGroup[T.EStringObj]):
         :param other_options:
         :return:
         """
-        print(f"{style}({text})")
-        print()
+
         text_class, kwargs = self._setup_kwargs(style, other_options)
+        parts = None
 
         with self.scene.simultaneous():
 
             # create the text and fix the text in frame (is always displayed at a fixed position on the screen)
-            newline = text_class(text, **kwargs, scene=self.scene, delay_anim=True)
+            newline = text_class(text_str, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
 
             # place the text
@@ -213,7 +210,7 @@ class TextBox(EGroup[T.EStringObj]):
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
-                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim)
+                parts = self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim)
 
             # not delaying the animation...
             elif not delay_anim:
@@ -223,10 +220,11 @@ class TextBox(EGroup[T.EStringObj]):
                 else:
                     newline.e_draw(skip_anim)
 
-        # save the text object in the VGroup, only if it is not a part?
-        if not is_a_part:
-            self.add(newline)
+        # save the text object in the VGroup
+        self.add(newline)
 
+        if parts is not None:
+            newline.parts = parts
         return newline
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -263,7 +261,7 @@ class TextBox(EGroup[T.EStringObj]):
 
         # now put the string in the appropriate 'y' position (don't modify any other direction)
         # NOTE: the coor_mask prevents moving in any direction except for up/down
-        str_obj.next_to(align_obj, mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
+        str_obj.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
 
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -292,30 +290,24 @@ class TextBox(EGroup[T.EStringObj]):
 
         # create the text objects for each part
         parts = []
-        text_kwargs:list[tuple] = []
-#        print(f"... {break_into_parts=}")
         for part in break_into_parts:
             if isinstance(part, str):
-#                print(f"...{part}")
-                text_kwargs.append((part,None))
-                parts.append(self.generate_text(text_obj.style, part,  delay_anim=True, is_a_part=True))
+                parts.extend(self.generate_text(part, text_obj.style, delay_anim=True))
             else:
                 part,kwargs = part[0:2]
-                text_kwargs.append ((part,kwargs))
-#                print(f"...{part}, ({kwargs})")
-                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, is_a_part=True, **kwargs))
+                parts.extend(self.generate_text(part, text_obj.style, delay_anim=True, **kwargs))
 
         # align the parts next to each other
-        for p, t in zip(parts, text_kwargs):
-            text, kwargs = t
-#            print(f"...{p=} {text=}")
-            if kwargs is None:
-                p.next_to(text_obj[text], mn.ORIGIN, buff=0)
-
+        for p, t in zip(parts, break_into_parts):
+            if isinstance(p, str):
+                parts.extend(self.generate_text(p, text_obj.style, delay_anim=True))
+            else:
+                p = p[0]
+            p.next_to(text_obj[t], mn.ORIGIN, buff=0)
             if not delay_anim:
                 p.e_draw(skip_anim)
 
-        text_obj.parts = parts
+        return *parts,
 
     # -----------------------------------------------------------------------------------------------------------------
     # transform text from one object to another
@@ -352,17 +344,11 @@ class TextBox(EGroup[T.EStringObj]):
         del self[-1]
 
     # -----------------------------------------------------------------------------------------------------------------
-    # return all string objects (and any parts)
+    # return all string objects
     # -----------------------------------------------------------------------------------------------------------------
     def get_group(self):
         """return all EStringObj objects in this textbox"""
-        all_objects = []
-        for x in self:
-            if not isinstance(x, T.EStringObj):
-                continue
-            all_objects.append(x)
-            all_objects.extend(x.parts)
-        return all_objects
+        return [x for x in self if isinstance(x, T.EStringObj)]
 
     # -----------------------------------------------------------------------------------------------------------------
     # calculate the bounding box
@@ -571,7 +557,4 @@ class TextBox(EGroup[T.EStringObj]):
     def sidenote(self, *args, **kwargs) -> T.EStringObj:
         return self.generate_text('side_note',*args, **kwargs)
 
-    # ----------------------------------------------------------------------------------------------------------------
-    # override all the functions in the super class (which is NOT EMObjectPlayer)
-    # to apply the changes to the main StringObj as well as any .parts it may have
-    # ----------------------------------------------------------------------------------------------------------------
+

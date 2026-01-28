@@ -861,7 +861,7 @@ sub _draw_label {
     my $self = shift;
     my $cn   = shift;
 
-    # input set: [x,y,text_str,location]
+    # input set: [x,y,text,location]
     
     # convert input into an array or arrays
     my @input;
@@ -872,17 +872,17 @@ sub _draw_label {
         @input = ( [@_] );
     }
 
-    # if more than one set (Gnomon's have 3 text_str labels for exampe)
-    # it is necessary to keep track of the entire "text_str"
+    # if more than one set (Gnomon's have 3 text labels for exampe)
+    # it is necessary to keep track of the entire "text"
     # so concatenate for "storage" purposes
-    my $text_str;
+    my $text;
     foreach my $set (@input) {
-        $text_str .= $set->[2] if $set->[2];
+        $text .= $set->[2] if $set->[2];
     }
 
     # do we really need to redraw?
     $self->_hide_label();
-    return $self unless $text_str;
+    return $self unless $text;
     
     
     $self->{"Shape::what"} = "";
@@ -897,31 +897,31 @@ sub _draw_label {
         my $t;
 
         if ( lc($where) eq 'exactly' ) {
-            $t = $cn->createText( $x, $y, -text_str => $what, -anchor => "c" );
+            $t = $cn->createText( $x, $y, -text => $what, -anchor => "c" );
         }
         elsif ( lc($where) eq 'right' ) {
-            $t = $cn->createText( $x + 15, $y-15, -text_str => $what, -anchor => "nw" );
+            $t = $cn->createText( $x + 15, $y-15, -text => $what, -anchor => "nw" );
         }
         elsif ( lc($where) eq 'left' ) {
-            $t = $cn->createText( $x - 15, $y-15, -text_str => $what, -anchor => "ne" );
+            $t = $cn->createText( $x - 15, $y-15, -text => $what, -anchor => "ne" );
         }
         elsif ( lc($where) eq 'top' ) {
-            $t = $cn->createText( $x, $y - 35, -text_str => $what, -anchor => "n" );
+            $t = $cn->createText( $x, $y - 35, -text => $what, -anchor => "n" );
         }
         elsif ( lc($where) eq 'topleft' ) {
-            $t = $cn->createText( $x - 15, $y - 35, -text_str => $what, -anchor => "ne" );
+            $t = $cn->createText( $x - 15, $y - 35, -text => $what, -anchor => "ne" );
         }
         elsif ( lc($where) eq 'topright' ) {
-            $t = $cn->createText( $x + 15, $y - 35, -text_str => $what, -anchor => "nw" );
+            $t = $cn->createText( $x + 15, $y - 35, -text => $what, -anchor => "nw" );
         }
         elsif ( lc($where) eq 'bottomleft' ) {
-            $t = $cn->createText( $x - 15, $y , -text_str => $what, -anchor => "ne" );
+            $t = $cn->createText( $x - 15, $y , -text => $what, -anchor => "ne" );
         }
         elsif ( lc($where) eq 'bottomright' ) {
-            $t = $cn->createText( $x + 15, $y , -text_str => $what, -anchor => "nw" );
+            $t = $cn->createText( $x + 15, $y , -text => $what, -anchor => "nw" );
         }
         else {
-            $t = $cn->createText( $x, $y + 7, -text_str => $what, -anchor => "n" );
+            $t = $cn->createText( $x, $y + 7, -text => $what, -anchor => "n" );
         }
         push @{ $self->{-label} }, $t;
         $self->{"Shape::what"}  .= $what;

@@ -73,7 +73,7 @@ class Prop06(Book1Scene):
         p['D'].add_label('D', RIGHT)
         l['BD'].add_label('r_1', inside=True)
         with self.simultaneous():
-            t2.math(r'BD = AC = r_1')[-1].shift(RIGHT * 0.5)
+            t2.math(r'BD = AC = r_1').shift(RIGHT * 0.5)
 
         self.next_page()
 
@@ -119,9 +119,9 @@ class Prop06(Book1Scene):
         t2.down()
         t2.e_fade(*t2.except_index(2, 3, 5))
         with self.simultaneous():
-            t2.math(r"BD = r_1\ \measuredangle DBC=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
+            t2.math(r"BD = r_1\ \measuredangle DBC=\alpha\ BC=r_3").shift(RIGHT / 2)
         with self.simultaneous():
-            t2.math(r"AC=r_1\ \measuredangle ACB=\alpha\ BC=r_3")[-1].shift(RIGHT / 2)
+            t2.math(r"AC=r_1\ \measuredangle ACB=\alpha\ BC=r_3").shift(RIGHT / 2)
 
         self.next_page()
 
@@ -132,7 +132,7 @@ class Prop06(Book1Scene):
         t['BCD'].set_angles(None, r'\alpha', None, 0, mn_scale(70), 0)
 
         with self.simultaneous():
-            t2.math(r"\therefore\quad \measuredangle DCB = \measuredangle ABC = \alpha")[-1].shift(RIGHT / 2)
+            t2.math(r"\therefore\quad \measuredangle DCB = \measuredangle ABC = \alpha").shift(RIGHT / 2)
 
         self.next_page()
 

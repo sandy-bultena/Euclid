@@ -5,14 +5,14 @@ class TextExample(Scene):
 
         # To run this scene properly, you should have "Consolas" font in your computer
         # for full usage, you can see https://github.com/3b1b/manim/pull/680
-        text = Text("Here is a text_str", font="Apple Symbols", font_size=90)
+        text = Text("Here is a text", font="Apple Symbols", font_size=90)
         difference = Text(
             """
             The most important difference between Text and TexText is that\n
             you can change the font more easily, but can't use the LaTeX grammar
             """,
             font="Arial", font_size=24,
-            # t2c is a dict that you can choose color for different text_str
+            # t2c is a dict that you can choose color for different text
             t2c={"Text": BLUE, "TexText": BLUE, "LaTeX": ORANGE}
         )
         VGroup(text, difference).arrange(DOWN, buff=1)

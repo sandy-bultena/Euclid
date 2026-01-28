@@ -172,7 +172,7 @@ B<Returns>
 # ----------------------------------------------------------------------------
 sub label {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text_str where)] );
+    Validate::Inputs( \@_, [], [qw(text where)] );
     my $what  = shift;
     my $where = shift;
     if ($where && $where eq "exactly") {
@@ -224,7 +224,7 @@ B<Returns>
 # ----------------------------------------------------------------------------
 sub label_edge {
     my $self = shift;
-    Validate::Inputs( \@_, [], [qw(text_str)] );
+    Validate::Inputs( \@_, [], [qw(text)] );
     my $what  = shift;
     my $where = shift;
 
@@ -278,7 +278,7 @@ B<Returns>
 # ----------------------------------------------------------------------------
 sub tick {
     my $self = shift;
-    Validate::Inputs( \@_, [qw(number)], [qw(text_str where number)] );
+    Validate::Inputs( \@_, [qw(number)], [qw(text where number)] );
     my $r     = shift;
     my $label = shift;
     my $where = shift || 'top';
@@ -350,7 +350,7 @@ sub tickmarks {
 
 sub tick_marks {
     my $self = shift;
-    Validate::Inputs( \@_, [qw(number)], [qw(text_str where number)] );
+    Validate::Inputs( \@_, [qw(number)], [qw(text where number)] );
     my $r     = shift;
     my $label = shift;
     my $where = shift || 'bottom';
@@ -1988,7 +1988,7 @@ B<Returns>
 sub parts {my $self = shift; return $self->show_parts(@_);}
 sub show_parts {
     my $self = shift;
-    Validate::Inputs( \@_, [qw(number)], [qw(number text_str text_str)] );
+    Validate::Inputs( \@_, [qw(number)], [qw(number text text)] );
     my $num    = shift;
     my $offset = shift || 6;
     my $edge   = shift || 'right';

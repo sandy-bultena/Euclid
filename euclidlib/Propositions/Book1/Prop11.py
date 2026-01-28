@@ -50,7 +50,7 @@ class Prop11(Book1Scene):
         with self.simultaneous():
             a[1] = EAngle(l[3], l[1], size=mn_scale(40))
             a[2] = EAngle(l[2], l[3], size=mn_scale(60))
-        t2.math(r'\angle ACD = \angle BCD = \rightangle\ \text{(right angle)}')
+        t2.math(r'\measuredangle ACD = \measuredangle BCD = \rightangle\ \text{(right angle)}')
         tmp = EGroup(*p.values(), *l.values(), *a.values())
         TMP.append(tmp)
 
@@ -128,8 +128,8 @@ class Prop11(Book1Scene):
         t1.explain("Line DC equals line CE since they are radii of the same circle")
         c['C'].e_normal()
         with self.simultaneous():
-            l['CD'].add_label('r_1', inside=True)
-            l['CE'].add_label('r_1', inside=True)
+            l['CD'].add_label('r_1', outside=True)
+            l['CE'].add_label('r_1', outside=True)
         t2.math('DC = CE = r_1')
 
         self.next_page()
@@ -139,8 +139,8 @@ class Prop11(Book1Scene):
         t1.explain("FD and FE are equal since they are two "
                    "sides of an equilateral triangle")
         with self.simultaneous():
-            l['DF'].e_normal().add_label('r_2', inside=True)
-            l['EF'].e_normal().add_label('r_2', inside=True)
+            l['DF'].e_normal().add_label('r_2', outside=True)
+            l['EF'].e_normal().add_label('r_2', outside=True)
         t2.math('FD = FE = r_2')
 
         self.next_page()
@@ -163,9 +163,9 @@ class Prop11(Book1Scene):
             a['BCF'] =  EAngle(*self.lines('BCF'), label=r'\alpha', size=mn_scale(30))
 
         with self.simultaneous():
-            t2.math(r'\angle CDF = \angle CEF = \beta')
-            t2.math(r'\angle DFC = \angle EFC = \theta')
-            t2.math(r'\angle FCD = \angle FCE = \alpha')
+            t2.math(r'\measuredangle CDF = \measuredangle CEF = \beta')
+            t2.math(r'\measuredangle DFC = \measuredangle EFC = \theta')
+            t2.math(r'\measuredangle FCD = \measuredangle FCE = \alpha')
 
         self.next_page()
 

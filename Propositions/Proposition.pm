@@ -73,7 +73,7 @@ sub init {
         $cn->createImage( 25, 710, -image => $self->{-cc}, -anchor => 'nw' );
         $cn->createText(
                          25, 750,
-                         -text_str   => $copyright_msg,
+                         -text   => $copyright_msg,
                          -anchor => 'nw'
         );
     };
@@ -153,33 +153,33 @@ sub last_page {
     if ( !$isPDF ) {
         $cn->createText(
                          700, 110,
-                         -text_str => "Reference:",
+                         -text => "Reference:",
                          -font => 'title'
         );
         $cn->createText(
               700, 150,
-              -text_str =>
+              -text =>
                 "Euclid's Elements - all thirteen books complete in one volume",
               -font => 'title'
         );
         $cn->createText(
               700, 180,
-              -text_str => "The Thomas L Heath Translation,  Dana Densmore, Editor",
+              -text => "The Thomas L Heath Translation,  Dana Densmore, Editor",
               -font => 'explain'
         );
         $cn->createText(
                          700, 210,
-                         -text_str => "Green Lion Press (c) 2013",
+                         -text => "Green Lion Press (c) 2013",
                          -font => 'explain'
         );
         $cn->createText(
                          700, 240,
-                         -text_str => "ISBN 978-1-888009-19-4",
+                         -text => "ISBN 978-1-888009-19-4",
                          -font => 'explain'
         );
         $cn->createText(
                          700, 325,
-                         -text_str => " ",
+                         -text => " ",
                          -font => 'explain'
         );
 
@@ -203,22 +203,22 @@ sub last_page {
             );
             $cn->createText(
                              300, 450,
-                             -text_str => "Previous",
+                             -text => "Previous",
                              -font => 'explain'
             );
             $cn->createText(
                              1100, 450,
-                             -text_str => "Next",
+                             -text => "Next",
                              -font => 'explain'
             );
             $cn->createText(
                              1100, 500,
-                             -text_str => "$next_text",
+                             -text => "$next_text",
                              -font => 'explain'
             );
             $cn->createText(
                              300, 500,
-                             -text_str => "$prev_text",
+                             -text => "$prev_text",
                              -font => 'explain'
             );
             $cn->bind(
@@ -267,12 +267,12 @@ sub last_page {
     else {
         $cn->createText(
                          700, 150,
-                         -text_str => "Youtube Videos",
+                         -text => "Youtube Videos",
                          -font => 'title'
         );
         $cn->createText(
                          700, 200,
-                         -text_str => "https://www.youtube.com/c/SandyBultena",
+                         -text => "https://www.youtube.com/c/SandyBultena",
                          -font => 'explain'
         );
 
@@ -283,18 +283,18 @@ sub last_page {
     $cn->createImage( 300, 700, -image => $self->{-cclarge} );
     $cn->createText(
           800, 700,
-          -text_str => "Except where otherwise noted, this work is licensed under\n"
+          -text => "Except where otherwise noted, this work is licensed under\n"
             . "http://creativecommons.org/licenses/by-nc/3.0",
           -font => 'cc_font',
     );
     $cn->createText(
                      700, 600,
-                     -text_str => $copyright_msg,
+                     -text => $copyright_msg,
                      -font => 'signature'
     );
     $cn->createText(
                      700, 650,
-                     -text_str => " ",
+                     -text => " ",
                      -font => 'explain'
     );
 }
@@ -322,12 +322,12 @@ sub title_page {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book I",
+                             -text => "Book I",
                              -font => "intro"
             );
 
@@ -358,12 +358,12 @@ sub title_page2 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book II",
+                             -text => "Book II",
                              -font => "intro"
             );
 
@@ -425,12 +425,12 @@ sub title_page3 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book III",
+                             -text => "Book III",
                              -font => "intro"
             );
 
@@ -494,12 +494,12 @@ sub title_page4 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book IV",
+                             -text => "Book IV",
                              -font => "intro"
             );
 
@@ -576,12 +576,12 @@ sub title_page5 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book V",
+                             -text => "Book V",
                              -font => "intro"
             );
 
@@ -656,12 +656,12 @@ sub title_page6 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book VI",
+                             -text => "Book VI",
                              -font => "intro"
             );
 
@@ -754,12 +754,12 @@ sub title_page7 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book VII",
+                             -text => "Book VII",
                              -font => "intro"
             );
 
@@ -838,12 +838,12 @@ sub title_page8 {
             my $cn = $pn->Tk_canvas();
             $cn->createText(
                              $x + 50, $y - 300,
-                             -text_str => "Euclid's Elements",
+                             -text => "Euclid's Elements",
                              -font => "intro"
             );
             $cn->createText(
                              $x + 50, $y - 200,
-                             -text_str => "Book VIII",
+                             -text => "Book VIII",
                              -font => "intro"
             );
 

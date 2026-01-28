@@ -1,4 +1,4 @@
-"""Any text_str of string object"""
+"""Any text of string object"""
 from __future__ import annotations
 
 import itertools
@@ -13,7 +13,7 @@ import manimlib as mn
 from functools import reduce, partial
 
 # =====================================================================================================================
-# numbers used to calculate how fast the text_str is written to the screen
+# numbers used to calculate how fast the text is written to the screen
 # =====================================================================================================================
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
@@ -39,8 +39,8 @@ MATH_PREAMBLE = (
 )
 
 TEX_REPLACE = (
-    (re.compile(r'\{txt:(.*?)}'), r'\\text_str{\1}'),
-    (re.compile(r'\{mstrike:(.*?)}'), r'\\text_str{\\sout{\\ensuremath{\1}}}'),
+    (re.compile(r'\{txt:(.*?)}'), r'\\text{\1}'),
+    (re.compile(r'\{mstrike:(.*?)}'), r'\\text{\\sout{\\ensuremath{\1}}}'),
     (re.compile(r'\{strike:(.*?)}'), r'\\sout{\1}'),
 )
 
@@ -73,6 +73,7 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
             self.em_object: Optional[E.EMObject] = None
         self.original_text = txt
         self.text = self.apply_rules(txt)
+        self.parts: list[EStringObj] = []
 
         super().__init__(
             self.text,
@@ -83,14 +84,14 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         )
 
     # -----------------------------------------------------------------------------------------------------------------
-    # modify the text_str based on any rules that apply
+    # modify the text based on any rules that apply
     # -----------------------------------------------------------------------------------------------------------------
     def apply_rules(self, txt):
         """apply substitutions on the txt according to the specified rules"""
         return reduce(lambda part, rule: rule[0].sub(rule[1], part), self.REPLACEMENT_RULES, txt)
 
     # -----------------------------------------------------------------------------------------------------------------
-    # create the text_str by transforming other text_str into this text_str
+    # create the text by transforming other text into this text
     # -----------------------------------------------------------------------------------------------------------------
     def transform_from(self, other: mn.VGroup | EStringObj, substr: str = '', **transform_args):
         copy = other.copy() if not substr else other[substr].copy()
@@ -119,7 +120,7 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
 
 
     # -----------------------------------------------------------------------------------------------------------------
-    # highlight the text_str
+    # highlight the text
     # -----------------------------------------------------------------------------------------------------------------
     def highlight(self, color=mn.RED, *args, **kwargs):
         return mn.FlashAround(self, *args, color=color, **kwargs)
@@ -142,7 +143,9 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
                            **kwargs)]
 
     def __str__(self):
-        return f"{type(self).__name__}: {self.text}"
+        return f"[{type(self).__name__}: {self.text}]"
+    def __repr__(self):
+        return str(self)
 
     # -----------------------------------------------------------------------------------------------------------------
     # get and set state - not sure what this is for
@@ -193,7 +196,7 @@ class ETexText(EStringObj, mn.TexText):
             \usepackage[no-math]{{fontspec}}
         '''
         preamble = '\n'.join(MATH_PREAMBLE) + rf'''
-            \setmainfont[Mapping=tex-text_str]{{{font}}}
+            \setmainfont[Mapping=tex-text]{{{font}}}
         '''
 
         if line_width:

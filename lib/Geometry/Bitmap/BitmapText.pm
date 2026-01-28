@@ -38,10 +38,10 @@ sub new {
 # ============================================================================
 sub title {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
 
     my $cn = $self->{-cn};
-    $self->_write_text( $text_str, "text_str", 0, 30, 0 );
+    $self->_write_text( $text, "text", 0, 30, 0 );
     $self->{-y} += 30;
     return $self;
 }
@@ -51,9 +51,9 @@ sub title {
 # ============================================================================
 sub math {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
-    $self->_write_text( $text_str, "math", 15, 30, 1, @_ );
+    $self->_write_text( $text, "math", 15, 30, 1, @_ );
     $self->{-y} += 30;
     return $self;
 }
@@ -63,9 +63,9 @@ sub math {
 # ============================================================================
 sub label {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
-    $self->_write_text( $text_str, "label", 0, 30, 0 );
+    $self->_write_text( $text, "label", 0, 30, 0 );
     $self->{-y} += 30;
     return $self;
 }
@@ -75,9 +75,9 @@ sub label {
 # ============================================================================
 sub explain {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
-    $self->_write_text( $text_str, "explain", 0, 22, 1, @_ );
+    $self->_write_text( $text, "explain", 0, 22, 1, @_ );
     $self->{-y} += 27;
     $cn->update();
     return $self;
@@ -88,9 +88,9 @@ sub explain {
 # ============================================================================
 sub normal {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
-    $self->_write_text( $text_str, "explain", 0, 22, 0 );
+    $self->_write_text( $text, "explain", 0, 22, 0 );
     $self->{-y} += 27;
     $cn->update();
     return $self;
@@ -125,13 +125,13 @@ sub read_font {
     opendir my $dh, "$font_dir/chalkboard";
     while ( my $file = readdir $dh ) {
         next unless $file =~ /^(.*)\.gif$/;
-        $fonts{text_str}{$1} = $mw->Photo( -file => "$font_dir/chalkboard/$file" );
+        $fonts{text}{$1} = $mw->Photo( -file => "$font_dir/chalkboard/$file" );
     }
     closedir $dh;
     opendir $dh, "$font_dir/chalkboard/caps";
     while ( my $file = readdir $dh ) {
         next unless $file =~ /^(.*)\.gif$/;
-        $fonts{text_str}{$1} = $mw->Photo( -file => "$font_dir/chalkboard/caps/$file" );
+        $fonts{text}{$1} = $mw->Photo( -file => "$font_dir/chalkboard/caps/$file" );
     }
 
     # gujrati
@@ -154,7 +154,7 @@ sub read_font {
     while ( my $file = readdir $dh ) {
         next unless $file =~ /^(.*)\.gif$/;
         $fonts{explain}{$1} = $mw->Photo( -file => "$font_dir/greek/$file" );
-        $fonts{text_str}{$1}    = $mw->Photo( -file => "$font_dir/greek/$file" );
+        $fonts{text}{$1}    = $mw->Photo( -file => "$font_dir/greek/$file" );
     }
     closedir $dh;
 }
@@ -164,7 +164,7 @@ sub read_font {
 # ============================================================================
 sub delete {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
     foreach my $i ( @{ $self->{-images} } ) {
         $cn->delete($i);
@@ -179,7 +179,7 @@ sub clear { erase(@_) }
 
 sub erase {
     my $self = shift;
-    my $text_str = shift;
+    my $text = shift;
     my $cn   = $self->{-cn};
     foreach my $i ( @{ $self->{-images} } ) {
         $cn->delete($i);
@@ -208,17 +208,17 @@ sub scale {
 }
 
 # ============================================================================
-# write text_str
+# write text
 # ============================================================================
 sub _write_text {
     my $self  = shift;
-    my $text_str  = shift || "";
+    my $text  = shift || "";
     my $type  = shift;
     my $fixed = shift || 0;
     my $down  = shift;
     my $pause = shift || 0;
 
-    my %font = ( math => "text_str", explain => "explain", text_str => "text_str", label => "text_str" );
+    my %font = ( math => "text", explain => "explain", text => "text", label => "text" );
 
     # get info from data object
     my $anchor = $self->{-anchor} || 'w';
@@ -228,7 +228,7 @@ sub _write_text {
     my $cn     = $self->{-cn};
 
     # define the individual characters
-    my @chars = split "", $text_str;
+    my @chars = split "", $text;
 
     # initial values
     my @pics;
@@ -300,7 +300,7 @@ sub _write_text {
 
         # define offset of next character
         my $w = 10;
-        $w = 10 if lc($type) eq "text_str";
+        $w = 10 if lc($type) eq "text";
         $w = 8 if lc($type) eq "explain";
         $w = $fonts{ $font{$type} }{$char}->width() + 1
           if exists $fonts{ $font{$type} }{$char};
@@ -329,7 +329,7 @@ sub _write_text {
             $h = $h + int( 0.5 * ( $fixed - $pic->width() + 1 ) );
         }
 
-        # adjust position if we are centering text_str etc.
+        # adjust position if we are centering text etc.
         # (note "n" doesn't work well for multiple lines)
         my $x = $xinit;
         my $y = $yinit;

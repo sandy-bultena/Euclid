@@ -143,9 +143,9 @@ class Prop20(Book1Scene):
 
         self.wait(0.5)
 
-        ad, q, ab, eq['-1'] = t2.math(r'\therefore\ BC + AC > AB',
+        ad, q, ab = t2.math(r'\therefore\ BC + AC > AB',
                                 break_into_parts=(r'\therefore', 'BC + AC', '> AB'),
-                                delay_anim=True)
+                                delay_anim=True).parts
         with self.simultaneous(run_time=1):
             ad.transform_from(tail, r'\implies')
             q.transform_from(head, 'BC + AC')

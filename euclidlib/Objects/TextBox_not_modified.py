@@ -1,13 +1,11 @@
 from __future__ import annotations
-
-import functools
 from collections import defaultdict
 from typing import Mapping, TYPE_CHECKING, Optional, Literal
 import manimlib as mn
 import numpy as np
 from euclidlib.debugging import print_debug
 
-from .EuclidMObject import EMObject, find_scene, EMObjectPlayer, freezable
+from .EuclidMObject import EMObject
 from .EuclidGroupMObject import EGroup, PsuedoGroup
 from . import Text as T
 from . import CustomAnimation as CA
@@ -23,11 +21,6 @@ INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
 DEFAULT_TEXT_FADE_OPACITY = 0.3
 
-class StringPlacement:
-    def __init__(self, align_to: Optional[EStringObj] = None, **kwargs ):
-        self.align_to = align_to
-
-
 
 
 # class TextBuffer(EMObject, mn.Square):
@@ -37,9 +30,6 @@ class StringPlacement:
 #     def __init__(self, size, scene, **kwargs):
 #         super().__init__(size, stroke_opacity=0, **kwargs, scene=scene)
 
-# =====================================================================================================================
-# Fonts
-# =====================================================================================================================
 # Font Contenders:
 # Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana
 class Fonts:
@@ -87,8 +77,7 @@ class Fonts:
 # Text Box - inherits from EGroup with StringObj
 # =====================================================================================================================
 class TextBox(EGroup[T.EStringObj]):
-    """A Container of StringObj
-        TextBox inherits from EGroup and manimgl.VGroup"""
+
     # -----------------------------------------------------------------------------------------------------------------
     # Class properties
     # -----------------------------------------------------------------------------------------------------------------
@@ -101,12 +90,12 @@ class TextBox(EGroup[T.EStringObj]):
     }
 
     # -----------------------------------------------------------------------------------------------------------------
-    # define buffer size between text objects
+    # define buffer size
     # -----------------------------------------------------------------------------------------------------------------
     @property
     def buff_size(self):
-        """define buffer size between text objects"""
         return self._buff_size if self else 0
+
 
     # -----------------------------------------------------------------------------------------------------------------
     # initialization
@@ -119,40 +108,59 @@ class TextBox(EGroup[T.EStringObj]):
                  alignment: Optional[Literal['n','e','w']]=None,
                  buff_size=mn.SMALL_BUFF,
                  **kwargs):
-        """
-        :param absolute_position: the position to place this textbox (north-west corner)
-        :param scene: where are the text objects going to be played (Proposition Scene)
-        :param args: additional arguments which are being ignored here, but passed to superclass (EGroup)
-        :param line_width: specify the line width of the text
-        :param alignment: text to be aligned in this box via 'n', 'e', or 'w' directions
-        :param buff_size: space between subsequent texts being added to this textbox
-        :param kwargs: additional keyword arguments being ignored here, but passed to superclass (EGroup)
-        """
 
-        self.abs_position = absolute_position
-        self.scene = scene
-        # if not scene:
-        #     self.scene=find_scene()
-        self.line_width = line_width
-        self.alignment = self.ALIGNMENT[alignment]
-        self._buff_size = buff_size
-
-        self.extra_buffer_size = 0
+        self.next_buff = 0
         self.indent_value = 0
+        self.line_width = line_width
+        self._buff_size = buff_size
+        self.abs_position = absolute_position
+        self.alignment = self.ALIGNMENT[alignment]
         self.bullet_symbol = None
+        self.obj_to_index = {}
         super().__init__(*args, **kwargs, scene=scene, stroke_width=0)
 
     def __str__(self):
-        return f"[{type(self).__name__}: {self.abs_position} {self.line_width=}]"
-    def __repr__(self):
-        return str(self)
+        return f"{type(self).__name__}: {self.abs_position} {self.line_width=}"
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # return all string objects
+    # -----------------------------------------------------------------------------------------------------------------
+    def get_group(self):
+        return [x for x in self if isinstance(x, T.EStringObj)]
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # calculate the bounding box
+    # -----------------------------------------------------------------------------------------------------------------
+    def compute_bounding_box(self):
+        if self:
+            return super().compute_bounding_box()
+        x, y, _ = self.abs_position
+        return np.array([[x, y, 0]] * 3)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # generate the text preamble
+    # -----------------------------------------------------------------------------------------------------------------
+    def _setup_kwargs(self, style, other_options)->tuple[type[T.EStringObj], dict]:
+        cls, kwargs = Fonts.fonts[style]
+        kwargs = kwargs | other_options
+        kwargs['style'] = style
+        if ((cls is T.ETexText or issubclass(cls, (mn.MarkupText, T.ETexText))) and
+                self.line_width is not None):
+            kwargs['line_width'] = self.line_width
+        return cls, kwargs
+
+    def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, **other_options):
+        cls, kwargs = self._setup_kwargs(style, other_options)
+        newline = cls(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
+        newline.fix_in_frame()
+        return newline
 
     # -----------------------------------------------------------------------------------------------------------------
     # generate the text
     # -----------------------------------------------------------------------------------------------------------------
     def generate_text(self,
-                      style: str,
-                      text: str,
+                      text_str: str,
+                      style: str = '',
                       /,
                       align_index: int | T.EStringObj = -1,
                       align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
@@ -161,59 +169,35 @@ class TextBox(EGroup[T.EStringObj]):
                       delay_anim=False,
                       skip_anim=False,
                       break_into_parts: tuple[str, ...] | str | None = None,
-                      is_a_part: bool = False,
-                      **other_options) -> EStringObj:
-        """
-        Writes `text` to the scene in the font style `style`
-
-        ALIGNING TEXT:
-
-        Will align the `str_obj` underneath of a previously defined object (`self[aligned_index]`)
-        The strings will be aligned such that `align_str[1]` is underneath of `align_str[0]`
-
-        :param text: the string to draw
-        :param style: what style font?
-
-        :param align_index: either the index of a EStringObj in self, or the name of the sub-object to be based for aligning
-        :param align_str: either a str, or a tuple (str, str), will be converted if necessary
-
-        :param transform_from:
-        :param transform_args:
-        :param delay_anim:
-        :param skip_anim:
-        :param break_into_parts:
-        :param other_options:
-        :return:
-        """
-        print(f"{style}({text})")
-        print()
-        text_class, kwargs = self._setup_kwargs(style, other_options)
+                      **other_options) -> tuple[EStringObj, ...]:
+        cls, kwargs = self._setup_kwargs(style, other_options)
+        bullet = None
+        parts = None
 
         with self.scene.simultaneous():
-
             # create the text and fix the text in frame (is always displayed at a fixed position on the screen)
-            newline = text_class(text, **kwargs, scene=self.scene, delay_anim=True)
+            newline = cls(text_str, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
 
             # place the text
             if align_str:
                 self.align_string_with_other_string(newline, align_str, align_index)
-                self.extra_buffer_size = 0
+                self.next_buff = 0
             else:
-                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
-                self.extra_buffer_size = 0
+                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.next_buff)
+                self.next_buff = 0
                 self.justify_text(newline)
 
             # add bullet_symbol (i.e. bullet marker)
             if self.bullet_symbol:
-                bullet = text_class(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
+                bullet = cls(self.bullet_symbol, **kwargs, scene=self.scene, delay_anim=True)
                 bullet.next_to(newline[0], mn.LEFT, buff=mn.SMALL_BUFF)
                 bullet.e_draw(skip_anim)
 
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
-                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim)
+                parts = self._break_into_parts(newline, break_into_parts, bullet, delay_anim, skip_anim)
 
             # not delaying the animation...
             elif not delay_anim:
@@ -223,47 +207,35 @@ class TextBox(EGroup[T.EStringObj]):
                 else:
                     newline.e_draw(skip_anim)
 
-        # save the text object in the VGroup, only if it is not a part?
-        if not is_a_part:
-            self.add(newline)
+        # save the text object in the VGroup
+        self.add(newline)
+        self.obj_to_index[newline] = len(self)-1
 
-        return newline
+        if parts is not None:
+            return *parts, newline
+        return newline,
 
     # -----------------------------------------------------------------------------------------------------------------
     # where to put the text with respect to another string
     # -----------------------------------------------------------------------------------------------------------------
-    def align_string_with_other_string(self, str_obj: EStringObj,
+    def align_string_with_other_string(self, original_str: EStringObj,
                                        align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None,
                                        align_index: int | T.EStringObj):
-        """
-        Will align the str_obj underneath of a previously defined object (self[aligned_index])
-
-        The strings will be aligned such that align_str[1] is underneath of align_str[0]
-
-        :param str_obj: the EStringObj to be aligned
-        :param align_str: either a str, or a tuple (str, str), will be converted if necessary
-        :param align_index: either the index of a EStringObj in self, or the name of the sub-object to be based for aligning
-        :return: Nothing
-        """
 
         # get the object we need to align to
+        print("align index=", align_index)
         if isinstance(align_str, str):
             align_str = (align_str, align_str)
-
-        # defined the object to be aligned to (either via an index, or an object itself)
         align_obj = align_index if isinstance(align_index, T.EStringObj) else self[align_index]
 
         # align string "align_str[0]" to "align_str[1]" (below)
-        str_obj.next_to(
+        original_str.next_to(
             align_obj[align_str[0]].get_bottom(),
             mn.DOWN,
-            buff=self.buff_size + self.extra_buffer_size,
+            buff=self.buff_size + self.next_buff,
             index_of_submobject_to_align=align_str[1],
         )
-
-        # now put the string in the appropriate 'y' position (don't modify any other direction)
-        # NOTE: the coor_mask prevents moving in any direction except for up/down
-        str_obj.next_to(align_obj, mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
+        original_str.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size, coor_mask=mn.UP)
 
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -280,7 +252,8 @@ class TextBox(EGroup[T.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     def _break_into_parts(self,
                           text_obj:EStringObj,
-                          break_into_parts: Optional[tuple[str|tuple[str,dict], ...] | str],
+                          break_into_parts: Optional[tuple[str, ...] | str],
+                          bullet: EStringObj,
                           delay_anim,
                           skip_anim,
                           ):
@@ -292,30 +265,16 @@ class TextBox(EGroup[T.EStringObj]):
 
         # create the text objects for each part
         parts = []
-        text_kwargs:list[tuple] = []
-#        print(f"... {break_into_parts=}")
         for part in break_into_parts:
-            if isinstance(part, str):
-#                print(f"...{part}")
-                text_kwargs.append((part,None))
-                parts.append(self.generate_text(text_obj.style, part,  delay_anim=True, is_a_part=True))
-            else:
-                part,kwargs = part[0:2]
-                text_kwargs.append ((part,kwargs))
-#                print(f"...{part}, ({kwargs})")
-                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, is_a_part=True, **kwargs))
+            parts.extend(self.generate_text(part, text_obj.style, delay_anim=True))
 
         # align the parts next to each other
-        for p, t in zip(parts, text_kwargs):
-            text, kwargs = t
-#            print(f"...{p=} {text=}")
-            if kwargs is None:
-                p.next_to(text_obj[text], mn.ORIGIN, buff=0)
-
+        for p, t in zip(parts, break_into_parts):
+            p.next_to(text_obj[t], mn.ORIGIN, buff=0)
             if not delay_anim:
                 p.e_draw(skip_anim)
 
-        text_obj.parts = parts
+        return *parts,
 
     # -----------------------------------------------------------------------------------------------------------------
     # transform text from one object to another
@@ -350,34 +309,6 @@ class TextBox(EGroup[T.EStringObj]):
 
     def delete_last(self):
         del self[-1]
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # return all string objects (and any parts)
-    # -----------------------------------------------------------------------------------------------------------------
-    def get_group(self):
-        """return all EStringObj objects in this textbox"""
-        all_objects = []
-        for x in self:
-            if not isinstance(x, T.EStringObj):
-                continue
-            all_objects.append(x)
-            all_objects.extend(x.parts)
-        return all_objects
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # calculate the bounding box
-    # -----------------------------------------------------------------------------------------------------------------
-    def compute_bounding_box(self):
-        """
-        If there are objects stored in 'self', then return the manim calculated bounding box (3d) for all elements, or
-        return a 3d bound box around the n/w corner of this text box
-        :return:  Lower left and upper right corners of bounding box
-        """
-        if self:
-            return super().compute_bounding_box()
-        x, y, _ = self.abs_position
-        return np.array([[x, y, 0]] * 3)
-
 
     # -----------------------------------------------------------------------------------------------------------------
     # managing items
@@ -415,7 +346,7 @@ class TextBox(EGroup[T.EStringObj]):
     # managing location of new text strings
     # -----------------------------------------------------------------------------------------------------------------
     def down(self, buff=mn.MED_SMALL_BUFF):
-        self.extra_buffer_size = buff
+        self.next_buff = buff
 
     def indent(self, buff=mn.MED_SMALL_BUFF):
         self.indent_value += buff
@@ -452,126 +383,87 @@ class TextBox(EGroup[T.EStringObj]):
                 text_obj.e_normal()
 
     # ----------------------------------------------------------------------------------------------------------------
-    # aligning two text strings
-    # ----------------------------------------------------------------------------------------------------------------
-    def e_math_align_to(self, txt: str,
-                        break_into_parts:list[str],
-                        which_part: str|int,
-                        aligned_to: T.EStringObj,
-                        side=mn.LEFT,
-                        **kwargs):
-
-        # create the text, but don't animate anything yet
-        parts = self.math(txt, break_into_parts=break_into_parts, delay_anim=True, **kwargs)
-
-        # if which_part is a string, find the index that this string is part of
-        index = which_part
-        if isinstance(which_part, str):
-            index = 0
-            for i,p in enumerate(parts):
-                if p == which_part:
-                    index = i
-                    break
-
-        # align the bits
-        parts[index].align_to(aligned_to, side)
-
-        # animate
-        self.scene.play(mn.Write(mn.VGroup(*parts[:-1])))
-        self.add(*parts[:-1])
-
-        # return the created parts
-        return *parts,
-
-    # ----------------------------------------------------------------------------------------------------------------
-    # aligning two text strings AND transform them
-    # ----------------------------------------------------------------------------------------------------------------
-    def math_align_to_and_transform(self, txt: str,
-                        break_into_parts:list[str],
-                        which_part: str|int,
-                        aligned_to: T.EStringObj,
-                        side=mn.LEFT,
-                        **kwargs):
-
-        # create the text, but don't animate anything yet
-        parts = self.math(txt, break_into_parts=break_into_parts, delay_anim=True, **kwargs)
-
-        # if which_part is a string, find the index that this string is part of
-        index = which_part
-        if isinstance(which_part, str):
-            index = 0
-            for i,p in enumerate(parts):
-                if p == which_part:
-                    index = i
-                    break
-
-        # align the bits
-        parts[index].align_to(aligned_to, side)
-
-        # animate
-        self.scene.play(mn.Write(mn.VGroup(*parts[:-1])))
-        self.add(*parts[:-1])
-
-        # return the created parts
-        return *parts,
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # Private: generate the text preamble
-    # -----------------------------------------------------------------------------------------------------------------
-    def _setup_kwargs(self, style, other_options)->tuple[type[T.EStringObj], dict]:
-        text_class, kwargs = Fonts.fonts[style]
-        kwargs = kwargs | other_options
-        kwargs['style'] = style
-        if ((text_class is T.ETexText or issubclass(text_class, (mn.MarkupText, T.ETexText))) and
-                self.line_width is not None):
-            kwargs['line_width'] = self.line_width
-        return text_class, kwargs
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # Private: generate text but don't add it to the scene
-    # -----------------------------------------------------------------------------------------------------------------
-    def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, **other_options):
-        text_class, kwargs = self._setup_kwargs(style, other_options)
-        newline = text_class(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
-        newline.fix_in_frame()
-        return newline
-
-    # ----------------------------------------------------------------------------------------------------------------
     # create functions for all of the text styles
     # ----------------------------------------------------------------------------------------------------------------
-    @functools.wraps(generate_text)
-    def title(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('title',*args, **kwargs)
+    if TYPE_CHECKING:
+        def title(self, text: str,
+                  align_index: int | T.EStringObj = -1,
+                  align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                  transform_from: T.EStringObj | int = None,
+                  transform_args: dict = None,
+                  break_into_parts: tuple[str, ...] | str | None = None,
+                  **kwargs,
+                  ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def explain(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('explain',*args, **kwargs)
+        def explain(self, text: str,
+                    align_index: int | T.EStringObj = -1,
+                    align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                    transform_from: T.EStringObj | int = None,
+                    transform_args: dict = None,
+                    break_into_parts: tuple[str, ...] | str | None = None,
+                    **kwargs,
+                    ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def explainM(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('explainM',*args, **kwargs)
+        def explainM(self, text: str,
+                     align_index: int | T.EStringObj = -1,
+                     align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                     transform_from: T.EStringObj | int = None,
+                     transform_args: dict = None,
+                     break_into_parts: tuple[str, ...] | str | None = None,
+                     **kwargs,
+                     ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def normal(self,  *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('normal',*args, **kwargs)
+        def normal(self, text: str,
+                   align_index: int | T.EStringObj = -1,
+                   align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                   transform_from: T.EStringObj | int = None,
+                   transform_args: dict = None,
+                   break_into_parts: tuple[str, ...] | str | None = None,
+                   **kwargs,
+                   ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def math(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('math',*args, **kwargs)
+        def math(self, text: str,
+                 align_index: int | T.EStringObj = -1,
+                 align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                 transform_from: T.EStringObj | int = None,
+                 transform_args: dict = None,
+                 break_into_parts: tuple[str, ...] | str | None = None,
+                 **kwargs,
+                 ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def fancy(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('fancy',*args, **kwargs)
+        def fancy(self, text: str,
+                  align_index: int | T.EStringObj = -1,
+                  align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                  transform_from: T.EStringObj | int = None,
+                  transform_args: dict = None,
+                  break_into_parts: tuple[str, ...] | str | None = None,
+                  **kwargs,
+                  ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def title_screen(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('title_screen',*args, **kwargs)
+        def title_screen(self, text: str,
+                         align_index: int | T.EStringObj = -1,
+                         align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                         transform_from: T.EStringObj | int = None,
+                         transform_args: dict = None,
+                         break_into_parts: tuple[str, ...] | str | None = None,
+                         **kwargs,
+                         ) -> T.EStringObj: ...
 
-    @functools.wraps(generate_text)
-    def sidenote(self, *args, **kwargs) -> T.EStringObj:
-        return self.generate_text('side_note',*args, **kwargs)
+        def sidenote(self, text: str,
+                         align_index: int | T.EStringObj = -1,
+                         align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
+                         transform_from: T.EStringObj | int = None,
+                         transform_args: dict = None,
+                         break_into_parts: tuple[str, ...] | str | None = None,
+                         **kwargs,
+                         ) -> T.EStringObj: ...
 
-    # ----------------------------------------------------------------------------------------------------------------
-    # override all the functions in the super class (which is NOT EMObjectPlayer)
-    # to apply the changes to the main StringObj as well as any .parts it may have
-    # ----------------------------------------------------------------------------------------------------------------
+    for style in Fonts.fonts:
+        exec(f"""
+def {style}(self, text: str, **kwargs):
+    objs, *rest = self.generate_text(text, '{style}', **kwargs)
+    print(text)
+    return (objs,*rest)
+""")
+
+

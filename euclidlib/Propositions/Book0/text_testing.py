@@ -43,8 +43,8 @@ class Prop0(BookScene):
                    "This is a very long text, which should wrap around, but I am not sure if it does "
                    "This is a very long text, which should wrap around, but I am not sure if it does ")
 
-        t2.title("This is title text_str")
-        t2.explain("This is more explanation text_str")
+        t2.title("This is title text")
+        t2.explain("This is more explanation text")
         t2.blue(13)
         t2.math(r'\angle ACD < \angle BCD')
         t2.math(r'\alpha<\beta', align_str='<')
@@ -61,7 +61,7 @@ class Prop0(BookScene):
             eq[0].transform_from(eq[2][0])
             eq[1].transform_from(eq[2][1])
 
-        t2.fancy("fancy text_str")
+        t2.fancy("fancy text")
         t2.math(r'\angle CGE = \angle CGF = \gamma')
 
         self.wait()

@@ -49,8 +49,8 @@ class Prop15(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explainM(r"$\angle{AEC}$ and $\angle{DEB}$ are equal")
-        t1.explainM(r"$\angle{AED}$ and $\angle{CEB}$ are equal")
+        t1.explainM(r"$\measuredangle{AEC}$ and $\measuredangle{DEB}$ are equal")
+        t1.explainM(r"$\measuredangle{AED}$ and $\measuredangle{CEB}$ are equal")
         l["CE"], l["DE"] = l["CD"].e_split(p["E"])
         l["AE"], l["BE"] = l["AB"].e_split(p["E"])
         with self.simultaneous():
@@ -75,7 +75,7 @@ class Prop15(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explainM(r"CD is a straight line, so the sum of $\angle{AEC}$ and $\angle{AED}$ "
+        t1.explainM(r"CD is a straight line, so the sum of $\measuredangle{AEC}$ and $\measuredangle{AED}$ "
                     r"equals two right angles (I.13)")
         t2.math(r"\alpha + \gamma = \rightangle + \rightangle")
         with self.simultaneous():
@@ -86,7 +86,7 @@ class Prop15(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explainM(r"AB is a straight line, so the sum of $\angle{AED}$ and $\angle{DEB}$ equals "
+        t1.explainM(r"AB is a straight line, so the sum of $\measuredangle{AED}$ and $\measuredangle{DEB}$ equals "
                     "two right angles (I.13)")
         t2.math(r'\gamma + \beta = \rightangle + \rightangle')
         with self.simultaneous():
@@ -112,14 +112,14 @@ class Prop15(Book1Scene):
             t2.e_fade()
             t2.white(-1)
             a['g'].e_fade()
-        t1.explainM(r"Thus $\angle{AEC}$ is equal to $\angle{DEB}$")
+        t1.explainM(r"Thus $\measuredangle{AEC}$ is equal to $\measuredangle{DEB}$")
         t2.math(r'\therefore\quad \alpha = \beta')
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.down()
-        t1.explainM(r"CD is a straight line, so the sum of $\angle{DEB}$ and $\angle{CEB}$ "
+        t1.explainM(r"CD is a straight line, so the sum of $\measuredangle{DEB}$ and $\measuredangle{CEB}$ "
                     r"equals two right angles (I.13)")
         with self.simultaneous():
             l['AE'].e_fade()
@@ -133,7 +133,7 @@ class Prop15(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explainM(r"AB is a straight line, so the sum of $\angle{AED}$ and $\angle{DEB}$ "
+        t1.explainM(r"AB is a straight line, so the sum of $\measuredangle{AED}$ and $\measuredangle{DEB}$ "
                     r"equals two right angles (I.13)")
         with self.simultaneous():
             l['CE'].e_fade()
@@ -159,7 +159,7 @@ class Prop15(Book1Scene):
             t2.e_fade()
             t2.white(-1)
             a['b'].e_fade()
-        t1.explainM(r"Thus $\angle{CEB}$ is equal to $\angle{AED}$")
+        t1.explainM(r"Thus $\measuredangle{CEB}$ is equal to $\measuredangle{AED}$")
         t2.math(r'\therefore\quad \theta = \gamma')
 
         self.next_page()
