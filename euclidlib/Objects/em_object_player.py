@@ -1,4 +1,7 @@
+import numpy as np
 from euclidlib.Objects.em_object_base import *
+from euclidlib.Objects.CustomAnimation import e_animate, Indicate
+
 
 # =====================================================================================================================
 # NullAnimationBuilder
@@ -35,10 +38,9 @@ class NullPlayer:
 # =====================================================================================================================
 class EMObjectPlayer:
     """
-    For a manim object to be animated, there are specific animators that are needed (ex. Write(TextObj)
-
-    * this class manages the 'players' that animate the objects
+    To create a player animation based on the current state of the EMObject
     """
+
     def __init__(self, eobj: EMObject):
         """
         :param eobj: the object that needs a player for animation
@@ -70,7 +72,7 @@ class EMObjectPlayer:
         self.rotation = []
 
     def __str__(self):
-        return f"EMObjectPlayer obj={str(self.eobj)}"
+        return f"EMObjectPlayer obj=<{str(self.eobj)}>"
 
     # ----------------------------------------------------------------------------------------------------------------
     # class methods (to find all properties and methods)
@@ -94,121 +96,122 @@ class EMObjectPlayer:
                 yield name
 
     # ----------------------------------------------------------------------------------------------------------------
-    # defines the properties of
+    # fade in or return to normal
     # ----------------------------------------------------------------------------------------------------------------
-    @property
-    def e_fade(self):
+    def e_fade(self, *args, **kwargs)->EMObject:
         self.main_animate = self.label_animate = True
         for method in self.o_animate_part:
             getattr(self.anim, method)(opacity=self.eobj.fade_opacity)
         for method in self.l_animate_part:
             getattr(self.label_anim, method)(opacity=0.0)
-        return self
+        return self._play_animation(*args, **kwargs)
 
-    @property
-    def e_normal(self):
-        print("inside e_normal")
+    def e_normal(self, *args, **kwargs)->EMObject:
         self.main_animate = self.label_animate = True
         for method in self.o_animate_part:
             getattr(self.anim, method)(opacity=1.0)
-            print(f"... calling {method}")
         for method in self.l_animate_part:
             getattr(self.label_anim, method)(opacity=1.0)
-            print(f"... calling {method}")
-        return self
+        return self._play_animation(*args, **kwargs)
 
-    def _e_color(self, color: mn.Color):
-        print(f"EMObjectPlayer._e_color({self}, {color}")
+    # ----------------------------------------------------------------------------------------------------------------
+    # colours
+    # ----------------------------------------------------------------------------------------------------------------
+    def _e_color(self, color: mn.Color, *args, **kwargs)->EMObject:
         self.main_animate = True
-        print("Set main_animate to true")
-        self.e_normal.anim.set_color(color=color)
-        print("Color has been set")
-        print()
-        return self
+        with (self.eobj.scene.simultaneous()):
+            self.e_normal()
+            self.anim.set_color(color=color)
+        return self._play_animation(*args, **kwargs)
 
-    @property
-    def green(self):
-        print("EMObjectPlayer.green", self)
+    def green(self, *args, **kwargs)->EMObject:
         return self._e_color(mn.GREEN)
 
-    @property
-    def blue(self):
-        print("EMObjectPlayer.blue", self)
+    def blue(self, *args, **kwargs)->EMObject:
         return self._e_color(mn.BLUE)
 
-    @property
-    def red(self):
-        print("EMObjectPlayer.red", self)
+    def red(self, *args, **kwargs)->EMObject:
         return self._e_color(mn.RED)
 
-    @property
-    def white(self):
+    def white(self, *args, **kwargs)->EMObject:
         return self._e_color(mn.WHITE)
 
-    @property
-    def grey(self):
+    def grey(self, *args, **kwargs)->EMObject:
         return self._e_color(mn.GREY)
 
-    @property
-    def lift(self):
+    # ----------------------------------------------------------------------------------------------------------------
+    # bring object to top
+    # ----------------------------------------------------------------------------------------------------------------
+    def lift(self, *args, **kwargs)->EMObject:
         if self.eobj.visible():
             self.eobj.scene.add(self.eobj)
-        return self
+        return self._play_animation(*args, **kwargs)
 
-    @property
-    def notice(self):
-        self.eobj.scene.play(mn.Indicate(self.eobj, color=mn.RED, scale_factor=1.5, run_time=10))
-        return self
+    # ----------------------------------------------------------------------------------------------------------------
+    # make the object temporarily noticeable
+    # ----------------------------------------------------------------------------------------------------------------
+    def notice(self, *args, **kwargs)->EMObject:
+        self.eobj.scene.play(Indicate(self.eobj, color=mn.RED, scale_factor=1.5, run_time=10))
+        return self.eobj
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # move objects
+    # ----------------------------------------------------------------------------------------------------------------
     def e_move_to(self,
-                  point_or_mobject: mn.Mobject | Vect3,
-                  aligned_edge: Vect3 = ORIGIN,
-                  coor_mask: Vect3 = np.array([1, 1, 1])):
+                  point_or_mobject: mn.Mobject | mn.Vect3,
+                  aligned_edge: mn.Vect3 = mn.ORIGIN,
+                  coor_mask: mn.Vect3 = np.array([1, 1, 1])):
         self.main_animate = True
         self.anim.move_to(point_or_mobject, aligned_edge, coor_mask)
         return self
 
-    def e_move(self, vector: Vect3):
+    def e_move(self, vector: mn.Vect3):
         self.main_animate = True
         self.anim.shift(vector)
         return self
 
     def e_to_edge(self,
-                  edge: Vect3 = LEFT,
-                  buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+                  edge: mn.Vect3 = mn.LEFT,
+                  buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER):
         self.main_animate = True
         self.anim.to_edge(edge, buff)
         return self
 
     def e_to_corner(self,
-                    corner: Vect3 = DL,
-                    buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+                    corner: mn.Vect3 = mn.DL,
+                    buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER):
         self.main_animate = True
         self.anim.to_to_corner(corner, buff)
         return self
 
-    def e_rotate(self, about: Vect3, angle: float):
+    def e_rotate(self, about: mn.Vect3, angle: float):
         self.main_animate = True
         self.anim.rotate(angle, about_point=about)
         self.rotating = angle
         return self
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # scale the object
+    # ----------------------------------------------------------------------------------------------------------------
     def e_scale(self,
                 scale: float,
                 min_scale_factor: float = 1e-8,
-                about_point: Vect3 | None = None,
-                about_edge: Vect3 = ORIGIN):
+                about_point: mn.Vect3 | None = None,
+                about_edge: mn.Vect3 = mn.ORIGIN):
         self.main_animate = True
         self.anim.scale(scale, min_scale_factor, about_point, about_edge)
         return self
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # build up all the animation from methods etc
+    # ----------------------------------------------------------------------------------------------------------------
     def _build_anim(self, anim, obj: mn.VMobject, flag, **kwargs):
         if obj is None or not flag:
             return None
         if isinstance(anim, NullAnimationBuilder):
             return None
         if 'run_time' not in kwargs:
-            kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
+            kwargs['run_time'] = mn.DEFAULT_TRANSFORM_RUNTIME
 
         if self.rotating:
             kwargs['path_arc'] = self.rotating
@@ -216,8 +219,10 @@ class EMObjectPlayer:
         anim_built = e_animate(anim(**kwargs))
         return anim_built
 
-    def __call__(self, *args, **kwargs):
-        print(f"***** EMobjectPlayer {self} is being called as a function")
+    # ----------------------------------------------------------------------------------------------------------------
+    # animations have been build, play the animations
+    # ----------------------------------------------------------------------------------------------------------------
+    def _play_animation(self, *args, **kwargs):
         anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
         label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
 
