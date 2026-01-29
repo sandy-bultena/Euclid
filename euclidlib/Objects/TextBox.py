@@ -14,7 +14,7 @@ from . import CustomAnimation as CA
 from contextlib import contextmanager
 import sys
 
-from euclidlib.Propositions import PropScene as ps
+from euclidlib.Scenes import PropScene as ps
 if TYPE_CHECKING:
     from . import EStringObj
 

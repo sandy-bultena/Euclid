@@ -1,5 +1,5 @@
 from euclidlib.Objects import EGroup
-from euclidlib.Propositions.prop_scene import PropScene
+from euclidlib.Scenes.prop_scene import PropScene
 
 class TestProp(PropScene):
     def __init__(self,*args, **kwargs):

@@ -419,15 +419,15 @@ setattr(cls, 'p{i}', property(p))
     def intersect_selection(self, other: mn.Rectangle):
         return False
 
-    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
-        repeat_last = lambda a: chain(a[:-1], repeat(a[-1]))
-        line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.l), other.lines)]
-        point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.p), other.points)]
-        angle_transforms = [us.transform_to(them, anim=anim)
-                            for us, them in zip(self.a, other.angles)
-                            if us is not None and them is not None]
-        return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
-                                    anim=anim)
+    # def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
+    #     repeat_last = lambda a: chain(a[:-1], repeat(a[-1]))
+    #     line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.l), other.lines)]
+    #     point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.p), other.points)]
+    #     angle_transforms = [us.transform_to(them, anim=anim)
+    #                         for us, them in zip(self.a, other.angles)
+    #                         if us is not None and them is not None]
+    #     return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
+    #                                 anim=anim)
 
     @log
     @copy_transform()

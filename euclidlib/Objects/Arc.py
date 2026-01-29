@@ -68,17 +68,17 @@ class AbstractArc(Da.Dashable, mn.Arc):
             self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
         return super().pointwise_become_partial(start, a, b)
 
-    def interpolate(
-            self,
-            mobject1: AbstractArc,
-            mobject2: AbstractArc,
-            alpha: float,
-            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
-    ) -> Self:
-        self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
-        self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
-        self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
-        return super().interpolate(mobject1, mobject2, alpha, path_func)
+    # def interpolate(
+    #         self,
+    #         mobject1: AbstractArc,
+    #         mobject2: AbstractArc,
+    #         alpha: float,
+    #         path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    # ) -> Self:
+    #     self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
+    #     self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
+    #     self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
+    #     return super().interpolate(mobject1, mobject2, alpha, path_func)
 
     def get_arc_center(self) -> Vect3:
         return np.array([self.vx, self.vy, 0])

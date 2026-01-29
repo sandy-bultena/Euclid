@@ -8,14 +8,15 @@ from typing import Sized, Self, Callable, Tuple, Iterable, Type, TYPE_CHECKING
 from contextlib import contextmanager
 import numpy.typing as npt
 
-import euclidlib.Propositions.PropScene as ps
+import euclidlib.Scenes.PropScene as ps
 from euclidlib.Objects import CustomAnimation as CA
+from euclidlib.Objects.EuclidMObjectDecorators import *
 
 # =====================================================================================================================
 # Constants
 # =====================================================================================================================
 DEFAULT_FADE_OPACITY = 0.30
-DEFAULT_TEXT_FADE_OPACITY = 0.3
+DEFAULT_TEXT_FADE_OPACITY = 0.30
 DEFAULT_CONSTRUCTION_RUNTIME = 1.0
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
@@ -83,143 +84,6 @@ def e_animate(anim):
     if anim.overridden_animation:
         return anim.overridden_animation
     return CA.E_MethodAnimation(anim.mobject, anim.methods, **anim.anim_args)
-
-# =====================================================================================================================
-# decorators
-# =====================================================================================================================
-
-# ---------------------------------------------------------------------------------------------------------------------
-# decorator - animate whatever changes happen in the function
-# ---------------------------------------------------------------------------------------------------------------------
-def animate(func):
-    @wraps(func)
-    def animate_change(self: EMObject, *args, rate_func=mn.smooth, **kwargs):
-        if not self.scene.is_paused():
-            an = self.animate(rate_func=rate_func)
-            func(self, an, *args, **kwargs)
-            self.scene.play(e_animate(an))
-            return self
-        else:
-            return func(self, self, *args, **kwargs)
-
-    return animate_change
-
-# ---------------------------------------------------------------------------------------------------------------------
-# decorator - debugging option by setting up a trace
-# ---------------------------------------------------------------------------------------------------------------------
-def log(func):
-    @wraps(func)
-    def logMethodName(self, *args, **kwargs):
-        with find_scene().trace(self, f"{type(self).__name__}:{func.__name__}"):
-            return func(self, *args, **kwargs)
-
-    return logMethodName
-
-
-# ---------------------------------------------------------------------------------------------------------------------
-# decorator - allows objects to be frozen against animation
-# ---------------------------------------------------------------------------------------------------------------------
-def freezable(func):
-    @wraps(func)
-    def dontIfFrozen(self, *args, **kwargs):
-        if self.is_frozen:
-            return self
-        return func(self, *args, **kwargs)
-
-    return dontIfFrozen
-
-# ---------------------------------------------------------------------------------------------------------------------
-# decorator - sets the animation speed for all animations happening during the function (this is a guess :( )
-# ---------------------------------------------------------------------------------------------------------------------
-def anim_speed(func):
-    @wraps(func)
-    def animate_change(*args, speed=-1, no_anim=False, **kwargs):
-        scene = find_scene()
-
-        # Note: draw is a list, so need to save all the objects to be drawn to this list
-        #       ... drawing occurs in scene.animation_speed
-        with scene.animation_speed(speed) as to_draw:
-            x = func(*args, **kwargs)
-            if not no_anim:
-                if isinstance(x, (tuple, list)):
-                    to_draw.extend(x)
-                else:
-                    to_draw.append(x)
-        return x
-
-    return animate_change
-
-
-# ---------------------------------------------------------------------------------------------------------------------
-# copy and transform?? (bad name)
-# - the 'func' that is decorated should return objects that need to be drawn 'if' speed < 0
-# - if the speed is less than zero, then don't show intermediate animations,
-# - if index is not none, and speed less than zero
-#     transform into the 'indexth' returned object from func, and display the rest
-# ---------------------------------------------------------------------------------------------------------------------
-def copy_transform(*, index=None):
-    def inner(func):
-        @wraps(func)
-        def animate_change(self: EMObject, *args, speed=-1, no_anim=False, **kwargs):
-
-            if speed > 0:
-                # call function after setting the speed for all animations
-                return anim_speed(func)(self, *args, speed=speed, no_anim=no_anim, **kwargs)
-
-            elif speed < 0:
-
-                # pause all animations
-                with self.scene.pause_animations_for():
-                    x = func(self, *args, **kwargs)
-
-                if index is None:
-                    # transform self into objects returned from calling func
-                    if not no_anim:
-                        self.scene.play(self.transform_to(x))
-
-                else:
-                    # transform self to x[index], and then draw the remainder of the objects in 'x'
-                    tmp = list(x)
-                    if not no_anim:
-                        with self.scene.simultaneous():
-                            self.scene.play(self.transform_to(tmp[index]))
-                            del tmp[index]
-                            for y in tmp:
-                                y.e_draw()
-                return x
-
-            else:
-                # default if speed = 0
-                return func(self, *args, **kwargs)
-
-        return animate_change
-
-    return inner
-
-
-def class_anim_speed(func):
-    @wraps(func)
-    def animate_change(cls: type, *args, speed=-1, **kwargs):
-        scene = find_scene()
-        with scene.animation_speed(speed) as draw:
-            x = func(cls, *args, **kwargs)
-            if isinstance(x, (tuple, list)):
-                draw.extend(x)
-            else:
-                draw.append(x)
-        return x
-
-    return animate_change
-
-
-def freezable_player(func):
-    @wraps(func)
-    def dontIfFrozen(self, *args, **kwargs):
-        if self.is_frozen:
-            return NullPlayer(self)
-        return func(self, *args, **kwargs)
-
-    return dontIfFrozen
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Using inspect to traverse the frames to find which scene this object belongs to
@@ -569,7 +433,7 @@ class EMObject(mn.VMobject):
     # default animation
     # -----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
-        '''default animation for a EMObject - override if you want something different'''
+        """default animation for a EMObject - override if you want something different"""
         return [CA.EShowCreation(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
     def RemovalOf(self, *args, **kwargs):
@@ -726,6 +590,7 @@ def {name}(self, *args):
         return self
 
     def __enter__(self):
+        print("__enter__ was called for:", self)
         self.e_draw()
         return self
 
