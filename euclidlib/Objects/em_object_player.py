@@ -93,6 +93,9 @@ class EMObjectPlayer:
             if callable(val):
                 yield name
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # defines the properties of
+    # ----------------------------------------------------------------------------------------------------------------
     @property
     def e_fade(self):
         self.main_animate = self.label_animate = True
@@ -214,7 +217,7 @@ class EMObjectPlayer:
         return anim_built
 
     def __call__(self, *args, **kwargs):
-        print(f"***** EMobject {self} is being called as a function")
+        print(f"***** EMobjectPlayer {self} is being called as a function")
         anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
         label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
 
