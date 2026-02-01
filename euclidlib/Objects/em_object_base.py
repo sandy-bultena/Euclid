@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from typing import Optional, Self, Type, Iterable, Union
+from typing import Optional, Self, Type, Iterable, Union, TYPE_CHECKING, Callable
 from contextlib import contextmanager
 import manimlib as mn
+import numpy as np
 
 # local imports
 from euclidlib.Utilities.find_scene import find_scene
 import euclidlib.Objects.CustomAnimation as custom_anim
-from euclidlib.Objects import freezable
-import euclidlib.Objects.Text as Text
+from euclidlib.Objects.em_object_decorators import freezable, freezable_player
 from euclidlib.Objects.CustomAnimation import EuclidAnimation
+from euclidlib.Objects.em_object_player import EMObjectPlayer
+
+if TYPE_CHECKING:
+    import euclidlib.Objects.Text as Text
 
 # global constants
 DEFAULT_FADE_OPACITY = 0.30
@@ -39,6 +43,7 @@ class EMObject(mn.VMobject):
                  delay_anim=False,
                  skip_anim=False,
                  debug=False,
+                 scene = None,
                  label_args: tuple[str, ...] | str | None = None,
                  label: tuple[str, ...] | str | None = None,
                  **kwargs):
@@ -55,10 +60,11 @@ class EMObject(mn.VMobject):
         """
 
         # can't do anything unless we have a scene object to draw to
-        scene = find_scene()
 
         if scene is None:
-            raise Exception("Could Not Find Scene Object")
+            scene = find_scene()
+            if scene is None:
+                raise Exception("Could Not Find Scene Object")
         self.scene = scene
 
         # set stroke width accordingly
@@ -68,15 +74,19 @@ class EMObject(mn.VMobject):
             kwargs['stroke_width'] = 2 * stroke_width
             kwargs['stroke_color'] = mn.RED
 
-        # create the manim object
-        super().__init__(*args, **kwargs)
-
         # setup some default parameters
         self._debug = debug
         self._freeze = False
         self.animate_part = ['set_stroke', 'set_e_fill'] if animate_part is None else animate_part
         self.animation_objects: list[mn.Mobject] = []
         self.e_label = None
+        self.cached_opacity = 1
+        self.e_stroke_color:mn.Color = mn.WHITE
+        self.e_fill_color:Optional[mn.Color] = None
+        self.e_fill_opacity_factor = 0.5
+
+        # create the manim object
+        super().__init__(*args, **kwargs)
 
         # handle the label stuff
         label_args = label_args or label
@@ -104,11 +114,52 @@ class EMObject(mn.VMobject):
         if not delay_anim:
             self.e_draw(skip_anim)
 
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # animations/changes
+    #   These methods are created during runtime,
+    #   but essentially they all just call their equivalent ObjectPlayer method
+    # -----------------------------------------------------------------------------------------------------------------
+    if TYPE_CHECKING:
+        def blue(self)-> EMObject: ...
+        def green(self)-> EMObject: ...
+        def red(self)-> EMObject: ...
+        def white(self)-> EMObject: ...
+        def grey(self)-> EMObject: ...
+        def e_fade(self) -> EMObject: ...
+        def e_normal(self)-> EMObject: ...
+        def lift(self)-> EMObject: ...
+        def notice(self)-> EMObject: ...
+
+        def e_move(self, vev: mn.Vect3) -> EMObjectPlayer: ...
+
+        def e_rotate(self, about: mn.Vect3, angle: float) -> EMObjectPlayer: ...
+
+        def e_scale(self,
+                    scale: float,
+                    min_scale_factor: float = 1e-8,
+                    about_point: mn.Vect3 | None = None,
+                    about_edge: mn.Vect3 = mn.ORIGIN) -> EMObjectPlayer: ...
+
+        def e_move_to(self,
+                      point_or_mobject: mn.Mobject | mn.Vect3,
+                      aligned_edge: mn.Vect3 = mn.ORIGIN,
+                      coor_mask: mn.Vect3 = np.array([1, 1, 1]))-> EMObjectPlayer: ...
+
+        def e_to_edge(self,
+                      edge: mn.Vect3 = mn.LEFT,
+                      buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)-> EMObjectPlayer: ...
+
+        def e_to_corner(self,
+                        corner: mn.Vect3 = mn.DL,
+                        buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)-> EMObjectPlayer: ...
+
     # -----------------------------------------------------------------------------------------------------------------
     # properties
     # -----------------------------------------------------------------------------------------------------------------
     @property
     def fade_opacity(self):
+        from . import Text
         return DEFAULT_TEXT_FADE_OPACITY if isinstance(self, Text.EStringObj) else DEFAULT_FADE_OPACITY
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -136,6 +187,7 @@ class EMObject(mn.VMobject):
 
     # -----------------------------------------------------------------------------------------------------------------
     # is visible? (in scene and is shown)
+    # Note: get_fill_opacity is a manim property
     # -----------------------------------------------------------------------------------------------------------------
     def visible(self) -> bool:
         return self.in_scene() and (self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0)
@@ -145,6 +197,7 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     @freezable
     def add_label(self, *args, **label_args) -> Self:
+        """different arguments for different EObjects"""
 
         # separate the arguments and key/value pairs
         if isinstance(args[-1], dict) and not label_args:
@@ -176,6 +229,7 @@ class EMObject(mn.VMobject):
     # initialize a label - creates a label, but doesn't draw or animate it
     # -----------------------------------------------------------------------------------------------------------------
     def init_label(self, label: str, *args, **extra_args) -> Optional[Text.Label]:
+        import euclidlib.Objects.Text as Text
         if label:
             return Text.Label(label, self, *args, **extra_args)
         return None
@@ -184,6 +238,16 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     # remove a label
     # -----------------------------------------------------------------------------------------------------------------
+    """
+            if self.e_label is not None:
+            if not self.e_label.visible():
+                self.scene.remove(self.e_label)
+            else:
+                self.scene.play(mn.FadeOut(self.e_label))
+        self.e_label = None
+        return self
+"""
+
     @freezable
     def remove_label(self) -> Self:
         if self.e_label is not None:
@@ -192,7 +256,6 @@ class EMObject(mn.VMobject):
             else:
                 self.scene.play(mn.FadeOut(self.e_label))
 
-        self.scene.remove(self.e_label)
         self.e_label = None
 
         return self
@@ -396,11 +459,20 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     # fill and unfill (colour the insides) of the object and animate
     # -----------------------------------------------------------------------------------------------------------------
-    def e_fill(self, color: mn.ManimColor = None, opacity=0.5):
+    def e_fill(self, color: mn.ManimColor = None, opacity=1):
+        print (f" in e_fill, setting colour to {color}, opacity={opacity}")
+
+        if color is None:
+            opacity = 0
+        elif opacity == 0:
+            self.e_fill_color = None
+        else:
+            self.e_fill_color = color
+
+        print(f"Calling scene.play set_fill({color}, opacity={opacity*self.e_fill_opacity_factor},)")
         self.scene.play(
-            self.animate.set_fill(color=color, opacity=opacity * self.cached_fade, recurse=False)
+            self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=False)
         )
-        self.cached_opacity = opacity  # not sure why this is done?
         return self
 
     def e_unfill(self):
@@ -418,8 +490,36 @@ class EMObject(mn.VMobject):
             border_width: float | None = None,
             recurse: bool = True
     ) -> Self:
-        self.cached_fade = opacity
-        return self.set_fill(color, opacity * self.cached_opacity, border_width, recurse)
+        if self.e_fill_color is not None and color is None:
+            color = self.e_fill_color
+        if color is None:
+            opacity = 0
+            self.e_fill_color = None
+        else:
+            self.e_fill_color = color
+        print("Calling set_fill with opacity",opacity)
+        return self.set_fill(color, opacity*self.e_fill_opacity_factor, border_width, recurse)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # interpolate finds the intermediate steps between two states, used for animation
+    # it appears that this is here to make sure that the label is animated as well
+    # -----------------------------------------------------------------------------------------------------------------
+    def interpolate(
+            self,
+            mobject1: EMObject,
+            mobject2: EMObject,
+            alpha: float,
+            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    ) -> Self:
+        if self.get_label() and hasattr(self.e_label, 'direction') and not callable(self.e_label.direction):
+            l0 = self.e_label
+            l1 = mobject1.e_label
+            l2 = mobject2.e_label
+            curr_pos = l0.ref.e_label_location(l1.direction)
+            start_pos = l1.ref.e_label_location(l1.direction)
+            end_pos = l2.ref.e_label_location(l2.direction)
+            self.e_label.direction = path_func(start_pos + l1.direction, end_pos + l2.direction, alpha) - curr_pos
+        return super().interpolate(mobject1, mobject2, alpha, path_func)
 
     # -----------------------------------------------------------------------------------------------------------------
     # helpers for pickle (used by manim)
@@ -437,67 +537,29 @@ class EMObject(mn.VMobject):
         self.scene = find_scene()
         self.shader_wrapper = None
 
-#     if TYPE_CHECKING:
-#         blue: EMObjectPlayer
-#         green: EMObjectPlayer
-#         red: EMObjectPlayer
-#         white: EMObjectPlayer
-#         grey: EMObjectPlayer
-#         e_fade: EMObjectPlayer
-#         e_normal: EMObjectPlayer
-#         lift: EMObjectPlayer
-#
-#         def e_move(self, vev: Vect3) -> EMObjectPlayer: ...
-#
-#         def e_rotate(self, about: Vect3, angle: float) -> EMObjectPlayer: ...
-#
-#         def e_scale(self,
-#                     scale: float,
-#                     min_scale_factor: float = 1e-8,
-#                     about_point: Vect3 | None = None,
-#                     about_edge: Vect3 = ORIGIN) -> EMObjectPlayer: ...
-#
-#     for name in EMObjectPlayer._properties():
-#         exec(f'''
-# print(f"making method {name} for property")
-# @property
-# @freezable_player
-# def {name}(self):
-#     print("EMObject calling EMObjectPlayer(",self,").{name}")
-#     return EMObjectPlayer(self).{name}
-#         '''.strip())
-#
-#     for name in EMObjectPlayer._methods():
-#         exec(f'''
-# @freezable_player
-# def {name}(self, *args):
-#     return EMObjectPlayer(self).{name}(*args)
-#         '''.strip())
+    # -----------------------------------------------------------------------------------------------------------------
+    # for all the properties and methods available for EMObject Player, create equivalent propert/methods here
+    # that call the player class ... (which plays whatever) ... and then returns this object
+    # -----------------------------------------------------------------------------------------------------------------
+    for name in EMObjectPlayer.get_properties():
+        exec(f'''
+@property
+@freezable_player
+def {name}(self):
+    return EMObjectPlayer(self).{name}
+        '''.strip())
+
+    for name in EMObjectPlayer.get_methods():
+        exec(f'''
+@freezable_player
+def {name}(self, *args):
+    return EMObjectPlayer(self).{name}(*args)
+        '''.strip())
 
 
 # ====================================================================================================================
 # rejects
 # ====================================================================================================================
-#     # -----------------------------------------------------------------------------------------------------------------
-#     # interpolate finds the intermediate steps between two states, used for animation
-#     # it appears that this is here to make sure that the label is animated as well
-#     # -----------------------------------------------------------------------------------------------------------------
-#     def interpolate(
-#             self,
-#             mobject1: EMObject,
-#             mobject2: EMObject,
-#             alpha: float,
-#             path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
-#     ) -> Self:
-#         if self.get_label() and hasattr(self.e_label, 'direction') and not callable(self.e_label.direction):
-#             l0 = self.e_label
-#             l1 = mobject1.e_label
-#             l2 = mobject2.e_label
-#             curr_pos = l0.ref.e_label_location(l1.direction)
-#             start_pos = l1.ref.e_label_location(l1.direction)
-#             end_pos = l2.ref.e_label_location(l2.direction)
-#             self.e_label.direction = path_func(start_pos + l1.direction, end_pos + l2.direction, alpha) - curr_pos
-#         return super().interpolate(mobject1, mobject2, alpha, path_func)
 
 
 

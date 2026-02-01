@@ -2,13 +2,28 @@
 # decorators specifically for methods for EuclidMObject
 # ... uses methods found in EuclidMObject
 # =====================================================================================================================
+from contextlib import contextmanager
 from functools import wraps
 from typing import TYPE_CHECKING
+from . import CustomAnimation as CA
+from euclidlib.Utilities.find_scene import find_scene
 
 import manimlib as mn
 if TYPE_CHECKING:
-    from euclidlib.Utilities.find_scene import find_scene
-    from euclidlib.Objects.CustomAnimation import e_animate
+    from euclidlib.Objects.em_object_player import NullPlayer
+
+# ---------------------------------------------------------------------------------------------------------------------
+# context manager
+# ---------------------------------------------------------------------------------------------------------------------
+@contextmanager
+def with_objects(head, *rest):
+    with head:
+        if rest:
+            with with_objects(*rest) as sub_elements:
+                yield head, *sub_elements
+        else:
+            yield head,
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # decorator - animate whatever changes happen in the function
@@ -26,7 +41,7 @@ def animate(func):
         if not self.scene.is_paused():
             an = self.animate(rate_func=rate_func)
             func(self, an, *args, **kwargs)
-            self.scene.play(e_animate(an))
+            self.scene.play(CA.e_animate(an))
             return self
         else:
             return func(self, self, *args, **kwargs)

@@ -1,26 +1,28 @@
 from __future__ import annotations
+import numpy as np
 
-from euclidlib.Objects import Polygon, ETriangle, EPolygon
-from euclidlib.Objects import CalculatePoints
-from euclidlib.Objects import Point
-from euclidlib.Objects import Line
-from euclidlib.Objects import Circle as Cir
-from euclidlib.Objects import EuclidGroupMObject as Gr
-from euclidlib.Objects import Angle as An
-from euclidlib.Objects.EuclidMObject import *
+from euclidlib.Objects.em_object_decorators import *
+import euclidlib.Scenes.PropScene as ps
+
+from . import Polygon
+from . import Triangle
+from . import Point
+from . import Line
+from . import Circle
+from . import Angle
 
 @anim_speed
-def pentagon(center: Point.EPoint | Vect3, radius: float):
+def pentagon(center: Point.EPoint | mn.Vect3, radius: float):
     scene: ps.PropScene = find_scene()
 
     # make circle where we will draw the pentagon
-    c = Cir.ECircle(center, center + RIGHT * radius).e_fade()
+    c = Circle.ECircle(center, center + mn.RIGHT * radius).e_fade()
 
     # make an arbitrary straight line so that we can create a
     # "golden" rectangle
     cl = center + np.array([1.2 * radius, radius, 0])
-    l = Line.ELine(cl, cl + DOWN * radius)
-    gold = ETriangle.golden(l, speed=0)
+    l = Line.ELine(cl, cl + mn.DOWN * radius)
+    gold = Triangle.ETriangle.golden(l, speed=0)
 
     g2 = gold.copy_to_circle(c)
 
@@ -30,8 +32,8 @@ def pentagon(center: Point.EPoint | Vect3, radius: float):
 
     # bisect the angles at the base
     with scene.simultaneous():
-        ac = An.EAngle(g2.l1, g2.l0)
-        ad = An.EAngle(g2.l2, g2.l1)
+        ac = Angle.EAngle(g2.l1, g2.l0)
+        ad = Angle.EAngle(g2.l2, g2.l1)
     with scene.simultaneous():
         lx = ac.clean_bisect()
         ly = ad.clean_bisect()
@@ -59,7 +61,7 @@ def pentagon(center: Point.EPoint | Vect3, radius: float):
     ]
 
     # make pentagon
-    pent = EPolygon(*points)
+    pent = Polygon.EPolygon(*points)
 
     with scene.simultaneous():
         lx.e_remove()

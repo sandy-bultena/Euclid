@@ -1,40 +1,43 @@
 from __future__ import annotations
 
+import math
 from itertools import pairwise
-from math import atan2, cos, sin, atan
-from typing import Sized, Tuple, Any, List
+from math import  cos, sin, atan
 
 import numpy as np
+import manimlib as mn
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import convert_to_coord, mn_scale
 
-from euclidlib.Objects.Polygon import EPolygon, LABEL_ARGS
-from euclidlib.Objects.EuclidMObject import *
-from . import EuclidGroupMObject as G
+from . import Polygon
+from . import EuclidGroupMObject as GroupObject
 from . import Parallelogram as Para
-from . import Line as L
-from . import Point as P
-from . import Angle as A
-from . import Circle as C
+from . import Line
+from . import Point
+from . import Angle
+from . import Circle
 
 
-class ETriangle(EPolygon):
+class ETriangle(Polygon.EPolygon):
     @staticmethod
-    def length_of(val: float | L.ELine):
+    def length_of(val: float | Line.ELine):
         if isinstance(val, mn.TipableVMobject):
             return val.get_length()
         return val
 
     @staticmethod
-    def angle_of(val: float | A.EAngleBase):
-        if isinstance(val, A.EAngleBase):
+    def angle_of(val: float | Angle.EAngleBase):
+        if isinstance(val, Angle.EAngleBase):
             return val.e_angle
         return val
 
     @classmethod
     def SAS(cls,
-            base: EMObject | Vect3,
-            side1: float | L.ELine,
-            angle: float | A.EAngleBase,
-            side2: float | L.ELine,
+            base: EMObject | mn.Vect3,
+            side1: float | Line.ELine,
+            angle: float | Angle.EAngleBase,
+            side2: float | Line.ELine,
             **kwargs):
         p2, p3, _ = cls.calculate_SAS(convert_to_coord(base),
                                       cls.length_of(side1),
@@ -43,7 +46,7 @@ class ETriangle(EPolygon):
         return cls(base, p2, p3, **kwargs)
 
     @classmethod
-    def calculate_SAS(cls, point: Vect3, r1: float, angle: float, r2: float):
+    def calculate_SAS(cls, point: mn.Vect3, r1: float, angle: float, r2: float):
         x1, y1, _ = point
         theta = atan((r1 - r2 * cos(angle)) /
                      (r2 * sin(angle)))
@@ -58,10 +61,10 @@ class ETriangle(EPolygon):
 
     @classmethod
     def SSS(cls,
-            base: EMObject | Vect3,
-            *sides: float | L.ELine,
-            labels: LABEL_ARGS = (None, None, None),
-            point_labels: LABEL_ARGS = (None, None, None),
+            base: EMObject | mn.Vect3,
+            *sides: float | Line.ELine,
+            labels: Polygon.LABEL_ARGS = (None, None, None),
+            point_labels: Polygon.LABEL_ARGS = (None, None, None),
             **kwargs):
         assert (len(sides) == 3)
         coord = convert_to_coord(base)
@@ -77,15 +80,15 @@ class ETriangle(EPolygon):
             cls._filter_point_labels_with_center(x, center)
             for x in point_labels]
 
-        p = P.EPoint(p2, label=point_labels_full[1])
+        p = Point.EPoint(p2, label=point_labels_full[1])
 
-        c1 = C.ECircle(p2, p2 + RIGHT * r[0], temp_line_label=labels_full[0])
+        c1 = Circle.ECircle(p2, p2 + mn.RIGHT * r[0], temp_line_label=labels_full[0])
         c1.e_fade()
 
-        l2 = L.ELine(p2, p3, label=labels_full[1])
-        nextp = P.EPoint(p3, label=point_labels_full[2])
+        l2 = Line.ELine(p2, p3, label=labels_full[1])
+        nextp = Point.EPoint(p3, label=point_labels_full[2])
 
-        c2 = C.ECircle(p3, p3 + r[2] * RIGHT, temp_line_label=labels_full[2])
+        c2 = Circle.ECircle(p3, p3 + r[2] * mn.RIGHT, temp_line_label=labels_full[2])
         c2.e_fade()
 
         new = cls(p1, p2, p3,
@@ -107,10 +110,10 @@ class ETriangle(EPolygon):
         return new
 
     @classmethod
-    def calculate_SSS(cls, coord: Vect3, *r: float):
-        next = coord + RIGHT * r[1]
-        c1 = C.VirtualCircle(coord, coord + RIGHT * r[0])
-        c2 = C.VirtualCircle(next, next + RIGHT * r[2])
+    def calculate_SSS(cls, coord: mn.Vect3, *r: float):
+        next = coord + mn.RIGHT * r[1]
+        c1 = Circle.VirtualCircle(coord, coord + mn.RIGHT * r[0])
+        c2 = Circle.VirtualCircle(next, next + mn.RIGHT * r[2])
         p3s = c1.intersect(c2)
         c1.e_delete()
         c2.e_delete()
@@ -125,9 +128,9 @@ class ETriangle(EPolygon):
 
     @log
     @anim_speed
-    def parallelogram(self, angle: A.EAngleBase):
+    def parallelogram(self, angle: Angle.EAngleBase):
         point = self.l[1].bisect(speed=0)
-        l = L.ELine(self.p[1], self.p[2])
+        l = Line.ELine(self.p[1], self.p[2])
         l.e_fade()
         l1, l2 = l.e_split(point)
         with self.scene.simultaneous():
@@ -143,13 +146,13 @@ class ETriangle(EPolygon):
         with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
             line2 = self.l[1].parallel(self.p[0], speed=0)
             line2.blue()
-            point2 = P.EPoint(line2.intersect(side1))
+            point2 = Point.EPoint(line2.intersect(side1))
 
         # Draw a line through triangle point 3, parallel to side 1
         with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
             line3 = side1.parallel(self.p[2], speed=0)
             line3.green()
-            point3 = P.EPoint(line3.intersect(line2))
+            point3 = Point.EPoint(line3.intersect(line2))
 
         # construct polygon
         poly = Para.EParallelogram(point2, point, self.p[2], point3)
@@ -168,7 +171,7 @@ class ETriangle(EPolygon):
 
     @log
     @copy_transform()
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
+    def copy_to_parallelogram_on_line(self, line: Line.ELine, angle: Angle.EAngleBase):
         # create parallelogram equal in size to triangle (I.42)
         s1, a2 = self.parallelogram(angle, speed=0)
         a2.e_remove()
@@ -190,7 +193,7 @@ class ETriangle(EPolygon):
         l2 = self.l2.perpendicular(pE, inside=True)
         p=  l1.intersect(l2)
 
-        c = C.ECircle(p, self.p0)
+        c = Circle.ECircle(p, self.p0)
 
         with self.scene.simultaneous():
             l1.e_remove()
@@ -203,16 +206,16 @@ class ETriangle(EPolygon):
 
     @classmethod
     @class_anim_speed
-    def golden(cls, line: L.ELine, negative=False):
+    def golden(cls, line: Line.ELine, negative=False):
         pC = line.golden_ration(speed=0)
-        pB = P.EPoint(line.get_end())
-        cA = C.ECircle(*line.get_start_and_end())
-        lAC = L.ELine(line.get_start(), pC).red()
+        pB = Point.EPoint(line.get_end())
+        cA = Circle.ECircle(*line.get_start_and_end())
+        lAC = Line.ELine(line.get_start(), pC).red()
         lBD = lAC.copy_to_circle(cA, pB, negative=negative)
 
         # which way to construct triangle? make sure angles are less than 90
-        a = A.EAngle(line, lBD)
-        if a.e_angle < PI:
+        a = Angle.EAngle(line, lBD)
+        if a.e_angle < mn.PI:
             t = cls(line.get_start(), lBD.get_start(), line.get_end())
         else:
             t = cls(line.get_start(), line.get_end(), lBD.get_start())
@@ -228,23 +231,23 @@ class ETriangle(EPolygon):
 
     @log
     @copy_transform()
-    def copy_to_circle(self, circle: C.ECircle) -> ETriangle:
+    def copy_to_circle(self, circle: Circle.ECircle) -> ETriangle:
         if self.is_clockwise:
-            angles: G.EGroup[A.EAngleBase] = G.EGroup(
-                A.EAngle(l2, l1, delay_anim=True)
+            angles: GroupObject.EGroup[Angle.EAngleBase] = GroupObject.EGroup(
+                Angle.EAngle(l2, l1, delay_anim=True)
                 for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
             )
             a1, a2 = angles[2], angles[1]
         else:
-            angles: G.EGroup[A.EAngleBase] = G.EGroup(
-                A.EAngle(l1, l2, delay_anim=True)
+            angles: GroupObject.EGroup[Angle.EAngleBase] = GroupObject.EGroup(
+                Angle.EAngle(l1, l2, delay_anim=True)
                 for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
             )
             a1, a2 = angles[1], angles[2]
 
         # Draw a line GH tangent to the circle at point A
-        pA = circle.e_point_at_angle(PI/2)
-        with L.ELine(circle.v, pA) as r1:
+        pA = circle.e_point_at_angle(mn.PI/2)
+        with Line.ELine(circle.v, pA) as r1:
             lGA = r1.perpendicular(pA, negative=True)
 
         lAH = lGA.prepend_cpy(2 * circle.radius)
@@ -253,13 +256,13 @@ class ETriangle(EPolygon):
         with with_objects(*a1.copy_to_line(pA, lAH)) as (la1, a1):
             la1.extend(2 * circle.radius)
             pts = circle.intersect(la1)
-            pC = P.EPoint(pts[0])
+            pC = Point.EPoint(pts[0])
 
         # Copy the angle L to line GH, at point A (I.23)
         with with_objects(*a2.copy_to_line(pA, lGA, negative=True)) as (la2, a2):
             la2.extend(2 * circle.radius)
             pts = circle.intersect(la2)
-            pB = P.EPoint(pts[1])
+            pB = Point.EPoint(pts[1])
 
         # create new triangle
         t = ETriangle(pA, pB, pC)

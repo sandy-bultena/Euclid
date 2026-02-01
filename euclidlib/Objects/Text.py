@@ -4,13 +4,12 @@ from __future__ import annotations
 import itertools
 from abc import ABC
 from typing import Optional
-
-from . import EuclidMObject as E
-from . import CustomAnimation as CA
-from . import EuclidGroupMObject as G
 import re
 import manimlib as mn
 from functools import reduce, partial
+
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Objects import CustomAnimation as CA
 
 # =====================================================================================================================
 # numbers used to calculate how fast the text is written to the screen
@@ -58,7 +57,7 @@ mn.TEX_TO_SYMBOL_COUNT[R"\sout"] = 1
 # =====================================================================================================================
 # String Object - Base Class for EText, ETexText, EMarkupText, Label
 # =====================================================================================================================
-class EStringObj(E.EMObject, mn.StringMobject, ABC):
+class EStringObj(EMObject, mn.StringMobject, ABC):
     style = str | None
     REPLACEMENT_RULES = ()
 
@@ -70,11 +69,12 @@ class EStringObj(E.EMObject, mn.StringMobject, ABC):
         self.style = style
         self.write_simultaneous = write_simultaneous
         if not hasattr(self, 'em_object'):
-            self.em_object: Optional[E.EMObject] = None
+            self.em_object: Optional[EMObject] = None
         self.original_text = txt
         self.text = self.apply_rules(txt)
         self.parts: list[EStringObj] = []
 
+        #print("EStringObj Calling super().__init__()")
         super().__init__(
             self.text,
             *args,
@@ -257,7 +257,7 @@ class Label(ETex):
     # -----------------------------------------------------------------------------------------------------------------
     # initialize
     # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, text, em_object: E.EMObject, *args, align=mn.ORIGIN, **extra_args):
+    def __init__(self, text, em_object: EMObject, *args, align=mn.ORIGIN, **extra_args):
         self.em_object = em_object
         self.args = args
         self.extra_args = extra_args
@@ -299,7 +299,7 @@ class Label(ETex):
     # -----------------------------------------------------------------------------------------------------------------
     # change the EMObject that this label is associated with
     # -----------------------------------------------------------------------------------------------------------------
-    def transfer_ownership(self, emobject: E.EMObject):
+    def transfer_ownership(self, emobject: EMObject):
         if emobject.e_label is not None:
             emobject.e_label.e_remove()
         emobject.e_label = self

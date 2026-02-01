@@ -1,8 +1,6 @@
 import sys
 import os
 
-from euclidlib.Objects.CustomAnimation import Indicate
-
 sys.path.append(os.getcwd())
 
 from euclidlib.Scenes.BookScene import Book1Scene

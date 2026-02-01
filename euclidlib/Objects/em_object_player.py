@@ -1,6 +1,12 @@
+from __future__ import annotations
 import numpy as np
-from euclidlib.Objects.em_object_base import *
+import manimlib as mn
+from typing import TYPE_CHECKING
 from euclidlib.Objects.CustomAnimation import e_animate, Indicate
+if TYPE_CHECKING:
+    from euclidlib.Objects.em_object_base import *
+
+DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
 # =====================================================================================================================
@@ -47,6 +53,7 @@ class EMObjectPlayer:
         """
         self.eobj = eobj
         self.rotating = False
+        self._fade_opacity = eobj.fade_opacity
 
         # create the anim properties
         # ... read about manimgl 'animate' usage for further info
@@ -78,7 +85,7 @@ class EMObjectPlayer:
     # class methods (to find all properties and methods)
     # ----------------------------------------------------------------------------------------------------------------
     @classmethod
-    def _properties(cls):
+    def get_properties(cls):
         for name, val in cls.__dict__.items():
             if name.startswith('_'):
                 continue
@@ -86,7 +93,7 @@ class EMObjectPlayer:
                 yield name
 
     @classmethod
-    def _methods(cls):
+    def get_methods(cls):
         for name, val in cls.__dict__.items():
             if name.startswith('_'):
                 continue
@@ -96,63 +103,95 @@ class EMObjectPlayer:
                 yield name
 
     # ----------------------------------------------------------------------------------------------------------------
+    # explanation
+    # ----------------------------------------------------------------------------------------------------------------
+    # for these animations to work,
+    # 1. first they set up the animation by calling a property or a method, which returns an EMObjectPlayer.
+    # 2. then this EMObjectPlayer must be called as a function (because manim does this internally, we have to mimic it)
+    #
+    # Example - using one of the 'properties':
+    #     obj = some_em_object
+    #     obj.some_property()
+    #          - EMObject method calls the appropriate EMObjectPlayer.some_property function
+    #          - which returns an EMObjectPlayer
+    #          - which in turn calls method __call__ on the EMObjectPlayer
+    #
+    #     equivalent to:
+    #     obj = some_em_object
+    #     player = EMObjectPlayer(obj)      <- create a player object for this obj
+    #     player = player.some_property     <- sets up the animation changes
+    #     player()                          <- animates and returns the original object
+    #
+    # Example - using one of the 'methods' - Notice you call e_to_corner(), and then call the player
+    #           as a function to get it to display
+    #        line = ELine([2,0,0],[0,2,0],label_args=('a', mn.UP, {'alpha':0.3}))
+    #        line.e_to_corner(mn.UR)(run_time=2)
+    #
+    # ----------------------------------------------------------------------------------------------------------------
     # fade in or return to normal
     # ----------------------------------------------------------------------------------------------------------------
-    def e_fade(self, *args, **kwargs)->EMObject:
+    @property
+    def e_fade(self):
         self.main_animate = self.label_animate = True
         for method in self.o_animate_part:
-            getattr(self.anim, method)(opacity=self.eobj.fade_opacity)
+            getattr(self.anim, method)(opacity=self._fade_opacity)
         for method in self.l_animate_part:
             getattr(self.label_anim, method)(opacity=0.0)
-        return self._play_animation(*args, **kwargs)
+        return self
 
-    def e_normal(self, *args, **kwargs)->EMObject:
+    @property
+    def e_normal(self):
         self.main_animate = self.label_animate = True
         for method in self.o_animate_part:
             getattr(self.anim, method)(opacity=1.0)
         for method in self.l_animate_part:
             getattr(self.label_anim, method)(opacity=1.0)
-        return self._play_animation(*args, **kwargs)
+        return self
 
     # ----------------------------------------------------------------------------------------------------------------
     # colours
     # ----------------------------------------------------------------------------------------------------------------
-    def _e_color(self, color: mn.Color, *args, **kwargs)->EMObject:
+    def _e_color(self, color: mn.Color):
         self.main_animate = True
-        with (self.eobj.scene.simultaneous()):
-            self.e_normal()
-            self.anim.set_color(color=color)
-        return self._play_animation(*args, **kwargs)
+        self.e_normal.anim.set_color(color=color)
+        return self
 
-    def green(self, *args, **kwargs)->EMObject:
+    @property
+    def green(self):
         return self._e_color(mn.GREEN)
 
-    def blue(self, *args, **kwargs)->EMObject:
+    @property
+    def blue(self):
         return self._e_color(mn.BLUE)
 
-    def red(self, *args, **kwargs)->EMObject:
+    @property
+    def red(self):
         return self._e_color(mn.RED)
 
-    def white(self, *args, **kwargs)->EMObject:
+    @property
+    def white(self):
         return self._e_color(mn.WHITE)
 
-    def grey(self, *args, **kwargs)->EMObject:
+    @property
+    def grey(self):
         return self._e_color(mn.GREY)
 
     # ----------------------------------------------------------------------------------------------------------------
     # bring object to top
     # ----------------------------------------------------------------------------------------------------------------
-    def lift(self, *args, **kwargs)->EMObject:
+    @property
+    def lift(self):
         if self.eobj.visible():
             self.eobj.scene.add(self.eobj)
-        return self._play_animation(*args, **kwargs)
+        return self
 
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, *args, **kwargs)->EMObject:
+    @property
+    def notice(self):
         self.eobj.scene.play(Indicate(self.eobj, color=mn.RED, scale_factor=1.5, run_time=10))
-        return self.eobj
+        return self
 
     # ----------------------------------------------------------------------------------------------------------------
     # move objects
@@ -181,7 +220,7 @@ class EMObjectPlayer:
                     corner: mn.Vect3 = mn.DL,
                     buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER):
         self.main_animate = True
-        self.anim.to_to_corner(corner, buff)
+        self.anim.to_corner(corner, buff)
         return self
 
     def e_rotate(self, about: mn.Vect3, angle: float):
@@ -211,7 +250,7 @@ class EMObjectPlayer:
         if isinstance(anim, NullAnimationBuilder):
             return None
         if 'run_time' not in kwargs:
-            kwargs['run_time'] = mn.DEFAULT_TRANSFORM_RUNTIME
+            kwargs['run_time'] = DEFAULT_TRANSFORM_RUNTIME
 
         if self.rotating:
             kwargs['path_arc'] = self.rotating
@@ -221,8 +260,9 @@ class EMObjectPlayer:
 
     # ----------------------------------------------------------------------------------------------------------------
     # animations have been build, play the animations
+    # NOTE: this overrides the build in manim __call__, so it cannot become anything other than it is
     # ----------------------------------------------------------------------------------------------------------------
-    def _play_animation(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         anim_built = self._build_anim(self.anim, self.eobj, self.main_animate, **kwargs)
         label_built = self._build_anim(self.label_anim, self.eobj.e_label, self.label_animate, **kwargs)
 
@@ -236,4 +276,5 @@ class EMObjectPlayer:
             if self.eobj.e_label is not None and self.label_animate:
                 self.eobj.e_label.become(self.eobj.e_label.target)
         return self.eobj
+
 

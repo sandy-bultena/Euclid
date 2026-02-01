@@ -1,8 +1,11 @@
 from typing import Self, List, Type
 import manimlib as mn
 import numpy as np
-from euclidlib.Objects import EuclidMObject as EM, EGroup, PsuedoGroup, mn_scale
-from euclidlib.Objects import Line as Line
+import euclidlib.Objects.em_object_base as EM
+from euclidlib.Objects.EuclidGroupMObject  import EGroup, PsuedoGroup
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+
+from . import Line
 
 
 class Dashable(PsuedoGroup):

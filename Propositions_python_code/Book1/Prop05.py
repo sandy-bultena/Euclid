@@ -139,7 +139,7 @@ class Prop05(Book1Scene):
             l['BD'].e_normal()
             l['AC'].e_remove()
         with self.simultaneous():
-            l['AC'] = ELine(A, C, label_args=('r',dict(inside=True)))
+            l['AC'] = ELine(A, C, label_args=('r',dict(outside=True)))
             l['CD'] = ELine(C, p['D'])
         t['ADC'] = ETriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
         t2.math(r'AD=x+r,\quad \measuredangle DAC = \gamma,\quad AC = r')
@@ -173,8 +173,8 @@ class Prop05(Book1Scene):
         with self.simultaneous():
             a['CDB'] = EAngle(l['BD'], l['CD'], size=mn_scale(20), label=r'\sigma')
             a['CEB'] = EAngle(l['BE'], l['CE'], size=mn_scale(20), label=r'\sigma')
-            l['CD'].add_label('y',inside=True, alpha=0.7 )
-            l['BE'].add_label('y', outside=True, alpha=0.7)
+            l['CD'].add_label('y',outside=True, alpha=0.7 )
+            l['BE'].add_label('y', inside=True, alpha=0.7)
         t2.math('CD = BE = y')
         t2.math(r'\measuredangle ACD = \measuredangle ABE = \delta')
         t2.math(r'\measuredangle CDA = \measuredangle BEA = \sigma')

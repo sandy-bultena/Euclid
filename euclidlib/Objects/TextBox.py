@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import functools
-from collections import defaultdict
-from typing import Mapping, TYPE_CHECKING, Optional, Literal
+import sys
+from typing import TYPE_CHECKING, Optional, Literal, cast
 import manimlib as mn
 import numpy as np
-from euclidlib.debugging import print_debug
 
-from .EuclidMObject import EMObject, find_scene, EMObjectPlayer, freezable
-from .EuclidGroupMObject import EGroup, PsuedoGroup
-from . import Text as T
+from euclidlib.Objects.EuclidGroupMObject import EGroup
+from . import Text
 from . import CustomAnimation as CA
-from contextlib import contextmanager
-import sys
 
 from euclidlib.Scenes import PropScene as ps
+from ..Utilities.find_scene import find_scene
+
 if TYPE_CHECKING:
     from . import EStringObj
 
@@ -43,41 +41,41 @@ class StringPlacement:
 # Font Contenders:
 # Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana
 class Fonts:
-    fonts: dict[str, tuple[type[T.EStringObj], dict]]
+    fonts: dict[str, tuple[type[Text.EStringObj], dict]]
 
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=24, font='Gotu')),
-            explain=(T.EMarkupText, dict(font_size=16, font='Gotu')),
-            sidenote=(T.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=16, font='Gotu')),
-            normal=(T.EText, dict(font_size=14, font='Gotu')),
-            math=(T.ETex, dict(font_size=22)),
-            fancy=(T.EText, dict(font_size=24, font='Charm')),
-            title_screen=(T.EText, dict(font_size=48, font='Bradley Hand')),
+            title=(Text.EMarkupText, dict(font_size=24, font='Gotu')),
+            explain=(Text.EMarkupText, dict(font_size=16, font='Gotu')),
+            sidenote=(Text.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
+            explainM=(Text.ETexText, dict(font_size=16, font='Gotu')),
+            normal=(Text.EText, dict(font_size=14, font='Gotu')),
+            math=(Text.ETex, dict(font_size=22)),
+            fancy=(Text.EText, dict(font_size=24, font='Charm')),
+            title_screen=(Text.EText, dict(font_size=48, font='Bradley Hand')),
         )
 
     elif sys.platform == 'linux':
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
-            explain=(T.EMarkupText, dict(font_size=18, font='Arimo')),
-            sidenote=(T.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=18, font='Arimo')),
-            normal=(T.EText, dict(font_size=16, font='Arimo')),
-            math=(T.ETex, dict(font_size=20)),
-            fancy=(T.EText, dict(font_size=36, font='Z003')),
-            title_screen=(T.EText, dict(font_size=128, font='Karumbi'))
+            title=(Text.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
+            explain=(Text.EMarkupText, dict(font_size=18, font='Arimo')),
+            sidenote=(Text.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
+            explainM=(Text.ETexText, dict(font_size=18, font='Arimo')),
+            normal=(Text.EText, dict(font_size=16, font='Arimo')),
+            math=(Text.ETex, dict(font_size=20)),
+            fancy=(Text.EText, dict(font_size=36, font='Z003')),
+            title_screen=(Text.EText, dict(font_size=128, font='Karumbi'))
         )
     else:
         fonts = dict(
-            title=(T.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
-            explain=(T.EMarkupText, dict(font_size=18)),
-            sidenote=(T.EMarkupText, dict(font_size=18, slant='ITALIC')),
-            explainM=(T.ETexText, dict(font_size=18)),
-            normal=(T.EText, dict(font_size=16)),
-            math=(T.ETex, dict(font_size=20)),
-            fancy=(T.EText, dict(font_size=36)),
-            title_screen=(T.EText, dict(font_size=128))
+            title=(Text.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
+            explain=(Text.EMarkupText, dict(font_size=18)),
+            sidenote=(Text.EMarkupText, dict(font_size=18, slant='ITALIC')),
+            explainM=(Text.ETexText, dict(font_size=18)),
+            normal=(Text.EText, dict(font_size=16)),
+            math=(Text.ETex, dict(font_size=20)),
+            fancy=(Text.EText, dict(font_size=36)),
+            title_screen=(Text.EText, dict(font_size=128))
         )
 
 
@@ -86,7 +84,7 @@ class Fonts:
 # =====================================================================================================================
 # Text Box - inherits from EGroup with StringObj
 # =====================================================================================================================
-class TextBox(EGroup[T.EStringObj]):
+class TextBox(EGroup[Text.EStringObj]):
     """A Container of StringObj
         TextBox inherits from EGroup and manimgl.VGroup"""
     # -----------------------------------------------------------------------------------------------------------------
@@ -131,8 +129,8 @@ class TextBox(EGroup[T.EStringObj]):
 
         self.abs_position = absolute_position
         self.scene = scene
-        # if not scene:
-        #     self.scene=find_scene()
+        if not scene:
+            self.scene=cast(ps.PropScene,find_scene())
         self.line_width = line_width
         self.alignment = self.ALIGNMENT[alignment]
         self._buff_size = buff_size
@@ -154,9 +152,9 @@ class TextBox(EGroup[T.EStringObj]):
                       style: str,
                       text: str,
                       /,
-                      align_index: int | T.EStringObj = -1,
+                      align_index: int | Text.EStringObj = -1,
                       align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
-                      transform_from: T.EStringObj | int = None,
+                      transform_from: Text.EStringObj | int = None,
                       transform_args: dict = None,
                       delay_anim=False,
                       skip_anim=False,
@@ -234,7 +232,7 @@ class TextBox(EGroup[T.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     def align_string_with_other_string(self, str_obj: EStringObj,
                                        align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None,
-                                       align_index: int | T.EStringObj):
+                                       align_index: int | Text.EStringObj):
         """
         Will align the str_obj underneath of a previously defined object (self[aligned_index])
 
@@ -251,7 +249,7 @@ class TextBox(EGroup[T.EStringObj]):
             align_str = (align_str, align_str)
 
         # defined the object to be aligned to (either via an index, or an object itself)
-        align_obj = align_index if isinstance(align_index, T.EStringObj) else self[align_index]
+        align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index]
 
         # align string "align_str[0]" to "align_str[1]" (below)
         str_obj.next_to(
@@ -293,22 +291,18 @@ class TextBox(EGroup[T.EStringObj]):
         # create the text objects for each part
         parts = []
         text_kwargs:list[tuple] = []
-#        print(f"... {break_into_parts=}")
         for part in break_into_parts:
             if isinstance(part, str):
-#                print(f"...{part}")
                 text_kwargs.append((part,None))
                 parts.append(self.generate_text(text_obj.style, part,  delay_anim=True, is_a_part=True))
             else:
                 part,kwargs = part[0:2]
                 text_kwargs.append ((part,kwargs))
-#                print(f"...{part}, ({kwargs})")
                 parts.append(self.generate_text(text_obj.style, part, delay_anim=True, is_a_part=True, **kwargs))
 
         # align the parts next to each other
         for p, t in zip(parts, text_kwargs):
             text, kwargs = t
-#            print(f"...{p=} {text=}")
             if kwargs is None:
                 p.next_to(text_obj[text], mn.ORIGIN, buff=0)
 
@@ -358,7 +352,7 @@ class TextBox(EGroup[T.EStringObj]):
         """return all EStringObj objects in this textbox"""
         all_objects = []
         for x in self:
-            if not isinstance(x, T.EStringObj):
+            if not isinstance(x, Text.EStringObj):
                 continue
             all_objects.append(x)
             all_objects.extend(x.parts)
@@ -385,7 +379,7 @@ class TextBox(EGroup[T.EStringObj]):
     def e_update(self, index, text: str, transform_args=None, **kwargs):
         old = self[index]
         transform_args = transform_args or {}
-        assert isinstance(old, T.EStringObj)
+        assert isinstance(old, Text.EStringObj)
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_corner(mn.UL), mn.DR, buff=0)
         self.scene.play(CA.AppendString(old, new, **transform_args))
@@ -393,7 +387,7 @@ class TextBox(EGroup[T.EStringObj]):
 
     def e_append(self, index, text: str, **kwargs):
         old = self[index]
-        assert isinstance(old, T.EStringObj)
+        assert isinstance(old, Text.EStringObj)
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_right(), mn.RIGHT, buff=mn.SMALL_BUFF)
         new.e_draw()
@@ -457,7 +451,7 @@ class TextBox(EGroup[T.EStringObj]):
     def e_math_align_to(self, txt: str,
                         break_into_parts:list[str],
                         which_part: str|int,
-                        aligned_to: T.EStringObj,
+                        aligned_to: Text.EStringObj,
                         side=mn.LEFT,
                         **kwargs):
 
@@ -489,7 +483,7 @@ class TextBox(EGroup[T.EStringObj]):
     def math_align_to_and_transform(self, txt: str,
                         break_into_parts:list[str],
                         which_part: str|int,
-                        aligned_to: T.EStringObj,
+                        aligned_to: Text.EStringObj,
                         side=mn.LEFT,
                         **kwargs):
 
@@ -518,11 +512,11 @@ class TextBox(EGroup[T.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # Private: generate the text preamble
     # -----------------------------------------------------------------------------------------------------------------
-    def _setup_kwargs(self, style, other_options)->tuple[type[T.EStringObj], dict]:
+    def _setup_kwargs(self, style, other_options)->tuple[type[Text.EStringObj], dict]:
         text_class, kwargs = Fonts.fonts[style]
         kwargs = kwargs | other_options
         kwargs['style'] = style
-        if ((text_class is T.ETexText or issubclass(text_class, (mn.MarkupText, T.ETexText))) and
+        if ((text_class is Text.ETexText or issubclass(text_class, (mn.MarkupText, Text.ETexText))) and
                 self.line_width is not None):
             kwargs['line_width'] = self.line_width
         return text_class, kwargs
@@ -540,35 +534,35 @@ class TextBox(EGroup[T.EStringObj]):
     # create functions for all of the text styles
     # ----------------------------------------------------------------------------------------------------------------
     @functools.wraps(generate_text)
-    def title(self, *args, **kwargs) -> T.EStringObj:
+    def title(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('title',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def explain(self, *args, **kwargs) -> T.EStringObj:
+    def explain(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('explain',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def explainM(self, *args, **kwargs) -> T.EStringObj:
+    def explainM(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('explainM',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def normal(self,  *args, **kwargs) -> T.EStringObj:
+    def normal(self,  *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('normal',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def math(self, *args, **kwargs) -> T.EStringObj:
+    def math(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('math',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def fancy(self, *args, **kwargs) -> T.EStringObj:
+    def fancy(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('fancy',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def title_screen(self, *args, **kwargs) -> T.EStringObj:
+    def title_screen(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('title_screen',*args, **kwargs)
 
     @functools.wraps(generate_text)
-    def sidenote(self, *args, **kwargs) -> T.EStringObj:
+    def sidenote(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('side_note',*args, **kwargs)
 
     # ----------------------------------------------------------------------------------------------------------------

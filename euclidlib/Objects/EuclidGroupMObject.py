@@ -1,9 +1,16 @@
 from __future__ import annotations
-from euclidlib.Objects.EuclidMObject import *
+
+from typing import TYPE_CHECKING
+import manimlib as mn
+
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Objects.em_object_player import EMObjectPlayer
+from euclidlib.Objects.em_object_decorators import *
 
 DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
+
 # *********************************************************************************************************************
 # code required for objects that are collections via VGroup or similar things
 # *********************************************************************************************************************
@@ -23,7 +30,7 @@ class EGroupPlayer:
     # this allows an EGroupPlayer instance to be called directly,
     # -----------------------------------------------------------------------------------------------------------------
     def __call__(self, *index, **kwargs):
-        print(f"EGroupPlayer.__call__ obj={str(self)}, index = {index}")
+        # print(f"EGroupPlayer.__call__ obj={str(self)}, index = {index}")
         # print(f'  ...  caller name:', inspect.stack()[0][3], inspect.stack()[0][1], inspect.stack()[0][2])
         # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1], inspect.stack()[1][2])
         # print(f'  ...  caller name:', inspect.stack()[2][3], inspect.stack()[2][1], inspect.stack()[2][2])
@@ -33,15 +40,11 @@ class EGroupPlayer:
         # print(f'  ...  caller name:', inspect.stack()[6][3], inspect.stack()[6][1], inspect.stack()[6][2])
 
         to_exec = self.indices or self.players
-        print()
-        print(f"to_exec=")
         if index:
             to_exec = [self.players[i] for i in index]
 
-        print(f"to_exec=")
         with self.obj.scene.simultaneous():
             for player in to_exec:
-                print(f"{player}")
                 player(**kwargs)
         return self.obj
 
@@ -49,19 +52,16 @@ class EGroupPlayer:
         self.indices = self.players[item]
         return self
 
-    for name in EMObjectPlayer._properties():
+    for name in EMObjectPlayer.get_properties():
         exec(f'''
 @property
 def {name}(self):
-    print()
-    print("In EGroupPlayer {name}")
     for player in self.players:
-        print("In EGroupPlayer: player=",player, "{name} property")
         player.{name}
     return self
 '''.strip())
 
-    for name in EMObjectPlayer._methods():
+    for name in EMObjectPlayer.get_methods():
         exec(f'''
 def {name}(self, *args):
     for player in self.players:
@@ -81,8 +81,8 @@ class PsuedoGroup(EMObject):
         e_fade: EGroupPlayer
         e_normal: EGroupPlayer
 
-        def e_move(self, vev: Vect3) -> EGroupPlayer: ...
-        def e_rotate(self, about: Vect3, angle: float) -> EGroupPlayer: ...
+        def e_move(self, vev: mn.Vect3) -> EGroupPlayer: ...
+        def e_rotate(self, about: mn.Vect3, angle: float) -> EGroupPlayer: ...
 
     def get_group(self):
         raise NotImplemented()
@@ -122,14 +122,14 @@ class PsuedoGroup(EMObject):
         super().e_draw(skip_anim, **kwargs)
         return self
 
-    for name in EMObjectPlayer._properties():
+    for name in EMObjectPlayer.get_properties():
         exec(f'''
 @property
 @freezable
 def {name}(self, *args):
     return EGroupPlayer(self).{name}'''.strip())
 
-    for name in EMObjectPlayer._methods():
+    for name in EMObjectPlayer.get_methods():
         exec(f'''
 @freezable
 def {name}(self, *args):

@@ -1,8 +1,5 @@
 import sys
 import os
-from cProfile import label
-
-from euclidlib.Objects import EquilateralTriangle
 
 sys.path.append(os.getcwd())
 

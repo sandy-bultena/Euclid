@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import math
+from typing import Iterable, Self, Callable
 
-from .EuclidMObject import *
-from .utils import call_or_get
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Utilities.coordinate_utilities import  convert_to_coord, call_or_get
 import manimlib as mn
 
 
-def darken(colour: ManimColor):
+def darken(colour: mn.ManimColor):
    return [
-       mn.interpolate_color(color, BLACK, 2/3)
+       mn.interpolate_color(color, mn.BLACK, 2/3)
        for color in mn.listify(colour)
    ]
 
@@ -43,7 +44,7 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     def set_color(
             self,
-            color: ManimColor | Iterable[ManimColor] | None,
+            color: mn.ManimColor | Iterable[mn.ManimColor] | None,
             opacity: float | Iterable[float] | None = None,
             recurse: bool = True
     ) -> Self:
@@ -85,7 +86,7 @@ class EPoint(EMObject, mn.Circle):
     # get distance between two points
     # ----------------------------------------------------------------------------------------------------------------
     @classmethod
-    def distance_between(cls, p1: EPoint | Vect3, p2: EPoint | Vect3):
+    def distance_between(cls, p1: EPoint | mn.Vect3, p2: EPoint | mn.Vect3):
         x0, y0, z0 = convert_to_coord(p1)
         x1, y1, z1 = convert_to_coord(p2)
         dx = x1 - x0
@@ -96,7 +97,7 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # highlight the point
     # ----------------------------------------------------------------------------------------------------------------
-    def highlight(self, color=RED, scale=2.0, **args):
+    def highlight(self, color=mn.RED, scale=2.0, **args):
         target = self.animate(rate_func=mn.there_and_back, **args)
         target.scale(scale)
         target.set_color(color)

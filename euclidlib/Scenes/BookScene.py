@@ -12,7 +12,21 @@ from itertools import pairwise
 
 import manimlib as mn
 from typing import Callable
-from euclidlib.Objects import *
+
+#from euclidlib.Objects import TextBox, ELine, EPoint, ECircle, ETriangle, EAngleBase, EGroup, EMObject, EPolygon
+#from euclidlib.Objects import *
+from euclidlib.Utilities.coordinate_utilities import mn_coord, mn_scale
+from euclidlib.Objects.TextBox import TextBox
+from euclidlib.Objects.Line import ELine
+from euclidlib.Objects.Circle import ECircle
+from euclidlib.Objects.Triangle import ETriangle
+from euclidlib.Objects.Angle import EAngleBase
+from euclidlib.Objects.EuclidGroupMObject import EGroup
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Objects.Polygon import EPolygon
+from euclidlib.Objects.Point import EPoint
+
+
 GRID_OPACITY = 0
 
 from euclidlib.debugging import print_debug
@@ -28,7 +42,7 @@ class AnimState(Enum):
 
 
 def get_TOC(toc):
-    entries = TextBox(ORIGIN)
+    entries = TextBox(mn.ORIGIN)
     for i, title in enumerate(toc, start=1):
         entries.explain(f"Proposition {i}: {title}", skip_anim=True)
     return mn.VGroup(*entries.submobjects)
@@ -80,7 +94,7 @@ class BookScene(PropScene):
 
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
-                    buff_size=MED_LARGE_BUFF,
+                    buff_size=mn.MED_LARGE_BUFF,
                     alignment='n'
                     )
 
@@ -95,19 +109,19 @@ class BookScene(PropScene):
     def table_of_contents(self, tb: TextBox):
         entries = get_TOC(self.TOC)
         self.add(entries)
-        entries.next_to(self.frame.get_corner(DL), DR)
+        entries.next_to(self.frame.get_corner(mn.DL), mn.DR)
 
         distance_diff = entries.get_center() - entries[self.prop - 1].get_center()
-        self.play(entries.animate(run_time=1, rate_func=mn.rush_from).move_to(distance_diff, coor_mask=UP))
+        self.play(entries.animate(run_time=1, rate_func=mn.rush_from).move_to(distance_diff, coor_mask=mn.UP))
 
         line = entries[self.prop - 1]
         entries.remove(line)
-        self.play(line.animate.set_fill(BLUE))
+        self.play(line.animate.set_fill(mn.BLUE))
 
         title = tb.title(f"Proposition {self.prop} of Book {self.book}", delay_anim=True)
         self.play(
             mn.TransformMatchingStrings(line, title),
-            entries.animate(run_time=1, rate_func=mn.rush_into).next_to(self.frame.get_corner(UL), UR)
+            entries.animate(run_time=1, rate_func=mn.rush_into).next_to(self.frame.get_corner(mn.UL), mn.UR)
         )
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -134,7 +148,7 @@ class BookScene(PropScene):
 
         # draw the grid
         line_options = dict(
-            stroke_color=WHITE,
+            stroke_color=mn.WHITE,
             stroke_width=0.5,
             stroke_opacity=GRID_OPACITY,
         )
@@ -195,20 +209,20 @@ class Book1Scene(BookScene):
             #
             # with self.pause_animations_for():
             #     lAlx = sC.l2.parallel(tABC.p0)
-            # pL = EPoint(lAlx.intersect(sC.l3), label=('L', DOWN))
+            # pL = EPoint(lAlx.intersect(sC.l3), label=('L', mn.DOWN))
             #
             # sBDL = EParallelogram(B, sC.p3, pL)
             # sCEL = EParallelogram(C, sC.p0, pL)
             #
-            # sA.e_fill(GREEN)
-            # sCEL.e_fill(GREEN)
-            # sECA.e_fill(GREEN_D)
-            # sBCK.e_fill(GREEN_D)
+            # sA.e_fill(mn.GREEN)
+            # sCEL.e_fill(mn.GREEN)
+            # sECA.e_fill(mn.GREEN_D)
+            # sBCK.e_fill(mn.GREEN_D)
             #
-            # sB.e_fill(BLUE)
-            # sBDL.e_fill(BLUE)
-            # sABD.e_fill(BLUE_D)
-            # sFBC.e_fill(BLUE_D)
+            # sB.e_fill(mn.BLUE)
+            # sBDL.e_fill(mn.BLUE)
+            # sABD.e_fill(mn.BLUE_D)
+            # sFBC.e_fill(mn.BLUE_D)
 
 
 class Book2Scene(BookScene):
@@ -230,7 +244,7 @@ class Book2Scene(BookScene):
                   A History of Mathematics (1893)
                 """, font_size=16)
 
-                title_box[-1].align_to(title_box[-2], RIGHT)
+                title_box[-1].align_to(title_box[-2], mn.RIGHT)
 
                 title_box.down()
                 title_box.explain('<b>Definitions:</b>')
@@ -254,7 +268,7 @@ class Book2Scene(BookScene):
                     mn_coord(550, 600),
                     mn_coord(500, 600),
                 )
-                gnomon.e_fill(BLUE_D)
+                gnomon.e_fill(mn.BLUE_D)
 
                 diag = ELine(mn_coord(450, 700), mn_coord(650, 600))
                 l1 = ELine(mn_coord(500, 700), mn_coord(550, 600))
@@ -303,14 +317,14 @@ class Book3Scene(BookScene):
                   quoting a schoolchild in "-English as She Is Taught-"
                 """, font_size=16)
 
-                title_box[-1].align_to(title_box[-2], RIGHT)
+                title_box[-1].align_to(title_box[-2], mn.RIGHT)
                 title_box.down()
                 title_box.fancy("If people stand in a circle long enough, "
                                 "they'll eventually begin to dance.", font_size=48, write_simultaneous=True)
                 title_box.explain("""
                 <b>George Carlin</b>, Napalm and Silly Putty (2001)
                 """, font_size=16)
-                title_box[-1].align_to(title_box[-2], RIGHT)
+                title_box[-1].align_to(title_box[-2], mn.RIGHT)
                 draw.append(title_box)
 
             c1 = mn_coord(260, 360)
@@ -318,11 +332,11 @@ class Book3Scene(BookScene):
             c2 = c1 + mn_scale(80, 0, 0)
 
             with self.pause_animations_for() as draw:
-                cA = ECircle(c1, c1 + r1 * RIGHT)
-                pE = EPoint(c1, label=('E', DL))
-                pF = EPoint(c2, label=('F', DR))
+                cA = ECircle(c1, c1 + r1 * mn.RIGHT)
+                pE = EPoint(c1, label=('E', mn.DL))
+                pF = EPoint(c2, label=('F', mn.DR))
 
-                pA = cA.e_point_at_angle(PI).add_label('A', away_from=c2)
+                pA = cA.e_point_at_angle(mn.PI).add_label('A', away_from=c2)
                 lFA = ELine(c2, pA)
 
                 pD = cA.e_point_at_angle(0).add_label('D', away_from=c2)
@@ -334,10 +348,10 @@ class Book3Scene(BookScene):
                 pC = cA.e_point_at_angle(100 * DEG).add_label('C', away_from=c2)
                 lFC = ELine(c2, pC)
 
-                pG = cA.e_point_at_angle(PI/4).add_label('G', away_from=c2)
+                pG = cA.e_point_at_angle(mn.PI/4).add_label('G', away_from=c2)
                 lFG = ELine(c2, pG)
 
-                pH = cA.e_point_at_angle(-PI/4).add_label('H', away_from=c2)
+                pH = cA.e_point_at_angle(-mn.PI/4).add_label('H', away_from=c2)
                 lFH = ELine(c2, pG)
 
                 draw.extend([cA, pE, pF, pA, lFA, pD, lFD, pB, lFB, pC, lFC, pG, lFG, pH, lFH])

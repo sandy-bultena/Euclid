@@ -11,7 +11,7 @@ from euclidlib.Objects import *
 from os import getenv
 
 from euclidlib.debugging import print_debug
-DEFAULT_SPEED = 1
+DEFAULT_SPEED = 10
 DEFAULT_TEXT_SPEED = 10
 
 class AnimState(Enum):
@@ -84,15 +84,12 @@ class PropScene(mn.InteractiveScene):
         with self.animation_speed(self._speed or 1):
             try:
                 if not self.debug:
-                    print_debug(txt="TITLE PAGE")
                     self.title_page()
                     self.next_page()
                     self.reset()
-                    print_debug(txt="Finished TITLE PAGE")
             except NotImplementedError:
                 pass
 
-            print_debug(txt="Running prop scene", level=10)
             self.go()
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -204,7 +201,6 @@ class PropScene(mn.InteractiveScene):
     # wait for user before printing next page
     # -----------------------------------------------------------------------------------------------------------------
     def next_page(self):
-        # print("\nHit key for next page")
         self.paused = True
         self.wait_until(lambda : not self.paused, 600)
 
@@ -236,7 +232,6 @@ class PropScene(mn.InteractiveScene):
 
             for anim in anims:
                 if isinstance(anim, mn.LaggedStart):
-                    print(f"************ WTF is this 'LaggedStart'")
                     for subanim in anim.animations:
                         if subanim.is_remover():
                             self.remove(subanim.mobject)
@@ -250,7 +245,6 @@ class PropScene(mn.InteractiveScene):
 
 
         elif self.animateState[-1] == AnimState.SKIP:
-            print("****** WE ARE SKIPPING")
             currently_skipping = self.skip_animations
             if not currently_skipping:
                 self.force_skipping()
@@ -300,7 +294,6 @@ class PropScene(mn.InteractiveScene):
         yield
         self.animateState.pop()
         stored_anims = self.animationsStored.pop()
-        print(f"{stored_anims=}")
         if stored_anims:
             self.play(*stored_anims, **kwargs)
 

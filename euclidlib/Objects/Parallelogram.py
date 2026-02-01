@@ -1,19 +1,23 @@
 from __future__ import annotations
 
-from euclidlib.Objects import Polygon
-from euclidlib.Objects import CalculatePoints
-from euclidlib.Objects import Point
-from euclidlib.Objects import Line
-from euclidlib.Objects.EuclidMObject import *
+import euclidlib.Utilities.calculate_points as cp
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+from euclidlib.Objects.em_object_base import *
+from euclidlib.Objects.em_object_decorators import *
+
+from . import Polygon
+from . import Point
+from . import Line
+
 
 class EParallelogram(Polygon.EPolygon):
-    def __init__(self, *points: EMObject | Vect3, **kwargs):
+    def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
         if points and isinstance(points[0], str):
             point_names = list(points[0])
             points = Point.EPoint.find_in_frame(point_names)
         assert len(points) in (3, 4)
         if len(points) == 3:
-            super().__init__(*CalculatePoints.parallelogram(*points), **kwargs)
+            super().__init__(*cp.parallelogram(*points), **kwargs)
         else:
             super().__init__(*points, **kwargs)
 
@@ -28,22 +32,22 @@ class EParallelogram(Polygon.EPolygon):
             l2p2.e_fade()
 
         with self.scene.trace(l2p2, "Find intersect of 1st line of parallelogram to parallel line l2p2"):
-            p22 = Point.EPoint(l2p2.intersect(self.l[0]), label=('p_{22}', UP))
+            p22 = Point.EPoint(l2p2.intersect(self.l[0]), label=('p_{22}', mn.UP))
 
         with self.scene.trace(p22, "Draw diagonal, find intersection with 4th line of parallelogram"):
             diag = Line.ELine(p22, p1)
             diag.e_fade()
-            p44 = Point.EPoint(diag.intersect(self.l[3]), label=('p_{44}', UP))
+            p44 = Point.EPoint(diag.intersect(self.l[3]), label=('p_{44}', mn.UP))
 
         with self.scene.trace(self.l[2], "Draw a line at point p44, parallel to 3rd line of parallelogram"):
             l3p44 = self.l[2].parallel(p44)
             l3p44.blue()
 
         with self.scene.trace(l2p2, "Find intersect of l2p2 and l3p44"):
-            p3 = Point.EPoint(l2p2.intersect(l3p44), label=('p_3', UP))
+            p3 = Point.EPoint(l2p2.intersect(l3p44), label=('p_3', mn.UP))
 
         with self.scene.trace(l3p44, "Fine intersect of 2nd line of parallelogram to parallel line KL"):
-            p4 = Point.EPoint(self.l[1].intersect(l3p44), label=('p_4', UP))
+            p4 = Point.EPoint(self.l[1].intersect(l3p44), label=('p_4', mn.UP))
 
         with self.scene.trace("construct a parallelogram"):
             poly = EParallelogram(p1, p2, p3, p4)
@@ -127,7 +131,7 @@ class EParallelogram(Polygon.EPolygon):
 
     @log
     @copy_transform()
-    def copy_to_point(self, point: EMObject | Vect3):
+    def copy_to_point(self, point: EMObject | mn.Vect3):
         np2 = point
 
         # create a starting line, starting at point $point
@@ -135,7 +139,7 @@ class EParallelogram(Polygon.EPolygon):
         # l2 = Line.ELine(xy, xy + 1.2 * self.l1.get_vector()).e_fade()
         # l2 = Line.ELine(
         #     xy + LEFT * 1.2 * self.l1.get_length(),
-        #     xy + RIGHT * 1.2 * self.l1.get_length()).e_fade()
+        #     xy + mn.RIGHT * 1.2 * self.l1.get_length()).e_fade()
         l2 = self.l1.parallel(point).extend(self.l1.get_length() * 1.2)
 
         # copy line 2 to the baseline

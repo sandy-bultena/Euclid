@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import itertools
 
-from euclidlib.Objects.EuclidMObject import *
-from .Line import ELine, VirtualLine
-from euclidlib.Objects import Circle as Cir
-from manimlib import TAU
-from . import Text as T
-from . import Point as P
-from . import Circle as C
-from . import Arc as Arc
+from euclidlib.Objects.em_object_base import *
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+
+from . import Line
+from . import Point
+from . import Circle
+from . import Arc
 import math
-from typing import Tuple, Any, Self, Callable
+
 
 EPSILON = mn_scale(1)
 if TYPE_CHECKING:
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     ]
 
 
-def angle_coords(l1: ELine, l2: ELine) -> ANGLE_DATA:
+def angle_coords(l1: Line.ELine, l2: Line.ELine) -> ANGLE_DATA:
     (l1x0, l1y0, _), (l1x1, l1y1, _) = l1.get_start(), l1.get_end()
     (l2x0, l2y0, _), (l2x1, l2y1, _) = l2.get_start(), l2.get_end()
 
@@ -69,7 +69,7 @@ def angleOf(p0: mn.Vect3, p1: mn.Vect3):
     )
 
 
-def calculateAngle(l1: ELine, l2: ELine):
+def calculateAngle(l1: Line.ELine, l2: Line.ELine):
     (vx, vy, _), vec1, vec2 = angle_coords(l1, l2)
 
     if vx is None:
@@ -80,13 +80,13 @@ def calculateAngle(l1: ELine, l2: ELine):
 
     th_diff = th2 - th1
 
-    return th_diff % TAU
+    return th_diff % mn.TAU
 
 
 class EAngleBase(Arc.AbstractArc):
     LabelBuff = 0.15
-    l1: ELine
-    l2: ELine
+    l1: Line.ELine
+    l2: Line.ELine
     size: float
     e_angle: float
     e_start_angle: float
@@ -105,7 +105,7 @@ class EAngleBase(Arc.AbstractArc):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform(index=1)
-    def copy_to_line(self, point: P.EPoint, line: ELine, negative=False) -> Tuple[ELine, EAngleBase]:
+    def copy_to_line(self, point: Point.EPoint, line: Line.ELine, negative=False) -> tuple[Line.ELine, EAngleBase]:
         start, end = line.get_start_and_end()
         if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
             mn.log.error("When copying an angle to a line, "
@@ -115,7 +115,7 @@ class EAngleBase(Arc.AbstractArc):
 
         if np.array_equal(end, point.get_center()):
             end, start = start, end
-        clone = ELine(start, end, stroke_color=BLUE)
+        clone = Line.ELine(start, end, stroke_color=mn.BLUE)
         if clone.get_length() < mn_scale(500):
             clone.extend_and_prepend(mn_scale(250))
 
@@ -126,20 +126,20 @@ class EAngleBase(Arc.AbstractArc):
         # ------------------------------------------------------------------------
         # define point D and E on angle
         # ------------------------------------------------------------------------
-        c1 = C.ECircle(self.v, self.v + RIGHT * min_length)
+        c1 = Circle.ECircle(self.v, self.v + mn.RIGHT * min_length)
         p1 = c1.intersect(self.l1)
         p2 = c1.intersect(self.l2)
-        pn1 = P.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
-        pn2 = P.EPoint(p2[0], label=('P2', dict(away_from=p1[0])))
+        pn1 = Point.EPoint(p1[0], label=('P1', dict(away_from=p2[0])))
+        pn2 = Point.EPoint(p2[0], label=('P2', dict(away_from=p1[0])))
         c1.e_remove()
 
         # ------------------------------------------------------------------------
         # copy CE to AF
         # ------------------------------------------------------------------------
-        l1 = ELine(self.v, p1[0], stroke_color=GREEN)
+        l1 = Line.ELine(self.v, p1[0], stroke_color=mn.GREEN)
         ln1, o = l1.copy_to_point(point)
         ln1.green()
-        c2 = C.ECircle(point, ln1.get_end(), stroke_color=GREEN)
+        c2 = Circle.ECircle(point, ln1.get_end(), stroke_color=mn.GREEN)
         with self.scene.delayed():
             for x in (ln1, o):
                 x.e_remove()
@@ -149,21 +149,21 @@ class EAngleBase(Arc.AbstractArc):
                 clone.extend(100)
                 p3 = c2.intersect(clone)
 
-        pn3 = P.EPoint(p3[0], fill_color=GREEN)
+        pn3 = Point.EPoint(p3[0], fill_color=mn.GREEN)
         l1.white()
         c2.white.e_fade()
 
-        l3 = ELine(p1[0], p2[0], stroke_color=GREEN)
+        l3 = Line.ELine(p1[0], p2[0], stroke_color=mn.GREEN)
         ln3, o2 = l3.copy_to_point(pn3)
-        c3 = C.ECircle(pn3, ln3.get_end())
+        c3 = Circle.ECircle(pn3, ln3.get_end())
         c2.e_normal()
 
         p4 = c3.intersect(c2)
-        lt1 = ELine(point, p4[0], delay_anim=True)
-        lt2 = ELine(point, p4[1], delay_anim=True)
+        lt1 = Line.ELine(point, p4[0], delay_anim=True)
+        lt2 = Line.ELine(point, p4[1], delay_anim=True)
 
-        lt3 = ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
-        lt4 = ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
+        lt3 = Line.ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
+        lt4 = Line.ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
 
         with self.scene.delayed():
             for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
@@ -208,8 +208,8 @@ class EAngleBase(Arc.AbstractArc):
         # make two temporary lines
         # ------------------------------------------------------------------------
         with self.scene.simultaneous():
-            s1 = ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
-            s2 = ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
+            s1 = Line.ELine(self.get_arc_center(), self.get_arc_center() + v1).e_fade()
+            s2 = Line.ELine(self.get_arc_center(), self.get_arc_center() + v2).e_fade()
 
         # ------------------------------------------------------------------------
         # define points B and C on the two lines, equidistance from the vertex
@@ -217,27 +217,27 @@ class EAngleBase(Arc.AbstractArc):
         # pick the shorter of the two lines to find the initial point
         short = self.l1 if self.l1.get_length() <= self.l2.get_length() else self.l2
         p = s1.point(0.75 * short.get_length())
-        pB = P.EPoint(p)
-        cA = C.ECircle(self.get_arc_center(), pB).e_fade()
+        pB = Point.EPoint(p)
+        cA = Circle.ECircle(self.get_arc_center(), pB).e_fade()
         p = cA.intersect(self.l2)
-        pC = P.EPoint(p[0])
+        pC = Point.EPoint(p[0])
 
         # ------------------------------------------------------------------------
-        # draw two circles, radius BC, centers: B & C.
+        # draw two circles, radius BC, centers: B & Circle.
         # - find the intersection points between two circles
         # ------------------------------------------------------------------------
-        c1 = C.ECircle(pB, pC).e_fade()
-        c2 = C.ECircle(pC, pB).e_fade()
+        c1 = Circle.ECircle(pB, pC).e_fade()
+        c2 = Circle.ECircle(pC, pB).e_fade()
         ps = c1.intersect(c2)
         if mn.norm_squared(ps[1] - self.get_arc_center()) < mn.norm_squared(ps[0] - self.get_arc_center()):
-            p1 = P.EPoint(ps[0])
+            p1 = Point.EPoint(ps[0])
         else:
-            p1 = P.EPoint(ps[1])
+            p1 = Point.EPoint(ps[1])
 
         # ------------------------------------------------------------------------
         # draw a line to intersection
         # ------------------------------------------------------------------------
-        lAD = ELine(self.get_arc_center(), p1)
+        lAD = Line.ELine(self.get_arc_center(), p1)
 
         # ------------------------------------------------------------------------
         # cleanup
@@ -268,8 +268,8 @@ class EAngleBase(Arc.AbstractArc):
 
 class ArcAngle(EAngleBase, mn.Arc):
     def __init__(self,
-                 l1: ELine,
-                 l2: ELine,
+                 l1: Line.ELine,
+                 l2: Line.ELine,
                  size: float,
                  angle_data: ANGLE_DATA,
                  angle1: float,
@@ -282,10 +282,10 @@ class ArcAngle(EAngleBase, mn.Arc):
 
         if kwargs.get('debug', None):
             scene = find_scene()
-            self.tmp_start = mn.Line(stroke_color=RED)
-            self.tmp_end = mn.Line(stroke_color=BLUE)
-            self.tmp_mid = mn.Line(stroke_color=GREEN)
-            self.tmp_txt = mn.Line(stroke_color=YELLOW)
+            self.tmp_start = mn.Line(stroke_color=mn.RED)
+            self.tmp_end = mn.Line(stroke_color=mn.BLUE)
+            self.tmp_mid = mn.Line(stroke_color=mn.GREEN)
+            self.tmp_txt = mn.Line(stroke_color=mn.YELLOW)
             self.tmp_start.f_always.set_points_by_ends(
                 lambda: center,
                 lambda: center + size * np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0]))
@@ -314,8 +314,8 @@ class RightAngle(EAngleBase):
     LabelBuff = 0.15
 
     def __init__(self,
-                 l1: ELine,
-                 l2: ELine,
+                 l1: Line.ELine,
+                 l2: Line.ELine,
                  size: float,
                  angle_data: ANGLE_DATA,
                  angle1: float,
@@ -332,20 +332,20 @@ class RightAngle(EAngleBase):
         part_size = 1 / math.sqrt(2)
         if angle > 0:
             self.set_points_as_corners([
-                RIGHT * part_size,
-                UR * part_size,
-                UP * part_size,
+                mn.RIGHT * part_size,
+                mn.UR * part_size,
+                mn.UP * part_size,
             ])
         else:
             self.set_points_as_corners([
-                RIGHT * part_size,
-                DR * part_size,
-                DOWN * part_size,
+                mn.RIGHT * part_size,
+                mn.DR * part_size,
+                mn.DOWN * part_size,
             ])
 
         center, self.vec1, self.vec2 = angle_data
-        self.rotate(angle1, about_point=ORIGIN)
-        self.scale(size, about_point=ORIGIN)
+        self.rotate(angle1, about_point=mn.ORIGIN)
+        self.scale(size, about_point=mn.ORIGIN)
         self.shift(center)
         if not delay_anim:
             self.e_draw()
@@ -355,14 +355,14 @@ class Gnomon(ArcAngle):
     pass
 
 
-def EAngle(l1: ELine | str,
-           l2: ELine = None,
+def EAngle(l1: Line.ELine | str,
+           l2: Line.ELine = None,
            size: float = mn_scale(40),
            no_right: bool = False,
            gnomon: bool = False,
            **kwargs):
     if isinstance(l1, str):
-        l1, l2 = ELine.find_in_frame(l1)
+        l1, l2 = Line.ELine.find_in_frame(l1)
 
     assert (l2 is not None)
 
@@ -378,19 +378,19 @@ def EAngle(l1: ELine | str,
 
     # RELEVANT CHANGE HERE ------------------------------------------
     if gnomon:
-        if 0 < th_diff < PI:
-            th_diff = th_diff - TAU
-        elif -PI < th_diff < PI:
-            th_diff = TAU + th_diff
+        if 0 < th_diff < mn.PI:
+            th_diff = th_diff - mn.TAU
+        elif -mn.PI < th_diff < mn.PI:
+            th_diff = mn.TAU + th_diff
         return Gnomon(l1, l2, size, data, th1, th2, th_diff, **kwargs)
     # ----------------------------------------------------------------
 
-    if th_diff > PI:
-        th_diff = th_diff - TAU
-    elif th_diff < -PI:
-        th_diff = TAU + th_diff
+    if th_diff > mn.PI:
+        th_diff = th_diff - mn.TAU
+    elif th_diff < -mn.PI:
+        th_diff = mn.TAU + th_diff
 
-    if abs(abs(th_diff) - PI / 2) < (1 * DEGREES) and not no_right:
+    if abs(abs(th_diff) - mn.PI / 2) < (1 * mn.DEGREES) and not no_right:
         return RightAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)
     else:
         return ArcAngle(l1, l2, size, data, th1, th2, th_diff, **kwargs)

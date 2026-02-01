@@ -4,7 +4,7 @@ import manimlib as mn
 from manimlib import Scene
 from typing import Callable
 
-from . import EuclidMObject as E
+from . import em_object_base as E
 
 @cache
 def EAnimationOf(anim_type: type):
@@ -59,6 +59,9 @@ class EuclidAnimation(mn.Animation):
         """
         assert(isinstance(mobject, E.EMObject))
         super().__init__(mobject, *args, **kwargs)
+
+    def __str__(self):
+        return f"{type(self).__name__}"
 
     # ----------------------------------------------------------------------------------------------------------------
     # begin
@@ -222,7 +225,6 @@ class UnWrite(mn.Write):
     # clean up from scene, not sure how this is different than the 'super().clean_up_from_scene'
     # ----------------------------------------------------------------------------------------------------------------
     def clean_up_from_scene(self, scene: mn.Scene):
-        print("We are cleaning text from screen... ???")
         super().clean_up_from_scene(scene)
         self.mobject.restore()
 

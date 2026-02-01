@@ -4,53 +4,57 @@ from typing_extensions import Unpack
 from itertools import pairwise, zip_longest, chain, repeat
 from typing import  Any,  TypedDict, TYPE_CHECKING, Optional
 
-from euclidlib.Objects.EuclidMObject import *
-from . import EuclidGroupMObject as G
-from . import Line as L
-from . import Point as P
-from . import Angle as A
+from euclidlib.Objects.em_object_base import *
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+
+from . import EuclidGroupMObject as GroupObject
+
+from . import Line
+from . import Point
+from . import Angle
 
 EPSILON = mn_scale(1)
 
 LABEL_ARG = (None | str |
-             Tuple[str, Unpack[tuple[Any, ...]], dict[str, Any]] |
-             Tuple[str, Unpack[tuple[Any, ...]]])
+             tuple[str, Unpack[tuple[Any, ...]], dict[str, Any]] |
+             tuple[str, Unpack[tuple[Any, ...]]])
 
 LABEL_ARGS = Iterable[LABEL_ARG]
 
-FULL_ANGLES_ARG = (Tuple[LABEL_ARG] |
-                   Tuple[LABEL_ARG, LABEL_ARG] |
-                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG] |
-                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float] |
-                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float] |
-                   Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float, float])
+FULL_ANGLES_ARG = (tuple[LABEL_ARG] |
+                   tuple[LABEL_ARG, LABEL_ARG] |
+                   tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG] |
+                   tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float] |
+                   tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float] |
+                   tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG, float, float, float])
 
-ANGLE_ARGS = (Tuple[LABEL_ARG] |
-              Tuple[LABEL_ARG, LABEL_ARG] |
-              Tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG])
-ANGLE_SIZE_ARGS = (Tuple[float] |
-                   Tuple[float, float] |
-                   Tuple[float, float, float])
+ANGLE_ARGS = (tuple[LABEL_ARG] |
+              tuple[LABEL_ARG, LABEL_ARG] |
+              tuple[LABEL_ARG, LABEL_ARG, LABEL_ARG])
+ANGLE_SIZE_ARGS = (tuple[float] |
+                   tuple[float, float] |
+                   tuple[float, float, float])
 
 
 class OPTIONS(TypedDict):
     point_labels: LABEL_ARG
     labels: LABEL_ARG
     angles: FULL_ANGLES_ARG
-    fill: Tuple[mn.Color, float] | None
+    fill: tuple[mn.Color, float] | None
 
 
-class EPolygon(G.PsuedoGroup, EMObject, mn.Polygon):
+class EPolygon(GroupObject.PsuedoGroup, EMObject, mn.Polygon):
     _area: float | None
 
     MAX_SIZE = 0
 
-    def IN(self, v: Vect3):
+    def IN(self, v: mn.Vect3):
         center = self.get_center_of_mass()
         direction = center - v
         return mn.normalize(direction)
 
-    def OUT(self, v: Vect3):
+    def OUT(self, v: mn.Vect3):
         center = self.get_center_of_mass()
         direction = v - center
         return mn.normalize(direction)
@@ -75,21 +79,21 @@ setattr(cls, 'p{i}', property(p))
 
     @classmethod
     def assemble(cls,
-                 lines: Optional[list[L.ELine] | str] = None,
-                 points: Optional[ list[P.EPoint] | str] = None,
-                 angles: Optional[ list[A.EAngleBase]] = None,
+                 lines: Optional[list[Line.ELine] | str] = None,
+                 points: Optional[ list[Point.EPoint] | str] = None,
+                 angles: Optional[ list[Angle.EAngleBase]] = None,
                  **kwargs):
         if points:
             if isinstance(points, str):
-                points = P.EPoint.find_in_frame(points)
+                points = Point.EPoint.find_in_frame(points)
             coords = [p.get_center() for p in points]
         elif lines:
             if isinstance(lines, str):
-                lines = L.ELine.find_in_frame(lines, loop=True)
+                lines = Line.ELine.find_in_frame(lines, loop=True)
             tmp_lines = lines + [lines[0]]
             coords = []
             for l1, l2 in pairwise(tmp_lines):
-                common, _, _ = A.angle_coords(l1, l2)
+                common, _, _ = Angle.angle_coords(l1, l2)
                 if common is None:
                     mn.log.warning("Your polygon lines should touch each other!")
                     return
@@ -107,22 +111,22 @@ setattr(cls, 'p{i}', property(p))
             labels: LABEL_ARG | None = None,
             angles: ANGLE_ARGS | None = None,
             angle_sizes: ANGLE_SIZE_ARGS | None = None,
-            fill: Tuple[mn.Color, float] | None = None,
+            fill: tuple[mn.Color, float] | None = None,
             z_index=-1,
             animate_part=('set_e_fill',),
             delay_anim=False,
             skip_anim=False,
             _assemble_flag=False,
-            _lines: list[L.ELine] | None = None,
-            _points: list[P.EPoint] | None = None,
-            _angles: list[A.EAngleBase | None] | None = None,
+            _lines: list[Line.ELine] | None = None,
+            _points: list[Point.EPoint] | None = None,
+            _angles: list[Angle.EAngleBase | None] | None = None,
             **kwargs
     ):
         if points and isinstance(points[0], str):
             point_names = list(points[0])
-            points = P.EPoint.find_in_frame(point_names)
+            points = Point.EPoint.find_in_frame(point_names)
 
-        if all(isinstance(p, L.ELine) for p in points):
+        if all(isinstance(p, Line.ELine) for p in points):
             lines = [p for p in points]
             tmp_lines = lines + [points[0]]
             points = []
@@ -147,19 +151,19 @@ setattr(cls, 'p{i}', property(p))
         self.sides = len(self.vertices)
         self.update_size(self.sides)
         if _assemble_flag and _lines:
-            self.lines: list[L.ELine] = _lines
+            self.lines: list[Line.ELine] = _lines
         else:
-            self.lines: list[L.ELine] = []
+            self.lines: list[Line.ELine] = []
 
         if _assemble_flag and _points:
-            self.points: list[P.EPoint] = _points
+            self.points: list[Point.EPoint] = _points
         else:
-            self.points: list[P.EPoint] = []
+            self.points: list[Point.EPoint] = []
 
         if _assemble_flag and _angles:
-            self.angles: list[A.EAngleBase | None] = _angles
+            self.angles: list[Angle.EAngleBase | None] = _angles
         else:
-            self.angles: list[A.EAngleBase | None] = [None] * self.sides
+            self.angles: list[Angle.EAngleBase | None] = [None] * self.sides
 
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
                          delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
@@ -187,7 +191,7 @@ setattr(cls, 'p{i}', property(p))
                         if a is not None:
                             a.e_normal()
 
-    def e_fill(self, color: ManimColor = None, opacity=0.5):
+    def e_fill(self, color: mn.ManimColor = None, opacity=1):
         self.options['fill'] = (color, opacity)
         return super().e_fill(color, opacity)
 
@@ -245,7 +249,7 @@ setattr(cls, 'p{i}', property(p))
         labels = self.options.get('point_labels', [()] * self.sides)
         with self.scene.simultaneous_speed(self.speed):
             self.points = [
-                P.EPoint(coord,
+                Point.EPoint(coord,
                          scene=self.scene,
                          label_args=self._filter_point_labels(args),
                          delay_anim=delay_anim,
@@ -260,7 +264,7 @@ setattr(cls, 'p{i}', property(p))
         with self.scene.simultaneous_speed(self.speed):
             labels = self.options.get('labels', [()] * self.sides)
             line_points = [(p0,p1) for p0,p1 in pairwise(self.vertices)]
-            self.lines = [L.ELine(*pts,
+            self.lines = [Line.ELine(*pts,
                                   delay_anim=True,
                                   label_args=self._filter_side_labels(args)
                                   )
@@ -297,7 +301,7 @@ setattr(cls, 'p{i}', property(p))
 
         if not self.angles:
             self.angles = [
-                A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim,
+                Angle.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim,
                          skip_anim=skip_anim)
                 for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
                 if name is not None
@@ -309,7 +313,7 @@ setattr(cls, 'p{i}', property(p))
                 old = self.angles[i]
                 if old is not None:
                     old.e_remove()
-                self.angles[i] = A.EAngle(l1, l2, size=size, label_args=name, scene=self.scene)
+                self.angles[i] = Angle.EAngle(l1, l2, size=size, label_args=name, scene=self.scene)
         return self
 
     def remove_angles(self):
@@ -343,34 +347,34 @@ setattr(cls, 'p{i}', property(p))
         return self.vertices
 
     if TYPE_CHECKING:
-        l0: L.ELine
-        l1: L.ELine
-        l2: L.ELine
-        l3: L.ELine
-        l4: L.ELine
-        a0: A.EAngleBase
-        a1: A.EAngleBase
-        a2: A.EAngleBase
-        a3: A.EAngleBase
-        a4: A.EAngleBase
-        p0: P.EPoint
-        p1: P.EPoint
-        p2: P.EPoint
-        p3: P.EPoint
-        p4: P.EPoint
+        l0: Line.ELine
+        l1: Line.ELine
+        l2: Line.ELine
+        l3: Line.ELine
+        l4: Line.ELine
+        a0: Angle.EAngleBase
+        a1: Angle.EAngleBase
+        a2: Angle.EAngleBase
+        a3: Angle.EAngleBase
+        a4: Angle.EAngleBase
+        p0: Point.EPoint
+        p1: Point.EPoint
+        p2: Point.EPoint
+        p3: Point.EPoint
+        p4: Point.EPoint
 
     def highlight(self):
-        return self.animate(rate_func=mn.there_and_back).set_fill(RED, opacity=1)
+        return self.animate(rate_func=mn.there_and_back).set_fill(mn.RED, opacity=1)
 
-    def replace_line(self, index, newline: L.ELine):
+    def replace_line(self, index, newline: Line.ELine):
         self.lines[index].e_delete()
         self.lines[index] = newline
 
-    def replace_point(self, index, newpoint: P.EPoint):
+    def replace_point(self, index, newpoint: Point.EPoint):
         self.points[index].e_delete()
         self.points[index] = newpoint
 
-    def move_point_to(self, index: int, dest: P.EPoint | Vect3):
+    def move_point_to(self, index: int, dest: Point.EPoint | mn.Vect3):
         if hasattr(self, '_angle_values'):
             del self._angle_values
         dest = convert_to_coord(dest)
@@ -393,9 +397,9 @@ setattr(cls, 'p{i}', property(p))
             for i in range(self.sides):
                 if self.angles[i] is not None:
                     old_angle = self.angles[i]
-                    l1 = L.VirtualLine(self.vertices[(i - 1) % self.sides], self.vertices[i])
-                    l2 = L.VirtualLine(self.vertices[i], self.vertices[i + 1])
-                    new_angle = A.EAngle(l1, l2, size=old_angle.size, delay_anim=True)
+                    l1 = Line.VirtualLine(self.vertices[(i - 1) % self.sides], self.vertices[i])
+                    l2 = Line.VirtualLine(self.vertices[i], self.vertices[i + 1])
+                    new_angle = Angle.EAngle(l1, l2, size=old_angle.size, delay_anim=True)
                     self.scene.play(mn.Transform(old_angle, new_angle))
                     l2.e_remove()
                     l1.e_remove()
@@ -431,16 +435,16 @@ setattr(cls, 'p{i}', property(p))
 
     @log
     @copy_transform()
-    def copy_to_parallelogram_on_point(self, point: P.EPoint, angle: A.EAngleBase, /, negative=False):
+    def copy_to_parallelogram_on_point(self, point: Point.EPoint, angle: Angle.EAngleBase, /, negative=False):
         coords = convert_to_coord(point)
-        line = L.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
+        line = Line.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
         para = self.copy_to_parallelogram_on_line(line, angle, speed=0)
         line.e_remove()
         return para
 
     @log
     @copy_transform()
-    def copy_to_parallelogram_on_line(self, line: L.ELine, angle: A.EAngleBase):
+    def copy_to_parallelogram_on_line(self, line: Line.ELine, angle: Angle.EAngleBase):
         # ------------------------------------------------------------------------
         # get a list of triangles that make up the polygon
         # ------------------------------------------------------------------------
@@ -454,16 +458,16 @@ setattr(cls, 'p{i}', property(p))
         current_line = line.copy()
         coords = current_line.get_start_and_end()
         for tri in triangles:
-            tri.e_fill(RED)
+            tri.e_fill(mn.RED)
             parallels.append(tri.copy_to_parallelogram_on_line(current_line, angle))
 
             with self.scene.simultaneous():
                 parallels[-1].e_draw()
                 tri.e_remove()
             current_line.e_delete()
-            current_line = L.ELine(*reversed(parallels[-1].l[2].get_start_and_end()),
+            current_line = Line.ELine(*reversed(parallels[-1].l[2].get_start_and_end()),
                                    skip_anim=True,
-                                   stroke_color=RED)
+                                   stroke_color=mn.RED)
         current_line.e_delete()
         from . import Parallelogram as Para
         poly = Para.EParallelogram(*coords, *reversed(current_line.get_start_and_end()))
@@ -521,23 +525,23 @@ setattr(cls, 'p{i}', property(p))
 
     def _calculate_angle_values(self):
         # clockwise
-        values = list(A.calculateAngle(l1, l2) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
+        values = list(Angle.calculateAngle(l1, l2) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
         self._is_clockwise = True
 
         # counter_clockwise
-        if sum(values) > (self.sides - 2) * PI + 0.0001:
+        if sum(values) > (self.sides - 2) * mn.PI + 0.0001:
             self._is_clockwise = False
-            values = list(A.calculateAngle(l2, l1) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
+            values = list(Angle.calculateAngle(l2, l1) for l1, l2 in pairwise([self.lines[-1]] + self.lines))
         self._angle_values = values
 
     @log
     @copy_transform()
-    def copy_to_rectangle(self, point: EMObject | Vect3):
+    def copy_to_rectangle(self, point: EMObject | mn.Vect3):
         # need a right angle
         with self.scene.simultaneous():
-            l1 = L.ELine(LEFT, ORIGIN).e_fade()
-            l2 = L.ELine(LEFT, UL).e_fade()
-        right = A.EAngle(l1, l2)
+            l1 = Line.ELine(mn.LEFT, mn.ORIGIN).e_fade()
+            l2 = Line.ELine(mn.LEFT, mn.UL).e_fade()
+        right = Angle.EAngle(l1, l2)
         with self.scene.simultaneous():
             l1.e_remove()
             l2.e_remove()
@@ -560,40 +564,40 @@ setattr(cls, 'p{i}', property(p))
 
     @log
     @copy_transform()
-    def copy_to_similar_shape(self, line: L.ELine):
+    def copy_to_similar_shape(self, line: Line.ELine):
         from . import Triangle as Tri
         # array of points for new polygon
         first_vec = self.l0.get_unit_vector()
         ref_line = line.get_unit_vector()
 
         if np.dot(first_vec, ref_line) >= 0:
-            points: list[P.EPoint] = [P.EPoint(line.get_start()), P.EPoint(line.get_end())]
+            points: list[Point.EPoint] = [Point.EPoint(line.get_start()), Point.EPoint(line.get_end())]
         else:
-            points: list[P.EPoint] = [P.EPoint(line.get_end()), P.EPoint(line.get_start())]
+            points: list[Point.EPoint] = [Point.EPoint(line.get_end()), Point.EPoint(line.get_start())]
 
         # --------------------------------------------------------------------------
         # create individual triangles and copy them
         # --------------------------------------------------------------------------
-        line_to_draw_on = L.ELine(*points, skip_anim=True).red()
+        line_to_draw_on = Line.ELine(*points, skip_anim=True).red()
         for third_point in self.p[2:]:
             # create new triangle
-            t = Tri.ETriangle(self.p0, self.p1, third_point, fill=(PINK, 0.5))
+            t = Tri.ETriangle(self.p0, self.p1, third_point, fill=(mn.PINK, 0.5))
 
             # create two new angles
             with self.scene.simultaneous():
-                a1 = A.EAngle(t.l0, t.l2)
-                a2 = A.EAngle(t.l1, t.l0)
+                a1 = Angle.EAngle(t.l0, t.l2)
+                a2 = Angle.EAngle(t.l1, t.l0)
 
             # copy these angles to the line to draw on
             with self.scene.simultaneous():
-                pt1 = P.EPoint(line_to_draw_on.get_start())
-                pt2 = P.EPoint(line_to_draw_on.get_end())
+                pt1 = Point.EPoint(line_to_draw_on.get_start())
+                pt2 = Point.EPoint(line_to_draw_on.get_end())
             with self.scene.simultaneous():
                 l1, a1tmp = a1.copy_to_line(pt1, line_to_draw_on)
                 l2, a2tmp = a2.copy_to_line(pt2, line_to_draw_on, negative=True)
 
             # find the intersection of the new lines
-            pt3 = P.EPoint(l1.intersect(l2))
+            pt3 = Point.EPoint(l1.intersect(l2))
             points.append(pt3)
 
             # clean up
@@ -608,7 +612,7 @@ setattr(cls, 'p{i}', property(p))
                 pt1.e_remove()
                 pt2.e_remove()
             # if third_point is not self.p[-1]:
-            #     line_to_draw_on = L.ELine(pt1, pt3).red()
+            #     line_to_draw_on = Line.ELine(pt1, pt3).red()
 
         line_to_draw_on.e_remove()
         poly = EPolygon.assemble(points=points)
@@ -616,11 +620,11 @@ setattr(cls, 'p{i}', property(p))
 
     @log
     @copy_transform()
-    def copy_to_polygon_shape(self, point: EMObject | Vect3, poly: EPolygon):
+    def copy_to_polygon_shape(self, point: EMObject | mn.Vect3, poly: EPolygon):
         # need a right angle
-        l1 = L.VirtualLine(mn_coord(10, 40), mn_coord(40, 40))
-        l2 = L.VirtualLine(mn_coord(10, 40), mn_coord(10, 10))
-        right = A.EAngle(l1, l2, delay_anim=True)
+        l1 = Line.VirtualLine(mn_coord(10, 40), mn_coord(40, 40))
+        l2 = Line.VirtualLine(mn_coord(10, 40), mn_coord(10, 10))
+        right = Angle.EAngle(l1, l2, delay_anim=True)
 
         # Create a rectangle equal in area to other BCLE (I.45)
         # drawn on it's base
@@ -635,7 +639,7 @@ setattr(cls, 'p{i}', property(p))
 
         # create a line GH (starting at point $pt) such that it is
         # the mean proportional of BC, CF (VI.13)
-        line3 = L.ELine.mean_proportional(t1.l0, t2.l1, point, 0)
+        line3 = Line.ELine.mean_proportional(t1.l0, t2.l1, point, 0)
 
         # finally, draw a copy of the polygon onto the new line
         # (the final polygon will be the size of self, but similar to polygon)

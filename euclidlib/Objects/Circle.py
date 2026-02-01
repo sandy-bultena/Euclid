@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import math
-from itertools import pairwise
-
-from euclidlib.Objects.EuclidMObject import *
-from euclidlib.Objects import Line as L
-from euclidlib.Objects import Arc
-from euclidlib.Objects import Point
 import manimlib as mn
-from euclidlib.Objects import Dashable as Da
+import numpy as np
+
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord
+import euclidlib.Scenes.PropScene as ps
+from . import Line
+from . import Arc
+from . import Point
 
 # =====================================================================================================================
 # Circle
@@ -49,7 +50,7 @@ class ECircle(mn.Circle, Arc.AbstractArc):
     # CreationOf - how to animate the drawing of a circle
     # -----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
-        tmpLine = L.ELine(self.e_center, self.get_end(),
+        tmpLine = Line.ELine(self.e_center, self.get_end(),
                           stroke_color=mn.RED,
                           label=self.temp_line_label,
                           delay_anim=True)
@@ -69,7 +70,7 @@ class ECircle(mn.Circle, Arc.AbstractArc):
 
             # don't know wtf this is
             if tmpLine.e_label is not None:
-                tmpLine.e_label.enable_updaters()
+                tmpLine.e_labeLine.enable_updaters()
 
         return super().CreationOf(*args, **kwargs)
 
@@ -79,25 +80,25 @@ class ECircle(mn.Circle, Arc.AbstractArc):
             edge = self.point_at_angle(angle)
         except AssertionError:
             try:
-                edge = self.point_from_proportion((angle%TAU)/TAU)
+                edge = self.point_from_proportion((angle%mn.TAU)/mn.TAU)
             except AssertionError:
                 edge = self.get_right()
         return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
 
 
-    def angle_of_point(self, point: Point.EPoint | Vect3):
+    def angle_of_point(self, point: Point.EPoint | mn.Vect3):
         p = convert_to_coord(point)
         c = self.center
         vec = p - c
-        return mn.angle_of_vector(vec) % TAU
+        return mn.angle_of_vector(vec) % mn.TAU
 
 
     @log
     @anim_speed
-    def draw_tangent(self, point: Mobject | Vect3, negative=False):
+    def draw_tangent(self, point: mn.Mobject | mn.Vect3, negative=False):
         # draw line from point to centre of circle
         pC = Point.EPoint(self.v)
-        lC = L.ELine(point, pC)
+        lC = Line.ELine(point, pC)
 
         # if point is inside circle, then we can't do this
         if lC.get_length() - self.r < mn_scale(-1):
@@ -113,7 +114,7 @@ class ECircle(mn.Circle, Arc.AbstractArc):
         # else draw a line from the point tangent to the circle
         else:
             # find where line from centre intersects small circle
-            p: Tuple[Vect3, Vect3] = self.intersect(lC)
+            p: tuple[mn.Vect3, mn.Vect3] = self.intersect(lC)
             pD = Point.EPoint(p[0]).e_fade()
             # draw larger circle, and where line from centre intersects small circle
             cL = ECircle(self.v, point).e_fade()
@@ -124,18 +125,18 @@ class ECircle(mn.Circle, Arc.AbstractArc):
             p = cL.intersect(lPerp)
             pF = Point.EPoint(p[0]).e_fade()
             # draw line from point F to centre of circle
-            lF = L.ELine(pF, pC).e_fade()
+            lF = Line.ELine(pF, pC).e_fade()
             # find intersection of this line with original circle
             p = self.intersect(lF)
             # fiddle around because round off errors might make point B
             # just outside the circle
-            radial = L.ELine(self.get_center(), p[0])
+            radial = Line.ELine(self.get_center(), p[0])
             if radial.get_length() > self.radius:
                 p = (radial.point(self.radius),)
             radial.e_remove()
             pB = Point.EPoint(p[0]).e_fade()
             # draw the tangent
-            l = L.ELine(point, pB)
+            l = Line.ELine(point, pB)
 
             to_remove.extend([pB, radial, lF, pF, lPerp, cL, pD])
 
