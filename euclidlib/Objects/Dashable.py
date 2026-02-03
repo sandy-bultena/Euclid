@@ -2,7 +2,7 @@ from typing import Self, List, Type
 import manimlib as mn
 import numpy as np
 import euclidlib.Objects.em_object_base as EM
-from euclidlib.Objects.EuclidGroupMObject  import EGroup, PsuedoGroup
+from euclidlib.Objects.em_group_object  import EGroup, PsuedoGroup
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 
 from . import Line

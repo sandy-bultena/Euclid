@@ -8,7 +8,7 @@ from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 
-from . import EuclidGroupMObject as GroupObject
+from . import em_group_object as GroupObject
 
 from . import Line
 from . import Point

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional, Literal, cast
 import manimlib as mn
 import numpy as np
 
-from euclidlib.Objects.EuclidGroupMObject import EGroup
+from euclidlib.Objects.em_group_object import EGroup
 from . import Text
 from . import CustomAnimation as CA
 

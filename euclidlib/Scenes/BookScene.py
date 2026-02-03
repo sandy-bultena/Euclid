@@ -21,7 +21,7 @@ from euclidlib.Objects.Line import ELine
 from euclidlib.Objects.Circle import ECircle
 from euclidlib.Objects.Triangle import ETriangle
 from euclidlib.Objects.Angle import EAngleBase
-from euclidlib.Objects.EuclidGroupMObject import EGroup
+from euclidlib.Objects.em_group_object import EGroup
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects.Polygon import EPolygon
 from euclidlib.Objects.Point import EPoint

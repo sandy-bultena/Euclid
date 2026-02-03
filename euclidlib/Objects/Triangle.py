@@ -11,7 +11,7 @@ from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import convert_to_coord, mn_scale
 
 from . import Polygon
-from . import EuclidGroupMObject as GroupObject
+from . import em_group_object as GroupObject
 from . import Parallelogram as Para
 from . import Line
 from . import Point

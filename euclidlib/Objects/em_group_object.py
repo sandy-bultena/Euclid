@@ -30,14 +30,6 @@ class EGroupPlayer:
     # this allows an EGroupPlayer instance to be called directly,
     # -----------------------------------------------------------------------------------------------------------------
     def __call__(self, *index, **kwargs):
-        # print(f"EGroupPlayer.__call__ obj={str(self)}, index = {index}")
-        # print(f'  ...  caller name:', inspect.stack()[0][3], inspect.stack()[0][1], inspect.stack()[0][2])
-        # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1], inspect.stack()[1][2])
-        # print(f'  ...  caller name:', inspect.stack()[2][3], inspect.stack()[2][1], inspect.stack()[2][2])
-        # print(f'  ...  caller name:', inspect.stack()[3][3], inspect.stack()[3][1], inspect.stack()[3][2])
-        # print(f'  ...  caller name:', inspect.stack()[4][3], inspect.stack()[4][1], inspect.stack()[4][2])
-        # print(f'  ...  caller name:', inspect.stack()[5][3], inspect.stack()[5][1], inspect.stack()[5][2])
-        # print(f'  ...  caller name:', inspect.stack()[6][3], inspect.stack()[6][1], inspect.stack()[6][2])
 
         to_exec = self.indices or self.players
         if index:
