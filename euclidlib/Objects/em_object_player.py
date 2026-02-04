@@ -1,10 +1,14 @@
 from __future__ import annotations
 import numpy as np
 import manimlib as mn
+from narwhals import Object
 from typing import TYPE_CHECKING
 from euclidlib.Objects.CustomAnimation import e_animate, Indicate
+from . import em_object_base as base
+
 if TYPE_CHECKING:
     from euclidlib.Objects.em_object_base import *
+    from euclidlib.Objects.em_group_object import *
 
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
@@ -40,7 +44,7 @@ class NullPlayer:
 
 # =====================================================================================================================
 # EMObjectPlayer
-# - methods to pass into 'play' ??
+# - methods to pass into 'play'
 # =====================================================================================================================
 class EMObjectPlayer:
     """
@@ -277,4 +281,53 @@ class EMObjectPlayer:
                 self.eobj.e_label.become(self.eobj.e_label.target)
         return self.eobj
 
+
+# =====================================================================================================================
+# EGroupPlayer
+# =====================================================================================================================
+
+
+class EGroupPlayer:
+    """
+    When an Object consists of a group of EMObjects that need to be treated as a single entity, we use EGroupPlayer
+    instead of EPlayer (example... Polygon)
+    """
+    def __init__(self, group: GroupedObjects[EMObject]):
+        self.obj = group
+        self.group = group.get_group()
+        self.manager = group.get_manager()
+        self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, base.EMObject)]
+
+    def __str__(self):
+        return ", ".join(str(g) for g in self.group)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # this allows an EGroupPlayer instance to be called directly,
+    # -----------------------------------------------------------------------------------------------------------------
+    def __call__(self, **kwargs):
+
+        with self.obj.scene.simultaneous():
+            for player in self.players:
+                player(**kwargs)
+        return self.obj
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # foreach possible player, define a method that sets up these players for each object
+    # -----------------------------------------------------------------------------------------------------------------
+    for name in EMObjectPlayer.get_properties():
+        exec(f'''
+@property
+def {name}(self):
+    for player in self.players:
+        player.{name}
+    return self
+'''.strip())
+
+    for name in EMObjectPlayer.get_methods():
+        exec(f'''
+def {name}(self, *args):
+    for player in self.players:
+        player.{name}(*args)
+    return self
+'''.strip())
 

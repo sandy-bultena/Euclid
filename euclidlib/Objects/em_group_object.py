@@ -4,79 +4,24 @@ from typing import TYPE_CHECKING
 import manimlib as mn
 
 from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects.em_object_player import EMObjectPlayer
+from euclidlib.Objects.em_object_player import EMObjectPlayer, EGroupPlayer
 from euclidlib.Objects.em_object_decorators import *
 
 DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_CONSTRUCTION_RUNTIME = 0.5
 DEFAULT_TRANSFORM_RUNTIME = 0.25
 
+
 # *********************************************************************************************************************
 # code required for objects that are collections via VGroup or similar things
 # *********************************************************************************************************************
 
-# =====================================================================================================================
-# EGroupPlayer
-# =====================================================================================================================
-
-# similar to object_player, but when the EGroupPlayer instance is called directly, it will
-# only apply the player options to the specified objects within the group (or all if no indices are expressed
-
-class EGroupPlayer:
-    def __init__(self, group: PsuedoGroup[EMObject]):
-        self.obj = group
-        self.group = group.get_group()
-        self.manager = group.get_manager()
-        self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, EMObject)]
-        self.indices = None
-
-    def __str__(self):
-        return ", ".join(str(g) for g in self.group)
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # this allows an EGroupPlayer instance to be called directly,
-    # -----------------------------------------------------------------------------------------------------------------
-    def __call__(self, *index, **kwargs):
-
-        to_exec = self.indices or self.players
-        if index:
-            to_exec = [self.players[i] for i in index]
-
-        with self.obj.scene.simultaneous():
-            for player in to_exec:
-                player(**kwargs)
-        return self.obj
-
-    def __getitem__(self, item: int | slice):
-        self.indices = self.players[item]
-        return self
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # foreach possible player, define a method that sets up these players for each object
-    # -----------------------------------------------------------------------------------------------------------------
-    for name in EMObjectPlayer.get_properties():
-        exec(f'''
-@property
-def {name}(self):
-    for player in self.players:
-        player.{name}
-    return self
-'''.strip())
-
-    for name in EMObjectPlayer.get_methods():
-        exec(f'''
-def {name}(self, *args):
-    for player in self.players:
-        player.{name}(*args)
-    return self
-'''.strip())
-
 
 # =====================================================================================================================
-# PseudoGroup
+# GroupedObjects
 # - its like a group, but isn't really, uses "get_manager" and "get_group" to get the sub-objects
 # =====================================================================================================================
-class PsuedoGroup(EMObject):
+class GroupedObjects(EMObject):
     if TYPE_CHECKING:
         blue: EGroupPlayer
         green: EGroupPlayer
@@ -144,7 +89,7 @@ def {name}(self, *args):
 # =====================================================================================================================
 # is a real group
 # =====================================================================================================================
-class EGroup[T](PsuedoGroup, EMObject, mn.VGroup[T]):
+class EGroup[T](GroupedObjects, EMObject, mn.VGroup[T]):
     def CreationOf(self, *args, **kwargs):
         return []
     def RemovalOf(self, *args, **kwargs):
