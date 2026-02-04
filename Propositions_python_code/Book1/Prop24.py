@@ -200,7 +200,7 @@ class Prop24(Book1Scene):
                 for line in t['DEG'].l:
                     line.remove_label()
 
-            all = EGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
+            all = EIndexedGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
             for x in all:
                 if x.e_label is not None:
                     x.e_label.enable_updaters()
@@ -240,7 +240,7 @@ class Prop24(Book1Scene):
 
         @self.push_step
         def _p12():
-            all = EGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
+            all = EIndexedGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
             for x in all:
                 if x.e_label is not None:
                     x.e_label.enable_updaters()

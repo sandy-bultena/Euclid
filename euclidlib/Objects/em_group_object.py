@@ -18,21 +18,10 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 
 
 # =====================================================================================================================
-# GroupedObjects
-# - its like a group, but isn't really, uses "get_manager" and "get_group" to get the sub-objects
+# EGroupedObjects
+# - treats all members in "get_manager()" and "get_group" as a single group
 # =====================================================================================================================
-class GroupedObjects(EMObject):
-    if TYPE_CHECKING:
-        blue: EGroupPlayer
-        green: EGroupPlayer
-        red: EGroupPlayer
-        white: EGroupPlayer
-
-        e_fade: EGroupPlayer
-        e_normal: EGroupPlayer
-
-        def e_move(self, vev: mn.Vect3) -> EGroupPlayer: ...
-        def e_rotate(self, about: mn.Vect3, angle: float) -> EGroupPlayer: ...
+class EGroupedObjects(EMObject):
 
     def get_group(self):
         raise NotImplemented()
@@ -42,11 +31,6 @@ class GroupedObjects(EMObject):
 
     def get_e_family(self):
         return *self.get_manager(), *self.get_group()
-
-    def except_index(self, *indices):
-        exceptions = set(indices)
-        full = set(range(len(self.get_group())))
-        return full - exceptions
 
     @freezable
     def e_remove(self):
@@ -87,17 +71,53 @@ def {name}(self, *args):
 
 
 # =====================================================================================================================
-# is a real group
+# this a a list or tuple of objects that can be treated as a group, or, can be called individually
+# example TextBox
+#   tb = TextBox()
+#   tb.explain("hi")
+#   tb.explain("hello")
+#   tb.green()          # turns both 'hi' and 'hello' to green
+#   tb.blue(1)          # turns the 1th element to blue (i.e. hello turns 'blue', and 'hi' remains untouched
+#
+# NOTE: Can only change properties, you cannot specify indices when doing something like moving
+#       ... to do that, try
+#       tb[2].e_move(...)
 # =====================================================================================================================
-class EGroup[T](GroupedObjects, EMObject, mn.VGroup[T]):
+class EIndexedGroup[T](EGroupedObjects, EMObject, mn.VGroup[T]):
+
     def CreationOf(self, *args, **kwargs):
         return []
     def RemovalOf(self, *args, **kwargs):
         return []
+
+    def except_index(self, *indices):
+        exceptions = set(indices)
+        full = set(range(len(self.get_group())))
+        return full - exceptions
 
     def get_group(self):
         return self.submobjects
 
     def get_manager(self):
         return ()
+
+    for name in EMObjectPlayer.get_properties():
+        exec(f'''
+@freezable
+def {name}(self, *indices, **kwargs):
+    objs = [obj for obj in [*self.get_group(), *self.get_manager()] if isinstance(obj, EMObject)]
+
+    if indices:
+        objs = [objs[i] for i in indices]
+
+    with self.scene.simultaneous():
+        for obj in objs:
+            if isinstance(obj, EGroupedObjects):
+                EGroupPlayer(obj).{name}(**kwargs)
+            else:
+                EMObjectPlayer(obj).{name}(**kwargs)
+    return self
+'''.strip())
+
+
 

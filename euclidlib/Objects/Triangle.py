@@ -233,13 +233,13 @@ class ETriangle(Polygon.EPolygon):
     @copy_transform()
     def copy_to_circle(self, circle: Circle.ECircle) -> ETriangle:
         if self.is_clockwise:
-            angles: GroupObject.EGroup[Angle.EAngleBase] = GroupObject.EGroup(
+            angles: GroupObject.EIndexedGroup[Angle.EAngleBase] = GroupObject.EIndexedGroup(
                 Angle.EAngle(l2, l1, delay_anim=True)
                 for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
             )
             a1, a2 = angles[2], angles[1]
         else:
-            angles: GroupObject.EGroup[Angle.EAngleBase] = GroupObject.EGroup(
+            angles: GroupObject.EIndexedGroup[Angle.EAngleBase] = GroupObject.EIndexedGroup(
                 Angle.EAngle(l1, l2, delay_anim=True)
                 for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
             )

@@ -285,14 +285,12 @@ class EMObjectPlayer:
 # =====================================================================================================================
 # EGroupPlayer
 # =====================================================================================================================
-
-
 class EGroupPlayer:
     """
     When an Object consists of a group of EMObjects that need to be treated as a single entity, we use EGroupPlayer
     instead of EPlayer (example... Polygon)
     """
-    def __init__(self, group: GroupedObjects[EMObject]):
+    def __init__(self, group: EGroupedObjects[EMObject]):
         self.obj = group
         self.group = group.get_group()
         self.manager = group.get_manager()
@@ -305,14 +303,15 @@ class EGroupPlayer:
     # this allows an EGroupPlayer instance to be called directly,
     # -----------------------------------------------------------------------------------------------------------------
     def __call__(self, **kwargs):
-
         with self.obj.scene.simultaneous():
             for player in self.players:
                 player(**kwargs)
         return self.obj
 
     # -----------------------------------------------------------------------------------------------------------------
-    # foreach possible player, define a method that sets up these players for each object
+    # animations/changes
+    #   These methods are created during runtime,
+    #   but essentially they all just call their equivalent ObjectPlayer method
     # -----------------------------------------------------------------------------------------------------------------
     for name in EMObjectPlayer.get_properties():
         exec(f'''

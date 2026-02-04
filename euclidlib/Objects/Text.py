@@ -9,7 +9,7 @@ import manimlib as mn
 from functools import reduce, partial
 
 from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects import CustomAnimation as CA, GroupedObjects
+from euclidlib.Objects import CustomAnimation as CA, EGroupedObjects
 
 # =====================================================================================================================
 # numbers used to calculate how fast the text is written to the screen
@@ -57,7 +57,7 @@ mn.TEX_TO_SYMBOL_COUNT[R"\sout"] = 1
 # =====================================================================================================================
 # String Object - Base Class for EText, ETexText, EMarkupText, Label
 # =====================================================================================================================
-class EStringObj(GroupedObjects, mn.StringMobject, ABC):
+class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     style = str | None
     REPLACEMENT_RULES = ()
 
@@ -324,7 +324,7 @@ class Label(ETex):
 # # =====================================================================================================================
 # # A group of labels
 # # =====================================================================================================================
-# class LabelGroup(G.EGroup[Label]):
+# class LabelGroup(G.EIndexedGroup[Label]):
 #
 #     # -----------------------------------------------------------------------------------------------------------------
 #     # initialize

@@ -52,7 +52,7 @@ class Prop12(Book1Scene):
             a[1] = EAngle(l[3], l[1], size=mn_scale(40))
             a[2] = EAngle(l[2], l[3], size=mn_scale(60))
         t2.math(r'\measuredangle ACD = \measuredangle BCD = \rightangle\ \text{(right angle)}')
-        tmp = EGroup(*p.values(), *l.values(), *a.values())
+        tmp = EIndexedGroup(*p.values(), *l.values(), *a.values())
         TMP.append(tmp)
 
         self.next_page()

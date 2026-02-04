@@ -154,7 +154,7 @@ class Prop08(Book1Scene):
         t1.explain(r"Since all the endpoints of the lines are congruent, "
                    "then the angles must also be congruent")
         with self.simultaneous():
-            EGroup(*t['EDF'].l).e_normal()
+            EIndexedGroup(*t['EDF'].l).e_normal()
 
         with self.simultaneous():
             t['ABC'].draw_angles()

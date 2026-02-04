@@ -2,13 +2,13 @@ from typing import Self, List, Type
 import manimlib as mn
 import numpy as np
 import euclidlib.Objects.em_object_base as EM
-from euclidlib.Objects.em_group_object  import EGroup, GroupedObjects
+from euclidlib.Objects.em_group_object  import EIndexedGroup, EGroupedObjects
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 
 from . import Line
 
 
-class Dashable(GroupedObjects):
+class Dashable(EGroupedObjects):
     def get_group(self):
         to_ret = [*self.tick_marks]
         if self.dash_ref is not None:
@@ -17,7 +17,7 @@ class Dashable(GroupedObjects):
 
     def __init__(self, *args, **kwargs):
         self.dash_ref: DashPath | None = None
-        self.tick_marks = EGroup()
+        self.tick_marks = EIndexedGroup()
         self.tick_mark_alphas: List[float] = []
         self.dash_options = dict()
         super().__init__(*args, **kwargs)

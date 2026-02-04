@@ -44,7 +44,7 @@ class OPTIONS(TypedDict):
     fill: tuple[mn.Color, float] | None
 
 
-class EPolygon(GroupObject.GroupedObjects, EMObject, mn.Polygon):
+class EPolygon(GroupObject.EGroupedObjects, EMObject, mn.Polygon):
     _area: float | None
 
     MAX_SIZE = 0

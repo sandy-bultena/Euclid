@@ -1,4 +1,4 @@
-from euclidlib.Objects import EGroup
+from euclidlib.Objects import EIndexedGroup
 from euclidlib.Scenes.prop_scene import PropScene
 
 class TestProp(PropScene):

@@ -76,7 +76,7 @@ class Prop07(Book1Scene):
             t['ABC'].e_fade()
             t['ABD'].e_fade()
             l['CD'].e_fade()
-            EGroup(*t['ABC'].p).e_normal()
+            EIndexedGroup(*t['ABC'].p).e_normal()
             p['D'].e_normal()
         with self.simultaneous():
             t['CBD'].e_fill(TEAL_D)

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional, Literal, cast
 import manimlib as mn
 import numpy as np
 
-from euclidlib.Objects.em_group_object import EGroup
+from euclidlib.Objects.em_group_object import EIndexedGroup
 from . import Text
 from . import CustomAnimation as CA
 
@@ -82,11 +82,11 @@ class Fonts:
 
 
 # =====================================================================================================================
-# Text Box - inherits from EGroup with StringObj
+# Text Box - inherits from EIndexedGroup with StringObj
 # =====================================================================================================================
-class TextBox(EGroup[Text.EStringObj]):
+class TextBox(EIndexedGroup[Text.EStringObj]):
     """A Container of StringObj
-        TextBox inherits from EGroup and manimgl.VGroup"""
+        TextBox inherits from EIndexedGroup and manimgl.VGroup"""
     # -----------------------------------------------------------------------------------------------------------------
     # Class properties
     # -----------------------------------------------------------------------------------------------------------------
@@ -120,11 +120,11 @@ class TextBox(EGroup[Text.EStringObj]):
         """
         :param absolute_position: the position to place this textbox (north-west corner)
         :param scene: where are the text objects going to be played (Proposition Scene)
-        :param args: additional arguments which are being ignored here, but passed to superclass (EGroup)
+        :param args: additional arguments which are being ignored here, but passed to superclass (EIndexedGroup)
         :param line_width: specify the line width of the text
         :param alignment: text to be aligned in this box via 'n', 'e', or 'w' directions
         :param buff_size: space between subsequent texts being added to this textbox
-        :param kwargs: additional keyword arguments being ignored here, but passed to superclass (EGroup)
+        :param kwargs: additional keyword arguments being ignored here, but passed to superclass (EIndexedGroup)
         """
 
         self.abs_position = absolute_position
@@ -433,7 +433,6 @@ class TextBox(EGroup[Text.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # fade/normalize specific objects
     # -----------------------------------------------------------------------------------------------------------------
-
     def fade_text_objs(self, *objs):
         with self.scene.simultaneous():
             if not objs:
@@ -448,39 +447,6 @@ class TextBox(EGroup[Text.EStringObj]):
                 objs = self.get_group()
             for text_obj in objs:
                 text_obj.e_normal()
-
-    # ----------------------------------------------------------------------------------------------------------------
-    # aligning two text strings
-    # ----------------------------------------------------------------------------------------------------------------
-    def e_math_align_to(self, txt: str,
-                        break_into_parts:list[str],
-                        which_part: str|int,
-                        aligned_to: Text.EStringObj,
-                        side=mn.LEFT,
-                        **kwargs):
-
-        # create the text, but don't animate anything yet
-        parts = self.math(txt, break_into_parts=break_into_parts, delay_anim=True, **kwargs)
-
-        # if which_part is a string, find the index that this string is part of
-        index = which_part
-        if isinstance(which_part, str):
-            index = 0
-            for i,p in enumerate(parts):
-                if p == which_part:
-                    index = i
-                    break
-
-        # align the bits
-        parts[index].align_to(aligned_to, side)
-
-        # animate
-        self.scene.play(mn.Write(mn.VGroup(*parts[:-1])))
-        print("Adding math parts to self")
-        self.add(*parts[:-1])
-
-        # return the created parts
-        return *parts,
 
     # ----------------------------------------------------------------------------------------------------------------
     # aligning two text strings AND transform them
