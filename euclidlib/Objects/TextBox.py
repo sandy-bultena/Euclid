@@ -193,14 +193,15 @@ class TextBox(EGroup[Text.EStringObj]):
             newline = text_class(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
 
-            # place the text
+            # place the text in the appropriate y position
+            newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
+            self.extra_buffer_size = 0
+            self.justify_text(newline)
+
+            # if we are aligning text adjust the x position
             if align_str:
                 self.align_string_with_other_string(newline, align_str, align_index)
                 self.extra_buffer_size = 0
-            else:
-                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
-                self.extra_buffer_size = 0
-                self.justify_text(newline)
 
             # add bullet_symbol (i.e. bullet marker)
             if self.bullet_symbol:
@@ -223,6 +224,7 @@ class TextBox(EGroup[Text.EStringObj]):
 
         # save the text object in the VGroup, only if it is not a part?
         if not is_a_part:
+            print("Adding ",newline,"to self")
             self.add(newline)
 
         return newline
@@ -236,7 +238,7 @@ class TextBox(EGroup[Text.EStringObj]):
         """
         Will align the str_obj underneath of a previously defined object (self[aligned_index])
 
-        The strings will be aligned such that align_str[1] is underneath of align_str[0]
+        The strings will be aligned such that align_str[1] is underneath of align_str[0], but stays in the correct y position
 
         :param str_obj: the EStringObj to be aligned
         :param align_str: either a str, or a tuple (str, str), will be converted if necessary
@@ -257,11 +259,12 @@ class TextBox(EGroup[Text.EStringObj]):
             mn.DOWN,
             buff=self.buff_size + self.extra_buffer_size,
             index_of_submobject_to_align=align_str[1],
+            coor_mask = mn.RIGHT
         )
 
         # now put the string in the appropriate 'y' position (don't modify any other direction)
         # NOTE: the coor_mask prevents moving in any direction except for up/down
-        str_obj.next_to(align_obj, mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
+        #str_obj.next_to(align_obj, mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
 
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -355,7 +358,7 @@ class TextBox(EGroup[Text.EStringObj]):
             if not isinstance(x, Text.EStringObj):
                 continue
             all_objects.append(x)
-            all_objects.extend(x.parts)
+            #all_objects.extend(x.parts)
         return all_objects
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -391,6 +394,7 @@ class TextBox(EGroup[Text.EStringObj]):
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_right(), mn.RIGHT, buff=mn.SMALL_BUFF)
         new.e_draw()
+        print("adding submobjects to old")
         old.add(*new.submobjects)
 
     def e_append_morph(self, index, text: str, color: None = None, transform_args=None, **kwargs):
@@ -472,6 +476,7 @@ class TextBox(EGroup[Text.EStringObj]):
 
         # animate
         self.scene.play(mn.Write(mn.VGroup(*parts[:-1])))
+        print("Adding math parts to self")
         self.add(*parts[:-1])
 
         # return the created parts

@@ -15,6 +15,13 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 # code required for objects that are collections via VGroup or similar things
 # *********************************************************************************************************************
 
+# =====================================================================================================================
+# EGroupPlayer
+# =====================================================================================================================
+
+# similar to object_player, but when the EGroupPlayer instance is called directly, it will
+# only apply the player options to the specified objects within the group (or all if no indices are expressed
+
 class EGroupPlayer:
     def __init__(self, group: PsuedoGroup[EMObject]):
         self.obj = group
@@ -44,6 +51,9 @@ class EGroupPlayer:
         self.indices = self.players[item]
         return self
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # foreach possible player, define a method that sets up these players for each object
+    # -----------------------------------------------------------------------------------------------------------------
     for name in EMObjectPlayer.get_properties():
         exec(f'''
 @property
@@ -62,7 +72,10 @@ def {name}(self, *args):
 '''.strip())
 
 
-
+# =====================================================================================================================
+# PseudoGroup
+# - its like a group, but isn't really, uses "get_manager" and "get_group" to get the sub-objects
+# =====================================================================================================================
 class PsuedoGroup(EMObject):
     if TYPE_CHECKING:
         blue: EGroupPlayer
@@ -128,6 +141,9 @@ def {name}(self, *args):
     return EGroupPlayer(self).{name}(*args)'''.strip())
 
 
+# =====================================================================================================================
+# is a real group
+# =====================================================================================================================
 class EGroup[T](PsuedoGroup, EMObject, mn.VGroup[T]):
     def CreationOf(self, *args, **kwargs):
         return []

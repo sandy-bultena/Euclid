@@ -29,7 +29,7 @@ class Prop21(Book1Scene):
         c: Dict[str | int, ECircle] = {}
         t: Dict[str | int, ETriangle] = {}
         a: Dict[str | int, EAngleBase] = {}
-        eq: Dict[str | int, EStringObj | Tuple[EStringObj, ...]] = {}
+        eq: Dict[str | int, EStringObj | tuple[EStringObj, ...]] = {}
         ex: Dict[str | int, Mobject] = {}
 
         A = mn_coord(200, 200)
@@ -38,58 +38,30 @@ class Prop21(Book1Scene):
         D = mn_coord(215, 400)
 
         # TESTING
-        line_property = ELine(A,B)
-        line_method = ELine(A,C)
-        line_property.green
-        line_property.green()
-        self.next_page()
         eq[1] = t2.math(r'c_1 + b_3\quad\quad\quad\quad >\ c_2 + c_3')
         t2.math("x=y")
-        print()
-        print(f"All super classes of eq1: \n{eq[1].__class__.__mro__}")
-        print()
-        print("*** Property green")
-        eq[1].green
-        self.next_page()
-        print()
-        print("*** Method green")
-        eq[1].green()
-        self.next_page()
-        print()
-        print("*** TextBox Method blue")
-        x=t2.blue(1 )
-        # print()
-        # print(f"x=")
-        # print()
-        # z = t2.red(1)
-        # print(f"z=",z)
-        # #t2.red(2)
-        self.next_page()
-        t2.blue(35)
         with self.simultaneous():
             eq[2] = t2.math(r'c_1 + b_3 + b_4 >\ c_2 + c_3 + b_4 bananas',
-                            break_into_parts=('c_1 + b_3 + b_4', (r'>\ c_2 + c_3 + b_4', {"align_str":">"})
+                            break_into_parts=('c_1 + b_3 + b_4', (r'>\ c_2 + c_3 + b_4',
+                                                                  {"align_str":">",
+                                                                   "align_index":-2})
                                               )
                             )
+        self.next_page()
         eq[3] = t2.math("hello")
         eq[4] = t2.math("salut")
-        eq[2].blue()
-        eq[2].parts[1].red()
-        eq[3].green()
+        # eq[2].blue()
+        # eq[2].parts[1].red()
+        # eq[3].green()
 
+        self.next_page()
+        t2.explain("by index")
+        t2.e_fade()
+        #t2.blue(1)
+        t2.red(2)
+        #t2.green(3)
+        #t2.white(4)
 
-
-        # eq[1] = t2.math(r'c_1 + b_3\quad\quad\quad\quad >\ c_2 + c_3',
-        #                 break_into_parts=('c_1 + b_3', r'>\ c_2 + c_3'))
-        # print(f"eq[1][0] = {eq[1][0]}")
-        # print(f"eq[1][1] = {eq[1][1]}")
-        # self.next_page()
-        # eq[2] = t2.math(r'c_1 + b_3 + b_4 >\ c_2 + c_3 + b_4',
-        #                  break_into_parts=(
-        #                      'c_1 + b_3 + b_4',
-        #                      (r'>\ c_2 + c_3 + b_4', dict(align_to_args=(eq[1][1],LEFT))),
-        #                  )
-        #                  )
         t2.explain("All done")
         self.next_page()
         t2.explain("next page")

@@ -497,7 +497,6 @@ class EMObject(mn.VMobject):
             self.e_fill_color = None
         else:
             self.e_fill_color = color
-        print("Calling set_fill with opacity",opacity)
         return self.set_fill(color, opacity*self.e_fill_opacity_factor, border_width, recurse)
 
     # -----------------------------------------------------------------------------------------------------------------

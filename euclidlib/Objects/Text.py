@@ -9,7 +9,7 @@ import manimlib as mn
 from functools import reduce, partial
 
 from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects import CustomAnimation as CA
+from euclidlib.Objects import CustomAnimation as CA, PsuedoGroup
 
 # =====================================================================================================================
 # numbers used to calculate how fast the text is written to the screen
@@ -57,7 +57,7 @@ mn.TEX_TO_SYMBOL_COUNT[R"\sout"] = 1
 # =====================================================================================================================
 # String Object - Base Class for EText, ETexText, EMarkupText, Label
 # =====================================================================================================================
-class EStringObj(EMObject, mn.StringMobject, ABC):
+class EStringObj(PsuedoGroup, mn.StringMobject, ABC):
     style = str | None
     REPLACEMENT_RULES = ()
 
@@ -74,7 +74,6 @@ class EStringObj(EMObject, mn.StringMobject, ABC):
         self.text = self.apply_rules(txt)
         self.parts: list[EStringObj] = []
 
-        #print("EStringObj Calling super().__init__()")
         super().__init__(
             self.text,
             *args,
@@ -82,6 +81,21 @@ class EStringObj(EMObject, mn.StringMobject, ABC):
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # only 'group' like required methods
+    # -----------------------------------------------------------------------------------------------------------------
+    def get_group(self):
+        if self.parts:
+            return mn.VGroup(*self.parts)
+        else:
+            return []
+
+    def get_manager(self):
+        if self.parts:
+            return []
+        else:
+            return self,
 
     # -----------------------------------------------------------------------------------------------------------------
     # modify the text based on any rules that apply
