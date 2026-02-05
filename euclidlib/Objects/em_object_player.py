@@ -192,9 +192,8 @@ class EMObjectPlayer:
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    @property
-    def notice(self):
-        self.eobj.scene.play(Indicate(self.eobj, color=mn.RED, scale_factor=1.5, run_time=10))
+    def notice(self, frac_speed=0.2, scale_factor=2):
+        self.eobj.scene.play(Indicate(self.eobj, scale_factor=scale_factor, run_time=10*frac_speed))
         return self
 
     # ----------------------------------------------------------------------------------------------------------------

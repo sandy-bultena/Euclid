@@ -179,13 +179,15 @@ class Prop07(Book1Scene):
             t['CAD'].e_remove()
             l['CD'].e_remove()
             t['CBD'].e_remove()
+            t['ABD'].l[0].remove_label()
+            t['ABD'].l[1].remove_label()
+            t['ABD'].l[2].remove_label()
 
 
         with self.simultaneous():
             t['ABD'].e_normal()
 
         t['ABD'].p[-1].add_label('C', UP)
-        #with self.simultaneous():
         t['ABD'].move_point_to(-1, t['ABC'].p[-1])
 
         t2.e_fade()

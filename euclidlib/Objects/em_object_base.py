@@ -460,7 +460,6 @@ class EMObject(mn.VMobject):
     # fill and unfill (colour the insides) of the object and animate
     # -----------------------------------------------------------------------------------------------------------------
     def e_fill(self, color: mn.ManimColor = None, opacity=1):
-        print (f" in e_fill, setting colour to {color}, opacity={opacity}")
 
         if color is None:
             opacity = 0
@@ -469,7 +468,6 @@ class EMObject(mn.VMobject):
         else:
             self.e_fill_color = color
 
-        print(f"Calling scene.play set_fill({color}, opacity={opacity*self.e_fill_opacity_factor},)")
         self.scene.play(
             self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=False)
         )

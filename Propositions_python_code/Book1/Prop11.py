@@ -90,7 +90,7 @@ class Prop11(Book1Scene):
 
         # ------------------------------------------------------------------------
         c['C'].e_fade()
-        t1.explain("Construct an equilateral triangle on DE and label the vertex {nb:F"
+        t1.explain("Construct an equilateral triangle on DE and label the {nb: vertex "
                    "(I.1)}")
         t[1] = EquilateralTriangle.build(p['D'], p['E'], speed=2)
         l['DF'], l['EF'], p['F'] = t[1].l[2], t[1].l[1], t[1].p[-1]
@@ -125,23 +125,23 @@ class Prop11(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        t1.explain("Line DC equals line CE since they are radii of the same circle")
+        t1.explain("Line DC equals line CE by construction (they are radii of the same circle)")
         c['C'].e_normal()
         with self.simultaneous():
             l['CD'].add_label('r_1', outside=True)
             l['CE'].add_label('r_1', outside=True)
-        t2.math('DC = CE = r_1')
+        t2.math('DC = CE = r_1', is_axiom=True)
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         c['C'].e_fade()
-        t1.explain("FD and FE are equal since they are two "
-                   "sides of an equilateral triangle")
+        t1.explain("FD and FE are equal by construction (they are two "
+                   "sides of an equilateral triangle)")
         with self.simultaneous():
             l['DF'].e_normal().add_label('r_2', outside=True)
             l['EF'].e_normal().add_label('r_2', outside=True)
-        t2.math('FD = FE = r_2')
+        t2.math('FD = FE = r_2', is_axiom=True)
 
         self.next_page()
 
@@ -188,4 +188,4 @@ class Prop11(Book1Scene):
             a['ACF'].remove_label()
             a['BCF'].remove_label()
 
-        t2.blue(-1)
+        t2[2:-1].fade()

@@ -156,10 +156,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                       align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
                       transform_from: Text.EStringObj | int = None,
                       transform_args: dict = None,
+                      same_line = False,
                       delay_anim=False,
                       skip_anim=False,
                       break_into_parts: tuple[str, ...] | str | None = None,
-                      is_a_part: bool = False,
+                      _is_a_part: bool = False,
                       **other_options) -> EStringObj:
         """
         Writes `text` to the scene in the font style `style`
@@ -177,14 +178,16 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
 
         :param transform_from:
         :param transform_args:
+        :param same_line: don't go down a line, stay on the same line as previous call to TextBox
         :param delay_anim:
         :param skip_anim:
         :param break_into_parts:
         :param other_options:
+        :param _is_a_part:
         :return:
         """
-        print(f"{style}({text})")
-        print()
+        if style == "math":
+            print(f"TextItem ({len(self)}),  {style}({text})")
         text_class, kwargs = self._setup_kwargs(style, other_options)
 
         with self.scene.simultaneous():
@@ -194,7 +197,10 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             newline.fix_in_frame()
 
             # place the text in the appropriate y position
-            newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
+            if same_line and len(self):
+                newline.next_to(self[-1], mn.ORIGIN, buff=0)
+            else:
+                newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
             self.extra_buffer_size = 0
             self.justify_text(newline)
 
@@ -223,8 +229,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                     newline.e_draw(skip_anim)
 
         # save the text object in the VGroup, only if it is not a part?
-        if not is_a_part:
-            print("Adding ",newline,"to self")
+        if not _is_a_part:
             self.add(newline)
 
         return newline
@@ -251,7 +256,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             align_str = (align_str, align_str)
 
         # defined the object to be aligned to (either via an index, or an object itself)
-        align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index]
+        align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index][0]
 
         # align string "align_str[0]" to "align_str[1]" (below)
         str_obj.next_to(
@@ -297,11 +302,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         for part in break_into_parts:
             if isinstance(part, str):
                 text_kwargs.append((part,None))
-                parts.append(self.generate_text(text_obj.style, part,  delay_anim=True, is_a_part=True))
+                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, _is_a_part=True))
             else:
                 part,kwargs = part[0:2]
                 text_kwargs.append ((part,kwargs))
-                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, is_a_part=True, **kwargs))
+                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, _is_a_part=True, **kwargs))
 
         # align the parts next to each other
         for p, t in zip(parts, text_kwargs):
@@ -333,7 +338,9 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # managing items
     # -----------------------------------------------------------------------------------------------------------------
     def e_remove(self):
-        super().e_remove()
+        with self.scene.simultaneous():
+            for obj in self:
+                obj.e_remove()
         self.clear()
 
     def __delitem__(self, key):
@@ -358,7 +365,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             if not isinstance(x, Text.EStringObj):
                 continue
             all_objects.append(x)
-            #all_objects.extend(x.parts)
         return all_objects
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -502,6 +508,23 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         return newline
 
     # ----------------------------------------------------------------------------------------------------------------
+    # subset - returns a subset of self as a new EIndexedGroup
+    #
+    # Example usage - use a slice to determine which elements to change:
+    #       collection = EIndexedGroup()
+    #       # ... code that adds to the collection
+    #       collection.blue(slice(1:3))
+    # ----------------------------------------------------------------------------------------------------------------
+    def subset(self, item: int | slice) -> EMObject| EIndexedGroup:
+        objs = [*self.get_group(), *self.get_manager()]
+        if isinstance(item, int):
+            return objs[item]
+        elif isinstance(item,slice):
+            return EIndexedGroup(*objs[item])
+        else:
+            raise ValueError("subset item MUST be an int or a slice")
+
+    # ----------------------------------------------------------------------------------------------------------------
     # create functions for all of the text styles
     # ----------------------------------------------------------------------------------------------------------------
     @functools.wraps(generate_text)
@@ -536,7 +559,3 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     def sidenote(self, *args, **kwargs) -> Text.EStringObj:
         return self.generate_text('side_note',*args, **kwargs)
 
-    # ----------------------------------------------------------------------------------------------------------------
-    # override all the functions in the super class (which is NOT EMObjectPlayer)
-    # to apply the changes to the main StringObj as well as any .parts it may have
-    # ----------------------------------------------------------------------------------------------------------------

@@ -11,8 +11,8 @@ from euclidlib.Objects import *
 from os import getenv
 
 from euclidlib.debugging import print_debug
-DEFAULT_SPEED = 1
-DEFAULT_TEXT_SPEED = 10
+DEFAULT_SPEED = 20
+DEFAULT_TEXT_SPEED = 20
 
 class AnimState(Enum):
     NORMAL = 0

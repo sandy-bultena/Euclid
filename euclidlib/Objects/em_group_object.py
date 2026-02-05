@@ -23,6 +23,9 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 # =====================================================================================================================
 class EGroupedObjects(EMObject):
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # get objects within this group
+    # ----------------------------------------------------------------------------------------------------------------
     def get_group(self):
         raise NotImplemented()
 
@@ -32,6 +35,9 @@ class EGroupedObjects(EMObject):
     def get_e_family(self):
         return *self.get_manager(), *self.get_group()
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # remove all items in the group
+    # ----------------------------------------------------------------------------------------------------------------
     @freezable
     def e_remove(self):
         with self.scene.simultaneous():
@@ -41,12 +47,18 @@ class EGroupedObjects(EMObject):
         super().e_remove()
         return self
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # remove all labels within the group
+    # ----------------------------------------------------------------------------------------------------------------
     @freezable
     def remove_labels(self):
         for x in self.get_group():
             x.remove_label()
         return self
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # draw all the objects within the group
+    # ----------------------------------------------------------------------------------------------------------------
     @freezable
     def e_draw(self, skip_anim=False, **kwargs):
         with self.scene.simultaneous():
@@ -56,6 +68,9 @@ class EGroupedObjects(EMObject):
         super().e_draw(skip_anim, **kwargs)
         return self
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # create wrapper methods for all the available player properties and methods
+    # ----------------------------------------------------------------------------------------------------------------
     for name in EMObjectPlayer.get_properties():
         exec(f'''
 @property
@@ -85,22 +100,52 @@ def {name}(self, *args):
 # =====================================================================================================================
 class EIndexedGroup[T](EGroupedObjects, EMObject, mn.VGroup[T]):
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # called by manim during creation and removal of this object
+    # ... since it is holder for a collection of objects, nothing gets drawn when this is created
+    # ----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
         return []
     def RemovalOf(self, *args, **kwargs):
         return []
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # helper function to remove indices
+    # ----------------------------------------------------------------------------------------------------------------
     def except_index(self, *indices):
         exceptions = set(indices)
         full = set(range(len(self.get_group())))
         return full - exceptions
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # get all the objects in the container
+    # ----------------------------------------------------------------------------------------------------------------
     def get_group(self):
-        return self.submobjects
+        return tuple(o for o in self if isinstance(o,EMObject))
 
     def get_manager(self):
         return ()
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # subset - returns a subset of self as a new EIndexedGroup
+    #
+    # Example usage - use a slice to determine which elements to change:
+    #       collection = EIndexedGroup()
+    #       # ... code that adds to the collection
+    #       collection.blue(slice(1:3))
+    # ----------------------------------------------------------------------------------------------------------------
+    def subset(self, item: int | slice) -> EMObject| EIndexedGroup:
+        if isinstance(item, int):
+            return self[item]
+        elif isinstance(item,slice):
+            return EIndexedGroup(*self[item])
+        else:
+            raise ValueError("subset item MUST be an int or a slice")
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # create wrapper methods for all the available player properties and methods
+    # ----------------------------------------------------------------------------------------------------------------
     for name in EMObjectPlayer.get_properties():
         exec(f'''
 @freezable
@@ -119,5 +164,19 @@ def {name}(self, *indices, **kwargs):
     return self
 '''.strip())
 
+
+    def __str__(self):
+        return f"EIndexedGroup, {self.get_group()}"
+
+    if TYPE_CHECKING:
+        def blue(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def green(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def red(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def white(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def grey(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def e_fade(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def e_normal(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def lift(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
+        def notice(self, index:(int|slice)=None)-> EIndexedGroup|EMObject: ...
 
 

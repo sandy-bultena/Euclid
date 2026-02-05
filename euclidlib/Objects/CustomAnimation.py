@@ -118,7 +118,7 @@ class Indicate(mn.Transform):
     # ----------------------------------------------------------------------------------------------------------------
     def create_target(self) -> mn.VMobject:
         target = self.mobject.copy()
-        target.set_stroke(width=self.scale_factor*target.get_stroke_width())
+        target.set_stroke(width=self.scale_factor*target.get_stroke_width() or self.scale_factor)
         target.set_color(self.color)
         return target
 

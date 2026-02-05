@@ -69,7 +69,7 @@ class Prop14(Book1Scene):
         t1.explain("If the sum of the angles ABC and ABD equals "
                    "the sum of two right angles...")
 
-        f = t2.math(r'\alpha + \beta = \rightangle + \rightangle',
+        f = t2.math(r'\alpha + \beta = \rightangle + \rightangle', is_axiom=True,
                     break_into_parts=(r'\alpha + \beta', '=', r'\rightangle + \rightangle'))
         eq['a+b'],eq['2R-1'] = f.parts[0], f.parts[2]
 
@@ -95,7 +95,7 @@ class Prop14(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Assume line BE makes a straight line with CB")
         t2.down()
-        t2.math(r"CB, BE\ =\ CE", fill_color=BLUE)
+        bad_eqn = t2.math(r"CB, BE\ =\ CE", is_axiom=True)
 
         p['E'] = EPoint(E, label=('E', UP))
         l['BE'] = ELine(B,E)
@@ -123,18 +123,39 @@ class Prop14(Book1Scene):
             a['b'].e_normal()
             a['a'].e_normal()
 
-        self.play(
-            mn.Indicate(eq['2R-1']),
-            mn.Indicate(eq['2R-2']),
-        )
-        at, q, ab = t2.math(r'\alpha + \theta = \alpha + \beta',
-                                  break_into_parts=(r'\alpha + \theta', '=', r'\alpha + \beta'),
-                                  delay_anim=True).parts
         with self.simultaneous():
-            at.transform_from(eq['a+t'])
-            ab.transform_from(eq['a+b'])
-            q.e_draw()
+            eq['2R-1'].notice()
+            eq['2R-2'].notice()
 
+        with self.simultaneous():
+            at = t2.math(
+                r'\alpha + \theta =',
+            )
+            ab = t2.math(r'\alpha + \beta',
+                         same_line = True,
+                         transform_from=eq['a+b']).next_to(at,RIGHT, buff=SMALL_BUFF)
+
+        """
+                    eq['3-2'] = t3.math(
+                r'\epsilon + \gamma',
+                align_str=r'\gamma',
+                align_index=eq['2-2'],
+                transform_from=eq['2-2'],
+                transform_args=dict(
+                    matched_keys=[r'\gamma'],
+                ),
+                )
+
+        """
+
+        # at, q, ab = t2.math(r'\alpha + \theta = \alpha + \beta',
+        #                           break_into_parts=(r'\alpha + \theta', '=', r'\alpha + \beta'),
+        #                           delay_anim=True).parts
+        # with self.simultaneous():
+        #     at.transform_from(eq['a+t'])
+        #     ab.transform_from(eq['a+b'])
+        #     q.e_draw()
+        #
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -143,6 +164,7 @@ class Prop14(Book1Scene):
             l['BD'].e_normal()
             a['b'].e_normal()
             a['a'].e_normal()
+            f.e_fade()
 
         t2.math(r'\beta = \theta')
         a['a'].e_fade()
@@ -161,7 +183,7 @@ class Prop14(Book1Scene):
         a['e'] = EAngle(*self.lines('DBE'), size=mn_scale(60), label=r'\epsilon')
         with self.simultaneous():
             t2.e_fade()
-            t2.blue[0:4]()
+            #t2.blue(0,1,2,3)
             t2.red(-1, -2)
 
         self.next_page()
@@ -171,8 +193,8 @@ class Prop14(Book1Scene):
                     "contradiction, and therefore must be incorrect")
         with self.simultaneous():
             t2.e_fade()
-            t2.blue[0:3]()
-            t2.red(3)
+            #t2.blue(0,1,2)
+            bad_eqn.red()
             t2.red(-1, -2)
 
         self.next_page()
@@ -181,7 +203,8 @@ class Prop14(Book1Scene):
         t1.down()
         t1.explain("Thus, CB and BD form a straight line")
         with self.simultaneous():
-            # t2.e_fade(3)
+            t2.e_fade()
+            t2.e_normal(0)
             a['a'].e_normal()
             a['e'].e_fade()
             a['th'].e_fade()

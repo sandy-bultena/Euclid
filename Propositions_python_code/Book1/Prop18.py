@@ -58,7 +58,7 @@ class Prop18(Book1Scene):
         # ----------------------------------------------
         t2.e_remove()
         #t2.down()
-        t2.math(r'b > a', is_axiom=True)
+        t2.math(r'AC > BC', is_axiom=True)
         t1.down()
         t1.title("Proof:")
 
@@ -122,11 +122,11 @@ class Prop18(Book1Scene):
         t1.explain("The triangle BCD is an isosceles triangle, "
                    "thus angles CDB and DBC are equal (I.5)")
         with self.simultaneous():
-            t['ABD'].e_fade()
+            #t['ABD'].e_fade()
             t['DBC'].e_normal()
             t['ABD'].a[0].e_normal()
-            a['a'].e_fade()
-            p['A'].e_fade()
+            #a['a'].e_fade()
+            #p['A'].e_fade()
         t['DBC'].set_angles(None, r'\theta', None, 0, mn_scale(15), 0)
         with self.simultaneous():
             t['DBC'].e_fill(GREEN_E)
@@ -136,7 +136,7 @@ class Prop18(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Angle ABC is greater than angle DBC, "
                    "so angle ABC is greater than angle BAC")
-        t['DBC'].e_unfill()
+        #t['DBC'].e_unfill()
         with self.simultaneous():
             p['A'].e_normal()
             a['a'].e_normal()
@@ -146,6 +146,13 @@ class Prop18(Book1Scene):
             a['b'].e_normal()
         t2.math(r'\beta > \theta > \alpha')
 
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.simultaneous():
+            t2.e_fade(slice(1,-1))
+        t2.down()
+        t2.math(r'\therefore\ \beta > \alpha')
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -164,6 +171,5 @@ class Prop18(Book1Scene):
             with self.freeze(a['c']):
                 t['ABC'].e_draw()
         with self.simultaneous():
-            t2.e_fade[2:]()
+            t2.e_fade(slice(1,-1))
         t2.down()
-        t2.math(r'\therefore\ \beta > \alpha')
