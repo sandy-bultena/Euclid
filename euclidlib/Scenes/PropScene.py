@@ -1,8 +1,6 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
-import inspect
 
-import manimlib as mn
 
 import traceback
 from enum import Enum
@@ -378,15 +376,17 @@ class PropScene(mn.InteractiveScene):
         else:
             yield
 
-    # @mn.contextmanager
-    # def delayed(self, **kwargs):
-    #     self.animateState.append(AnimState.STORING)
-    #     self.animationsStored.append([])
-    #     yield
-    #     self.animateState.pop()
-    #     stored_anims = self.animationsStored.pop()
-    #     if stored_anims:
-    #         self.play(mn.LaggedStart(*stored_anims, **kwargs))
+    # -----------------------------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------------
+    @mn.contextmanager
+    def delayed(self, **kwargs):
+        self.animateState.append(AnimState.STORING)
+        self.animationsStored.append([])
+        yield
+        self.animateState.pop()
+        stored_anims = self.animationsStored.pop()
+        if stored_anims:
+            self.play(mn.LaggedStart(*stored_anims, **kwargs))
     #
     #
     # @mn.contextmanager

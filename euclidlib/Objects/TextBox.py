@@ -255,10 +255,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         if isinstance(align_str, str):
             align_str = (align_str, align_str)
 
-        print(f"{align_index=}, {self[align_index]=}")
         align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index]
-        print(f"{align_obj}, {type(align_obj)} {align_str[0]}")
-        print(align_obj[align_str[0]])
 
         # align string "align_str[0]" to "align_str[1]" (below)
         str_obj.next_to(
@@ -268,11 +265,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             index_of_submobject_to_align=align_str[1],
             coor_mask = mn.RIGHT
         )
-
-        # now put the string in the appropriate 'y' position (don't modify any other direction)
-        # NOTE: the coor_mask prevents moving in any direction except for up/down
-        #str_obj.next_to(align_obj, mn.DOWN, buff=self.buff_size + self.extra_buffer_size, coor_mask=mn.UP)
-
 
     # -----------------------------------------------------------------------------------------------------------------
     # align text (north, south, east, west)

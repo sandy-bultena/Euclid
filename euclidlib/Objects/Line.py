@@ -39,11 +39,12 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             start = start.get_arc_center()
         if isinstance(end,Point.EPoint):
             end = end.get_arc_center()
+        self.brace = None
 
         super().__init__(start, end, *args, **kwargs)
 
     def __str__(self):
-        return f"Line: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
+        return f"ELine: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
             f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.get_slope():.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
@@ -365,6 +366,21 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             if clone.in_scene():
                 clone.e_remove()
         return nl, np
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # add/remove a brace to an ELine
+    # -----------------------------------------------------------------------------------------------------------------
+    def e_brace(self, direction=None, buff=LabelBuff * 2):
+        if not direction:
+            direction = self.OUT()
+        brace = mn.Brace(self, direction=direction, buff=buff)
+        self.scene.play(mn.FadeInFromPoint(brace, point=self.e_label.get_center()))
+        self.brace = brace
+
+    def e_remove_brace(self):
+        if self.brace is not None:
+            self.scene.play(mn.FadeOut(self.brace))
+        self.brace = None
 
     # -----------------------------------------------------------------------------------------------------------------
     # rotate to

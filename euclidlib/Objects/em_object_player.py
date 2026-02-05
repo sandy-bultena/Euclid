@@ -1,7 +1,6 @@
 from __future__ import annotations
 import numpy as np
 import manimlib as mn
-from narwhals import Object
 from typing import TYPE_CHECKING
 from euclidlib.Objects.CustomAnimation import e_animate, Indicate
 from . import em_object_base as base
@@ -40,7 +39,6 @@ class NullPlayer:
 
     def __call__(self, *args, **kwargs):
         return self.obj
-
 
 # =====================================================================================================================
 # EMObjectPlayer
@@ -136,28 +134,31 @@ class EMObjectPlayer:
     # ----------------------------------------------------------------------------------------------------------------
     @property
     def e_fade(self):
-        self.main_animate = self.label_animate = True
-        for method in self.o_animate_part:
-            getattr(self.anim, method)(opacity=self._fade_opacity)
-        for method in self.l_animate_part:
-            getattr(self.label_anim, method)(opacity=0.0)
+        if not self.eobj.is_frozen:
+            self.main_animate = self.label_animate = True
+            for method in self.o_animate_part:
+                getattr(self.anim, method)(opacity=self._fade_opacity)
+            for method in self.l_animate_part:
+                getattr(self.label_anim, method)(opacity=0.0)
         return self
 
     @property
     def e_normal(self):
-        self.main_animate = self.label_animate = True
-        for method in self.o_animate_part:
-            getattr(self.anim, method)(opacity=1.0)
-        for method in self.l_animate_part:
-            getattr(self.label_anim, method)(opacity=1.0)
+        if not self.eobj.is_frozen:
+            self.main_animate = self.label_animate = True
+            for method in self.o_animate_part:
+                getattr(self.anim, method)(opacity=1.0)
+            for method in self.l_animate_part:
+                getattr(self.label_anim, method)(opacity=1.0)
         return self
 
     # ----------------------------------------------------------------------------------------------------------------
     # colours
     # ----------------------------------------------------------------------------------------------------------------
     def _e_color(self, color: mn.Color):
-        self.main_animate = True
-        self.e_normal.anim.set_color(color=color)
+        if not self.eobj.is_frozen:
+            self.main_animate = True
+            self.e_normal.anim.set_color(color=color)
         return self
 
     @property
@@ -185,8 +186,9 @@ class EMObjectPlayer:
     # ----------------------------------------------------------------------------------------------------------------
     @property
     def lift(self):
-        if self.eobj.visible():
-            self.eobj.scene.add(self.eobj)
+        if not self.eobj.is_frozen:
+            if self.eobj.visible():
+                self.eobj.scene.add(self.eobj)
         return self
 
     # ----------------------------------------------------------------------------------------------------------------

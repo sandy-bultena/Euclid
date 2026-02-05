@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import euclidlib.Objects.Text as Text
 
 # global constants
-DEFAULT_FADE_OPACITY = 0.30
+DEFAULT_FADE_OPACITY = 0.15
 DEFAULT_TEXT_FADE_OPACITY = 0.30
 
 # =====================================================================================================================
@@ -541,14 +541,12 @@ class EMObject(mn.VMobject):
     for name in EMObjectPlayer.get_properties():
         exec(f'''
 @property
-@freezable_player
 def {name}(self):
     return EMObjectPlayer(self).{name}
         '''.strip())
 
     for name in EMObjectPlayer.get_methods():
         exec(f'''
-@freezable_player
 def {name}(self, *args):
     return EMObjectPlayer(self).{name}(*args)
         '''.strip())
