@@ -128,11 +128,6 @@ class EIndexedGroup[T](EGroupedObjects, EMObject, mn.VGroup[T]):
 
     # ----------------------------------------------------------------------------------------------------------------
     # subset - returns a subset of self as a new EIndexedGroup
-    #
-    # Example usage - use a slice to determine which elements to change:
-    #       collection = EIndexedGroup()
-    #       # ... code that adds to the collection
-    #       collection.blue(slice(1:3))
     # ----------------------------------------------------------------------------------------------------------------
     def subset(self, item: int | slice) -> EMObject| EIndexedGroup:
         if isinstance(item, int):
@@ -150,10 +145,15 @@ class EIndexedGroup[T](EGroupedObjects, EMObject, mn.VGroup[T]):
         exec(f'''
 @freezable
 def {name}(self, *indices, **kwargs):
-    objs = [obj for obj in [*self.get_group(), *self.get_manager()] if isinstance(obj, EMObject)]
+    objs = [*self.get_group(), *self.get_manager()] 
 
     if indices:
-        objs = [objs[i] for i in indices]
+        objs = []
+        for index in indices:
+            if isinstance(index,slice):
+                objs.extend(self[index])
+            else:
+                objs.append(self[index])
 
     with self.scene.simultaneous():
         for obj in objs:

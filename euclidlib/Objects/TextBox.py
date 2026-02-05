@@ -255,8 +255,10 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         if isinstance(align_str, str):
             align_str = (align_str, align_str)
 
-        # defined the object to be aligned to (either via an index, or an object itself)
-        align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index][0]
+        print(f"{align_index=}, {self[align_index]=}")
+        align_obj = align_index if isinstance(align_index, Text.EStringObj) else self[align_index]
+        print(f"{align_obj}, {type(align_obj)} {align_str[0]}")
+        print(align_obj[align_str[0]])
 
         # align string "align_str[0]" to "align_str[1]" (below)
         str_obj.next_to(
