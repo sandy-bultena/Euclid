@@ -6,7 +6,9 @@ import numpy as np
 
 from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord
-import euclidlib.Scenes.PropScene as ps
+if TYPE_CHECKING:
+    pass
+    #import euclidlib.Scenes.PropScene as ps
 from . import Line
 from . import Arc
 from . import Point
@@ -56,21 +58,21 @@ class ECircle(mn.Circle, Arc.AbstractArc):
                           delay_anim=True)
 
         # normal animation
-        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
+#        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
 
-            # draw the line to create the 'swoop' of drawing a circle
-            self.animation_objects.append(tmpLine)
-            tmpLine.e_draw(
-                anim_args=dict(
-                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
-                ))
+        # draw the line to create the 'swoop' of drawing a circle
+        self.animation_objects.append(tmpLine)
+        tmpLine.e_draw(
+            anim_args=dict(
+                run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+            ))
 
-            # at every frame, set the points of the line to the animation of the drawing circle
-            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+        # at every frame, set the points of the line to the animation of the drawing circle
+        tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
 
-            # don't know wtf this is
-            if tmpLine.e_label is not None:
-                tmpLine.e_labeLine.enable_updaters()
+        # don't know wtf this is
+        if tmpLine.e_label is not None:
+            tmpLine.e_labeLine.enable_updaters()
 
         return super().CreationOf(*args, **kwargs)
 

@@ -10,11 +10,11 @@ from euclidlib.Objects.em_group_object import EIndexedGroup
 from . import Text
 from . import CustomAnimation as CA
 
-from euclidlib.Scenes import PropScene as ps
 from ..Utilities.find_scene import find_scene
 
 if TYPE_CHECKING:
     from . import EStringObj
+    from euclidlib.Scenes import PropScene as ps
 
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
@@ -129,8 +129,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
 
         self.abs_position = absolute_position
         self.scene = scene
-        if not scene:
-            self.scene=cast(ps.PropScene,find_scene())
+        self.scene=find_scene()
         self.line_width = line_width
         self.alignment = self.ALIGNMENT[alignment]
         self._buff_size = buff_size

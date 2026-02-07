@@ -4,8 +4,9 @@ from typing import cast
 from euclidlib.Utilities.calculate_points import square
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects.em_object_decorators import *
-from euclidlib.Scenes.PropScene import PropScene
 from euclidlib.Utilities.find_scene import find_scene
+if TYPE_CHECKING:
+    from euclidlib.Scenes.PropScene import PropScene
 
 from . import Parallelogram
 from . import Point

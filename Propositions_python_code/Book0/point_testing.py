@@ -19,7 +19,7 @@ class Prop0(BookScene):
         p: dict[str | int, EPoint] = {}
         c: dict[str | int, ECircle] = {}
 
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(500))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(500))
 
         t1.title("Construction:")
         t1.explain("Start with line segment AB")

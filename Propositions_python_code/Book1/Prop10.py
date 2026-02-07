@@ -67,7 +67,7 @@ class Prop10(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Bisect angle ACB, and extend line past the line segment{nb: AB (I.9)")
         a['t'] = EAngle(*self.lines('ACB'))
-        l['CD'], p['D'], *objs = a['t'].bisect(speed=2)
+        l['CD'], p['D'], *objs = a['t'].bisect(speed=self.default_speed*2)
         with self.simultaneous():
             for o in objs:
                 o.e_remove()

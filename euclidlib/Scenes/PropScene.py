@@ -1,16 +1,17 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
-
+import manimlib as mn
 
 import traceback
 from enum import Enum
 
 from euclidlib.Objects import *
+print(EStringObj)
 from os import getenv
 
 from euclidlib.debugging import print_debug
-DEFAULT_SPEED = 20
-DEFAULT_TEXT_SPEED = 20
+DEFAULT_SPEED = 2
+DEFAULT_TEXT_SPEED = 2
 
 class AnimState(Enum):
     NORMAL = 0
@@ -179,21 +180,26 @@ class PropScene(mn.InteractiveScene):
             # if the animation type is part of the animation builder (ex: obj.animate.set_fill(...)), then
             # create the animation (via the build command)
             anim = anim.build()
-
+        try:
+            if isinstance(anim.mobject, EStringObj) and not isinstance(anim.mobject, Label):
+                speed = DEFAULT_TEXT_SPEED
+        except:
+            pass
         anim.set_run_time(anim.get_run_time() / speed)
         return anim
 
     # -----------------------------------------------------------------------------------------------------------------
     # average? the speed over all the specified speeds
     # -----------------------------------------------------------------------------------------------------------------
-    def _get_current_speed(self):
-        return mn.reduce(mn.op.mul, self.animationSpeedStack, 1.0)
+    def get_current_speed(self):
+        # return mn.reduce(mn.op.mul, self.animationSpeedStack, 1.0)
+        return self.animationSpeedStack[-1]
 
     # -----------------------------------------------------------------------------------------------------------------
     # not sure why wait time should be dependent on the current speed
     # -----------------------------------------------------------------------------------------------------------------
     def wait(self, duration: float = 3, *args, **kwargs):
-        super().wait(duration / self._get_current_speed(), *args, **kwargs)
+        super().wait(duration / self.get_current_speed(), *args, **kwargs)
 
     # -----------------------------------------------------------------------------------------------------------------
     # wait for user before printing next page
@@ -209,17 +215,12 @@ class PropScene(mn.InteractiveScene):
     #        but can be called by manim directly
     # -----------------------------------------------------------------------------------------------------------------
     def play(self, *anims: mn.AnimationType, **kwargs):
-        # print()
-        # print(f"  PropScene play {anims} {self.animateState}")
-        # print(f'  ...  caller name:', inspect.stack()[1][3], inspect.stack()[1][1])
-        # print(f'  ...  caller name:', inspect.stack()[2][3],inspect.stack()[2][1], inspect.stack()[2][2])
-        # print(f'  ...  caller name:', inspect.stack()[3][3],inspect.stack()[3][1], inspect.stack()[3][2])
 
         # if the animation state is normal, then play the animation (makes sense)
         if self.animateState[-1] == AnimState.NORMAL:
 
             # adjust the speed as required
-            speed = self._get_current_speed()
+            speed = self.get_current_speed()
             if 'run_time' in kwargs:
                 kwargs['run_time'] /= speed
             else:
@@ -302,18 +303,22 @@ class PropScene(mn.InteractiveScene):
     #   if run_time > 0 then list is not used for anything
     #   if the run_time < 0
     #       add any objects to this list, which will be drawn after the code block is completed
+    # ... example, @anim (in em_object_decorators) uses this to animate (or not) the intermediate steps
+    #              in a construction method (ex: ELine.bisect())
     # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
-    def animation_speed(self, run_time: float):
-        if run_time > 0:
-            self.animationSpeedStack.append(run_time)
+    def animation_speed(self, speed: float):
+        if speed > 0:
+            self.animationSpeedStack.append(speed)
             yield []
             self.animationSpeedStack.pop()
-        elif run_time < 0:
+        elif speed < 0:
             with self.pause_animations_for() as to_draw:
                 yield to_draw
         else:
             yield []
+
+
 
     # -----------------------------------------------------------------------------------------------------------------
     # set the animation speed same for everyone, and draw simultaneously
@@ -340,12 +345,10 @@ class PropScene(mn.InteractiveScene):
             self.animateState.pop()
 
             # draw all the objects that need to be drawn
-            if len(to_draw) > 1:
+            if len(to_draw) > 0:
                 with self.simultaneous():
                     for x in to_draw:
                         x.e_draw()
-            if len(to_draw) == 1:
-                to_draw[0].e_draw()
 
         else:
             yield []
@@ -379,14 +382,14 @@ class PropScene(mn.InteractiveScene):
     # -----------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
-    def delayed(self, **kwargs):
+    def delayed(self, lag_ratio=0.3, **kwargs):
         self.animateState.append(AnimState.STORING)
         self.animationsStored.append([])
         yield
         self.animateState.pop()
         stored_anims = self.animationsStored.pop()
         if stored_anims:
-            self.play(mn.LaggedStart(*stored_anims, **kwargs))
+            self.play(mn.LaggedStart(*stored_anims, lag_ratio=lag_ratio, **kwargs))
     #
     #
     # @mn.contextmanager

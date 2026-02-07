@@ -1,8 +1,12 @@
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import manimlib as mn
 from euclidlib.Objects.Circle import ECircle
 from euclidlib.Utilities.find_scene import find_scene
-import  euclidlib.Scenes.PropScene as ps
+if TYPE_CHECKING:
+    import  euclidlib.Scenes.PropScene as ps
 
 from euclidlib.Objects import Line
 from euclidlib.Objects import Angle
@@ -12,8 +16,10 @@ from euclidlib.Objects import Triangle
 # =====================================================================================================================
 # build an equilateral triangle given two points
 # =====================================================================================================================
-def build(p1, p2, scene: ps.PropScene = None, speed = 1.0):
+def build(p1, p2, scene: ps.PropScene = None, speed = None):
     scene = scene or find_scene()
+    if speed is None:
+        speed = scene.get_current_speed()
 
     # have everything drawn at the same speed
     with scene.animation_speed(speed):

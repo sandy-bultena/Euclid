@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import euclidlib.Objects.Text as Text
 
 # global constants
-DEFAULT_FADE_OPACITY = 0.15
+DEFAULT_FADE_OPACITY = 0.30
 DEFAULT_TEXT_FADE_OPACITY = 0.30
 
 # =====================================================================================================================

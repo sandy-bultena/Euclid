@@ -1,6 +1,6 @@
 from manimlib import LEFT, RIGHT
 
-from euclidlib.Objects import ELine, EPoint, ECircle, TextBox, mn_coord, mn_h_scale, EMObject
+from euclidlib.Objects import ELine, EPoint, ECircle, TextBox, mn_coord, mn_scale, EMObject
 from euclidlib.Scenes.PropScene import PropScene
 
 class Prop(PropScene):
@@ -17,7 +17,7 @@ class Prop(PropScene):
 
     def go(self):
         pass
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(500))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(500))
         A = mn_coord(200, 500)
         B = mn_coord(450, 500)
         C = mn_coord(200+100, 500+100)

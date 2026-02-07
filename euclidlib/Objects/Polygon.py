@@ -106,7 +106,7 @@ setattr(cls, 'p{i}', property(p))
 
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
-            speed: float = 1,
+            speed = None,
             point_labels: LABEL_ARG | None = None,
             labels: LABEL_ARG | None = None,
             angles: ANGLE_ARGS | None = None,
@@ -147,6 +147,9 @@ setattr(cls, 'p{i}', property(p))
             if locals()[k] is not None
         }
         self.speed = speed
+        if self.speed is None:
+            scene = find_scene()
+            self.speed = scene.get_current_speed()
         self.vertices = [convert_to_coord(p) for p in points]
         self.sides = len(self.vertices)
         self.update_size(self.sides)

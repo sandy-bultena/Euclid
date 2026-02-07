@@ -4,7 +4,7 @@
 # =====================================================================================================================
 from contextlib import contextmanager
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from . import CustomAnimation as CA
 from euclidlib.Utilities.find_scene import find_scene
 
@@ -73,7 +73,14 @@ def freezable(func):
     return dontIfFrozen
 
 # ---------------------------------------------------------------------------------------------------------------------
-# decorator - sets the animation speed for all animations happening during the function (this is a guess :( )
+# decorator - anim_speed
+#    if speed <=0, then the intermediate steps of the drawing are not animated, only the objects that are
+#                  returned by the function are animated
+#    if speed > 0, then the intermediate steps of the drawing are animated
+# Example:
+#    l = ELine(...)
+#    l.bisect()         # only the bisected point is animated
+#    l.bisect(speed=2)  # intermediate steps are animated
 # ---------------------------------------------------------------------------------------------------------------------
 def anim_speed(func):
     @wraps(func)
@@ -135,6 +142,7 @@ def copy_transform(*, index=None):
             else:
                 # default if speed = 0
                 return func(self, *args, **kwargs)
+
 
         return animate_change
 

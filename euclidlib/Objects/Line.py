@@ -8,10 +8,10 @@ import numpy as np
 
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 from euclidlib.Utilities.coordinate_utilities import get_dist
-import euclidlib.Scenes.PropScene as ps
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects.em_object_decorators import *
-
+if TYPE_CHECKING:
+    import euclidlib.Scenes.PropScene as ps
 
 from . import Point
 from . import Circle
