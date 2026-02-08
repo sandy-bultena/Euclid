@@ -544,6 +544,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     @anim_speed
     def parallel(self, p: Point.EPoint):
         B, C = self.get_start_and_end()
+        A = p.coordinates
 
         # make sure line goes from left to right
         if B[0] > C[0]:
