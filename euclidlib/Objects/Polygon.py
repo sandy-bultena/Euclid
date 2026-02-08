@@ -199,8 +199,11 @@ setattr(cls, 'p{i}', property(p))
         return super().e_fill(color, opacity)
 
     def e_unfill(self):
-        del self.options['fill']
-        super().e_unfill()
+        try:
+            del self.options['fill']
+            super().e_unfill()
+        except KeyError:
+            pass
 
     def get_group(self):
         return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
