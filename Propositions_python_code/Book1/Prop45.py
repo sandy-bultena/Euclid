@@ -13,7 +13,7 @@ class Prop45(Book1Scene):
     steps = []
     title = "To construct a parallelogram equal to a given rectilinear figure in a given rectilinear angle."
 
-    def define_steps(self):
+    def go(self):
         t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(475, 200))
         t3 = TextBox(mn_coord(475, 525))
@@ -25,7 +25,6 @@ class Prop45(Book1Scene):
         s: Dict[str | int, EPolygon] = {}
         a: Dict[str | int, EAngleBase] = {}
         eq: Dict[str | int, EStringObj] = {}
-        ex: Dict[str | int, Mobject] = {}
 
         top = 125
         bot = 325
@@ -45,40 +44,37 @@ class Prop45(Book1Scene):
         # ----------------------------------------------
         # In Other Words
         # ----------------------------------------------
-        @self.push_step
-        def _i1():
-            t1.title("In other words:")
-            t1.explainM("Start with a given rectilinear figure ABCD and a "
-                       r"given angle $\epsilon$")
-            s['ABCD'] = EPolygon(A, B, C, D, point_labels='ABCD')
-            l['E12'] = ELine(E1, E2)
-            l['E23'] = ELine(E2, E3)
-            a['E'] = EAngle(l['E23'], l['E12'], label=r'\epsilon')
-            s['ABCD'].e_fill(BLUE_D)
+        t1.title("In other words:")
+        t1.explainM("Start with a given rectilinear figure ABCD and a "
+                   r"given angle $\epsilon$")
+        s['ABCD'] = EPolygon(A, B, C, D, point_labels='ABCD')
+        l['E12'] = ELine(E1, E2)
+        l['E23'] = ELine(E2, E3)
+        a['E'] = EAngle(l['E23'], l['E12'], label=r'\epsilon')
+        s['ABCD'].e_fill(BLUE_D)
 
-        @self.push_step
-        def _i1():
-            t1.explainM(r"Create a parallelogram with an angle $\epsilon$, "
-                       "such that it is equal in area to the polygon ABCD")
-            p['x'] = EPoint(K)
-            with self.skip_animations_for(False):
-                s['x'] = s['ABCD'].copy_to_parallelogram_on_point(p['x'], a['E'], negative=True, speed=1)
-            s['x'].e_draw()
-            s['x'].e_fill(BLUE_D)
-            s['x'].set_angles(None, r'\epsilon')
+        self.next_page()
 
-        # ----------------------------------------------
+        # ------------------------------------------------------------------------
+        t1.explainM(r"Create a parallelogram with an angle $\epsilon$, "
+                   "such that it is equal in area to the polygon ABCD")
+        p['x'] = EPoint(K)
+        with self.skip_animations_for(False):
+            s['x'] = s['ABCD'].copy_to_parallelogram_on_point(p['x'], a['E'], negative=True, speed=1)
+        s['x'].e_draw()
+        s['x'].e_fill(BLUE_D)
+        s['x'].set_angles(None, r'\epsilon')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
         # Construction
         # ----------------------------------------------
-        @self.push_step
-        def _c1():
-            t1.down()
-            t1.title("Construction:")
+        t1.down()
+        t1.title("Construction:")
 
         # ----------------------------------------------
         # Proof
         # ----------------------------------------------
-        @self.push_step
-        def _p1():
-            t1.down()
-            t1.title("Proof:")
+        t1.down()
+        t1.title("Proof:")

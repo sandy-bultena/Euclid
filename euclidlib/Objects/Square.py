@@ -15,7 +15,7 @@ from . import Circle
 
 class ESquare(Parallelogram.EParallelogram):
     def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
-        self.scene: PropScene  = cast(PropScene, find_scene())
+        self.scene: PropScene  =  find_scene()
 
         if len(points) == 4:
             super().__init__(*points, **kwargs, point_calc=square)

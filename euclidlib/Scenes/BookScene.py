@@ -69,8 +69,10 @@ class BookScene(PropScene):
             pts.append(self.p[c])
         return [self.p.get(a,None) for a in name if a in self.p]
 
-    def lines(self, name: str):
+    def lines(self, name: str, num=None):
         lines = []
+        if num is None:
+            num = len(name)
         for c1,c2 in pairwise(name):
             if f"{c1}{c2}" not in self.l and f"{c2}{c1}" not in self.l:
                 raise IndexError(f"neither l[{c1}{c2}] nor l[{c2}{c1}] exists")
@@ -78,7 +80,7 @@ class BookScene(PropScene):
                 lines.append(self.l[f"{c1}{c2}"])
             else:
                 lines.append(self.l[f"{c2}{c1}"])
-        return lines
+        return lines[:num]
 
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),

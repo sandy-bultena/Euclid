@@ -1,5 +1,9 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
+
+from itertools import pairwise
+import operator as op
+
 import manimlib as mn
 
 import traceback
@@ -294,6 +298,46 @@ class PropScene(mn.InteractiveScene):
         with self.simultaneous():
             for o in obj:
                 o.e_remove()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get all the lines defined by the polygon[poly_name] and assign them to lines dictionary
+    # -----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def extract_lines(lines: dict[str, ELine], polygons: dict[str, EPolygon], label: str, poly_name=None):
+        poly_name = poly_name or label
+        label2 = label + label[0]
+        for l_label, line in zip(pairwise(label2), polygons[poly_name].l):
+            lines[op.add(*l_label)] = line
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get all the points defined by the polygon[poly_name] and assign them to points dictionary
+    # -----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def extract_points(points: dict[str, EPoint], polygons: dict[str, EPolygon], label: str, poly_name=None):
+        poly_name = poly_name or label
+        for p_label, point in zip(label, polygons[poly_name].p):
+            points[p_label] = point
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get all the angles defined by the polygon[poly_name] and assign them to angles dictionary
+    # -----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def extract_angles(angles: dict[str, EAngleBase], polygons: dict[str, EPolygon], label: str, poly_name=None):
+        poly_name = poly_name or label
+        label2 = label[-1] + label + label[0]
+        for i, angle in enumerate(polygons[poly_name].a):
+            if angle is not None:
+                angles[label2[i:i + 3]] = angle
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get all the lines/points/angles defined by the polygon[poly_name] and assign them to their appropriate dictionary
+    # -----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def extract_all(lines, points, angles, polygons, label, poly_name=None):
+        poly_name = poly_name or label
+        PropScene.extract_lines(lines, polygons, label, poly_name)
+        PropScene.extract_points(points, polygons, label, poly_name)
+        PropScene.extract_angles(angles, polygons, label, poly_name)
 
     # -----------------------------------------------------------------------------------------------------------------
     # context for running animations simultaneously as opposed to one at a time

@@ -12,11 +12,8 @@ from . import Line
 
 class EParallelogram(Polygon.EPolygon):
     def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
-        if points and isinstance(points[0], str):
-            point_names = list(points[0])
-            points = Point.EPoint.find_in_frame(point_names)
-        assert len(points) in (3, 4)
         if len(points) == 3:
+            print(cp.parallelogram(*points))
             super().__init__(*cp.parallelogram(*points), **kwargs)
         else:
             super().__init__(*points, **kwargs)
