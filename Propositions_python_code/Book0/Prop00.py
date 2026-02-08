@@ -16,7 +16,7 @@ class Prop0(BookScene):
     title = ""
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 50), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 50), line_width=mn_scale(550))
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}

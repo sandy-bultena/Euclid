@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import euclidlib.Objects.Text as Text
 
 # global constants
-DEFAULT_FADE_OPACITY = 0.30
+DEFAULT_FADE_OPACITY = 0.20
 DEFAULT_TEXT_FADE_OPACITY = 0.30
 
 # =====================================================================================================================
@@ -176,7 +176,9 @@ class EMObject(mn.VMobject):
         t = self.CONSTRUCTION_TIME
         if hasattr(self, "DE_CONSTRUCTION_TIME"):
             t = self.DE_CONSTRUCTION_TIME
-        return [custom_anim.UncreatePreserve(self, *args, **kwargs, run_time=t)]
+        return [mn.FadeOut(self, *args, **kwargs, run_time=t)]
+
+        #return [custom_anim.UncreatePreserve(self, *args, **kwargs, run_time=t)]
 
     # -----------------------------------------------------------------------------------------------------------------
     # is object in the scene?

@@ -4,7 +4,8 @@ import itertools
 
 from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
-from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
+
 
 from . import Line
 from . import Point
@@ -107,7 +108,7 @@ class EAngleBase(Arc.AbstractArc):
     @copy_transform(index=1)
     def copy_to_line(self, point: Point.EPoint, line: Line.ELine, negative=False) -> tuple[Line.ELine, EAngleBase]:
         start, end = line.get_start_and_end()
-        if not any(mn.get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
+        if not any(get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
             mn.log.error("When copying an angle to a line, "
                          "the point must be one of the endpoints\n"
                          f"{point.get_center()=} | {start=} | {end=}")
