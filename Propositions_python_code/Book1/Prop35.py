@@ -14,7 +14,7 @@ class Prop35(Book1Scene):
              "the same parallels equal one another.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(475, 175))
         t3 = TextBox(mn_coord(475, 300))
 
@@ -141,7 +141,7 @@ class Prop35(Book1Scene):
             s['ABCD'].e_unfill()
             a['CDE'] = EAngle(s['ABCD'].l[2], l['DE'], size=mn_scale(20), label=r'\alpha')
             t3.e_fade(-1)
-            t3.math(r'\angle{EAB} = \angle{FDC}')
+            t3.math(r'\measuredangle{EAB} = \measuredangle{FDC}')
 
         @self.push_step
         def p07_triangles_are_eq():

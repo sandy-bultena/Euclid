@@ -16,11 +16,11 @@ class Prop5(Book2Scene):
              "points of section is equal to the square on the half")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(200, 500))
         t3 = TextBox(mn_coord(200, 500))
-        t4 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(480))
-        t5 = TextBox(mn_coord(820, 150), line_width=mn_h_scale(480))
+        t4 = TextBox(mn_coord(800, 150), line_width=mn_scale(480))
+        t5 = TextBox(mn_coord(820, 150), line_width=mn_scale(480))
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}

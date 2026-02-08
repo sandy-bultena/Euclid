@@ -13,7 +13,7 @@ class Prop14(Book2Scene):
     title = "To construct a square equal to a given rectilinear figure."
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(200, 530))
         t3 = TextBox(mn_coord(500, 200))
 

@@ -17,7 +17,7 @@ class Prop47(Book1Scene):
              "containing the right angle.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(775, 150), line_width=mn_h_scale(575))
+        t1 = TextBox(mn_coord(775, 150), line_width=mn_scale(575))
         t2 = TextBox(mn_coord(500, 175))
         t3 = TextBox(mn_coord(500, 175))
 
@@ -148,7 +148,7 @@ class Prop47(Book1Scene):
             with self.simultaneous():
                 t3.e_fade()
                 t3.e_normal.blue(0, 2)
-                t2.math(r'\angle{FBC} = \rightangle + \angle{ABC} = \angle{ABD}')
+                t2.math(r'\measuredangle{FBC} = \rightangle + \measuredangle{ABC} = \measuredangle{ABD}')
 
         @self.push_step
         def p05_draw_line_from_A_para_BD():
@@ -289,7 +289,7 @@ class Prop47(Book1Scene):
             with self.simultaneous():
                 t2.e_fade()
                 t3.e_normal(1, 2)
-                t2.math(r'\angle{BCK} = \angle{ACE}')
+                t2.math(r'\measuredangle{BCK} = \measuredangle{ACE}')
                 t2.math(r'\triangle{ECA} = \triangle{BCK}')
 
         @self.push_step

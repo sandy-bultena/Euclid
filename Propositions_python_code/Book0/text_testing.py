@@ -13,7 +13,7 @@ class Prop0(BookScene):
 
     def go(self):
         tr = TextBox(mn_coord(0,0))
-        tl = TextBox(mn_coord(1400,0), line_width=mn_h_scale(200), alignment='e')
+        tl = TextBox(mn_coord(1400,0), line_width=mn_scale(200), alignment='e')
         br = TextBox(mn_coord(0,780))
         bl = TextBox(mn_coord(800,1400))
 
@@ -21,7 +21,7 @@ class Prop0(BookScene):
         tl.explain("Top Left")
         br.explain("Bottom Right")
 
-        t1 = TextBox(mn_coord(20, 50), line_width=mn_h_scale(1380))
+        t1 = TextBox(mn_coord(20, 50), line_width=mn_scale(1380))
         t2 = TextBox(mn_coord(500, 430))
         t3 = TextBox(mn_coord(1300, 430))
 
@@ -46,7 +46,7 @@ class Prop0(BookScene):
         t2.title("This is title text")
         t2.explain("This is more explanation text")
         t2.blue(13)
-        t2.math(r'\angle ACD < \angle BCD')
+        t2.math(r'\measuredangle ACD < \measuredangle BCD')
         t2.math(r'\alpha<\beta', align_str='<')
         eq = t2.math(r'c_1 + b_1 >\ c_2 + c_3 + b_4',
                 break_into_parts=('c_1 + b_1', r'>\ c_2 + c_3 + b_4'),
@@ -62,13 +62,13 @@ class Prop0(BookScene):
             eq[1].transform_from(eq[2][1])
 
         t2.fancy("fancy text")
-        t2.math(r'\angle CGE = \angle CGF = \gamma')
+        t2.math(r'\measuredangle CGE = \measuredangle CGF = \gamma')
 
         self.wait()
-        t2.e_update(-1, r'\angle CGE = \angle CGF = \rightangle',
+        t2.e_update(-1, r'\measuredangle CGE = \measuredangle CGF = \rightangle',
                     fill_color=BLUE,
                     transform_args=dict(
-                        matched_keys=[r'\angle CGE = \angle CGF = '],
+                        matched_keys=[r'\measuredangle CGE = \measuredangle CGF = '],
                         key_map={r'\gamma': r'\rightangle'},
                     ))
 

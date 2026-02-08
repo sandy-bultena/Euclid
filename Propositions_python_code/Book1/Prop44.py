@@ -14,10 +14,10 @@ class Prop44(Book1Scene):
              "to apply a parallelogram equal to a given triangle.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(525, 175))
         t3 = TextBox(mn_coord(525, 200))
-        t4 = TextBox(mn_coord(825, 150), line_width=mn_h_scale(455))
+        t4 = TextBox(mn_coord(825, 150), line_width=mn_scale(455))
 
         l: Dict[str | int, ELine] = {}
         p: Dict[str | int, EPoint] = {}

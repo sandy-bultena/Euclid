@@ -16,7 +16,7 @@ class Prop32(Book1Scene):
              "interior angles of the triangle equals two right angles.")
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(475, 175))
         t3 = TextBox(mn_coord(475, 500))
 
@@ -99,7 +99,7 @@ class Prop32(Book1Scene):
                        "then angles BAC and ACE are equal (I.29)")
 
             a['ECA'] = EAngle(l['CE'], t['ABC'].l[2], size=mn_scale(20), label=r'\gamma')
-            t3.math(r'\angle{BAC} = \angle{ACE} = \gamma')
+            t3.math(r'\measuredangle{BAC} = \measuredangle{ACE} = \gamma')
 
         @self.push_step
         def _p03_since_lines_are_parallel_and_BC_cross():
@@ -115,7 +115,7 @@ class Prop32(Book1Scene):
                        "then angles ABC and ECD are equal (I.29)")
 
             a['ECD'] = EAngle(l['CD'], l['CE'], size=mn_scale(25), label=r'\alpha')
-            t3.math(r'\angle{ABC} = \angle{ECD} = \alpha')
+            t3.math(r'\measuredangle{ABC} = \measuredangle{ECD} = \alpha')
 
         @self.push_step
         def _p04_angle_ACD_eq_ACE_plus_ECD():

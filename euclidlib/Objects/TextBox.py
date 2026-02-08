@@ -148,8 +148,8 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # generate the text
     # -----------------------------------------------------------------------------------------------------------------
     def generate_text(self,
-                      style: str,
                       text: str,
+                      style: str = "e_normal",
                       /,
                       align_index: int | Text.EStringObj = -1,
                       align_str: mn.SingleSelector | tuple[mn.SingleSelector, mn.SingleSelector] | None = None,
@@ -295,11 +295,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         for part in break_into_parts:
             if isinstance(part, str):
                 text_kwargs.append((part,None))
-                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, _is_a_part=True))
+                parts.append(self.generate_text( part, text_obj.style, delay_anim=True, _is_a_part=True))
             else:
                 part,kwargs = part[0:2]
                 text_kwargs.append ((part,kwargs))
-                parts.append(self.generate_text(text_obj.style, part, delay_anim=True, _is_a_part=True, **kwargs))
+                parts.append(self.generate_text(part, text_obj.style,delay_anim=True, _is_a_part=True, **kwargs))
 
         # align the parts next to each other
         for p, t in zip(parts, text_kwargs):
@@ -521,34 +521,34 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # create functions for all of the text styles
     # ----------------------------------------------------------------------------------------------------------------
     @functools.wraps(generate_text)
-    def title(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('title',*args, **kwargs)
+    def title(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'title', **kwargs)
 
     @functools.wraps(generate_text)
-    def explain(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('explain',*args, **kwargs)
+    def explain(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'explain', **kwargs)
 
     @functools.wraps(generate_text)
-    def explainM(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('explainM',*args, **kwargs)
+    def explainM(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'explainM', **kwargs)
 
     @functools.wraps(generate_text)
-    def normal(self,  *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('normal',*args, **kwargs)
+    def normal(self,  txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'normal', **kwargs)
 
     @functools.wraps(generate_text)
-    def math(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('math',*args, **kwargs)
+    def math(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'math', **kwargs)
 
     @functools.wraps(generate_text)
-    def fancy(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('fancy',*args, **kwargs)
+    def fancy(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'fancy', **kwargs)
 
     @functools.wraps(generate_text)
-    def title_screen(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('title_screen',*args, **kwargs)
+    def title_screen(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'title_screen', **kwargs)
 
     @functools.wraps(generate_text)
-    def sidenote(self, *args, **kwargs) -> Text.EStringObj:
-        return self.generate_text('side_note',*args, **kwargs)
+    def sidenote(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'side_note', **kwargs)
 

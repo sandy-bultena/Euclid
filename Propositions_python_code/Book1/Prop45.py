@@ -14,7 +14,7 @@ class Prop45(Book1Scene):
     title = "To construct a parallelogram equal to a given rectilinear figure in a given rectilinear angle."
 
     def define_steps(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_h_scale(550))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
         t2 = TextBox(mn_coord(475, 200))
         t3 = TextBox(mn_coord(475, 525))
 
