@@ -123,7 +123,7 @@ class Prop10(Book1Scene):
         with self.simultaneous():
             a['ACD'] = EAngle(*self.lines('ACD'), label=r'\alpha')
             a['DCB'] = EAngle(*self.lines('DCB'), label=r'\alpha')
-        t2.math(r'\angle ACD = \angle BCD = \alpha')
+        t2.math(r'\measuredangle ACD = \measuredangle BCD = \alpha')
 
         self.next_page()
 
