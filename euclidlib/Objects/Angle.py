@@ -141,7 +141,7 @@ class EAngleBase(Arc.AbstractArc):
         ln1, o = l1.copy_to_point(point)
         ln1.green()
         c2 = Circle.ECircle(point, ln1.get_end(), stroke_color=mn.GREEN)
-        with self.scene.delayed():
+        with self.scene.staggered_animation():
             for x in (ln1, o):
                 x.e_remove()
         p3 = c2.intersect(line)
@@ -166,7 +166,7 @@ class EAngleBase(Arc.AbstractArc):
         lt3 = Line.ELine(point, point.get_center() - lt1.get_unit_vector(), delay_anim=True)
         lt4 = Line.ELine(point, point.get_center() - lt2.get_unit_vector(), delay_anim=True)
 
-        with self.scene.delayed():
+        with self.scene.staggered_animation():
             for x in (l1, pn3, pn1, pn2, l3, ln3, o2):
                 x.e_remove()
 
@@ -190,7 +190,7 @@ class EAngleBase(Arc.AbstractArc):
             final_line.e_draw()
             final_angle.e_draw()
 
-        with self.scene.delayed():
+        with self.scene.staggered_animation():
             for x in (*lines, *angles, c2, c3, clone):
                 if x is final_line:
                     continue

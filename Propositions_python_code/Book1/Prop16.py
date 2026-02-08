@@ -84,7 +84,7 @@ class Prop16(Book1Scene):
             l['AB'].e_fade()
             l['BC'].e_fade()
             l['CD'].e_fade()
-        p['E'] = l['AC'].bisect(speed=2)
+        p['E'] = l['AC'].bisect(speed=2*self.default_speed)
         p['E'].add_label('E', mn.rotate_vector(l['AC'].get_unit_vector(), 90 * DEG))
         l['CE'], l['AE'] = l['AC'].e_split(p['E'])
         l['CE'].add_label('y', inside=True)
@@ -212,7 +212,6 @@ class Prop16(Book1Scene):
 
         # ------------------------------------------------------------------------
         self.set_base_animation_speed(self.default_speed*3)
-        print("Bisecting line BC")
         p['E'] = l['BC'].bisect()
         p['E'].add_label('E', DOWN)
         l['BE'] = ELine(p['E'],B, label=('y', DOWN))

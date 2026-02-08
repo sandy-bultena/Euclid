@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import functools
 import sys
-from typing import TYPE_CHECKING, Optional, Literal, cast
+from typing import TYPE_CHECKING, Optional, Literal
 import manimlib as mn
 import numpy as np
 
 from euclidlib.Objects.em_group_object import EIndexedGroup
 from . import Text
 from . import CustomAnimation as CA
+from . import em_object_base as base
 
 from ..Utilities.find_scene import find_scene
 
@@ -396,7 +397,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         print("adding submobjects to old")
         old.add(*new.submobjects)
 
-    def e_append_morph(self, index, text: str, color: None = None, transform_args=None, **kwargs):
+    def e_append_morph(self, index, text: str, color: Optional[mn.Color] = None, transform_args=None, **kwargs):
         if color:
             kwargs['t2c'] = {text: color}
         transform_args = transform_args or {}
@@ -508,7 +509,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     #       # ... code that adds to the collection
     #       collection.blue(slice(1:3))
     # ----------------------------------------------------------------------------------------------------------------
-    def subset(self, item: int | slice) -> EMObject| EIndexedGroup:
+    def subset(self, item: int | slice) -> base.EMObject| EIndexedGroup:
         objs = [*self.get_group(), *self.get_manager()]
         if isinstance(item, int):
             return objs[item]

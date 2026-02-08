@@ -11,20 +11,8 @@ from enum import Enum
 from itertools import pairwise
 
 import manimlib as mn
-from typing import Callable
 
-#from euclidlib.Objects import TextBox, ELine, EPoint, ECircle, ETriangle, EAngleBase, EIndexedGroup, EMObject, EPolygon
-#from euclidlib.Objects import *
-from euclidlib.Utilities.coordinate_utilities import mn_coord, mn_scale
-from euclidlib.Objects.TextBox import TextBox
-from euclidlib.Objects.Line import ELine
-from euclidlib.Objects.Circle import ECircle
-from euclidlib.Objects.Triangle import ETriangle
-from euclidlib.Objects.Angle import EAngleBase
-from euclidlib.Objects.em_group_object import EIndexedGroup
-from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects.Polygon import EPolygon
-from euclidlib.Objects.Point import EPoint
+from euclidlib.Objects import *
 
 
 GRID_OPACITY = 0
@@ -286,7 +274,7 @@ class Book2Scene(BookScene):
                 ar3 = ELine(mn_coord(650, 660),
                             mn_coord(660, 670))
 
-            with self.delayed():
+            with self.staggered_animation():
                 for x in title_box:
                     x.e_draw()
             with self.simultaneous():

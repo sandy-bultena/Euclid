@@ -81,7 +81,7 @@ class Prop08(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain(r"Construct line segment BX equal to DE at point {nb:B (I.2})")
-        l['BX'], p['X'] = t['EDF'].l[0].copy_to_point(p['B'], speed=2)
+        l['BX'], p['X'] = t['EDF'].l[0].copy_to_point(p['B'], speed=2*self.default_speed)
         p['X'].add_label('X', RIGHT)
 
         t['EDF'].l[0].e_fade()
@@ -103,7 +103,7 @@ class Prop08(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Construct line segment BZ equal to EF at point {nb:B I.2}")
-        l['BZ'], p['Z'] = t['EDF'].l[2].copy_to_point(p['B'], speed=2)
+        l['BZ'], p['Z'] = t['EDF'].l[2].copy_to_point(p['B'], speed=2*self.default_speed)
         p['Z'].add_label('Z', RIGHT)
         t['EDF'].l[2].e_fade()
         t2.math('BZ = EF')
@@ -112,7 +112,7 @@ class Prop08(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Construct line segment AY equal to DF at point {nb:A I.2}")
-        l['AY'], p['Y'] = t['EDF'].l[1].copy_to_point(p['A'], speed=2)
+        l['AY'], p['Y'] = t['EDF'].l[1].copy_to_point(p['A'], speed=2*self.default_speed)
         p['Y'].add_label('Y', RIGHT)
         t['EDF'].l[1].e_fade()
         t2.math('AY = DF')

@@ -309,6 +309,18 @@ class EMObject(mn.VMobject):
         ]
 
     # -----------------------------------------------------------------------------------------------------------------
+    # get group and manager and family... (allows code to work on single or grouped object
+    # -----------------------------------------------------------------------------------------------------------------
+    def get_group(self):
+        return ()
+
+    def get_manager(self):
+        return self,
+
+    def get_e_family(self):
+        return *self.get_manager(), *self.get_group()
+
+    # -----------------------------------------------------------------------------------------------------------------
     # draws the object onto the scene (with animation)
     # -----------------------------------------------------------------------------------------------------------------
     @freezable

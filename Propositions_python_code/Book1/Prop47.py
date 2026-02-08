@@ -63,7 +63,7 @@ class Prop47(Book1Scene):
             self.extract_all(l, p, a, s, 'HACK', 'A')
             self.extract_all(l, p, a, s, 'ECBD', 'C')
 
-            with self.delayed():
+            with self.staggered_animation():
                 t3.explainM('$ABFG$ is a square', fill_color=BLUE)
                 t3.explainM('$ACKH$ is a square', fill_color=BLUE)
                 t3.explainM('$BCDE$ is a square', fill_color=BLUE)
@@ -80,7 +80,7 @@ class Prop47(Book1Scene):
         # ----------------------------------------------
         @self.push_step
         def p01_cleanup_iow():
-            with self.delayed():
+            with self.staggered_animation():
                 t1.e_remove()
                 t2.e_remove()
             t2.next_to(t3, DOWN, aligned_edge=LEFT)

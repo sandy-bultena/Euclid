@@ -62,7 +62,7 @@ class Prop35(Book1Scene):
                                            ('F', UP),
                                            ('E', UP),
                                        ])
-            with self.delayed():
+            with self.staggered_animation():
                 t2.math(r'AD \parallel BC \parallel EF', fill_color=BLUE)
                 t2.math(r'AB \parallel DC', fill_color=BLUE)
                 t2.math(r'EB \parallel FC', fill_color=BLUE)
@@ -72,7 +72,7 @@ class Prop35(Book1Scene):
             nonlocal A, B, C, F
             t1.explain("The area ABCD is equal to EBCF")
             t2.math(r'\parallelogram ABCD = \parallelogram EBCF')
-            with self.delayed():
+            with self.staggered_animation():
                 for v in l.values():
                     v.e_fade()
 
@@ -113,7 +113,7 @@ class Prop35(Book1Scene):
         def p04_add_delta():
             t1.explain("Add DE to both AD and EF, then AE is equal to DF")
             l['DE'] = ELine(s['ABCD'].p[3], s['BCFE'].p[3], label=(r'\delta', UP))
-            with self.delayed():
+            with self.staggered_animation():
                 t3.e_fade[0:-1]()
             t3.math(r'AE = DF = x + \delta', transform_from=-1)
 
@@ -123,7 +123,7 @@ class Prop35(Book1Scene):
             s['ABCD'].l[0].add_label('y', outside=True)
             s['ABCD'].l[2].add_label('y', outside=True)
             s['ABCD'].e_fill(BLUE_D)
-            with self.delayed():
+            with self.staggered_animation():
                 t3.e_fade[-2:]()
             t3.math('AB = DC = y')
 
@@ -132,7 +132,7 @@ class Prop35(Book1Scene):
             t1.explain("Angle DAB and FDC are equal (interior and "
                        "exterior angles), since AF "
                        "intersects two parallel lines AB and DC{nb}(I.29)")
-            with self.delayed():
+            with self.staggered_animation():
                 s['BCFE'].l[0].e_fade()
                 s['BCFE'].l[1].e_fade()
                 s['BCFE'].l[3].e_fade()
@@ -195,5 +195,5 @@ class Prop35(Book1Scene):
 
         @self.push_step
         def p10_QED():
-            with self.delayed():
+            with self.staggered_animation():
                 t3.e_fade[:-1]()

@@ -101,13 +101,9 @@ class Prop12(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Bisect line EF at point G (I.9)")
-        print()
-        print()
-        print("Bisecting line")
         p['D'].e_remove()
         l['EF'] = ELine(p['E'],p['F'])
-        p['G'] = l['EF'].bisect(speed=2)
-        print(p['G'])
+        p['G'] = l['EF'].bisect(speed=2*self.default_speed)
         p['G'].add_label('G', DOWN)
         l['AB'].e_fade()
 

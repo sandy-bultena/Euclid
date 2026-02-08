@@ -112,7 +112,7 @@ class Dashable(EGroupedObjects):
         self.clear_ticks()
         position = period
         label_iter = iter(labels)
-        with self.scene.delayed():
+        with self.scene.staggered_animation():
             while position < (self.get_arc_length() - mn_scale(1)):
                 self.tick_abs(position, tick_size, label=next(label_iter, None))
                 position += period

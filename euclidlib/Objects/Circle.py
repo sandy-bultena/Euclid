@@ -56,7 +56,6 @@ class ECircle(mn.Circle, Arc.AbstractArc):
                           stroke_color=mn.RED,
                           label=self.temp_line_label,
                           delay_anim=True)
-
         # normal animation
 #        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
 
@@ -70,9 +69,9 @@ class ECircle(mn.Circle, Arc.AbstractArc):
         # at every frame, set the points of the line to the animation of the drawing circle
         tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
 
-        # don't know wtf this is
+        # as the temp line is being drawn, if it has a label, allow label to be updated as the circle is drawn
         if tmpLine.e_label is not None:
-            tmpLine.e_labeLine.enable_updaters()
+            tmpLine.e_label.enable_updaters()
 
         return super().CreationOf(*args, **kwargs)
 

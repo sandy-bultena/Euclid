@@ -137,7 +137,7 @@ class Prop09(Book1Scene):
             l['AC'].red()
         with self.simultaneous():
             t2.e_fade()
-            t2.white[0]
+            t2.white(0)
             t2.math('AB = AC')
 
         self.next_page()

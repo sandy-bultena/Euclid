@@ -39,14 +39,14 @@ class Prop22(Book1Scene):
         t1.title("Construction:")
         t1.explain("Start with three lines a,b,c where the sum of any two "
                    "is greater than the third")
-        with self.delayed():
+        with self.staggered_animation():
             p['A'] = EPoint(A[0], label=('a', LEFT))
             l['A'] = ELine(*A)
             p['B'] = EPoint(B[0], label=('b', LEFT))
             l['B'] = ELine(*B)
             p['C'] = EPoint(C[0], label=('c', LEFT))
             l['C'] = ELine(*C)
-        with self.delayed():
+        with self.staggered_animation():
             t2.math('b + c > a')
             t2.math('c + a > b')
             t2.math('a + b > c')
@@ -56,11 +56,10 @@ class Prop22(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Construct a line DE of sufficient length such that "
                    "it is greater than the sum of a,b,c")
-        with self.delayed():
+        with self.staggered_animation():
             p['D'] = EPoint(D, label=('D', LEFT))
             l['DE'] = ELine(D,E)
             p['E'] = EPoint(E, label=('E', RIGHT))
-        t2.math("self delayed = 1")
 
         self.next_page()
 

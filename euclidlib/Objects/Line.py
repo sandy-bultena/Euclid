@@ -575,7 +575,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             lEA.prepend(mn_scale(200))
 
         # cleanup
-        with self.scene.delayed():
+        with self.scene.staggered_animation():
             aADC.e_remove()
             angle.e_remove()
             pD.e_remove()

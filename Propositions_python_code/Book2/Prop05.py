@@ -61,7 +61,7 @@ class Prop5(Book2Scene):
                        "(AD and{nb}DB) added to the "
                        "square of the tiny segment CD, is equal to the half segment "
                        "(CB) all squared.")
-            with self.delayed():
+            with self.staggered_animation():
                 t2.math(r'AD \cdot DB + CD \cdot CD = CB \cdot CB\ \\ '
                         r'AD \cdot DB = CB \cdot CB - CB \cdot CB')
 

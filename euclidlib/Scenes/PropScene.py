@@ -6,7 +6,6 @@ import traceback
 from enum import Enum
 
 from euclidlib.Objects import *
-print(EStringObj)
 from os import getenv
 
 from euclidlib.debugging import print_debug
@@ -208,6 +207,19 @@ class PropScene(mn.InteractiveScene):
         self.paused = True
         self.wait_until(lambda : not self.paused, 600)
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # scale
+    # -----------------------------------------------------------------------------------------------------------------
+    def scale(self, *objs, corner=DL, factor = 1):
+        all_objs = EIndexedGroup(sub for obj in objs for sub in obj.get_e_family())
+        for x in all_objs:
+            if x.e_label is not None:
+                x.e_label.enable_updaters()
+        self.play(all_objs.animate.scale(factor, about_point=all_objs.get_corner(corner)))
+        for x in all_objs:
+            if x.e_label is not None:
+                x.e_label.disable_updaters()
+
 
     # -----------------------------------------------------------------------------------------------------------------
     # play animations
@@ -380,9 +392,10 @@ class PropScene(mn.InteractiveScene):
             yield
 
     # -----------------------------------------------------------------------------------------------------------------
+    # the start of each animation occurs when lag_ratio percent of the previous animation is completed
     # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
-    def delayed(self, lag_ratio=0.3, **kwargs):
+    def staggered_animation(self, lag_ratio=0.3, **kwargs):
         self.animateState.append(AnimState.STORING)
         self.animationsStored.append([])
         yield

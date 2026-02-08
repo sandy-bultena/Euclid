@@ -339,7 +339,7 @@ class Prop21(Book1Scene):
             t['ABC'].e_fill(BLUE_D)
             t['DBC'].e_fill(TEAL_D)
 
-        with self.delayed():
+        with self.staggered_animation():
             t2.e_fade()
             eq[6].parts[0].e_normal()
             eq[6].parts[1].e_normal()

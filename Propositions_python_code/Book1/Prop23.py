@@ -71,7 +71,7 @@ class Prop23(Book1Scene):
         # ----------------------------------------------
         with self.simultaneous():
             t1.e_remove()
-        with self.delayed():
+        with self.staggered_animation():
             for x in ex['cpy']:
                 x.e_remove()
         t1.title("Construction:")
@@ -161,7 +161,7 @@ class Prop23(Book1Scene):
         t1.title("Proof:")
         t1.explain("Two triangles where all three sides are equivalent, have "
                  "equivalent angles (I.8)")
-        with self.delayed():
+        with self.staggered_animation():
             c['F'].e_remove()
             c['A'].e_remove()
             l['FG'].e_remove()

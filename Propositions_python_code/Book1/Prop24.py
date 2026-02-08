@@ -139,7 +139,7 @@ class Prop24(Book1Scene):
             t['DFG'].e_fade()
             t['DEG'].e_normal()
             t['ABC'].l[1].e_normal()
-        with self.delayed():
+        with self.staggered_animation():
             t['ABC'].e_fill(BLUE_D)
             t['DEG'].e_fill(BLUE_D)
 
@@ -174,6 +174,7 @@ class Prop24(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
+        t1.explain('Angle EFG is greater than DFG')
         with self.simultaneous():
             t['DFG'].e_fade()
         with self.simultaneous():
@@ -182,7 +183,6 @@ class Prop24(Book1Scene):
         t['DEF'].p[0].e_normal()
         with self.simultaneous():
             t['EFG'].e_normal()
-        t1.explain('Angle EFG is greater than DFG')
 
         with self.simultaneous():
             t['DEF'].l[2].e_normal()
@@ -200,7 +200,7 @@ class Prop24(Book1Scene):
         with self.simultaneous():
             t['ABC'].e_remove()
         t['DFG'].a[1].red()
-        with self.delayed():
+        with self.staggered_animation():
             for line in t['DFG'].l:
                 line.remove_label()
             for line in t['EFG'].l:
@@ -208,15 +208,8 @@ class Prop24(Book1Scene):
             for line in t['DEG'].l:
                 line.remove_label()
 
-        all = EIndexedGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
-        for x in all:
-            if x.e_label is not None:
-                x.e_label.enable_updaters()
-        self.play(all.animate.scale(1.5, about_point=all.get_corner(DL)))
-        for x in all:
-            if x.e_label is not None:
-                x.e_label.disable_updaters()
-
+        objs_to_scale = [t[name] for name in 'DFG EFG DEF DEG'.split()]
+        self.scale(*objs_to_scale, corner=DL, factor=1.5)
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -235,7 +228,7 @@ class Prop24(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        with self.delayed():
+        with self.staggered_animation():
             t['DFG'].l[2].e_fade()
             t['DFG'].a[2].e_fade()
         t['EFG'].e_fill(PINK)
@@ -252,18 +245,11 @@ class Prop24(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        all = EIndexedGroup(sub for name in 'DFG EFG DEF DEG'.split() for sub in t[name].get_e_family())
-        for x in all:
-            if x.e_label is not None:
-                x.e_label.enable_updaters()
-        self.play(all.animate.scale(1/1.5, about_point=all.get_corner(DL)))
-        for x in all:
-            if x.e_label is not None:
-                x.e_label.disable_updaters()
+        t1.explain("Since EG is equal to BC, BC is greater than EF")
+        self.scale(*objs_to_scale, corner=DL, factor=1/1.5)
 
         with self.simultaneous():
             t['ABC'].e_draw()
-        t1.explain("Since EG is equal to BC, BC is greater than EF")
         with self.simultaneous():
             t2.e_fade()
             t2.white(5, -1)

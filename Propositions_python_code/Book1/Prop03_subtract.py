@@ -74,7 +74,7 @@ class Book1Prop3(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Construct line segment CE equal to AB (I.2)")
-        l['CE'], p['E'] = l['AB'].copy_to_point(p['C'], speed=1)
+        l['CE'], p['E'] = l['AB'].copy_to_point(p['C'], speed=self.default_speed)
         p['E'].add_label('E', away_from=C)
         self.next_page()
 

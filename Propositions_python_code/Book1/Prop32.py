@@ -103,7 +103,7 @@ class Prop32(Book1Scene):
 
         @self.push_step
         def _p03_since_lines_are_parallel_and_BC_cross():
-            with self.delayed():
+            with self.staggered_animation():
                 t['ABC'].e_normal()
                 l['CD'].e_normal()
                 t['ABC'].l[2].e_fade()
@@ -119,7 +119,7 @@ class Prop32(Book1Scene):
 
         @self.push_step
         def _p04_angle_ACD_eq_ACE_plus_ECD():
-            with self.delayed():
+            with self.staggered_animation():
                 t['ABC'].e_normal()
                 a['ECA'].e_normal()
                 a['DCA'].e_normal()

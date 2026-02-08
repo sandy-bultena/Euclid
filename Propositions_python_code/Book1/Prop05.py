@@ -100,7 +100,7 @@ class Prop05(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Construct a line starting at C, with length BD, "
                    "on the line {nb:segment AC (I.2)}")
-        l['CE'], p['E'] = l['BD'].copy_to_line(p['C'], l['CZ'], speed=2)
+        l['CE'], p['E'] = l['BD'].copy_to_line(p['C'], l['CZ'], speed=2*self.default_speed)
         l['CE'].add_label('x',outside=True)
         p['E'].add_label('E', away_from=B)
         t2.math("BD = CE = x")
