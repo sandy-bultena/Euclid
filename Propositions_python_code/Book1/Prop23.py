@@ -97,7 +97,6 @@ class Prop23(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Copy this triangle onto line segment AB, using the methods "
                    "described in I.22")
-        t1.indent()
         t1.set_bullet_symbol()
         t1.explain('Copy length CE to AF (I.2)')
         t2.math('AF = CE')
@@ -143,7 +142,6 @@ class Prop23(Book1Scene):
         c['A'].e_fade()
         l['AG'] = ELine(A,p['G'], label=('c', dict(inside=True)))
         l['FG'] = ELine(p['F'],p['G'], label=('e', dict(outside=True)))
-        t1.unindent()
         t1.reset_bullet_symbol()
 
         self.next_page()

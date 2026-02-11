@@ -198,11 +198,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
 
             # place the text in the appropriate y position
             if same_line and len(self):
-                newline.next_to(self[-1], mn.ORIGIN, buff=0)
+                newline.next_to(self[-1], mn.RIGHT, buff=mn.SMALL_BUFF)
             else:
                 newline.next_to(self.get_bottom(), mn.DOWN, buff=self.buff_size + self.extra_buffer_size)
-            self.extra_buffer_size = 0
-            self.justify_text(newline)
+                self.extra_buffer_size = 0
+                self.justify_text(newline)
 
             # if we are aligning text adjust the x position
             if align_str:
@@ -297,12 +297,13 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             if isinstance(part, str):
                 text_kwargs.append((part,None))
                 parts.append(self.generate_text( part, text_obj.style, delay_anim=True, _is_a_part=True))
+
             else:
                 part,kwargs = part[0:2]
                 text_kwargs.append ((part,kwargs))
                 parts.append(self.generate_text(part, text_obj.style,delay_anim=True, _is_a_part=True, **kwargs))
 
-        # align the parts next to each other
+        # align the parts overtop of the main string
         for p, t in zip(parts, text_kwargs):
             text, kwargs = t
             if kwargs is None:
@@ -426,9 +427,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     def set_bullet_symbol(self, text='–'):
         self.bullet_symbol = text
+        self.indent()
 
     def reset_bullet_symbol(self):
         self.bullet_symbol = None
+        self.unindent()
 
     # -----------------------------------------------------------------------------------------------------------------
     # fade/normalize specific objects
@@ -551,5 +554,5 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
 
     @functools.wraps(generate_text)
     def sidenote(self, txt:str, **kwargs) -> Text.EStringObj:
-        return self.generate_text(txt, 'side_note', **kwargs)
+        return self.generate_text(txt, 'sidenote', **kwargs)
 

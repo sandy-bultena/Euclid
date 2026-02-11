@@ -73,11 +73,11 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
         self.original_text = txt
         self.text = self.apply_rules(txt)
         self.parts: list[EStringObj] = []
-
+        if "stroke_width" not in kwargs:
+            kwargs["stroke_width"]=0
         super().__init__(
             self.text,
             *args,
-            stroke_width=0,
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
