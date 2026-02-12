@@ -131,7 +131,7 @@ class EMObject(mn.VMobject):
         def lift(self)-> EMObject: ...
         def notice(self)-> EMObject: ...
 
-        def e_move(self, vev: mn.Vect3) -> EMObjectPlayer: ...
+        def e_move(self, vector: mn.Vect3) -> EMObjectPlayer: ...
 
         def e_rotate(self, about: mn.Vect3, angle: float) -> EMObjectPlayer: ...
 
@@ -240,16 +240,6 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     # remove a label
     # -----------------------------------------------------------------------------------------------------------------
-    """
-            if self.e_label is not None:
-            if not self.e_label.visible():
-                self.scene.remove(self.e_label)
-            else:
-                self.scene.play(mn.FadeOut(self.e_label))
-        self.e_label = None
-        return self
-"""
-
     @freezable
     def remove_label(self) -> Self:
         if self.e_label is not None:
@@ -266,13 +256,13 @@ class EMObject(mn.VMobject):
     # undraw a label
     # -----------------------------------------------------------------------------------------------------------------
     @freezable
-    def undraw_label(self) -> Self:
+    def _undraw_label(self) -> Self:
         if self.e_label is not None and self.e_label.visible():
             self.scene.play(mn.FadeOut(self.e_label))
         return self
 
     def label_fade(self) -> Self:
-        return self.undraw_label()
+        return self._undraw_label()
 
     # -----------------------------------------------------------------------------------------------------------------
     # Functions that should be defined in inherited classes
@@ -380,6 +370,7 @@ class EMObject(mn.VMobject):
 
     # -----------------------------------------------------------------------------------------------------------------
     # rotate the object (adds the rotation of the label as well as the object)
+    # ... rotates without animation
     # -----------------------------------------------------------------------------------------------------------------
     @freezable
     def rotate(
@@ -418,7 +409,7 @@ class EMObject(mn.VMobject):
             anim_args['run_time'] = self.CONSTRUCTION_TIME
         if not self.Virtual and self.visible():
             anims = self.RemovalOf()
-            self.undraw_label()
+            self._undraw_label()
             if anims:
                 self.scene.play(*anims, **anim_args)
         else:
@@ -478,9 +469,8 @@ class EMObject(mn.VMobject):
         if color is None:
             opacity = 0
         elif opacity == 0:
-            self.e_fill_color = None
-        else:
-            self.e_fill_color = color
+            color = None
+        self.e_fill_color = color
 
         self.scene.play(
             self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=False)

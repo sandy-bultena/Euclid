@@ -1,70 +1,3 @@
-## Points
-
-```python
-        p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
-```
-
-
-
-# Coordinates
-
-
-
-# BookScene
-
-
-
-# Base Objects
-
-## Changing Properties:
-
-A change in property will be animated (fading from the old state to the new state)
-
-### Single objects (`Eline`, `ETriangle`, etc)
-
-```python
-def blue(self)->     EMObject: ... # change stroke and fill colour
-def green(self)->    EMObject: ... # change stroke and fill colour
-def red(self)->      EMObject: ... # change stroke and fill colour
-def white(self)->    EMObject: ... # change stroke and fill colour
-def grey(self)->     EMObject: ... # change stroke and fill colour
-def e_fade(self) ->  EMObject: ... # change the opacity to a lower value so object appears 'faded'
-def e_normal(self)-> EMObject: ... # change the opacity back to its default value
-def lift(self)->     EMObject: ... # bring the object to the top of scene (in front of all other objects)
-def notice(self)->   EMObject: ... # temporarily enlarge and colour change the object, so as to make it visibly noticable
-```
-
-### Collection objects (`TextBox`, etc)
-
-Similar to single objects, but individual objects within the collection can be uniquely selected for the property change
-
-```python
-def blue(self,     *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def green(self,    *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def red(self,      *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def white(self,    *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def grey(self,     *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def e_fade(self,   *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def e_normal(self, *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def lift(self,     *index:(int|slice))-> EIndexedGroup|EMObject: ...
-def notice(self,   *index:(int|slice))-> EIndexedGroup|EMObject: ...
-```
-> (see `TextBox` section for example of usage)
-
-
-
-## Lines
-
-
-
-## Triangles
-
-
-
-## Square
-
-
-
 # TextBox 
 
 A `TextBox` is a collection of text strings.
@@ -129,6 +62,7 @@ _Example:_ styles
 
 ```python
     t1 = TextBox(mn_coord(20, 20))
+    
     t1.title_screen("This is 'title_screen' text")
     t1.title("This is 'title' text")
     t1.explain("This is 'explain' text")
@@ -196,6 +130,7 @@ _Example:_ Changing the property after creation
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("green")
     t1.explain("green")
+    
     t2 = TextBox(mn_coord(120, 20))
     t2.explain("white")
     t2.explain("blue")
@@ -206,7 +141,7 @@ _Example:_ Changing the property after creation
 
     t1.green()                  # change all text elements in TextBox to green
     t2.blue(1,slice(3,5))       # change [1] and [3:5] text elements to blue
-    t2.e_fade(2)                # fade 3rd and 5th text elements
+    t2.e_fade(2)                # fade 3rd text element
 
 ```
 
@@ -238,10 +173,12 @@ _Example:_ bulleted list:
 ```python
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("No bullet")
+    
     t1.set_bullet_symbol("*")
     t1.explain("point 1")
     t1.explain("point 2")
     t1.reset_bullet_symbol()
+    
     t1.explain("Denouement")
 ```
 
@@ -300,7 +237,9 @@ _Example:_ Align strings using `align_index`
 
 ```python
     t1 = TextBox(mn_coord(20, 20))
+    
     eq = t1.math("a + b + d = 3")
+    
     t1.math("a = 3", align_str="a", align_index=eq)
     t1.math("b = 4", align_str="b", align_index=eq)					# aligned_index=-2 would also work
     t1.math("d = 3 - 4 - 3 = -4", align_str="d", align_index=eq)	# aligned_index=-3 would also work
@@ -340,9 +279,11 @@ _Example_: Transformation with `key_map`
 
 ```python
     t1 = TextBox(mn_coord(20,20))
+    
     t1.explainM(r"transforming $\quad a^2\rightarrow x$, $\quad b^2\rightarrow y$, $\quad c\rightarrow f$")
     t1.math(r'a^2 + b = c')
     t1.math(r'x+y=f', transform_from=-1, transform_args=dict(key_map={'a^2':'x','b':'y','c':'f'}))
+    
     t1.down()
     t1.explainM(r"transforming $\quad a^2\rightarrow y$, $\quad b^2\rightarrow x$, $\quad c\rightarrow f$")
     t1.math(r'a^2 + b = c')
@@ -360,8 +301,10 @@ _Example:_ Simple `break_into_parts`
 
 ```python
     t1 = TextBox(mn_coord(20, 20))
+    
     eq = t1.math('z=x+y',break_into_parts=['z','=x+y'])
     eq1,eq2 = eq.parts
+    
     eq1.red()
     eq2.blue()
 ```
@@ -382,221 +325,4 @@ Where each part is drawn is based on the original string (its not a perfect syst
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-In ManimGL (3b1b's OpenGL-based version), the `matched_keys` argument in transformation functions (often used with `TransformMatchingShapes` or similar) is used to explicitly map specific sub-mobjects of a source object to corresponding sub-mobjects of a target object, based on keys (often LaTeX strings) that identify them. 
-
-
-# ---
-
-```python
-    # PROP 9   
-    with self.simultaneous():
-            t2.e_fade()
-            t2.math(r'\measuredangle CAD = \frac{1}{2} \measuredangle CAB',
-                    transform_from=-1,
-                    transform_args=dict(
-                        matched_keys=[r'\measuredangle CAD', r'\measuredangle CAB', r'='],
-                        key_map={'2': r'\frac{1}{2}'},
-                        path_arc=90 * DEGREES,
-                    ))
-     # PROP 13
-           t2.math(r'\alpha\quad + \beta\quad = 2 \rightangle',
-                break_into_parts=(
-                    (r'\alpha\quad + ',{"align_str":"+"}),
-                    (r'\beta\quad = 2 \rightangle',{"align_str":"="})
-                )
-                )
-
-     eq['2-2'] = t3.math(r'\gamma = \beta + \theta', align_str = "=")
-        with self.simultaneous():
-            eq['3-2'] = t3.math(
-                r'\epsilon + \gamma',
-                align_str=r'\gamma',
-                align_index=eq['2-2'],
-                transform_from=eq['2-2'],
-                transform_args=dict(
-                    matched_keys=[r'\gamma'],
-                ),
-                )
-            eq['3-3'] = t3.math(
-                r'= \beta + \theta + \epsilon',
-                same_line = True,
-                align_str=r'=',
-                align_index=eq['2-2'],
-                transform_from=eq['2-2'],
-                transform_args=dict(
-                    matched_keys=[r'\beta + \theta', r'='],
-                ),
-                )
-        with self.simultaneous():
-            eq['5-2'] = t3.math(
-                r'\beta + \alpha', align_str=r'\alpha',
-                align_index=eq['4-2'],
-                transform_from=eq['4-2'],
-                transform_args=dict(matched_keys=[r'\alpha']),
-                )
-            eq['5-3'] = t3.math(
-                r'= \beta + \theta + \epsilon',
-                same_line=True,
-                align_str=r'=',
-                align_index=eq['4-3'],
-                transform_from=eq['4-3'],
-                transform_args=dict(matched_keys=[r'\theta + \epsilon', '=']),
-                )
-        with self.simultaneous():
-            eq['6-2'] = t3.math(
-                r'\beta + \alpha', align_str=r'\alpha',
-                align_index=eq['5-2'],
-                transform_from=eq['5-2'],
-                transform_args=dict(matched_keys=[r'\beta + \alpha']),
-                )
-            eq['6-3'] = t3.math(
-                r'= \epsilon + \gamma',
-                same_line=True,
-                align_str=r'=',
-                align_index=eq['5-3'],
-                transform_from=eq['3-2'],
-                ).align_to(eq['6-2'], DOWN)
-            eq['6-4'] = t3.math(
-                r'= 2\ \rightangle',
-            ).next_to(eq['6-3'], RIGHT, buff=SMALL_BUFF)
-
-        self.next_page()
-
-```
-
-
-
-
-
-
-
-
-
-```python
-import sys
-import os
-sys.path.append(os.getcwd())
-
-from euclidlib.Scenes.BookScene import Book1Scene
-from euclidlib.Objects import *
-
-
-class Book1Prop1(Book1Scene):
-    title = "To construct an equilateral triangle on a given finite straight line."
-    steps = []
-
-    def go(self):
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(500))
-        t2 = TextBox(mn_coord(500, 430))
-        A = mn_coord(200, 500)
-        B = mn_coord(450, 500)
-
-        l: dict[str | int, ELine] = {}
-        p: dict[str | int, EPoint] = {}
-        c: dict[str | int, ECircle] = {}
-
-        # -------------------------------------------------------------------------------------------------------------
-        t1.title("Construction:")
-        t1.explain("Start with line segment AB")
-        p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
-        p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
-        l['AB'] = ELine(p['A'], p['B'], scene=self)
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Create a circle with center A and radius AB")
-        c['A'] = ECircle(p['A'], p['B'], scene=self)
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Create a circle with center B and radius AB")
-        c['B'] = ECircle(p['B'], p['A'], scene=self)
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Label the intersection point C")
-        pts = c['A'].intersect(c['B'])
-        p['C'] = EPoint(pts[0], scene=self, label_args=('C', UP))
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Create line AC and CB")
-        with self.simultaneous():
-            l['AC'] = ELine(p['A'], p['C'], scene=self)
-            l['BC'] = ELine(p['B'], p['C'], scene=self)
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Triangle ABC is an equilateral triangle")
-        with self.simultaneous():
-            c['A'].e_fade()
-            c['B'].e_fade()
-
-        # -------------------------------------------------------------------------------------------------------------
-        # Proof
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.down()
-        t1.title("Proof:")
-        with self.simultaneous():
-            l['AC'].e_fade()
-            c['A'].e_fade()
-            c['B'].e_normal()
-
-        t1.explain("AB and CB are radii of the same circle - hence they are equal")
-        l['AB'].add_label("r", DOWN)
-        l['BC'].add_label("r", RIGHT)
-        t2.math("AB = CB = r")
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        with self.simultaneous():
-            l['BC'].e_fade()
-            c['B'].e_fade()
-            l['AB'].e_normal()
-            l['AC'].e_normal()
-            c['A'].e_normal()
-
-        t1.explain("AB and AC are radii of the same circle - hence they are equal")
-        l['AC'].add_label("r", LEFT)
-        t2.math("AB = AC = r")
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        with self.simultaneous():
-            c['B'].e_fade()
-            c['A'].e_fade()
-            l['AB'].e_normal()
-            l['AC'].e_normal()
-            l['BC'].e_normal()
-
-        t1.explain(
-            "If AB equals AC and AB equals CB, "
-            "then AC equals CB"
-        )
-        l['BC'].add_label("r", RIGHT)
-        t2.math("AB = CB = CA = r")
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t2.down()
-        t2.math(r"\therefore\quad Equilateral\quad Triangle!")
-
-
-```
 

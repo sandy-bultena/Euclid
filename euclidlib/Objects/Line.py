@@ -61,7 +61,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -mn.PI / 2)
 
-    def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=None, alpha=0.5, buff=None):
+    def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=True, alpha=0.5, buff=None):
         """By default, finds the middle of the line, calculates the position where the label should go"""
 
         # get mid-point (or the alpha percentage of the line) - uses manimlib stuff
