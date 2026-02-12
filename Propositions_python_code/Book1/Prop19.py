@@ -105,7 +105,7 @@ class Prop19(Book1Scene):
                    "proposition, angle BCA would be larger than angle ABC (I.18)")
 
         with self.simultaneous():
-            t2.e_fade[-1:]()
+            t2.e_fade(-1)
         t['ABC'].move_point_to(0, F)
         t2.math(r'AC < AB')
         t2.math(r'\implies \beta < \gamma')
@@ -156,4 +156,4 @@ class Prop19(Book1Scene):
                 r'\therefore\ AC > AB',
                 transform_args={'matched_keys': ['AC', 'AB'], 'key_map': {r'\le': '>'}}
             )
-            t2.e_fade[2:]()
+            t2.e_fade(slice(2,None))

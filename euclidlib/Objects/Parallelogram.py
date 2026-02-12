@@ -13,7 +13,6 @@ from . import Line
 class EParallelogram(Polygon.EPolygon):
     def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
         if len(points) == 3:
-            print(cp.parallelogram(*points))
             super().__init__(*cp.parallelogram(*points), **kwargs)
         else:
             super().__init__(*points, **kwargs)

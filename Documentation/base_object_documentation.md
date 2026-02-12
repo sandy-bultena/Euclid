@@ -62,14 +62,14 @@ eg.
 
 `line.e_rotate([0.0.0], mn.PI)(run_time=2)` works, 
 
-| Method                                                       | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **`e_move(self, vector: mn.Vect3`**                          | moves object by `vector` amount                              |
-| **`e_move_to(self, point_or_mobject: mn.Mobject|mn.Vect3, aligned_edge = mn.ORIGIN, coor_mask = np.array([1, 1, 1]))`** | moves object *to* the new specified location                 |
-| **`e_rotate(self, about: mn.Vect3, angle: float)`**          | rotates object around the `about` point by `angle` radians (NOT degrees) |
-| **`e_scale(self, scale: float, min_scale_factor = 1e-8, about_point = None, about_edge = mn.ORIGIN)`** | change the size of the object                                |
-| **`e_to_edge(self, edge = mn.LEFT, buff = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)`** |                                                              |
-| **`e_to_corner(self, corner: mn.Vect3 = mn.DL, buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)`** |                                                              |
+| Method                                                                                                 | Description                                                              |
+|--------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| **`e_move(self, vector: mn.Vect3`**                                                                    | moves object by `vector` amount                                          |
+| **`e_move_to(self, point_or_mobject: mn.Mobject                                                        | mn.Vect3, aligned_edge = mn.ORIGIN, coor_mask = np.array([1, 1, 1]))`**  | moves object *to* the new specified location                 |
+| **`e_rotate(self, about: mn.Vect3, angle: float)`**                                                    | rotates object around the `about` point by `angle` radians (NOT degrees) |
+| **`e_scale(self, scale: float, min_scale_factor = 1e-8, about_point = None, about_edge = mn.ORIGIN)`** | change the size of the object                                            |
+| **`e_to_edge(self, edge = mn.LEFT, buff = DEFAULT_EDGE_BUFFER)`**                                      |                                                                          |
+| **`e_to_corner(self, corner: mn.Vect3 = mn.DL, buff: float = DEFAULT_EDGE_BUFFER)`**                   |                                                                          |
 
 
 

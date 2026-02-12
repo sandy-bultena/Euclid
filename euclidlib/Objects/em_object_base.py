@@ -11,13 +11,12 @@ import euclidlib.Objects.CustomAnimation as custom_anim
 from euclidlib.Objects.em_object_decorators import freezable, freezable_player
 from euclidlib.Objects.CustomAnimation import EuclidAnimation
 from euclidlib.Objects.em_object_player import EMObjectPlayer
+from euclidlib.CONSTANTS import *
 
 if TYPE_CHECKING:
     import euclidlib.Objects.Text as Text
 
 # global constants
-DEFAULT_FADE_OPACITY = 0.30
-DEFAULT_TEXT_FADE_OPACITY = 0.30
 
 # =====================================================================================================================
 # EMObject
@@ -148,11 +147,11 @@ class EMObject(mn.VMobject):
 
         def e_to_edge(self,
                       edge: mn.Vect3 = mn.LEFT,
-                      buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)-> EMObjectPlayer: ...
+                      buff: float = DEFAULT_EDGE_BUFFER)-> EMObjectPlayer: ...
 
         def e_to_corner(self,
                         corner: mn.Vect3 = mn.DL,
-                        buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER)-> EMObjectPlayer: ...
+                        buff: float = DEFAULT_EDGE_BUFFER)-> EMObjectPlayer: ...
 
     # -----------------------------------------------------------------------------------------------------------------
     # properties

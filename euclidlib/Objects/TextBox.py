@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 INIT_TEXT_RUN_TIME = 0.5
 INCREASE_PER_CHARACTER = 0.02
 DELAYED_INCREASE = 20
-DEFAULT_TEXT_FADE_OPACITY = 0.3
 
 class StringPlacement:
     def __init__(self, align_to: Optional[EStringObj] = None, **kwargs ):

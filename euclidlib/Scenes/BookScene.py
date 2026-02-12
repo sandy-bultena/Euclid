@@ -7,26 +7,15 @@ inherits from PropScene
 from __future__ import annotations
 
 import re
-from enum import Enum
 from itertools import pairwise
-
-import manimlib as mn
-
 from euclidlib.Objects import *
+from euclidlib.CONSTANTS import *
 
 
-GRID_OPACITY = 0
-
-from euclidlib.debugging import print_debug
 from euclidlib.Scenes.PropScene import PropScene
 import roman
 
 DEG = 180/mn.PI
-
-class AnimState(Enum):
-    NORMAL = 0
-    STORING = 1
-    PAUSED = 2
 
 
 def get_TOC(toc):
@@ -89,7 +78,6 @@ class BookScene(PropScene):
                     )
 
         t.title_screen("Euclid's Elements", write_simultaneous=True)
-        print_debug(2,f"book number: {self.book=}")
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
         t.fancy("Fancy quote")
 
@@ -140,7 +128,7 @@ class BookScene(PropScene):
         line_options = dict(
             stroke_color=mn.WHITE,
             stroke_width=0.5,
-            stroke_opacity=GRID_OPACITY,
+            stroke_opacity=BOOK_SCENE_GRID_OPACITY,
         )
 
         grid = mn.NumberPlane(

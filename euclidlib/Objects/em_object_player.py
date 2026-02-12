@@ -4,12 +4,13 @@ import manimlib as mn
 from typing import TYPE_CHECKING
 from euclidlib.Objects.CustomAnimation import e_animate, Indicate
 from . import em_object_base as base
+from euclidlib.CONSTANTS import *
 
 if TYPE_CHECKING:
     from euclidlib.Objects.em_object_base import *
     from euclidlib.Objects.em_group_object import *
 
-DEFAULT_TRANSFORM_RUNTIME = 0.25
+
 
 
 # =====================================================================================================================

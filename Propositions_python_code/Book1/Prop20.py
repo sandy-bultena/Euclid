@@ -170,7 +170,7 @@ class Prop20(Book1Scene):
             l['CD'].e_fade()
             l['Dp'].e_fade()
             p['D'].e_fade()
-            t2.e_fade[0:-4]()
+            t2.e_fade(slice(0,-4))
 
         self.next_page()
 

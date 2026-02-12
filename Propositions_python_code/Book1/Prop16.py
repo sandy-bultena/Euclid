@@ -222,7 +222,6 @@ class Prop16(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        print("extending line AE")
         l['AF1'] = l['AE'].extend_cpy(p['E'].distance_to(A) + mn_scale(50))
         c['E'] = ECircle(p['E'], A)
         pts = c['E'].intersect(l['AF1'])
@@ -235,7 +234,6 @@ class Prop16(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        print("assembling triangles ABE and CEF")
         l['CF'] = ELine(C, F)
         with self.simultaneous():
             t['ABE'] = ETriangle.assemble(lines=self.lines('ABEA'), angles=[None, None, None]).e_fill(GREEN_E)
@@ -249,14 +247,12 @@ class Prop16(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        print("Setting 'gamma' angle for triangle CEF")
         a['g'].e_normal()
         t['CEF'].set_angles(r'\gamma', None, None, mn_scale(60))
 
         self.next_page()
 
         # ------------------------------------------------------------------------
-        print("removing extra stuff")
         with self.simultaneous():
             t['ABE'].e_unfill()
             t['CEF'].e_unfill()
@@ -277,7 +273,6 @@ class Prop16(Book1Scene):
         self.next_page()
 
         # ------------------------------------------------------------------------
-        print("removing the rest of the stuff")
         with self.simultaneous():
             with self.freeze(l['AB'], a['b'], a['a']):
                 t['ABE'].e_remove()

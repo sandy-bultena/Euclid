@@ -70,11 +70,13 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         except AssertionError:
             point = self.get_start()
 
-        # calculate the position
-        if inside:
-            direction = self.IN()
-        elif outside:
-            direction = self.OUT()
+        # calculate the position if direction not given
+        if direction is None:
+            if inside:
+                direction = self.IN()
+            elif outside:
+                direction = self.OUT()
+
         return point + (buff or self.LabelBuff) * direction
 
     # -----------------------------------------------------------------------------------------------------------------

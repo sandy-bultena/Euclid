@@ -11,16 +11,9 @@ from enum import Enum
 
 from euclidlib.Objects import *
 from os import getenv
+from .animate_state import AnimState
+from euclidlib.CONSTANTS import *
 
-from euclidlib.debugging import print_debug
-DEFAULT_SPEED = 20
-DEFAULT_TEXT_SPEED = 20
-
-class AnimState(Enum):
-    NORMAL = 0
-    STORING = 1
-    PAUSED = 2
-    SKIP = 3
 
 # =====================================================================================================================
 # PropScene
@@ -84,7 +77,6 @@ class PropScene(mn.InteractiveScene):
     # -----------------------------------------------------------------------------------------------------------------
     def run_full(self):
         with self.animation_speed(self._speed or 1):
-            print(f"{self.animationSpeedStack}")
             try:
                 if not self.debug:
                     self.title_page()
@@ -94,7 +86,6 @@ class PropScene(mn.InteractiveScene):
                 pass
 
             self.go()
-        print(f"{self.animationSpeedStack}")
 
     # -----------------------------------------------------------------------------------------------------------------
     # selection tools
@@ -369,7 +360,6 @@ class PropScene(mn.InteractiveScene):
     # -----------------------------------------------------------------------------------------------------------------
     @mn.contextmanager
     def animation_speed(self, speed: float):
-        print("inside animation_speed", speed)
         if speed > 0:
             self.animationSpeedStack.append(speed)
             yield []

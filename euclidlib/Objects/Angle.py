@@ -12,9 +12,9 @@ from . import Point
 from . import Circle
 from . import Arc
 import math
+from euclidlib import CONSTANTS
 
 
-EPSILON = mn_scale(1)
 if TYPE_CHECKING:
     from manimlib import Vect3
 
