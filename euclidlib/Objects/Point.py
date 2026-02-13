@@ -40,7 +40,9 @@ class EPoint(EMObject, mn.Circle):
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # set the colour
+    # set the colour (not part of the user animation stuff, used by create_target,
+    #                 which is used by manim during transformations)
+    #                 which is used by manim during transformations)
     # ----------------------------------------------------------------------------------------------------------------
     def set_color(
             self,
@@ -58,7 +60,7 @@ class EPoint(EMObject, mn.Circle):
     # this is a callback routine from the lambda that is used for Label, to keep the label in the correct position
     # if this point is moved
     def e_label_location(self,
-                         direction: mn.Vect3 = None,
+                         direction: mn.Vect3 = mn.UP,
                          buff: float = None,
                          *,
                          away_from: Callable[[], mn.Vect3] | float = None,
@@ -104,13 +106,12 @@ class EPoint(EMObject, mn.Circle):
         return target
 
     # ----------------------------------------------------------------------------------------------------------------
-    # two points overlap?
+    # two points overlap - maybe used when interacting with mouse selection??
     # ----------------------------------------------------------------------------------------------------------------
     def intersect(self, other: mn.Mobject, reverse=True):
-        print(f"intercept: {self} {other}")
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
-        super().intersect(other)
+        return super().intersect(other)
 
     # ----------------------------------------------------------------------------------------------------------------
     # is point touching a rectangle?
@@ -127,35 +128,6 @@ class EPoint(EMObject, mn.Circle):
 
     def __str__(self):
         return f"Point: ({self.get_arc_center()[0]:6.2f},{self.get_arc_center()[1]:6.2f})"
-
-    # # ================================================================================================================
-    # # given names of points, return the point objects
-    # # ================================================================================================================
-    # @staticmethod
-    # def find_in_frame(names: Iterable) -> list[EPoint]:
-    #     """
-    #     Based on the variable(?) names of the points, get the objects by going up the
-    #     call stack and finding the values according to their name
-    #     """
-    #     from inspect import currentframe
-    #     point_names = list(names)
-    #     f = currentframe()
-    #
-    #     # go up the stack and look for points in the local variables in the specific frame
-    #     while (f := f.f_back) is not None:
-    #         if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
-    #             break
-    #     if f is None:
-    #         raise Exception(f"Can't Find Points dict or Point variables {', '.join(names)}")
-    #
-    #     # get the point objects
-    #     points = [f.f_locals.get(p, f.f_locals.get('p', {}).get(p)) for p in names]
-    #     if all(p is not None for p in points):
-    #         return points
-    #
-    #     raise Exception(f"Can't find point(s) {', '.join( n for p, n in zip(points, names) if p is None)}")
-    #
-
 
 class VirtualPoint(EPoint):
     Virtual = True

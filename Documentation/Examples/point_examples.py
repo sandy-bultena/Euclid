@@ -10,10 +10,13 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        point_no_label()
+        point_with_label()
 
     def go(self):
         pass
 
 def point_no_label():
     p = EPoint(mn_coord(20, 20))
+
+def point_with_label():
+    p = EPoint(mn_coord(100, 100), label='A')

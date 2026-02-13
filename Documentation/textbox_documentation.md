@@ -51,6 +51,12 @@ _Example:_ `buff_size`
 
 ## Writing text to a `TextBox`
 
+### Suppressing line breaks
+
+In every style except for `math` you can force a section of text to be treated as a single non breakable entity by using the following `nb` hack:
+
+`t1.explain("This is a line that goes on and on, but I don't want {nb:a, b, c, d} to be broken across lines")`
+
 ### Styles
 
 To write text to a textbox, each style listed below can be used as a method. 
