@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import itertools
 from abc import ABC
-from typing import Optional
+from typing import Optional, Iterable, Any
 import re
 import manimlib as mn
 from functools import reduce, partial
 
 from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects import CustomAnimation as CA, EGroupedObjects
+from euclidlib.Objects import CustomAnimation as CA, EGroupedObjects, EIndexedGroup
 
 # =====================================================================================================================
 # numbers used to calculate how fast the text is written to the screen
@@ -321,62 +321,62 @@ class Label(ETex):
         self.em_object = emobject
 
 
-# # =====================================================================================================================
-# # A group of labels
-# # =====================================================================================================================
-# class LabelGroup(G.EIndexedGroup[Label]):
-#
-#     # -----------------------------------------------------------------------------------------------------------------
-#     # initialize
-#     # -----------------------------------------------------------------------------------------------------------------
-#     def __init__(self, texts: List[str], em_object: E.EMObject, pos_args: Iterable[Tuple], kw_args: Iterable[Dict[str, Any]]):
-#         self.em_object = em_object
-#         super().__init__(
-#             (Label(txt, em_object, *pos, index=i, **kw)
-#             for txt, pos, kw, i
-#             in zip(texts, pos_args, kw_args, itertools.count())),
-#             delay_anim=True
-#         )
-#
-#     # -----------------------------------------------------------------------------------------------------------------
-#     # overload CreationOf by specifying
-#     # -----------------------------------------------------------------------------------------------------------------
-#     def CreationOf(self, *args, **kwargs):
-#         kwargs['run_time'] = self.em_object.CONSTRUCTION_TIME
-#         return [
-#             y
-#             for x in self
-#             for y in x.CreationOf(*args, **kwargs)
-#         ]
-#
-#     def RemovalOf(self, *args, **kwargs):
-#         kwargs['run_time'] = self.em_object.AUX_CONSTRUCTION_TIME
-#
-#         return [
-#             y
-#             for x in self
-#             for y in x.RemovalOf(*args, **kwargs)
-#         ]
-#
-#     # -----------------------------------------------------------------------------------------------------------------
-#     # manim stuff
-#     # -----------------------------------------------------------------------------------------------------------------
-#     def enable_updaters(self):
-#         for x in self:
-#             x.resume_updating()
-#
-#     def disable_updaters(self):
-#         for x in self:
-#             x.suspend_updating()
-#
-#     # -----------------------------------------------------------------------------------------------------------------
-#     # change the EMObject that these labels are associated with
-#     # -----------------------------------------------------------------------------------------------------------------
-#     def transfer_ownership(self, emobject: E.EMObject):
-#         if emobject.e_label is not None:
-#             emobject.e_label.e_remove()
-#         emobject.e_label = self
-#         self.em_object.e_label = None
-#         self.em_object = emobject
+# =====================================================================================================================
+# A group of labels (maybe used for tick marks??)
+# =====================================================================================================================
+class LabelGroup(EIndexedGroup[Label]):
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # initialize
+    # -----------------------------------------------------------------------------------------------------------------
+    def __init__(self, texts: list[str], em_object: EMObject, pos_args: Iterable[tuple], kw_args: Iterable[dict[str, Any]]):
+        self.em_object = em_object
+        super().__init__(
+            (Label(txt, em_object, *pos, index=i, **kw)
+            for txt, pos, kw, i
+            in zip(texts, pos_args, kw_args, itertools.count())),
+            delay_anim=True
+        )
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # overload CreationOf by specifying
+    # -----------------------------------------------------------------------------------------------------------------
+    def CreationOf(self, *args, **kwargs):
+        kwargs['run_time'] = self.em_object.CONSTRUCTION_TIME
+        return [
+            y
+            for x in self
+            for y in x.CreationOf(*args, **kwargs)
+        ]
+
+    def RemovalOf(self, *args, **kwargs):
+        kwargs['run_time'] = self.em_object.AUX_CONSTRUCTION_TIME
+
+        return [
+            y
+            for x in self
+            for y in x.RemovalOf(*args, **kwargs)
+        ]
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # manim stuff
+    # -----------------------------------------------------------------------------------------------------------------
+    def enable_updaters(self):
+        for x in self:
+            x.resume_updating()
+
+    def disable_updaters(self):
+        for x in self:
+            x.suspend_updating()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # change the EMObject that these labels are associated with
+    # -----------------------------------------------------------------------------------------------------------------
+    def transfer_ownership(self, emobject: EMObject):
+        if emobject.e_label is not None:
+            emobject.e_label.e_remove()
+        emobject.e_label = self
+        self.em_object.e_label = None
+        self.em_object = emobject
 
 

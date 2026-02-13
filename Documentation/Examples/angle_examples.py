@@ -11,20 +11,49 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        right_angle()
+        label_locations_index()
 
     def go(self):
         pass
 
+def point_at_angle():
+    l1 = ELine(mn_coord(130,400),mn_coord(230,100))
+    l2 = ELine(mn_coord(130,400),mn_coord(500,600))
+    a = EAngle(l2,l1)
+    x = a.e_point_at_angle(mn.PI/4)
+    x.add_label("B")
+    print(x, type(x))
+
+def label_locations_index():
+    l1 = ELine(mn_coord(130,400),mn_coord(230,100))
+    l2 = ELine(mn_coord(130,400),mn_coord(500,400))
+    a = EAngle(l2,l1)
+    a.add_label("A",where=ArcLabelLocation.BY_ALPHA, alpha = 0.25, buff = 0.001)
+    l1 = ELine(mn_coord(130,500),mn_coord(230,200))
+    l2 = ELine(mn_coord(130,500),mn_coord(500,500))
+    a = EAngle(l2,l1)
+    a.add_label("A",where=ArcLabelLocation.AT_START)
+    l1 = ELine(mn_coord(130,600),mn_coord(230,300))
+    l2 = ELine(mn_coord(130,600),mn_coord(500,600))
+    a = EAngle(l2,l1)
+    a.add_label("A",where=ArcLabelLocation.AT_END)
+
+def get_bisect():
+    l1 = ELine(mn_coord(130,400),mn_coord(130,150))
+    l2 = ELine(mn_coord(130,400),mn_coord(500,400))
+    a = EAngle(l2,l1,label="A")
+    b = a.get_bisect()
+    print(a.e_angle, type(a.e_angle), b, type(b), a.e_angle/b)
+
 def right_angle():
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,400))
-    a = EAngle(l2,l1,label="A",debug=1)
+    a = EAngle(l2,l1,label="A")
 
 def angle():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,400))
-    a = EAngle(l2,l1,label="A",debug=1)
+    a = EAngle(l2,l1,label="A")
 
 def angle_clean_bisect():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))

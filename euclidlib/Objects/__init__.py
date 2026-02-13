@@ -6,7 +6,7 @@ from euclidlib.Utilities.coordinate_utilities import *
 from manimlib.constants import *
 from .Angle import EAngle, EAngleBase
 from . import Angle as Angle
-from .Arc import EArc, AbstractArc
+from .Arc import EArc, AbstractArc, ArcLabelLocation
 from .Circle import ECircle, VirtualCircle
 from .Line import ELine, EDashedLine, VirtualLine
 from .Point import EPoint, VirtualPoint

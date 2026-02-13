@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 # =====================================================================================================================
 
 class EMObject(mn.VMobject):
-    LabelBuff = mn.MED_SMALL_BUFF
+    LabelBuff = LABEL_BUFF
     CONSTRUCTION_TIME = 1
 
     @property
@@ -198,7 +198,12 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     @freezable
     def add_label(self, *args, **label_args) -> Self:
-        """different arguments for different EObjects"""
+        """
+        NOTE: the location of the label is defined by em_object.e_label_location(*self.args, **self.extra_args),
+        :param args: specific to object having the label created
+        :param label_args: specific to the object having the label created
+        :return:
+        """
 
         # separate the arguments and key/value pairs
         if isinstance(args[-1], dict) and not label_args:
@@ -230,6 +235,14 @@ class EMObject(mn.VMobject):
     # initialize a label - creates a label, but doesn't draw or animate it
     # -----------------------------------------------------------------------------------------------------------------
     def init_label(self, label: str, *args, **extra_args) -> Optional[Text.Label]:
+        """
+        NOTE: the location of the label is defined by em_object.e_label_location(*self.args, **self.extra_args),
+
+        :param label: text string
+        :param args: specific to object having the label created
+        :param extra_args: specific to the object having the label created
+        :return:
+        """
         import euclidlib.Objects.Text as Text
         if label:
             return Text.Label(label, self, *args, **extra_args)
@@ -361,8 +374,6 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     def __enter__(self):
         self.e_draw()
-        raise TypeError("Time to figure out what this method is for")
-        #return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.e_remove()

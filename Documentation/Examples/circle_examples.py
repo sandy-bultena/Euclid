@@ -6,14 +6,25 @@ from euclidlib.Scenes.PropScene import PropScene
 from euclidlib.Objects import *
 
 class Book1Prop1(PropScene):
-    title = "To construct an equilateral triangle on a given finite straight line."
+    title = ""
     steps = []
 
     def run_full(self):
-        circle_no_label()
+        arc_bisect()
 
     def go(self):
         pass
+
+def arc_bisect():
+    la = EArc(2, LEFT * 3 + UP, UP, clockwise=False)
+    la.bisect()
+
+def arc_fill_test():
+    la = EArc(2, LEFT * 3 + UP, UP, clockwise=False)
+
+    pie = la.create_pie()
+    pie.e_fill(BLUE)
+
 
 def circle_no_label():
     l = ECircle(mn_coord(100, 100), mn_coord(150,150), label_args='A')
