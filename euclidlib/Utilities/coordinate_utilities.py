@@ -58,7 +58,7 @@ def mn_scale(f, *rest) -> float | npt.NDArray[float]:
     :return: either a single float, or a numpy array of floats
     """
     if rest:
-        return np.array([i * E_TO_M_SCALE for i in (f, *rest)])
+        return convert_to_coord(np.array([i * E_TO_M_SCALE for i in (f, *rest)]))
     return f * E_TO_M_SCALE
 
 # ---------------------------------------------------------------------------------------------------------------------

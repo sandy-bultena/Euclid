@@ -303,7 +303,6 @@ class Label(ETex):
     # manim stuff maybe?
     # -----------------------------------------------------------------------------------------------------------------
     def enable_updaters(self):
-        # print(f"START {self.em_object} -> {self}:{self.string}")
         self.resume_updating()
 
     def disable_updaters(self):

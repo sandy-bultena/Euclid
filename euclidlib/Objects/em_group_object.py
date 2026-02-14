@@ -75,8 +75,8 @@ def {name}(self, *args):
 
     for name in EMObjectPlayer.get_methods():
         exec(f'''
-def {name}(self, *args):
-    return EGroupPlayer(self).{name}(*args)'''.strip())
+def {name}(self, *args, **kwargs):
+    return EGroupPlayer(self).{name}(*args, **kwargs)'''.strip())
 
 
 # =====================================================================================================================

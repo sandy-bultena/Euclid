@@ -110,6 +110,9 @@ class EAngleBase(Arc.AbstractArc):
     vec1: mn.Vect2
     vec2: mn.Vect2
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # properties
+    # -----------------------------------------------------------------------------------------------------------------
     @property
     def lines(self):
         return self.l1, self.l2
@@ -336,6 +339,8 @@ class ArcAngle(EAngleBase, mn.Arc):
             arc_center=center,
             **kwargs
         )
+    def get_group(self):
+        return self.l1, self.l2
 
 # ==============================================================================================================
 # Right Angle class
@@ -386,6 +391,7 @@ class RightAngle(EAngleBase):
 # - not sure why we have an empty class, but I guess I'll figure out why later
 # ==============================================================================================================
 class Gnomon(ArcAngle):
+    """the part of a parallelogram left when a similar parallelogram has been taken from its corner."""
     pass
 
 

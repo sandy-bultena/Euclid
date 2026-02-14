@@ -63,15 +63,15 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return self.get_arc_center()
 
     @property
-    def r(self):
+    def r(self)->float:
         return self.size
 
     @property
-    def radius(self):
+    def radius(self)->float:
         return self.size
 
     @property
-    def arc(self):
+    def arc(self)->float:
         return self.e_angle
 
     if TYPE_CHECKING:
@@ -85,7 +85,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
             """
 
     # ----------------------------------------------------------------------------------------------------------
-    # method called by manim... used for transformations??
+    # method called by manim... used when constructing
     # ----------------------------------------------------------------------------------------------------------
     def pointwise_become_partial(self, start: AbstractArc, a: float, b: float) -> Self:
         if a <= 0:
@@ -100,19 +100,21 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return super().pointwise_become_partial(start, a, b)
 
     # ----------------------------------------------------------------------------------------------------------
-    # override manim's interpolate function
+    # override manim's interpolate function,
+    # - by keeping track of the arc center and the start/stop of the arc, the label will be
+    #   updated as the Arc object is manipulated
     # ----------------------------------------------------------------------------------------------------------
-    # def interpolate(
-    #         self,
-    #         mobject1: AbstractArc,
-    #         mobject2: AbstractArc,
-    #         alpha: float,
-    #         path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
-    # ) -> Self:
-    #     self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
-    #     self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
-    #     self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
-    #     return super().interpolate(mobject1, mobject2, alpha, path_func)
+    def interpolate(
+            self,
+            mobject1: AbstractArc,
+            mobject2: AbstractArc,
+            alpha: float,
+            path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
+    ) -> Self:
+        self.vx, self.vy, _ = mn.interpolate(mobject1.get_arc_center(), mobject2.get_arc_center(), alpha)
+        self.e_start_angle = mn.interpolate(mobject1.e_start_angle, mobject2.e_start_angle, alpha)
+        self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
+        return super().interpolate(mobject1, mobject2, alpha, path_func)
 
     # ----------------------------------------------------------------------------------------------------------
     # Faster method of getting arc center than the one manim uses
@@ -129,7 +131,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return super().shift(vector)
 
     # ----------------------------------------------------------------------------------------------------------
-    # rotate - but keep track of start and stop angle
+    # rotate - but keep track of start and stop angle - not for user consumption!
     # ----------------------------------------------------------------------------------------------------------
     def rotate(self, angle: float, *args, **kwargs) -> Self:
         self.e_start_angle += angle
@@ -233,7 +235,8 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # return a point on the arc at a given angle
     # ----------------------------------------------------------------------------------------------------------
     def e_point_at_angle(self, angle) ->Point.EPoint:
-        """create and return a EPoint object on the arc, located at angle (in radians)"""
+        """create and return a EPoint object on the arc, located at angle (in radians),
+        IF it falls into the range within the arc, otherwise defaults at 'start' or 'stop' of angle """
         return Point.EPoint(self.point_at_angle(angle))
     
     # ----------------------------------------------------------------------------------------------------------

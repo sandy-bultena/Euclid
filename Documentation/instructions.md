@@ -64,5 +64,24 @@ If `scene` is not defined, it is found by calling `find_scene` which works it wa
 
 * `center_of_mass` is a manim method
 
-## Don't Know
-what are `updaters` - see circle animation
+## Updaters
+what are `updaters` - they are methods (like `f_always` that keep are called at every frame change)
+
+## Labels
+
+### Label Updaters
+
+in `Text:Label`, an updater is created which calls `e_label_location` on every frame,
+
+```python
+        self.f_always.move_to(
+            lambda: em_object.e_label_location(*self.args, **self.extra_args),
+            aligned_edge=lambda: self.align
+        )
+```
+
+### Label Location
+
+label location is defined by its updater `e_label_location`, NOT by `add_label`, or `init_label`
+
+NOTE: it is important that if the `e_label_location` is relies on elements of the object it is attached to, then those elements must be modified if the object is being modified via animations (so you must create your own animation (see Arc as an example))
