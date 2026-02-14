@@ -10,7 +10,7 @@ from euclidlib.Utilities.find_scene import find_scene
 import euclidlib.Objects.CustomAnimation as custom_anim
 from euclidlib.Objects.em_object_decorators import freezable, freezable_player
 from euclidlib.Objects.CustomAnimation import EuclidAnimation
-from euclidlib.Objects.em_object_player import EMObjectPlayer
+from euclidlib.Objects.animation_players import EMObjectPlayer
 from euclidlib.CONSTANTS import *
 
 if TYPE_CHECKING:

@@ -10,7 +10,7 @@ from euclidlib.Utilities.find_scene import find_scene
 
 import manimlib as mn
 if TYPE_CHECKING:
-    from euclidlib.Objects.em_object_player import NullPlayer
+    from euclidlib.Objects.animation_players import NullPlayer
 
 # ---------------------------------------------------------------------------------------------------------------------
 # context manager

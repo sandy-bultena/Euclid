@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import manimlib as mn
 
 from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects.em_object_player import EMObjectPlayer, EGroupPlayer
+from euclidlib.Objects.animation_players import EMObjectPlayer, EGroupPlayer
 from euclidlib.Objects.em_object_decorators import *
 
 

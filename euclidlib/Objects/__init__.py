@@ -1,6 +1,6 @@
 from .em_object_base import *
 from .em_object_decorators import *
-from .em_object_player import *
+from .animation_players import *
 from .em_group_object import *
 from euclidlib.Utilities.coordinate_utilities import *
 from manimlib.constants import *
