@@ -244,7 +244,7 @@ class EAngleBase(Arc.AbstractArc):
     # bisect angle (I.9)
     # -----------------------------------------------------------------------------------------------------------------
     @anim_speed
-    def bisect(self)-> tuple[Line.ELine, Point.EPoint, Circle.ECircle, Circle.ECircle, Circle.ECircle]:
+    def bisect(self)-> Line.ELine:
         """ bisects the angle, and draws and returns all objects used in its construction """
         vx, vy, _ = self.get_arc_center()
         v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
@@ -289,18 +289,19 @@ class EAngleBase(Arc.AbstractArc):
         # cleanup
         # ------------------------------------------------------------------------
         with self.scene.simultaneous():
-            c1.e_fade()
-            c2.e_fade()
-            cA.e_fade()
+            c1.e_remove()
+            c2.e_remove()
+            cA.e_remove()
             s1.e_remove()
             s2.e_remove()
             pB.e_remove()
             pC.e_remove()
+            p1.e_remove()
 
         # ------------------------------------------------------------------------
-        # return new line, point, all circles
+        # return new line
         # ------------------------------------------------------------------------
-        return lAD, p1, c1, c2, cA
+        return lAD
 
     # -----------------------------------------------------------------------------------------------------------------
     # clean_bisect - same as bisect, but removes all objects except the bisect line
@@ -339,8 +340,6 @@ class ArcAngle(EAngleBase, mn.Arc):
             arc_center=center,
             **kwargs
         )
-    def get_group(self):
-        return self.l1, self.l2
 
 # ==============================================================================================================
 # Right Angle class

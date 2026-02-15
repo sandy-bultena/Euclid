@@ -292,10 +292,11 @@ class EGroupPlayer:
     When an Object consists of a group of EMObjects that need to be treated as a single entity, we use EGroupPlayer
     instead of EPlayer (example... Polygon)
     """
-    def __init__(self, group: EGroupedObjects[EMObject]):
+    def __init__(self, group: EGroupedObjects):
         self.obj = group
-        self.group = group.get_group()
-        self.manager = group.get_manager()
+        self.group = group.get_group() or ()
+        self.manager = group.get_manager() or ()
+        self.main_obj = (*self.manager, *self.group)[-1]
         self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, base.EMObject)]
 
     def __str__(self):
@@ -324,11 +325,76 @@ def {name}(self):
     return self
 '''.strip())
 
-    for name in EMObjectPlayer.get_methods():
-        exec(f'''
-def {name}(self, *args):
-    for player in self.players:
-        player.{name}(*args)
-    return self
-'''.strip())
+    # ----------------------------------------------------------------------------------------------------------------
+    # make the object temporarily noticeable
+    # ----------------------------------------------------------------------------------------------------------------
+    def notice(self, frac_speed=0.2, scale_factor=2):
+        for player in self.players:
+            player.notice(frac_speed, scale_factor)
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # move objects
+    # ----------------------------------------------------------------------------------------------------------------
+    def e_move_to(self,
+                  point_or_mobject: mn.Mobject | mn.Vect3,
+                  aligned_edge: mn.Vect3 = mn.ORIGIN,
+                  coor_mask: mn.Vect3 = np.array([1, 1, 1])):
+
+        # taken from manim code
+        if isinstance(point_or_mobject, base.EMObject):
+            target = point_or_mobject.get_bounding_box_point(aligned_edge)
+        else:
+            target = point_or_mobject
+        point_to_align = self.main_obj.get_bounding_box_point(aligned_edge)
+
+        shift_vector = (target - point_to_align) * coor_mask
+
+        for player in self.players:
+            player.e_move(shift_vector)
+        return self
+
+    def e_move(self, vector: mn.Vect3):
+        for player in self.players:
+            player.e_move(vector)
+        return self
+
+    def e_to_edge(self,
+                  edge: mn.Vect3 = mn.LEFT,
+                  buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        for player in self.players:
+            player.e_to_edge(edge, buff)
+        return self
+
+    def e_to_corner(self,
+                    corner: mn.Vect3 = mn.DL,
+                    buff: float = mn.DEFAULT_MOBJECT_TO_EDGE_BUFFER):
+        for player in self.players:
+            player.e_to_corner(corner, buff)
+        return self
+
+    def e_rotate(self, about: mn.Vect3, angle: float):
+        for player in self.players:
+            player.e_rotate(about, angle)
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # scale the object
+    # ----------------------------------------------------------------------------------------------------------------
+    def e_scale(self,
+                scale: float,
+                min_scale_factor: float = 1e-8,
+                about_point: mn.Vect3 | None = None,
+                about_edge: mn.Vect3 = mn.ORIGIN):
+        for player in self.players:
+            player.e_scale(scale, min_scale_factor, about_point, about_edge)
+        return self
+
+#     for name in EMObjectPlayer.get_methods():
+#         exec(f'''
+# def {name}(self, *args):
+#     for player in self.players:
+#         player.{name}(*args)
+#     return self
+# '''.strip())
 

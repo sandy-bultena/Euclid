@@ -1,5 +1,8 @@
 import sys
 import os
+
+from numpy.ma.core import negative
+
 sys.path.append(os.getcwd())
 
 from euclidlib.Scenes.PropScene import PropScene
@@ -11,39 +14,17 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        angle_move_to()
+        right_angle()
 
     def go(self):
         pass
 
 
-from manimlib import *
-def manimlib_example(self):
-
-    circle = Circle()
-    circle.set_fill(BLUE, opacity=0.5)
-    circle.set_stroke(BLUE_E, width=4)
-    self.play(ShowCreation(circle))
-
-    # This opens an iPython terminal where you can keep writing
-    # lines as if they were part of this construct method.
-    # In particular, 'square', 'circle' and 'self' will all be
-    # part of the local namespace in that terminal.
-    # self.embed()
-
-    # Try copying and pasting some of the lines below into
-    # the interactive shell
-    self.play(circle.animate.shift(2 * RIGHT))
-    self.play(circle.animate.shift(-2 * RIGHT))
-    print(-2*RIGHT)
-
-def angle_move_to():
+def colour():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,400))
     a = EAngle(l2,l1,label=r'\alpha',size=mn_scale(80))
-    c = ECircle([0,0,0,],[2,2,2])
-    a.e_move_to(c, aligned_edge=mn.LEFT, coor_mask=[1,1,1])(run_time=1)
-
+    a.blue()
 
 def angle_move():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))
@@ -98,17 +79,39 @@ def label_locations_index():
     a = EAngle(l2,l1)
     a.add_label("A",where=ArcLabelLocation.AT_END)
 
-def get_bisect():
+def bisect():
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
-    l2 = ELine(mn_coord(130,400),mn_coord(500,400))
-    a = EAngle(l2,l1,label="A")
-    b = a.get_bisect()
-    print(a.e_angle, type(a.e_angle), b, type(b), a.e_angle/b)
+    l2 = ELine(mn_coord(130,400),mn_coord(500,500))
+    a = EAngle(l2,l1,label=("A",dict(alpha=.25)))
+    l3 = a.bisect()
+    a_half = EAngle(l1,l3, label="B", size=mn_scale(60))
+
+def bisect_animated():
+    l1 = ELine(mn_coord(130,400),mn_coord(130,150))
+    l2 = ELine(mn_coord(130,400),mn_coord(500,500))
+    a = EAngle(l2,l1,label=("A",dict(alpha=.25)))
+    l3 = a.bisect(speed=1)
+    a_half = EAngle(l1,l3, label="B", size=mn_scale(60))
 
 def right_angle():
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,400))
     a = EAngle(l2,l1,label="A")
+    a.blue()
+    a.e_move([1,1,0])
+
+def right_and_normal_angles():
+    l1 = ELine(mn_coord(130,400),mn_coord(130,150))
+    l2 = ELine(mn_coord(130,400),mn_coord(300,400))
+    EAngle(l1,l2,label=("right angle",dict(buff=2*LABEL_BUFF)))
+
+    l1 = ELine(mn_coord(330,400),mn_coord(330,150))
+    l2 = ELine(mn_coord(330,400),mn_coord(500,400))
+    EAngle(l1,l2,no_right=True, label=("right angle, arc symbol",dict(buff=2*LABEL_BUFF)))
+
+    l1 = ELine(mn_coord(530,400),mn_coord(580,150))
+    l2 = ELine(mn_coord(530,400),mn_coord(700,400))
+    EAngle(l1,l2, label=("standard",dict(buff=2*LABEL_BUFF)))
 
 
 def angle():
@@ -152,3 +155,10 @@ def angle_copy_to_line_speed_0():
     a = EAngle(l2,l1,label="A")
     l3 = ELine(mn_coord(100,600),mn_coord(500,600))
     a.copy_to_line(EPoint(mn_coord(100,600)),l3)
+
+def angle_copy_negative():
+    l1 = ELine(mn_coord(100,400),mn_coord(500,150))
+    l2 = ELine(mn_coord(100,400),mn_coord(500,500))
+    a = EAngle(l2,l1,label="A")
+    l3 = ELine(mn_coord(100,600),mn_coord(500,600))
+    a.copy_to_line(EPoint(mn_coord(100,600)),l3, negative=True)

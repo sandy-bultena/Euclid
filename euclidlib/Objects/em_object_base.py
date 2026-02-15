@@ -437,7 +437,7 @@ class EMObject(mn.VMobject):
         return self
 
     # -----------------------------------------------------------------------------------------------------------------
-    # copies the object, and the label
+    # copies the object, and the label (doesn't work well with Grouped Objects)
     # -----------------------------------------------------------------------------------------------------------------
     def copy(self, deep: bool = False) -> Self:
         cpy = super().copy(deep)
