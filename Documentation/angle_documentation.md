@@ -8,26 +8,15 @@
 
 ## Arguments
 
-| variable    | type                    | default              | description                                                  |
-| ----------- | ------------------------|------------- | ------------------------------------------------------------ |
-| `l1`        | `ELine`                 |             | one of the two lines denoting the angle                      |
-| `l2`        | `ELine`                 |             | the second of the two lines denoting the angle (the two lines ***must*** have a common vertex!) |
-| `size`      | `float`                 | `mn_scale(40)` | The radius of the arc which indicates the angle              |
-| `no_right` | `bool` | `False` | If set to True, the angle will be indicated by an arc, even if the angle is 90 degrees |
-| `gnomon` | `bool` | `False` | Is  or is not an angle describing an gnomon (the part of a parallelogram left when a similar parallelogram has been taken from its corner) |
-| `**kwargs` |                          |               | Extra arguments for the animation |
-|||||
-
-## Properties
-
-| Property        | type                 | Description                                                  |
-| --------------- | -------------------- | ------------------------------------------------------------ |
-| `lines`         | `tuple[ELine,ELine]` | the two lines that define the angle                          |
-| `center`        | `mn.Vect3`           | the coordinates of the vertex of the two lines defining the angle |
-| `e_start_angle` | `float` (radians)    | the angle (in radians) where the angle starts (i.e. the smaller of the two angles defined by the two lines) |
-| `e_angle`       | `float` (radians)    | the total angle (in radians)                                 |
-| `radius`        | `float`              | the radius of the arc indicating the angle                   |
-|                 |                      |                                                              |
+| variable             | type                     | default        | description                                                  |
+| -------------------- | ------------------------ | -------------- | ------------------------------------------------------------ |
+| `l1`                 | `ELine`                  |                | one of the two lines denoting the angle                      |
+| `l2`                 | `ELine`                  |                | the second of the two lines denoting the angle (the two lines ***must*** have a common vertex!) |
+| `size`               | `float`                  | `mn_scale(40)` | The radius of the arc which indicates the angle              |
+| `no_right`           | `bool`                   | `False`        | If set to True, the angle will be indicated by an arc, even if the angle is 90 degrees |
+| `gnomon`             | `bool`                   | `False`        | Is  or is not an angle describing an gnomon (the part of a parallelogram left when a similar parallelogram has been taken from its corner) |
+| `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here, with all the arguments passed as a dictionary |
+| `**kwargs`           |                          |                | Extra arguments for the animation                            |
 
 _Example_:
 <img src="./images/angle_basics.png" style="zoom:30%;" />
@@ -45,9 +34,30 @@ _Example_:
     EAngle(l1,l2, label=("standard",dict(buff=2*LABEL_BUFF)))
 ```
 
+## Properties
+
+| Property        | type                 | Description                                                  |
+| --------------- | -------------------- | ------------------------------------------------------------ |
+| `lines`         | `tuple[ELine,ELine]` | the two lines that define the angle                          |
+| `center`        | `mn.Vect3`           | the coordinates of the vertex of the two lines defining the angle |
+| `e_start_angle` | `float` (radians)    | the angle (in radians) where the angle starts (i.e. the smaller of the two angles defined by the two lines) |
+| `e_angle`       | `float` (radians)    | the total angle (in radians)                                 |
+| `radius`        | `float`              | the radius of the arc indicating the angle                   |
+|                 |                      |                                                              |
+
+
 ## Label
 
-### `add_label`
+```python
+# valid ways of adding a label
+EAngle(line1, line2, label='A')
+EAngle(line1, line2, label=('A',dict(alpha=0.25)))
+
+a = EAngle(line1, line2)
+a.add_label('A', alpha=0.25)
+```
+
+### `add_label(text, where, alpha, buff)->EAngle`
 
 | parameter | type               | default                     | description                                                  |
 | --------- | ------------------ | --------------------------- | ------------------------------------------------------------ |
@@ -70,6 +80,9 @@ _Example_:
     a = EAngle(l2,l1)
     a.add_label(r'\alpha', alpha = 0.25)
     
+    ## SAME THING AS ABOVE
+    # e = EAngle(l2,l1, label=(r'\alpha`,dict(alpha=0.25)))
+    
     # add label as part of the creation of the angle
     b = EAngle(l2,l3, size=mn_scale(30), label_args=(r'\beta', dict(where=ArcLabelLocation.AT_START)))
     
@@ -85,9 +98,11 @@ Note that the transformations only apply to the angle indicator and its label, n
 
 Generally speaking, it is not necessary to transform an angle using a transformation methods.  
 
+
+
 ## Constructions
 
-### `copy_to_line`
+### `copy_to_line(point, line, negative, speed)-> tuple[ELine, EAngleBase]`
 
 Takes an existing angle, and copies that angle onto another line.
 
@@ -98,9 +113,7 @@ Takes an existing angle, and copies that angle onto another line.
 | `negative` | `bool`   | `False` | if true, a positive angle will be drawn, else a negative angle |
 | `speed`    | `int`    | `None`  | if  `speed > 0`, the construction of the new angle will be animated, otherwise only the final angle being drawn will be animated.  The larger the `speed` number, the faster the animation |
 
-**Returns**: `tuple[ELine, EAngleBase]`
-
-_Example:_ Copy to line, no construction animation (click to play)
+Example:_ Copy to line, no construction animation (click to play)
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/angle_copy_to_line_speed_0.mp4" type="video/mp4">
 </video>
@@ -126,7 +139,7 @@ _Example:_ Copy to line, with construction animation (click to play)
 
 ```
 
-### bisect
+### `bisect(speed) -> ELine, EPoint`
 
 Create a line that bisects the angle, and draws said line
 
@@ -134,7 +147,7 @@ Create a line that bisects the angle, and draws said line
 | --------- | ---- | ------- | ----------- |
 | `speed`    | `int`    | `None`  | if  `speed > 0`, the construction of the new angle will be animated, otherwise only the final |
 
-**Returns**: bisecting_line
+
 
 _Example:_
 <img src="./images/angle_bisect.png" style="zoom:30%;" />
@@ -143,7 +156,8 @@ _Example:_
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,500))
     a = EAngle(l2,l1,label=("A",dict(alpha=.25)))
-    l3 = a.bisect()
+    l3,p = a.bisect()
+    p.e_remove()
     a_half = EAngle(l1,l3, label="B", size=mn_scale(60))
 ```
 

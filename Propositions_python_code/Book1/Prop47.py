@@ -100,7 +100,7 @@ class Prop47(Book1Scene):
         s['B'].p[3].e_normal()
         s['B'].set_angles(None, None, " ", 0, 0, mn_scale(30))
         l['GC'] = ELine(s['B'].p[3], C)
-        l['GC'].highlight()
+        l['GC'].notice()
         t2.e_fade()
         t2.math('GA,AC = GC')
 
@@ -116,7 +116,7 @@ class Prop47(Book1Scene):
 
         s['A'].set_angles(None, " ", None, 0, mn_scale(30))
         l['BH'] = ELine(s['A'].p[0], B)
-        l['BH'].highlight()
+        l['BH'].notice()
 
         with self.simultaneous():
             t3.e_fade()

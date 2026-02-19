@@ -14,11 +14,16 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        right_angle()
+        bisect()
 
     def go(self):
         pass
 
+def highlight():
+    l1 = ELine(mn_coord(130,400),mn_coord(500,150))
+    l2 = ELine(mn_coord(130,400),mn_coord(500,400))
+    a = EAngle(l2,l1,label=r'\alpha',size=mn_scale(80))
+    a.notice()
 
 def colour():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))
@@ -83,7 +88,8 @@ def bisect():
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
     l2 = ELine(mn_coord(130,400),mn_coord(500,500))
     a = EAngle(l2,l1,label=("A",dict(alpha=.25)))
-    l3 = a.bisect()
+    l3,p = a.bisect()
+    p.e_remove()
     a_half = EAngle(l1,l3, label="B", size=mn_scale(60))
 
 def bisect_animated():

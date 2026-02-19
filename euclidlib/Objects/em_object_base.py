@@ -128,7 +128,7 @@ class EMObject(mn.VMobject):
         def e_fade(self) -> EMObject: ...
         def e_normal(self)-> EMObject: ...
         def lift(self)-> EMObject: ...
-        def notice(self)-> EMObject: ...
+        def notice(self,frac_speed=0.2, scale_factor=2, color = mn.YELLOW)-> EMObject: ...
 
         def e_move(self, vector: mn.Vect3) -> EMObjectPlayer: ...
 
@@ -282,9 +282,6 @@ class EMObject(mn.VMobject):
     def e_label_location(self, *args, **kwargs):
         raise NotImplementedError(f"{self.__class__.__name__} e_label_location is Undefined")
 
-    def highlight(self):
-        raise NotImplementedError(f"{self.__class__.__name__} Highlighting is Undefined")
-
     def intersect(self, other: mn.Mobject, reverse=True):
         if reverse and isinstance(other, EMObject):
             return other.intersect(self, False)
@@ -374,6 +371,7 @@ class EMObject(mn.VMobject):
     # -----------------------------------------------------------------------------------------------------------------
     def __enter__(self):
         self.e_draw()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.e_remove()

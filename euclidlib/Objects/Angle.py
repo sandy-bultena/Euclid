@@ -296,12 +296,11 @@ class EAngleBase(Arc.AbstractArc):
             s2.e_remove()
             pB.e_remove()
             pC.e_remove()
-            p1.e_remove()
 
         # ------------------------------------------------------------------------
         # return new line
         # ------------------------------------------------------------------------
-        return lAD
+        return lAD,p1
 
     # -----------------------------------------------------------------------------------------------------------------
     # clean_bisect - same as bisect, but removes all objects except the bisect line

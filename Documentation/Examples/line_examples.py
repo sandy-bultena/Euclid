@@ -10,7 +10,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        line_dash_and_undash()
+        highlight()
 
     def go(self):
         pass
@@ -28,6 +28,9 @@ def line_dash_and_undash():
         l = ELine(mn_coord(A[0],A[1]+i*25), mn_coord(B[0],B[1]+i*25))
         l.dash(dash_length=mn.DEFAULT_DASH_LENGTH,positive_space_ratio=pos_space, final_opacity=op)
 
+def highlight():
+    l = ELine(mn_coord(40, 40), mn_coord(100,100))
+    l.notice()
 
 def line_no_label():
     l = ELine(mn_coord(40, 40), mn_coord(100,100))

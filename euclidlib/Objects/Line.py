@@ -94,13 +94,6 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         return self.get_start() + r * vec
 
     # -----------------------------------------------------------------------------------------------------------------
-    # highlight the line
-    # -----------------------------------------------------------------------------------------------------------------
-    def highlight(self, color=mn.RED, scale=3.0, **args):
-        return (self.animate(rate_func=mn.there_and_back, **args)
-                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
-
-    # -----------------------------------------------------------------------------------------------------------------
     # find intersection between two lines, or lines and a rectangle
     # -----------------------------------------------------------------------------------------------------------------
     def intersect(self, other: mn.Mobject, reverse=True):

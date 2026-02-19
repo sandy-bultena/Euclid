@@ -21,15 +21,16 @@ A change in property will be animated (fading from the old state to the new stat
 ### Single objects (`Eline`, `ETriangle`, etc)
 
 ```python
-def blue(self)->     EMObject: ... # change stroke and fill colour
-def green(self)->    EMObject: ... # change stroke and fill colour
-def red(self)->      EMObject: ... # change stroke and fill colour
-def white(self)->    EMObject: ... # change stroke and fill colour
-def grey(self)->     EMObject: ... # change stroke and fill colour
-def e_fade(self) ->  EMObject: ... # change the opacity to a lower value so object appears 'faded'
-def e_normal(self)-> EMObject: ... # change the opacity back to its default value
-def lift(self)->     EMObject: ... # bring the object to the top of scene (in front of all other objects)
-def notice(self)->   EMObject: ... # temporarily enlarge and colour change the object, so as to make it visibly noticable
+blue(self)->     EMObject: ... # change stroke and fill colour
+green(self)->    EMObject: ... # change stroke and fill colour
+red(self)->      EMObject: ... # change stroke and fill colour
+white(self)->    EMObject: ... # change stroke and fill colour
+grey(self)->     EMObject: ... # change stroke and fill colour
+e_fade(self) ->  EMObject: ... # change the opacity to a lower value so object appears 'faded'
+e_normal(self)-> EMObject: ... # change the opacity back to its default value
+lift(self)->     EMObject: ... # bring the object to the top of scene (in front of all other objects)
+notice(self,frac_speed=0.2, scale_factor=3, color=mn.RED)->EMObject: ... # temporarily enlarge and colour change the object, 
+																		 # so as to make it visibly noticable
 ```
 
 ### Collection objects (`TextBox`, etc)
@@ -62,14 +63,15 @@ eg.
 
 `line.e_rotate([0.0.0], mn.PI)(run_time=2)` works, 
 
-| Method                                                                                                 | Description                                                              |
-|--------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| **`e_move(self, vector: mn.Vect3`**                                                                    | moves object by `vector` amount                                          |
-| **`e_move_to(self, point_or_mobject: mn.Mobject                                                        | mn.Vect3, aligned_edge = mn.ORIGIN, coor_mask = np.array([1, 1, 1]))`**  | moves object *to* the new specified location                 |
-| **`e_rotate(self, about: mn.Vect3, angle: float)`**                                                    | rotates object around the `about` point by `angle` radians (NOT degrees) |
-| **`e_scale(self, scale: float, min_scale_factor = 1e-8, about_point = None, about_edge = mn.ORIGIN)`** | change the size of the object                                            |
-| **`e_to_edge(self, edge = mn.LEFT, buff = DEFAULT_EDGE_BUFFER)`**                                      |                                                                          |
-| **`e_to_corner(self, corner: mn.Vect3 = mn.DL, buff: float = DEFAULT_EDGE_BUFFER)`**                   |                                                                          |
+| Method                                                       | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **`e_move(self, vector: mn.Vect3`**                          | moves object by `vector` amount                              |
+| **`e_move_to(self, point_or_mobject: mn.Mobject                                                        | mn.Vect3, aligned_edge = mn.ORIGIN, coor_mask = np.array([1, 1, 1]))`** | moves object *to* the new specified location                 |
+| **`e_rotate(self, about: mn.Vect3, angle: float)`**          | rotates object around the `about` point by `angle` radians (NOT degrees) |
+| **`e_scale(self, scale: float, min_scale_factor = 1e-8, about_point = None, about_edge = mn.ORIGIN)`** | change the size of the object                                |
+| **`e_to_edge(self, edge = mn.LEFT, buff = DEFAULT_EDGE_BUFFER)`** |                                                              |
+| **`e_to_corner(self, corner: mn.Vect3 = mn.DL, buff: float = DEFAULT_EDGE_BUFFER)`** |                                                              |
+|                                                              |                                                              |
 
 
 
