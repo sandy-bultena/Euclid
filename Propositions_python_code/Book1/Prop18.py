@@ -73,7 +73,7 @@ class Prop18(Book1Scene):
         c['C'].e_remove()
         l['CD'], l['AD'] = l['AC'].e_split(p['D'])
         with self.simultaneous():
-            l['CD'].add_label('a', outside=True)
+            l['CD'].add_label('a')
             l['AC'].remove_label()
         t2.math('DC = BC')
 
@@ -166,7 +166,7 @@ class Prop18(Book1Scene):
             # l['BC'].remove_label()
         with self.skip_animations_for():
             t['ABC'].e_normal()
-            l['AC'].add_label('b', outside=True)
+            l['AC'].add_label('b')
         with self.simultaneous():
             with self.freeze(a['c']):
                 t['ABC'].e_draw()

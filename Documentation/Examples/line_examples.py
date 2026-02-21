@@ -10,10 +10,26 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        highlight()
+        line_labels()
 
     def go(self):
         pass
+
+def line_labels():
+    l1 = ELine(mn_coord(140, 140), mn_coord(300,200))
+    l1.add_label('A',direction=mn.RIGHT)
+
+    l2 = ELine(mn_coord(140, 240), mn_coord(300,300))
+    l2.add_label('B',side=LineLabelSide.INSIDE)
+
+    l3 = ELine(mn_coord(140, 340), mn_coord(300,400))
+    l3.add_label('C',side=LineLabelSide.OUTSIDE)
+
+    l4 = ELine(mn_coord(440, 140), mn_coord(600,200))
+    l4.add_label('D',side=LineLabelSide.OUTSIDE, alpha = 0.1)
+
+    l5 = ELine(mn_coord(440, 240), mn_coord(600,300))
+    l5.add_label('E',direction=mn.LEFT, alpha = 0.0)
 
 def line_dash_and_undash():
     A = (425,30)
@@ -33,7 +49,10 @@ def highlight():
     l.notice()
 
 def line_no_label():
-    l = ELine(mn_coord(40, 40), mn_coord(100,100))
+    p1 = EPoint(mn_coord(140,300))
+    p2 = EPoint(mn_coord(300,140))
+    l1 = ELine(mn_coord(140, 140), mn_coord(300,300))
+    l2 = ELine(p1,p2).blue()
 
 def line_rotate():
     l = ELine(mn_coord(40, 40), mn_coord(100,100))

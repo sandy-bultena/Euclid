@@ -8,7 +8,7 @@ from .Angle import EAngle, EAngleBase
 from . import Angle as Angle
 from .Arc import EArc, AbstractArc, ArcLabelLocation
 from .Circle import ECircle, VirtualCircle
-from .Line import ELine, EDashedLine, VirtualLine
+from .Line import ELine, EDashedLine, VirtualLine, LineLabelSide
 from .Point import EPoint, VirtualPoint
 from .Polygon import EPolygon
 from .TextBox import TextBox

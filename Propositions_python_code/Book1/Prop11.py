@@ -128,8 +128,8 @@ class Prop11(Book1Scene):
         t1.explain("Line DC equals line CE by construction (they are radii of the same circle)")
         c['C'].e_normal()
         with self.simultaneous():
-            l['CD'].add_label('r_1', outside=True)
-            l['CE'].add_label('r_1', outside=True)
+            l['CD'].add_label('r_1')
+            l['CE'].add_label('r_1')
         t2.math('DC = CE = r_1', is_axiom=True)
 
         self.next_page()
@@ -139,8 +139,8 @@ class Prop11(Book1Scene):
         t1.explain("FD and FE are equal by construction (they are two "
                    "sides of an equilateral triangle)")
         with self.simultaneous():
-            l['DF'].e_normal().add_label('r_2', outside=True)
-            l['EF'].e_normal().add_label('r_2', outside=True)
+            l['DF'].e_normal().add_label('r_2')
+            l['EF'].e_normal().add_label('r_2')
         t2.math('FD = FE = r_2', is_axiom=True)
 
         self.next_page()

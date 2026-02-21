@@ -87,15 +87,15 @@ class Prop16(Book1Scene):
         p['E'] = l['AC'].bisect(speed=2*self.default_speed)
         p['E'].add_label('E', mn.rotate_vector(l['AC'].get_unit_vector(), 90 * DEG))
         l['CE'], l['AE'] = l['AC'].e_split(p['E'])
-        l['CE'].add_label('y', inside=True)
-        l['AE'].add_label('y', outside=True)
+        l['CE'].add_label('y', side=LineLabelSide.INSIDE)
+        l['AE'].add_label('y')
         t2.math('AE = EC = y')
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Create line segment BE")
-        l['BE'] = ELine(B, p['E'], label=('x', dict(outside=True)))
+        l['BE'] = ELine(B, p['E'], label='x')
 
         self.next_page()
 
@@ -111,7 +111,7 @@ class Prop16(Book1Scene):
 
         tmp, l['EF'], x = l['BF1'].e_split(p['E'], p['F'])
         x.e_remove()
-        l['EF'].add_label('x', inside=True)
+        l['EF'].add_label('x', side=LineLabelSide.INSIDE)
         tmp.e_delete()
         t2.math('BE = EF = x')
 
@@ -216,7 +216,7 @@ class Prop16(Book1Scene):
         p['E'].add_label('E', DOWN)
         l['BE'] = ELine(p['E'],B, label=('y', DOWN))
         l['CE'] = ELine(p['E'],C, label=('y', UP))
-        l['AE'] = ELine(A,p['E'], label=('x', dict(inside=True)))
+        l['AE'] = ELine(A,p['E'], label=('x', dict(side=LineLabelSide.INSIDE)))
         a['b'].e_fade()
 
         self.next_page()
@@ -228,7 +228,7 @@ class Prop16(Book1Scene):
         p['F'] = EPoint(pts[0]).add_label('F',DOWN)
         F = p['F'].coordinates
         c['E'].e_remove()
-        l['EF'] = ELine(p['E'],p['F'], label=('x', dict(outside=True)))
+        l['EF'] = ELine(p['E'],p['F'], label='x')
         l['AF1'].e_remove()
 
         self.next_page()

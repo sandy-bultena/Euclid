@@ -129,7 +129,7 @@ class Prop21(Book1Scene):
         t['ABE'].set_labels((), (), 'b_3')
 
         b1:ELine = t['ABC'].l[2]
-        b1.add_label('b_1', outside=True, buff=ELine.LabelBuff * 2 + MED_LARGE_BUFF)
+        b1.add_label('b_1', buff=ELine.LabelBuff * 2 + MED_LARGE_BUFF)
 
         b1.e_brace()
         b1.freeze()
@@ -231,7 +231,7 @@ class Prop21(Book1Scene):
         #self.play(mn.FadeOut(ex['b1']))
         b1.e_remove_brace()
         t['ABC'].l[2].unfreeze()
-        t['ABC'].l[2].add_label('b_1', outside=True)
+        t['ABC'].l[2].add_label('b_1')
 
         with self.simultaneous(run_time=1):
             t2.e_fade()

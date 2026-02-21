@@ -111,8 +111,8 @@ class Prop10(Book1Scene):
             l['AC'].e_normal()
             l['BC'].e_normal()
 
-        l['AC'].add_label('r_1', outside=True)
-        l['BC'].add_label('r_1', outside=True)
+        l['AC'].add_label('r_1')
+        l['BC'].add_label('r_1')
         t2.math('AC = CB')
 
         self.next_page()

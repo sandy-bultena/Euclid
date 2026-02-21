@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from enum import Enum
 from itertools import pairwise
 import manimlib as mn
 from typing_extensions import deprecated
@@ -20,7 +21,14 @@ from . import EquilateralTriangle
 from . import Dashable
 from . import Arc
 from . import Triangle
+from euclidlib.CONSTANTS import *
 
+# =====================================================================================================================
+# enum for label direction
+# =====================================================================================================================
+class LineLabelSide(Enum):
+    INSIDE = 0
+    OUTSIDE = 1
 
 # =====================================================================================================================
 # Line
@@ -33,7 +41,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # init
     # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
+    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3, *args, **kwargs):
         """create a new line"""
         if isinstance(start, Point.EPoint):
             start = start.get_arc_center()
@@ -48,8 +56,23 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.get_slope():.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
+    # this specifies the arguments for e_label_location
+    # -----------------------------------------------------------------------------------------------------------------
+    if TYPE_CHECKING:
+        # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
+        def add_label(self, text:str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5, buff=LABEL_BUFF) -> ELine:
+            """
+            :param text:  the label
+            :param direction: what direction do you want to put the label (up, down, right, left) (overides 'side' parameter)
+            :param side: imagine a triangle drawn counter-clockwise, label inside or outside?
+            :param alpha: how far along the line (fraction) do you want the label
+            :param buff: how far away from the line do you want the label
+            :return: ELine
+            """
+
+    # -----------------------------------------------------------------------------------------------------------------
     # where to put the label
-    # - this is called by the Label object as part of an updater (wo it can be called many times so keep it simple.
+    # - this is called by the Label object as part of an updater (it can be called many times so keep it simple)
     # - options for e_label_location should be passed when calling 'add_label'
     # - called by EMObject as part of the interpolate method when an object is being transformed
     # -----------------------------------------------------------------------------------------------------------------
@@ -61,7 +84,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -mn.PI / 2)
 
-    def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=True, alpha=0.5, buff=None):
+    def e_label_location(self, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5, buff=LABEL_BUFF):
         """By default, finds the middle of the line, calculates the position where the label should go"""
 
         # get mid-point (or the alpha percentage of the line) - uses manimlib stuff
@@ -72,9 +95,9 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
 
         # calculate the position if direction not given
         if direction is None:
-            if inside:
+            if side == LineLabelSide.INSIDE:
                 direction = self.IN()
-            elif outside:
+            elif  LineLabelSide.INSIDE:
                 direction = self.OUT()
 
         return point + (buff or self.LabelBuff) * direction

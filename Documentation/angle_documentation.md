@@ -15,11 +15,13 @@
 | `size`               | `float`                  | `mn_scale(40)` | The radius of the arc which indicates the angle              |
 | `no_right`           | `bool`                   | `False`        | If set to True, the angle will be indicated by an arc, even if the angle is 90 degrees |
 | `gnomon`             | `bool`                   | `False`        | Is  or is not an angle describing an gnomon (the part of a parallelogram left when a similar parallelogram has been taken from its corner) |
-| `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here, with all the arguments passed as a dictionary |
-| `**kwargs`           |                          |                | Extra arguments for the animation                            |
+| `stroke_width` | `float` | 2        | the width of the line outlining the object |
+| `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here |
+| `**kwargs`           |                          |         | Extra arguments for the animation                            |
 
 _Example_:
 <img src="./images/angle_basics.png" style="zoom:30%;" />
+
 ```python
     l1 = ELine(mn_coord(130,400),mn_coord(130,150))
     l2 = ELine(mn_coord(130,400),mn_coord(300,400))

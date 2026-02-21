@@ -246,7 +246,7 @@ setattr(cls, 'p{i}', property(p))
         if isinstance(args, str):
             args = (args,)
         if len(args) == 1:
-            args = *args, dict(outside=True)
+            args = *args, dict(side=Line.LineLabelSide.OUTSIDE)
         return args
 
     def define_points(self, delay_anim=False, skip_anim=False):

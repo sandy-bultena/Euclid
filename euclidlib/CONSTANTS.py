@@ -18,10 +18,10 @@ DEFAULT_EDGE_BUFFER = mn_constants.DEFAULT_MOBJECT_TO_EDGE_BUFFER
 BOOK_SCENE_GRID_OPACITY = 0
 
 # Default speed for running animations
-DEFAULT_SPEED = 2
-DEFAULT_TEXT_SPEED = 2
+DEFAULT_SPEED = 20
+DEFAULT_TEXT_SPEED = 20
 
 # label buff for EMObject
-LABEL_BUFF = mn_constants.MED_SMALL_BUFF
+LABEL_BUFF = 0.5*(mn_constants.MED_SMALL_BUFF+mn_constants.SMALL_BUFF)
 
 

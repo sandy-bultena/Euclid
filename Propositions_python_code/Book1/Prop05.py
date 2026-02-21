@@ -92,7 +92,7 @@ class Prop05(Book1Scene):
         D = l['BY'].point(mn_scale(100))
         p['D'] = EPoint(D, label_args=('D', dict(away_from=C)))
         l['BD'] = ELine(B, D)
-        l['BD'].add_label('x', inside=True)
+        l['BD'].add_label('x', side=LineLabelSide.INSIDE)
         t2.math('BD = x')
 
         self.next_page()
@@ -101,7 +101,7 @@ class Prop05(Book1Scene):
         t1.explain("Construct a line starting at C, with length BD, "
                    "on the line {nb:segment AC (I.2)}")
         l['CE'], p['E'] = l['BD'].copy_to_line(p['C'], l['CZ'], speed=2*self.default_speed)
-        l['CE'].add_label('x',outside=True)
+        l['CE'].add_label('x')
         p['E'].add_label('E', away_from=B)
         t2.math("BD = CE = x")
 
@@ -139,7 +139,7 @@ class Prop05(Book1Scene):
             l['BD'].e_normal()
             l['AC'].e_remove()
         with self.simultaneous():
-            l['AC'] = ELine(A, C, label_args=('r',dict(outside=True)))
+            l['AC'] = ELine(A, C, label_args='r')
             l['CD'] = ELine(C, p['D'])
         t['ADC'] = ETriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
         t2.math(r'AD=x+r,\quad \measuredangle DAC = \gamma,\quad AC = r')
@@ -173,8 +173,8 @@ class Prop05(Book1Scene):
         with self.simultaneous():
             a['CDB'] = EAngle(l['BD'], l['CD'], size=mn_scale(20), label=r'\sigma')
             a['CEB'] = EAngle(l['BE'], l['CE'], size=mn_scale(20), label=r'\sigma')
-            l['CD'].add_label('y',outside=True, alpha=0.7 )
-            l['BE'].add_label('y', inside=True, alpha=0.7)
+            l['CD'].add_label('y', alpha=0.7 )
+            l['BE'].add_label('y',side=LineLabelSide.INSIDE, alpha=0.7)
         t2.math('CD = BE = y')
         t2.math(r'\measuredangle ACD = \measuredangle ABE = \delta')
         t2.math(r'\measuredangle CDA = \measuredangle BEA = \sigma')

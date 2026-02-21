@@ -13,6 +13,7 @@
 | `point1`             | `EPoint`, `mn.Vect3`     |         | the start point of the arc (Note: the arc will always be constructed anti-clockwise ) |
 | `point2`             | `EPoint`, `mn.Vect3`     |         | the end point of the arc (Note: the arc will always be constructed anti-clockwise ) |
 | `big`        | `bool`                   | `False` | There are two possible arcs, if `True` choose the biggest |
+| `stroke_width` | `float` | 2        | the width of the line outlining the object |
 | `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here |
 | `**kwargs`           |                          |         | Extra arguments for the animation                            |
 

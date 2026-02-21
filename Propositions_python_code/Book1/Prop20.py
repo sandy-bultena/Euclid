@@ -46,7 +46,6 @@ class Prop20(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("The sum of any two sides of the triangle is greater "
                    "than the third")
-        #with self.delayed(lag_ratio=0.1):
         with self.simultaneous():
             strings = {'ABc', 'BCa', 'ACb'}
             for char in strings:

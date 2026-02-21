@@ -54,7 +54,7 @@ class Book1Prop4(Book1Scene):
                              scene=self,
                              point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
                                                 ('C', dict(away_from='center_f'))],
-                             labels=[('x', dict(outside=True)), (), ('y', dict(outside=True))],
+                             labels=['x', (), 'y'],
                              angles=[r'\alpha', None, None, mn_scale(20)]
                              )
 
@@ -62,7 +62,7 @@ class Book1Prop4(Book1Scene):
                              scene=self,
                              point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
                                                 ('F', dict(away_from='center_f'))],
-                             labels=[('x', dict(outside=True)), (), ('y', dict(outside=True))],
+                             labels=['x', (), 'y'],
                              angles=[r'\alpha', None, None]
                              )
         self.next_page()
@@ -110,7 +110,7 @@ class Book1Prop4(Book1Scene):
         t1.explain("... diagram is offset a bit so we can see more clearly")
 
         t['DEF'].l[0].red()
-        t['ABC'].l[2].add_label('y', inside=True)
+        t['ABC'].l[2].add_label('y', side=LineLabelSide.INSIDE)
 
         with self.simultaneous():
             t['DEF'].remove_labels()

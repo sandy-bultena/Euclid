@@ -149,8 +149,8 @@ class Prop12(Book1Scene):
             l['EF'].e_fade()
             p['G'].e_fade()
 
-        l['CE'] = ELine(C,p['E'], label=('r_1', dict(outside=True)))
-        l['CF'] = ELine(C,p['F'], label=('r_1', dict(inside=True)))
+        l['CE'] = ELine(C,p['E'], label='r_1')
+        l['CF'] = ELine(C,p['F'], label=('r_1', dict(side=LineLabelSide.INSIDE)))
 
         t2.math('CE = CF = r_1')
 
@@ -167,8 +167,8 @@ class Prop12(Book1Scene):
             l['CF'].e_fade()
 
         with self.simultaneous():
-            l['EG'].add_label('r_2', dict(outside=True))
-            l['FG'].add_label('r_2', dict(outside=True))
+            l['EG'].add_label('r_2')
+            l['FG'].add_label('r_2')
 
         t2.math('EG = GF = r_2')
 

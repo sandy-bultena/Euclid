@@ -127,7 +127,7 @@ class Prop22(Book1Scene):
         with self.simultaneous():
             l['GK'].e_fade()
             c['F'].e_normal()
-        l['FK'].add_label('a', outside=True)
+        l['FK'].add_label('a')
         t3.math('FK = FD = a')
 
         self.next_page()
@@ -140,7 +140,7 @@ class Prop22(Book1Scene):
             c['F'].e_fade()
             c['G'].e_normal()
             l['GK'].e_normal()
-        l['GK'].add_label('c', inside=True)
+        l['GK'].add_label('c', side=LineLabelSide.INSIDE)
         t3.math('GK = GH = c')
 
         self.next_page()

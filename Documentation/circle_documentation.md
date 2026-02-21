@@ -10,6 +10,8 @@
 | `center`             | `Point.EPoint, mn.Vect3` |         | the center point of the circle (coordinates or EPoint object) |
 | `point1`             | `EPoint`, `mn.Vect3`     |         | any point on the circle (coordinate or EPoint object)        |
 | `temp_line_label`    | `str`                    | ""      | a label for the line that is used during the animation of the circle drawing |
+| `stroke_width` | `float` | 2        | the width of the line outlining the object |
+| `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here |
 | `**kwargs`           |                          |         | Extra arguments for the animation                            |
 
 _Example:_ default

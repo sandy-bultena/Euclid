@@ -83,14 +83,14 @@ class Prop23(Book1Scene):
                    "the two lines defining the angle")
         p['D'] = EPoint(D, label=('D', dict(away_from=E)))
         p['E'] = EPoint(E, label=('E', dict(away_from=D)))
-        l['CD'].add_label('e', inside=True)
-        l['CE'].add_label('d', outside=True)
+        l['CD'].add_label('e', side=LineLabelSide.INSIDE)
+        l['CE'].add_label('d')
 
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Construct triangle DCE by constructing the line DE")
-        l['DE'] = ELine(p['D'],p['E'], label=('c', dict(inside=True)))
+        l['DE'] = ELine(p['D'],p['E'], label=('c', dict(side=LineLabelSide.INSIDE)))
 
         self.next_page()
 
@@ -102,8 +102,7 @@ class Prop23(Book1Scene):
         t2.math('AF = CE')
         l['AF'], p['F'] = l['CE'].copy_to_line(p['A'], l['AB'])
         p['F'].add_label('F', DOWN)
-        l['AF'].add_label('d', outside=True)
-
+        l['AF'].add_label('d')
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -113,7 +112,7 @@ class Prop23(Book1Scene):
         p['G'].e_remove()
         c['A'] = ECircle(A, p['G'])
         l['AG'].grey()
-        l['AG'].add_label('e', inside=True)
+        l['AG'].add_label('e', side=LineLabelSide.INSIDE)
 
         self.next_page()
 
@@ -124,7 +123,7 @@ class Prop23(Book1Scene):
         p['H'].e_remove()
         c['F'] = ECircle(p['F'], p['H'])
         l['FH'].grey()
-        l['FH'].add_label('c', inside=True)
+        l['FH'].add_label('c', side=LineLabelSide.INSIDE)
 
         self.next_page()
 
@@ -140,8 +139,8 @@ class Prop23(Book1Scene):
         p['G'] = EPoint(pts[0], label=('G', UP))
         c['F'].e_fade()
         c['A'].e_fade()
-        l['AG'] = ELine(A,p['G'], label=('c', dict(inside=True)))
-        l['FG'] = ELine(p['F'],p['G'], label=('e', dict(outside=True)))
+        l['AG'] = ELine(A,p['G'], label=('c', dict(side=LineLabelSide.INSIDE)))
+        l['FG'] = ELine(p['F'],p['G'], label='e')
         t1.reset_bullet_symbol()
 
         self.next_page()

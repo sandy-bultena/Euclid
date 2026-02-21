@@ -121,8 +121,8 @@ class Prop35(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Since ABCD is a parallelograms, AB is equal to DC{nb}(I.34)")
-        s['ABCD'].l[0].add_label('y', outside=True)
-        s['ABCD'].l[2].add_label('y', outside=True)
+        s['ABCD'].l[0].add_label('y')
+        s['ABCD'].l[2].add_label('y')
         s['ABCD'].e_fill(BLUE_D)
         with self.staggered_animation():
             t3.e_fade(slice(-2))

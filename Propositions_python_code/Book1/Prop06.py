@@ -45,7 +45,7 @@ class Prop06(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Then the sides opposite the equal angles are equal")
 
-        t['ABC'].set_labels(('r', dict(outside=True)), (), ('r', dict(outside=True)))
+        t['ABC'].set_labels('r', (), 'r')
         t2.math("AC = AB")
 
         self.next_page()
@@ -59,7 +59,7 @@ class Prop06(Book1Scene):
         t1.explain("Assume that the sides are not equal, and "
                    "demonstrate that this leads to a logical inconsistency")
 
-        t['ABC'].set_labels(('r_1', dict(outside=True)), (), ('r_2', dict(outside=True))).e_fill(BLUE_D)
+        t['ABC'].set_labels('r_1', (), 'r_2').e_fill(BLUE_D)
         t2.math(r'\measuredangle ACB = \measuredangle ABC', fill_color=BLUE)
         t4.set_y(t2[-1].get_top()[1])
         t2.math(r"AB > AC\quad(r_2 > r_1)")
@@ -71,7 +71,7 @@ class Prop06(Book1Scene):
                    "point D such that BD equals AC")
         l['BD'], p['D'] = t['ABC'].l[0].copy_to_line(B, t['ABC'].l[-1])
         p['D'].add_label('D', RIGHT)
-        l['BD'].add_label('r_1', inside=True)
+        l['BD'].add_label('r_1', side=LineLabelSide.INSIDE)
         with self.simultaneous():
             t2.math(r'BD = AC = r_1').shift(RIGHT * 0.5)
 
@@ -95,7 +95,7 @@ class Prop06(Book1Scene):
 
         with self.simultaneous():
             t['ABC'].set_labels((), 'r_3', ())
-            t['BCD'].set_labels(('r_3', dict(inside=True)), (), ())
+            t['BCD'].set_labels(('r_3', dict(side=LineLabelSide.INSIDE)), (), ())
 
         with self.simultaneous(run_time=1):
             t['BCD'].e_move(mn_scale(150, -250, 0))()
@@ -185,7 +185,7 @@ class Prop06(Book1Scene):
             t['BCD'].p[-1].add_label('D', away_from=C)
 
         t['ABC'].move_point_to(0, t['BCD'].p[-1])
-        t['BCD'].set_labels((), ('r', dict(inside=True)), 'r')
+        t['BCD'].set_labels((), ('r', dict(side=LineLabelSide.INSIDE)), 'r')
 
         with self.simultaneous():
             t2.e_fade(*t2.except_index(0))

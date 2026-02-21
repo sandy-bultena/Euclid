@@ -101,7 +101,7 @@ class Prop24(Book1Scene):
         c['D'] = ECircle(D, t['DEF'].p[2])
         p['G'] = EPoint(*c['D'].intersect(l['DG2']), label=('G', RIGHT))
         l['DG2'].e_fade()
-        l['DG'] = ELine(p['G'],D, label=('b', dict(outside=True)))
+        l['DG'] = ELine(p['G'],D, label='b')
         c['D'].e_remove()
         t2.e_fade()
         t2.math('DG = DF', fill_color=BLUE)
@@ -146,7 +146,7 @@ class Prop24(Book1Scene):
         t1.explain("Triangle ABC and DEG have two equal sides "
                    "with an equal angle between them, hence they are equal, "
                    "and the line BC equals EG (I.4)")
-        l['EG'].add_label('a', outside=True)
+        l['EG'].add_label('a')
         t2.blue(1, 2, 3, 4)
         t2.math('EG = BC')
 
