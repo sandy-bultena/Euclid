@@ -76,7 +76,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
-        def add_label(self, text: str, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF):
+        def add_label(self, text: str, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF) -> AbstractArc:
             """
             where is the arc label located?
             :param text: string
@@ -142,25 +142,25 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # ----------------------------------------------------------------------------------------------------------
     # get angle proportionally between start and end of this arc
     # ----------------------------------------------------------------------------------------------------------
-    def proportion_angle(self, alpha: float):
+    def proportion_angle(self, alpha: float) -> float:
         interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
         return interp
 
     # ----------------------------------------------------------------------------------------------------------
     # same as proportional_angle, but with alpha = 0.5
     # ----------------------------------------------------------------------------------------------------------
-    def get_bisect(self):
+    def get_bisect(self) -> float:
         return self.proportion_angle(0.5)
 
     # ----------------------------------------------------------------------------------------------------------
     # Get the vector that points in direction of angle
     # ----------------------------------------------------------------------------------------------------------
     @staticmethod
-    def vector_of_angle(angle):
+    def vector_of_angle(angle)->mn.Vect3:
         return np.array([math.cos(angle), math.sin(angle), 0.0])
 
     # ----------------------------------------------------------------------------------------------------------
-    # get the vector 90 deg to the tangent of the arc at a proportional distance from the start angle
+    # convert proportional angle to direction vector
     # ----------------------------------------------------------------------------------------------------------
     def proportional_angle_dir(self, alpha=0.5):
         angle = self.proportion_angle(alpha)
@@ -204,7 +204,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # e_label_location
     # - where is the label located?
     # ----------------------------------------------------------------------------------------------------------
-    def e_label_location(self, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=None):
+    def e_label_location(self, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF):
         if where == ArcLabelLocation.BY_ALPHA:
             bisect_dir = self.proportional_angle_dir(alpha)
             try:
@@ -214,9 +214,9 @@ class AbstractArc(Da.Dashable, mn.Arc):
             return base + bisect_dir * (buff or self.LabelBuff)
 
         if where == ArcLabelLocation.AT_START:
-            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
+            return self.get_start() + self.tangent_at_start() * buff
 
-        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
+        return self.get_end() + self.tangent_at_end() * buff
 
     # ----------------------------------------------------------------------------------------------------------
     # return the coordinates on the arc at a given angle
@@ -236,7 +236,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # ----------------------------------------------------------------------------------------------------------
     # intersect two circles
     # ----------------------------------------------------------------------------------------------------------
-    def intersect_circle(self, other: AbstractArc) -> Optional[tuple[mn.Vect3,...]]:
+    def intersect_circle(self, other: AbstractArc) -> tuple[mn.Vect3,...]:
         """Find the two points (or None) where two circles intersect"""
 
         p2, r2 = other.center, other.radius
@@ -256,7 +256,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         # if hsqr is negative, then the circles don't intersect
         if hsqr < 0:
             base.e_remove()
-            return None
+            return []
 
         h = math.sqrt(hsqr)
 
@@ -474,11 +474,11 @@ class EArc(AbstractArc):
     # bisect the arc
     # --------------------------------------------------------------------------------------------------------
     @anim_speed
-    def bisect(self)->Optional[Point.EPoint]:
+    def bisect(self, **kwargs)->Optional[Point.EPoint]:
         line = Line.ELine(*self.get_start_and_end())
         p3 = line.bisect()
-        perp = line.perpendicular(p3)
-        perp.extend_and_prepend(2 * self.radius)
+        perp = line.perpendicular(p3,**kwargs)
+        perp.extend_and_prepend(2 * self.radius,**kwargs)
         
         pts : list[mn.Vect3] | None = self.intersect(perp)
         results = None
@@ -494,7 +494,7 @@ class EArc(AbstractArc):
     # --------------------------------------------------------------------------------------------------------
     # is point on arc
     # --------------------------------------------------------------------------------------------------------
-    def _is_point_on_arc(self, pt: mn.Vect3) -> bool:
+    def is_point_on_arc(self, pt: mn.Vect3) -> bool:
         c = self.center
         vec = pt - c
         angle = mn.angle_of_vector(vec) % mn.TAU
@@ -506,9 +506,6 @@ class EArc(AbstractArc):
     # --------------------------------------------------------------------------------------------------------
     def intersect(self, other: mn.Mobject, reverse=True) -> list[mn.Vect3]:
         pts = super().intersect(other, reverse) or []
-        print(pts)
-
-        c = self.center
 
         # if an object is used as a context manager, it is removed at the end of the block
         results = []
@@ -516,11 +513,10 @@ class EArc(AbstractArc):
             pts = [pts]
         for p in pts:
             if isinstance(other,EArc):
-                #print("other is EArc,",p)
-                if self._is_point_on_arc(p) and other._is_point_on_arc(p):
+                if self.is_point_on_arc(p) and other.is_point_on_arc(p):
                     results.append(p)
             else:
-                if self._is_point_on_arc(p):
+                if self.is_point_on_arc(p):
                     results.append(p)
 
         return results

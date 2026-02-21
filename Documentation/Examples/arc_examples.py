@@ -15,7 +15,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        intersect_line()
+        bisect()
 
     def go(self):
         pass
@@ -128,7 +128,7 @@ def tangents():
 
 
 def bisect():
-    a = EArc(mn_scale(200), mn_coord(300, 400), mn_coord(40, 400))
+    a = EArc(mn_scale(200), mn_coord(300, 400), mn_coord(40, 450))
     p = a.bisect()
     print(p)
 

@@ -100,14 +100,13 @@ a.add_label('A', alpha=0.25)
 
 ### `add_label(text, where, alpha, buff)->EArc`
 
-    | parameter | type               | default                     | description                                                  |
-    | --------- | ------------------ | --------------------------- | ------------------------------------------------------------ |
-    | `text`    | `str`              |                             | the label text                                               |
-    | `where`   | `ArcLabelLocation` | `ArcLabelLocation.BY_ALPHA` | `BY_ALPHA` - label is placed a fraction along its arc (defined by `alpha` argument)<br>`AT_START` - label is placed at the beginning of the arc (`alpha` argument is ignored)<br>`AT_END` - label is placed at the end of the arc (`alpha` argument is ignored) |
-    | `alpha`   | `float`            | `0.5`                       | a fractional value defining where along the arc path the label should be placed |
-    | `buff`    | `float`            | `LABEL_BUFF`                | the amount of space between the arc and the label            |
+| parameter | type               | default                     | description                                                  |
+| --------- | ------------------ | --------------------------- | ------------------------------------------------------------ |
+| `text`    | `str`              |                             | the label text                                               |
+| `where`   | `ArcLabelLocation` | `ArcLabelLocation.BY_ALPHA` | `BY_ALPHA` - label is placed a fraction along its arc (defined by `alpha` argument)<br>`AT_START` - label is placed at the beginning of the arc (`alpha` argument is ignored)<br>`AT_END` - label is placed at the end of the arc (`alpha` argument is ignored) |
+| `alpha`   | `float`            | `0.5`                       | a fractional value defining where along the arc path the label should be placed |
+| `buff`    | `float`            | `LABEL_BUFF`                | the amount of space between the arc and the label            |
 
-**Returns:** Arc object
 
 
 
@@ -135,11 +134,12 @@ _Example_:
 
 ### `bisect(self)->EPoint`
 
-Draws a point on the arc at the specified angle.  If this point is not located on the arc, then it will draw a point on the closest of the end or start of the arc.
+Draws a point on the midpoint of the arc. 
+| parameter | type               | default                     | description                                                |
+| --------- | ------------------ | --------------------------- | -----------------------------------------------------------|
+| `speed`    | `float` | -1 | If speed > 0, then the construction animation will be shown, otherwise it won't |
+| `**kwargs`           |                          |         | Extra arguments for the animation                            |
 
-| parameter | type    | default | description                                     |
-| --------- | ------- | ------- | ----------------------------------------------- |
-| `angle`   | `float` | 0.5     | the absolute angle to draw the point on the arc |
 
 _Example:_ bisect
 <img src="./images/arc_bisect.png" alt="textbox_params" style="zoom:50%;" />
@@ -175,9 +175,9 @@ _Example:_ Pie
 
 Draws a point on the arc at the specified angle.  If this point is not located on the arc, then it will draw a point on the closest of the end or start of the arc.
 
-| parameter | type    | default | description                                     |
-| --------- | ------- | ------- | ----------------------------------------------- |
-| `angle`   | `float` | 0.5     | the absolute angle to draw the point on the arc |
+| parameter | type    | default | description                                                  |
+| --------- | ------- | ------- | ------------------------------------------------------------ |
+| `angle`   | `float` |         | the absolute angle (in radians) to draw the point on the arc |
 
 _Example:_ points on arc at various angles positions
 <img src="./images/arc_label_locations.png" alt="textbox_params" style="zoom:50%;" />
