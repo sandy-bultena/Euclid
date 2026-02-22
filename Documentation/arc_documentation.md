@@ -85,7 +85,6 @@ _Example_: Semi circle
 | `e_start_angle` | `float` (radians) | the angle (in radians) where the angle starts (i.e. the smaller of the two angles defined by the two lines) |
 | `arc`           | `float` (radians) | the total angle or the arc (in radians)                      |
 | `radius`        | `float`           | the radius of the arc                                        |
-|                 |                   |                                                              |
 
 
 ## Label
@@ -107,6 +106,7 @@ a.add_label('A', alpha=0.25)
 | `where`   | `ArcLabelLocation` | `ArcLabelLocation.BY_ALPHA` | `BY_ALPHA` - label is placed a fraction along its arc (defined by `alpha` argument)<br>`AT_START` - label is placed at the beginning of the arc (`alpha` argument is ignored)<br>`AT_END` - label is placed at the end of the arc (`alpha` argument is ignored) |
 | `alpha`   | `float`            | `0.5`                       | a fractional value defining where along the arc path the label should be placed |
 | `buff`    | `float`            | `LABEL_BUFF`                | the amount of space between the arc and the label            |
+| `align`        |      | `mn.ORIGIN`| which side to align the text to |
 
 
 

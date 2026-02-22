@@ -32,7 +32,7 @@ _Example:_ default
 
 ## Label
 
-### `add_label(text, angle, outside, buff) -> ECircle`
+### `add_label(text, angle, outside, buff, align) -> ECircle`
 
 | parameter | type    | default                | description                                             |
 | --------- | ------- | ---------------------- | ------------------------------------------------------- |
@@ -40,6 +40,8 @@ _Example:_ default
 | `angle`   | `float` | `mn.PI/4` (45 degrees) | Angle at which to place the label (in radians)          |
 | `outside` | `bool`  | `True`                 | place label outside of circle if true, otherwise inside |
 | `buff`    | `float` | `LABEL_BUFF`           | the amount of space between the circle and the label    |
+| `align`        |      | `mn.ORIGIN`| which side to align the text to |
+
 
 _Example:_
 <img src="./images/circle_labels.png" alt="" style="zoom:30%;" />

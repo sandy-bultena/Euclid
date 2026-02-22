@@ -28,11 +28,23 @@ _Example:_
 	l2 = ELine(p1,p2).blue()
 ```
 
+
+
+## ELine Properties
+
+| Property | type       | Description                              |
+| -------- | ---------- | ---------------------------------------- |
+| `start`  | `mn.Vect3` | the coordinates of the start of the line |
+| `end`    | `mn.Vect3` | the coordinates of the end of the line   |
+| `slope`  | `float`    | the slope of the line                    |
+| `length` | `float`    | the length of the line                   |
+
+
+## 
+
 ## Label
 
-### `add_label(self, text, direction, side=LineLabelSide.OUTSIDE, alpha=0.5, `
-
-### `		   buff=LABEL_BUFF) -> ELine`
+### `add_label(self, text, direction, side, alpha, buff, align) -> ELine`
 
 
 
@@ -46,6 +58,8 @@ _Example:_
 | `side`      | ``LineLabelSide`` | `LineLabelSide.OUTSIDE` | imagine a triangle drawn counter-clockwise, label inside or outside? |
 | `alpha`     | `float`           | `0.5`                   | how far along the line (fraction) do you want the label      |
 | `buff`      | `float`           | `LABEL_BUFF`            | how far away from the line do you want the label             |
+| `align`        |      | `mn.ORIGIN`| which side to align the text to |
+
 
 _Example_: labels
 <img src="./images/line_labels.png" alt="" style="zoom:30%;" />
@@ -67,129 +81,67 @@ _Example_: labels
     l5.add_label('E',direction=mn.LEFT, alpha = 0.0)
 ```
 
+## Methods
+
+### `invert_start_and_end(self)`
+
+reverses the direction of the line (swaps start and end points)
+
+### `point(self, r)->mn.Vect3`
+
+Get point at distance `r` along the line.  Note that the point is not limited by the dimensions of the line
+
+### Arguments
+
+| variable             | type                     | default | description                                                  |
+| -------------------- | ------------------------ | ------- | ------------------------------------------------------------ |
+| `r`                  | `float`                  |         | the distance between the start of the line and the returned point |
+
+_Example:_ point at distance `r`
+<img src="./images/line_point.png" alt="" style="zoom:30%;" />
+
+```python
+    l1 = ELine(mn_coord(140, 140), mn_coord(300,200))
+    
+    p = l1.point(mn_scale(200))
+    EPoint(p).add_label("r=200", align=mn.LEFT)
+    
+    p = l1.point(mn_scale(-30))
+    EPoint(p).add_label("r=-30", align=mn.RIGHT)
+    
+    p = l1.point(mn_scale(50))
+    EPoint(p).add_label("r=50", align=mn.LEFT)
+```
 
 
+
+### `intersect(self, other, reverse)-> list[mn.Vect3]`
+
+returns the intersection points between this line and the other object.  
+
+> If the `other` is an `ELine`, then the intersection will be returned as if both lines were infinite
+
+### Arguments
+
+| variable  | type                                 | default | description                                            |
+| --------- | ------------------------------------ | ------- | ------------------------------------------------------ |
+| `other`   | `ELine`, `ECircle`, `EArc`, `EAngle` |         | the object which we want to see if our line intersects |
+| `reverse` | `bool`                               | `True`  | not used                                               |
+
+_Example_: Intersections
+<img src="./images/lines_intersections.png" alt="" style="zoom:30%;" />
 
 
 
 
 
 ```python
-from __future__ import annotations
-
-import math
-from itertools import pairwise
-import manimlib as mn
-from typing_extensions import deprecated
-import numpy as np
-
-from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
-from euclidlib.Utilities.coordinate_utilities import get_dist
-from euclidlib.Objects.em_object_base import EMObject
-from euclidlib.Objects.em_object_decorators import *
-if TYPE_CHECKING:
-    import euclidlib.Scenes.PropScene as ps
-
-from . import Point
-from . import Circle
-from . import Angle
-from . import EquilateralTriangle
-from . import Dashable
-from . import Arc
-from . import Triangle
-
 
 # =====================================================================================================================
 # Line
 # =====================================================================================================================
 class ELine(Dashable.Dashable, EMObject, mn.Line):
-    CONSTRUCTION_TIME = 2.0
-    DE_CONSTRUCTION_TIME = 0.5
-    LabelBuff = 0.15
 
-    # -----------------------------------------------------------------------------------------------------------------
-    # init
-    # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
-        """create a new line"""
-        if isinstance(start, Point.EPoint):
-            start = start.get_arc_center()
-        if isinstance(end,Point.EPoint):
-            end = end.get_arc_center()
-        self.brace = None
-
-        super().__init__(start, end, *args, **kwargs)
-
-    def __str__(self):
-        return f"ELine: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
-            f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.get_slope():.2f} length={self.get_length():.2f}"
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # where to put the label
-    # - this is called by the Label object as part of an updater (wo it can be called many times so keep it simple.
-    # - options for e_label_location should be passed when calling 'add_label'
-    # - called by EMObject as part of the interpolate method when an object is being transformed
-    # -----------------------------------------------------------------------------------------------------------------
-    def IN(self):
-        vec = self.get_unit_vector()
-        return mn.rotate_vector(vec, mn.PI / 2)
-
-    def OUT(self):
-        vec = self.get_unit_vector()
-        return mn.rotate_vector(vec, -mn.PI / 2)
-
-    def e_label_location(self, direction: mn.Vect3 = None, inside=None, outside=True, alpha=0.5, buff=None):
-        """By default, finds the middle of the line, calculates the position where the label should go"""
-
-        # get mid-point (or the alpha percentage of the line) - uses manimlib stuff
-        try:
-            point = self.point_from_proportion(alpha)
-        except AssertionError:
-            point = self.get_start()
-
-        # calculate the position if direction not given
-        if direction is None:
-            if inside:
-                direction = self.IN()
-            elif outside:
-                direction = self.OUT()
-
-        return point + (buff or self.LabelBuff) * direction
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # change direction of line
-    # -----------------------------------------------------------------------------------------------------------------
-    def invert_start_and_end(self):
-        self.reverse_points()
-        return self
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # get point at distance r along the line
-    # -----------------------------------------------------------------------------------------------------------------
-    def point(self, r: float):
-        vec = self.get_unit_vector()
-        return self.get_start() + r * vec
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # find intersection between two lines, or lines and a rectangle
-    # -----------------------------------------------------------------------------------------------------------------
-    def intersect(self, other: mn.Mobject, reverse=True):
-        if isinstance(other, mn.Line):
-            return self.intersect_line(other)
-        if isinstance(other, mn.Rectangle):
-            return self.intersect_selection(other)
-        return super().intersect(other)
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # find intersection between line and rectangle
-    # -----------------------------------------------------------------------------------------------------------------
-    def intersect_selection(self, other: mn.Rectangle):
-        if other.get_arc_length() < 1e-3:
-            other = mn.Rectangle(0.2, 0.2).move_to(other)
-        corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
-        return any(self.intersect_bound_line(mn.Line(x, y)) for x, y in pairwise(corners)) or (
-                other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
-        )
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between line, and another bound line (as opposed to an infinite line)

@@ -10,10 +10,81 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        line_labels()
+        intersect_bound_lines()
 
     def go(self):
         pass
+
+def intersect_bound_lines():
+    l = ELine(mn_coord(250,300),mn_coord(150,100)).green()
+    l2 = ELine(mn_coord(150,300),mn_coord(250,100)).green()
+    intersections = l.intersect_bound_lines(l2)
+    for i in intersections:
+        EPoint(i)
+
+
+    l = ELine(mn_coord(360,180),mn_coord(400,100)).red()
+    l2 = ELine(mn_coord(340,180),mn_coord(300,100)).red()
+    intersections = l.intersect_bound_lines(l2)
+    for i in intersections:
+        print(euclid_coord(*i))
+        EPoint(i)
+
+    l = ELine(mn_coord(510,180),mn_coord(550,100)).blue()
+    l2 = ELine(mn_coord(550,300),mn_coord(450,100)).blue()
+    i = l.intersect(l2)
+    print(euclid_coord(*i[0]))
+    intersections = l.intersect_bound_lines(l2)
+    for i in intersections:
+        print(euclid_coord(*i))
+        EPoint(i)
+
+def intersects():
+
+    # intersects EArc
+    l = ELine(mn_coord(500,300),mn_coord(400,100)).blue()
+    a = EArc(mn_scale(200), mn_coord(600, 250), mn_coord(400, 200)).blue()
+    intersections = l.intersect(a, reverse=True)
+    for i in intersections:
+        EPoint(i)
+
+    # intersect circle
+    l = ELine(mn_coord(120,120),mn_coord(250,250))
+    c1 = ECircle(mn_coord(250,250),mn_coord(350,250))
+    intersections = l.intersect(c1)
+    for i in intersections:
+        EPoint(i)
+
+    # intersect line
+    l = ELine(mn_coord(750,300),mn_coord(650,100)).green()
+    l2 = ELine(mn_coord(650,300),mn_coord(750,100)).green()
+    intersections = l.intersect(l2)
+    for i in intersections:
+        EPoint(i)
+
+
+    # intersect line
+    l = ELine(mn_coord(870,195),mn_coord(850,100)).red()
+    l2 = ELine(mn_coord(900,250),mn_coord(950,100)).red()
+    intersections = l.intersect(l2)
+    for i in intersections:
+        print(euclid_coord(*i))
+        EPoint(i)
+
+
+
+
+
+def point():
+    l1 = ELine(mn_coord(140, 140), mn_coord(300,200))
+    p = l1.point(mn_scale(200))
+    EPoint(p).add_label("r=200", align=mn.LEFT)
+    p = l1.point(mn_scale(-30))
+    EPoint(p).add_label("r=-30", align=mn.RIGHT)
+    p = l1.point(mn_scale(50))
+    EPoint(p).add_label("r=50", align=mn.LEFT)
+
+
 
 def line_labels():
     l1 = ELine(mn_coord(140, 140), mn_coord(300,200))

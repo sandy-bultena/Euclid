@@ -15,10 +15,20 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        bisect()
+        arc_label_with_align()
 
     def go(self):
         pass
+
+def arc_label_with_align():
+
+    e = EArc(mn_scale(200), mn_coord(40, 500), mn_coord(300, 500))
+    e.add_label(r'\text{start}', where=ArcLabelLocation.AT_START, align=mn.RIGHT)
+
+    e = EArc(mn_scale(200), mn_coord(40, 600), mn_coord(300, 600))
+    e.add_label(r'\text{start}', where=ArcLabelLocation.AT_START, align=mn.LEFT)
+
+
 
 def intersect_arc2():
     a1 = EArc(mn_scale(200), mn_coord(600, 500), mn_coord(340, 400))

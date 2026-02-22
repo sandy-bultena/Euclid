@@ -76,13 +76,15 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
-        def add_label(self, text: str, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF) -> AbstractArc:
+        def add_label(self, text: str, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF, align=mn.ORIGIN) -> AbstractArc:
             """
             where is the arc label located?
             :param text: string
             :param where: decided by alpha, or start or end of arc
             :param alpha: what fraction along the arc do you want the label
             :param buff: how far from arc do you want the label
+            :param align: which side to align the text to
+            :return Self:
             """
 
     # ----------------------------------------------------------------------------------------------------------
@@ -299,7 +301,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
         x0, y0, _ = other.get_start()
         x1, y1, _ = other.get_end()
-        m = other.get_e_slope()
+        m = other.slope
 
         if not math.isinf(m):
             # math:

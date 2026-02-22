@@ -49,6 +49,20 @@ def mn_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDArray[
         z * E_TO_M_SCALE
     ])
 
+def euclid_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDArray[float]:
+    """
+    convert euclid coordinates to manim coordinates
+    :param x:
+    :param y:
+    :param z:
+    :return: a numpy array with the appropriate coordinates
+    """
+    # a = (x-width)*scale, x-width = a/scale
+    return np.array([
+        x/E_TO_M_SCALE + E_WIDTH/2,
+        E_HEIGHT/2 - y/E_TO_M_SCALE,
+        z / E_TO_M_SCALE
+    ])
 
 def mn_scale(f, *rest) -> float | npt.NDArray[float]:
     """

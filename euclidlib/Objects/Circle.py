@@ -79,12 +79,13 @@ class ECircle(mn.Circle, Arc.AbstractArc):
     # -----------------------------------------------------------------------------------------------------------------
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
-        def add_label(self, text: str, angle: float=45, outside=True, buff=LABEL_BUFF) -> ECircle:
+        def add_label(self, text: str, angle: float=45, outside=True, buff=LABEL_BUFF, align=mn.ORIGIN) -> ECircle:
             """
             :param text:
             :param angle: where to draw
             :param outside: inside or outside of the circle
             :param buff: how far away from the circle
+            :param align: which side to align the text to
             :return: ECircle
             """
 

@@ -282,7 +282,7 @@ class EMObject(mn.VMobject):
     def e_label_location(self, *args, **kwargs):
         raise NotImplementedError(f"{self.__class__.__name__} e_label_location is Undefined")
 
-    def intersect(self, other: mn.Mobject, reverse=True):
+    def intersect(self, other: mn.Mobject, reverse=True)->list[mn.Vect3]:
         if reverse and isinstance(other, EMObject):
             return other.intersect(self, False)
         raise NotImplementedError(f"{self.__class__.__name__}-{other.__class__.__name__} Intersection is Undefined")

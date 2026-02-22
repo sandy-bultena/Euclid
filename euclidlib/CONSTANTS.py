@@ -15,13 +15,14 @@ DEFAULT_TRANSFORM_RUNTIME = 0.25
 DEFAULT_EDGE_BUFFER = mn_constants.DEFAULT_MOBJECT_TO_EDGE_BUFFER
 
 # The Book Scene has a grid, change opacity to see if it
-BOOK_SCENE_GRID_OPACITY = 0
+BOOK_SCENE_GRID_OPACITY = .3
 
 # Default speed for running animations
-DEFAULT_SPEED = 20
-DEFAULT_TEXT_SPEED = 20
+DEFAULT_SPEED = 2
+DEFAULT_TEXT_SPEED = 2
 
 # label buff for EMObject
-LABEL_BUFF = 0.5*(mn_constants.MED_SMALL_BUFF+mn_constants.SMALL_BUFF)
+LABEL_BUFF = mn_constants.MED_SMALL_BUFF
+LINE_LABEL_BUFF = 0.15
 
 

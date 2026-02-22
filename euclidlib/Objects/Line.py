@@ -36,7 +36,7 @@ class LineLabelSide(Enum):
 class ELine(Dashable.Dashable, EMObject, mn.Line):
     CONSTRUCTION_TIME = 2.0
     DE_CONSTRUCTION_TIME = 0.5
-    LabelBuff = 0.15
+    LabelBuff = LINE_LABEL_BUFF
 
     # -----------------------------------------------------------------------------------------------------------------
     # init
@@ -53,20 +53,22 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
 
     def __str__(self):
         return f"ELine: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
-            f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.get_slope():.2f} length={self.get_length():.2f}"
+            f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.slope:.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
     # this specifies the arguments for e_label_location
     # -----------------------------------------------------------------------------------------------------------------
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
-        def add_label(self, text:str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5, buff=LABEL_BUFF) -> ELine:
+        def add_label(self, text:str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5,
+                      buff=LINE_LABEL_BUFF, align=mn.ORIGIN) -> ELine:
             """
             :param text:  the label
             :param direction: what direction do you want to put the label (up, down, right, left) (overides 'side' parameter)
             :param side: imagine a triangle drawn counter-clockwise, label inside or outside?
             :param alpha: how far along the line (fraction) do you want the label
             :param buff: how far away from the line do you want the label
+            :param align: which side to align the text to
             :return: ELine
             """
 
@@ -84,7 +86,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         vec = self.get_unit_vector()
         return mn.rotate_vector(vec, -mn.PI / 2)
 
-    def e_label_location(self, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5, buff=LABEL_BUFF):
+    def e_label_location(self, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE,
+                         alpha=0.5, buff=LINE_LABEL_BUFF):
         """By default, finds the middle of the line, calculates the position where the label should go"""
 
         # get mid-point (or the alpha percentage of the line) - uses manimlib stuff
@@ -112,57 +115,55 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # get point at distance r along the line
     # -----------------------------------------------------------------------------------------------------------------
-    def point(self, r: float):
+    def point(self, r: float)->mn.Vect3:
+        """get point at distance r along the line"""
         vec = self.get_unit_vector()
         return self.get_start() + r * vec
 
     # -----------------------------------------------------------------------------------------------------------------
-    # find intersection between two lines, or lines and a rectangle
+    # find intersection between two lines, or lines and a rectangle, or
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect(self, other: mn.Mobject, reverse=True):
+    def intersect(self, other: Circle.ECircle|Arc.EArc|Angle.EAngle, reverse=True)-> list[mn.Vect3]:
         if isinstance(other, mn.Line):
             return self.intersect_line(other)
-        if isinstance(other, mn.Rectangle):
-            return self.intersect_selection(other)
+        if isinstance(other, (Circle.ECircle,Arc.EArc,Angle.EAngle )):
+            return other.intersect(self)
         return super().intersect(other)
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between line and rectangle
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect_selection(self, other: mn.Rectangle):
+    def intersect_selection(self, other: mn.Rectangle)->bool:
         if other.get_arc_length() < 1e-3:
             other = mn.Rectangle(0.2, 0.2).move_to(other)
         corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
-        return any(self.intersect_bound_line(mn.Line(x, y)) for x, y in pairwise(corners)) or (
+        return any(self.intersect_bound_lines(mn.Line(x, y)) for x, y in pairwise(corners)) or (
                 other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
         )
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between line, and another bound line (as opposed to an infinite line)
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect_bound_line(self, l2: mn.Line):
-        (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
-        (x3, y3, _), (x4, y4, _) = l2.get_start_and_end()
-        uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
-        uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
-
-        if not (0 <= uA <= 1 and 0 <= uB <= 1):
-            return False
-        x = x1 + (uA * (x2 - x1))
-        y = y1 + (uA * (y2 - y1))
-        return x, y, 0
+    def intersect_bound_lines(self, l2: mn.Line) -> list[mn.Vect3]:
+        pt = self.intersect(l2)
+        if pt:
+            if self._is_point_on_line(pt[0]):
+                return pt
+            else:
+                return []
+        return pt
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection of line, and other infinite line
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect_line(self, l2: mn.Line):
+    def intersect_line(self, l2: mn.Line) -> list[mn.Vect3]:
         (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
         (x10, y10, _), (x11, y11, _) = l2.get_start_and_end()
-        m1 = self.get_e_slope()
-        m2 = l2.get_e_slope()
+        m1 = self.slope
+        m2 = l2.get_slope()
 
         if abs(m1 - m2) < 0.1:
-            return
+            return []
 
         if abs(m1) > 1e10:
             x = x00
@@ -174,24 +175,27 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             x = (y11 - y00 + m1 * x00 - m2 * x11) / (m1 - m2)
             y = m1 * (x - x00) + y00
 
-        return np.array([x, y, 0])
+        return list((convert_to_coord([x,y]),))
 
     # -----------------------------------------------------------------------------------------------------------------
     # get distance along line from point to end of line
+    # TODO: what if point is not on the line?
     # -----------------------------------------------------------------------------------------------------------------
     def length_from_end(self, p: Point.EPoint):
         return p.distance_to(self.get_end())
 
     # -----------------------------------------------------------------------------------------------------------------
     # get distance along line from point to start of line
+    # TODO: what if point is not on the line?
     # -----------------------------------------------------------------------------------------------------------------
     def length_from_start(self, p: Point.EPoint):
         return p.distance_to(self.get_start())
 
     # -----------------------------------------------------------------------------------------------------------------
-    # get slope of line
+    # slope of line
     # -----------------------------------------------------------------------------------------------------------------
-    def get_e_slope(self) -> float:
+    @property
+    def slope(self) -> float:
         (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
         if abs(x2 - x1) < mn_scale(1):
             if abs(y2 - y1) < mn_scale(1):
@@ -201,6 +205,13 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             return -math.inf
 
         return (y2 - y1) / (x2 - x1)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # length
+    # -----------------------------------------------------------------------------------------------------------------
+    @property
+    def length(self):
+        return self.get_length()
 
     # -----------------------------------------------------------------------------------------------------------------
     # extend/prepend the line by 'r' amount
@@ -1113,6 +1124,27 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     #     super().interpolate(mobject1, mobject2, alpha, path_func)
     #     self.locked_data_keys.remove('point')
     #     return self
+
+
+    # is point on the line?
+    def _is_point_on_line(self,p: Point.EPoint| mn.Vect3) -> bool:
+        eps = mn_scale(0.1)
+
+        x0, y0, z0 = convert_to_coord(self.start)
+        x1, y1, z1 = convert_to_coord(p)
+        x2, y2, z2 = convert_to_coord(self.end)
+
+        if abs(self.slope)>1e10 and abs(x1-x0) > eps:
+            return False
+
+        y = self.slope*(x1-x0)+y0
+        if abs(y-y1) > eps:
+            return False
+
+        x0,x2 = sorted((x0,x2))
+        y0,y2 = sorted((y0,y2))
+        return (((x0 - eps < x1 ) and (x1 < x2 + eps)) and
+                ((y0 - eps < y1 ) and (y1 < y2 + eps)) )
 
 
 class EDashedLine(ELine, mn.DashedLine):

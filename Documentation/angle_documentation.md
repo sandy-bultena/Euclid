@@ -45,7 +45,6 @@ _Example_:
 | `e_start_angle` | `float` (radians)    | the angle (in radians) where the angle starts (i.e. the smaller of the two angles defined by the two lines) |
 | `e_angle`       | `float` (radians)    | the total angle (in radians)                                 |
 | `radius`        | `float`              | the radius of the arc indicating the angle                   |
-|                 |                      |                                                              |
 
 
 ## Label
@@ -59,7 +58,7 @@ a = EAngle(line1, line2)
 a.add_label('A', alpha=0.25)
 ```
 
-### `add_label(text, where, alpha, buff)->EAngle`
+### `add_label(text, where, alpha, buff, align)->EAngle`
 
 | parameter | type               | default                     | description                                                  |
 | --------- | ------------------ | --------------------------- | ------------------------------------------------------------ |
@@ -67,6 +66,8 @@ a.add_label('A', alpha=0.25)
 | `where`   | `ArcLabelLocation` | `ArcLabelLocation.BY_ALPHA` | `BY_ALPHA` - label is placed a fraction along its arc (defined by `alpha` argument)<br>`AT_START` - label is placed at the beginning of the arc (`alpha` argument is ignored)<br>`AT_END` - label is placed at the end of the arc (`alpha` argument is ignored) |
 | `alpha`   | `float`            | `0.5`                       | a fractional value defining where along the arc path the label should be placed |
 | `buff`    | `float`            | `LABEL_BUFF`                | the amount of space between the arc and the label            |
+| `align`        |      | `mn.ORIGIN`| which side to align the text to |
+
 
 
 
@@ -115,7 +116,7 @@ Takes an existing angle, and copies that angle onto another line.
 | `negative` | `bool`   | `False` | if true, a positive angle will be drawn, else a negative angle |
 | `speed`    | `int`    | `None`  | if  `speed > 0`, the construction of the new angle will be animated, otherwise only the final angle being drawn will be animated.  The larger the `speed` number, the faster the animation |
 
-Example:_ Copy to line, no construction animation (click to play)
+_Example:_ Copy to line, no construction animation (click to play)
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/angle_copy_to_line_speed_0.mp4" type="video/mp4">
 </video>
