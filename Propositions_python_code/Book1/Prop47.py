@@ -157,7 +157,8 @@ class Prop47(Book1Scene):
         t1.explain("Draw a line from A, parallel to BD")
         with self.skip_animations_for():
             l['ALx'] = s['C'].l2.parallel(t['ABC'].p0)
-        p['L'] = EPoint(l['ALx'].intersect(s['C'].l3), label=('L', DOWN))
+            l['ALx'].prepend(200)
+        p['L'] = l['ALx'].point_on_intersection(s['C'].l3).add_label('L', DOWN)
         l['AL'] = EDashedLine(A, p['L'])
         l['ALx'].e_remove()
         with self.simultaneous():

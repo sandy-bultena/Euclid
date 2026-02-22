@@ -137,9 +137,9 @@ class EAngleBase(Arc.AbstractArc):
             end, start = start, end
 
         # clone the line to draw on
-        clone = Line.ELine(start, end, stroke_color=mn.BLUE)
-        if clone.get_length() < mn_scale(500):
-            clone.extend_and_prepend(mn_scale(250))
+        line_clone = Line.ELine(start, end, stroke_color=mn.BLUE)
+        if line_clone.get_length() < mn_scale(500):
+            line_clone.extend_and_prepend(mn_scale(250))
 
         min_length = min(self.l1.get_length(),
                          self.l2.get_length(),
@@ -170,8 +170,8 @@ class EAngleBase(Arc.AbstractArc):
         p3 = c2.intersect(line)
         if not p3:
             for i in range(5):
-                clone.extend(100)
-                p3 = c2.intersect(clone)
+                line_clone.extend(100)
+                p3 = c2.intersect(line_clone)
 
         pn3 = Point.EPoint(p3[0], fill_color=mn.GREEN)
         l1.white()
@@ -228,7 +228,7 @@ class EAngleBase(Arc.AbstractArc):
         # remove all unnecessary objects
         # ------------------------------------------------------------------------
         with self.scene.staggered_animation():
-            for x in (*lines, *angles, c2, c3, clone):
+            for x in (*lines, *angles, c2, c3, line_clone):
                 if x is final_line:
                     continue
                 if x is final_angle:

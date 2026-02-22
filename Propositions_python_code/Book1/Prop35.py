@@ -150,7 +150,7 @@ class Prop35(Book1Scene):
         # ------------------------------------------------------------------------
         l['BC1'].e_remove()
         t1.explain("Triangles ABE and DFC are equivalent{nb}(I.4), thus equal in area")
-        p['G'] = EPoint(s['BCFE'].l[3].intersect(s['ABCD'].l[2]))
+        p['G'] = s['BCFE'].l[3].point_on_intersection(s['ABCD'].l[2])
         t['ABDG'] = ETriangle(A, B, s['BCFE'].p[3]).e_fill(BLUE_D)
         t['EFCG'] = ETriangle(F, C, s['ABCD'].p[3]).e_fill(GREEN_D)
         t3.e_normal(3, 4)

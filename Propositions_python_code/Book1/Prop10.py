@@ -74,7 +74,8 @@ class Prop10(Book1Scene):
             a['t'].e_remove()
             pts = l['CD'].intersect(l['AB'])
             p['D'].e_remove()
-        p['D'] = EPoint(pts, label=('D', UR))
+        if pts:
+            p['D'] = EPoint(pts[0], label=('D', UR))
 
         self.next_page()
 

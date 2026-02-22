@@ -3,6 +3,8 @@ from __future__ import annotations
 import math
 from enum import Enum
 from itertools import pairwise
+from typing import Optional
+
 import manimlib as mn
 from typing_extensions import deprecated
 import numpy as np
@@ -52,8 +54,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         super().__init__(start, end, *args, **kwargs)
 
     def __str__(self):
-        return f"ELine: ({self.start[0]:.2f},{self.start[1]:.2f})-" + \
-            f"({self.end[0]:.2f},{self.end[1]:.2f}) slope={self.slope:.2f} length={self.get_length():.2f}"
+        return f"ELine: ({self.e_start[0]:.2f},{self.e_start[1]:.2f})-" + \
+            f"({self.e_end[0]:.2f},{self.e_end[1]:.2f}) slope={self.slope:.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
     # this specifies the arguments for e_label_location
@@ -125,7 +127,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     def intersect(self, other: Circle.ECircle|Arc.EArc|Angle.EAngle, reverse=True)-> list[mn.Vect3]:
         if isinstance(other, mn.Line):
-            return self.intersect_line(other)
+            return self.intersect_bound_lines(other)
         if isinstance(other, (Circle.ECircle,Arc.EArc,Angle.EAngle )):
             return other.intersect(self)
         return super().intersect(other)
@@ -137,15 +139,24 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         if other.get_arc_length() < 1e-3:
             other = mn.Rectangle(0.2, 0.2).move_to(other)
         corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
-        return any(self.intersect_bound_lines(mn.Line(x, y)) for x, y in pairwise(corners)) or (
+        return any(self.intersect_line(mn.Line(x, y)) for x, y in pairwise(corners)) or (
                 other.is_point_touching(self.get_start()) and other.is_point_touching(self.get_end())
         )
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # create a point on intersection between two bound lines
+    # -----------------------------------------------------------------------------------------------------------------
+    def point_on_intersection(self, other: ELine)->Optional[Point.EPoint]:
+        pts = self.intersect(other)
+        if pts:
+            return Point.EPoint(pts[0])
+        return None
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between line, and another bound line (as opposed to an infinite line)
     # -----------------------------------------------------------------------------------------------------------------
     def intersect_bound_lines(self, l2: mn.Line) -> list[mn.Vect3]:
-        pt = self.intersect(l2)
+        pt = self.intersect_line(l2)
         if pt:
             if self._is_point_on_line(pt[0]):
                 return pt
@@ -192,6 +203,17 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         return p.distance_to(self.get_start())
 
     # -----------------------------------------------------------------------------------------------------------------
+    # start and end of line
+    # -----------------------------------------------------------------------------------------------------------------
+    @property
+    def e_start(self) -> float:
+        return self.get_start()
+
+    @property
+    def e_end(self) -> float:
+        return self.get_end()
+
+    # -----------------------------------------------------------------------------------------------------------------
     # slope of line
     # -----------------------------------------------------------------------------------------------------------------
     @property
@@ -219,11 +241,14 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     def _extend(self, anim: ELine, r: float):
         e_end = self.point(r + self.get_length())
         anim.set_points_by_ends(self.get_start(), e_end)
+        self.put_start_and_end_on(self.get_start(), e_end)
+
         return self
 
     def _prepend(self, anim: ELine, r: float):
         e_start = self.point(-r)
         anim.set_points_by_ends(e_start, self.get_end())
+        self.put_start_and_end_on(e_start, self.get_end())
         return self
 
     @animate
@@ -244,6 +269,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         e_end = self.point(r + self.get_length())
         e_start = self.point(-r)
         anim.set_points_by_ends(e_start, e_end)
+        self.put_start_and_end_on(e_start, e_end)
         return self
 
     def extend_cpy(self, r: float):
@@ -440,14 +466,17 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # bisect the line
     # -----------------------------------------------------------------------------------------------------------------
     @anim_speed
-    def bisect(self):
+    def bisect(self)->Point.EPoint:
         cls = type(self)
         c1 = Circle.ECircle(*self.get_start_and_end()[::-1]).e_fade()
         c2 = Circle.ECircle(*self.get_start_and_end()).e_fade()
         pts = c1.intersect(c2)
         l = cls(*pts).e_fade()
 
-        pt = Point.EPoint(l.intersect(self))
+        line_intersection = l.intersect_line(self)
+        pt = None
+        if line_intersection:
+            pt = Point.EPoint(line_intersection[0])
         with self.scene.simultaneous():
             c1.e_remove()
             c2.e_remove()
@@ -844,7 +873,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         # Extend line AC and define the intercept of AC and the previous parallel
         # line as point E
         # -------------------------------------------------------------------------
-        p = lAC.intersect(lDEx)
+        p = lAC.intersect_line(lDEx)
         pE = Point.EPoint(p)
         lCE = ELine(pC, pE)
         lDEx.e_remove()
@@ -908,7 +937,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         # -------------------------------------------------------------------------
         lGH = ELine(pG, pH)
         lEFx = lGH.parallel(pE).prepend(mn_scale(200))
-        p = lEFx.intersect(ld1)
+        p = lEFx.intersect_line(ld1)
         pF = Point.EPoint(p)
 
         # -------------------------------------------------------------------------
@@ -1130,9 +1159,9 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     def _is_point_on_line(self,p: Point.EPoint| mn.Vect3) -> bool:
         eps = mn_scale(0.1)
 
-        x0, y0, z0 = convert_to_coord(self.start)
+        x0, y0, z0 = convert_to_coord(self.e_start)
         x1, y1, z1 = convert_to_coord(p)
-        x2, y2, z2 = convert_to_coord(self.end)
+        x2, y2, z2 = convert_to_coord(self.e_end)
 
         if abs(self.slope)>1e10 and abs(x1-x0) > eps:
             return False
@@ -1179,35 +1208,34 @@ class EDashedLine(ELine, mn.DashedLine):
         except ZeroDivisionError:
             return 1
 
-    def _extend(self, anim: ELine, r: float):
-        self.e_end = self.point(r + self.get_length())
-        anim.set_points_by_ends(self.get_start(), self.e_end)
-        return self
+    # def _extend(self, anim: ELine, r: float):
+    #     e_end = self.point(r + self.get_length())
+    #     anim.set_points_by_ends(self.get_start(), e_end)
+    #     return self
+    #
+    # def _prepend(self, anim: ELine, r: float):
+    #     e_start = self.point(-r)
+    #     anim.set_points_by_ends(e_start, self.get_end())
+    #
+    #     return self
 
-    def _prepend(self, anim: ELine, r: float):
-        self.e_start = self.point(-r)
-        anim.set_points_by_ends(self.e_start, self.get_end())
-        return self
-
-    @animate
-    def extend(self, anim: ELine, r: float):
-        if r < 0:
-            return self._prepend(anim, -r)
-        return self._extend(anim, r)
-
-    @animate
-    def prepend(self, anim: ELine, r: float):
-        if r < 0:
-            return self._extend(anim, -r)
-        return self._prepend(anim, r)
-
-    @animate
-    def extend_and_prepend(self, anim: ELine, r: float):
-        r = abs(r)
-        self.e_end = self.point(r + self.get_length())
-        self.e_start = self.point(-r)
-        anim.set_points_by_ends(self.e_start, self.e_end)
-        return self
+    # @animate
+    # def extend(self, anim: ELine, r: float):
+    #     if r < 0:
+    #         return self._prepend(anim, -r)
+    #     return self._extend(anim, r)
+    #
+    # @animate
+    # def prepend(self, anim: ELine, r: float):
+    #     if r < 0:
+    #         return self._extend(anim, -r)
+    #     return self._prepend(anim, r)
+    #
+    # @animate
+    # def extend_and_prepend(self, anim: ELine, r: float):
+    #     r = abs(r)
+    #     anim.set_points_by_ends(self.e_start, self.e_end)
+    #     return self
 
     @staticmethod
     def find_in_frame(name, loop=False):

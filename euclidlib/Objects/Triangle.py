@@ -146,13 +146,13 @@ class ETriangle(Polygon.EPolygon):
         with self.scene.trace(self.l[1], "Draw a line through triangle point 1, parallel triangle line 2"):
             line2 = self.l[1].parallel(self.p[0], speed=0)
             line2.blue()
-            point2 = Point.EPoint(line2.intersect(side1))
+            point2 = Point.EPoint(line2.intersect_line(side1)[0])
 
         # Draw a line through triangle point 3, parallel to side 1
         with self.scene.trace(side1, "Draw a line through triangle point 3, parallel to side 1"):
             line3 = side1.parallel(self.p[2], speed=0)
             line3.green()
-            point3 = Point.EPoint(line3.intersect(line2))
+            point3 = Point.EPoint(line3.intersect_line(line2)[0])
 
         # construct polygon
         poly = Para.EParallelogram(point2, point, self.p[2], point3)
@@ -191,7 +191,7 @@ class ETriangle(Polygon.EPolygon):
         # Find the centre of the circle
         l1 = self.l0.perpendicular(pD, inside=True)
         l2 = self.l2.perpendicular(pE, inside=True)
-        p=  l1.intersect(l2)
+        p=  l1.intersect_line(l2)[0]
 
         c = Circle.ECircle(p, self.p0)
 

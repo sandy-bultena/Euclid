@@ -105,8 +105,7 @@ class Prop21(Book1Scene):
             t['DBC'].l[2].e_fade()
 
         l['BX'] = t['DBC'].l[0].copy().prepend(mn_scale(200))
-        pts = l['BX'].intersect(t['ABC'].l[2])
-        p['E'] = EPoint(pts, label=('E', RIGHT))
+        p['E'] = l['BX'].point_on_intersection(t['ABC'].l[2]).add_label('E',RIGHT)
 
         l['EX'], l['BE'] = l['BX'].e_split(p['E'])
         l['DE'], l['BD'] = l['BE'].copy().e_split(t['DBC'].p[0])

@@ -444,6 +444,7 @@ setattr(cls, 'p{i}', property(p))
     def copy_to_parallelogram_on_point(self, point: Point.EPoint, angle: Angle.EAngleBase, /, negative=False):
         coords = convert_to_coord(point)
         line = Line.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
+        print("speed", self.speed)
         para = self.copy_to_parallelogram_on_line(line, angle, speed=0)
         line.e_remove()
         return para
@@ -454,6 +455,7 @@ setattr(cls, 'p{i}', property(p))
         # ------------------------------------------------------------------------
         # get a list of triangles that make up the polygon
         # ------------------------------------------------------------------------
+        print("speed", self.speed)
         triangles = self.copy_to_triangles()
 
         # ------------------------------------------------------------------------
@@ -489,6 +491,7 @@ setattr(cls, 'p{i}', property(p))
         triangles = []
         sides = self.sides
         coords = [p.get_center() for p in self.points]
+        print("copy_to_triangles: speed",self.speed)
         new = EPolygon(*coords)
         while sides > 3:
             # calculate the index with the most 'narrow' extension
@@ -508,6 +511,7 @@ setattr(cls, 'p{i}', property(p))
             # create and save new triangle, update polygon
             triangles.append(Tri.ETriangle(*triangle_points))
             new2 = EPolygon(*new_points, delay_anim=True)
+            print("playing replacement transform")
             self.scene.play(mn.ReplacementTransform(new, new2))
             new = new2
             sides = new.sides
@@ -603,7 +607,7 @@ setattr(cls, 'p{i}', property(p))
                 l2, a2tmp = a2.copy_to_line(pt2, line_to_draw_on, negative=True)
 
             # find the intersection of the new lines
-            pt3 = Point.EPoint(l1.intersect(l2))
+            pt3 = Point.EPoint(l1.intersect_line(l2)[0])
             points.append(pt3)
 
             # clean up
