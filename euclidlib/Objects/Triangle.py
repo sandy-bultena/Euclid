@@ -211,7 +211,7 @@ class ETriangle(Polygon.EPolygon):
         pB = Point.EPoint(line.get_end())
         cA = Circle.ECircle(*line.get_start_and_end())
         lAC = Line.ELine(line.get_start(), pC).red()
-        lBD = lAC.copy_to_circle(cA, pB, negative=negative)
+        lBD = lAC.copy_as_chord(cA, pB, negative=negative)
 
         # which way to construct triangle? make sure angles are less than 90
         a = Angle.EAngle(line, lBD)

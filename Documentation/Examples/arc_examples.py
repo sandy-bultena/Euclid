@@ -15,10 +15,16 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        arc_label_with_align()
+        tangent_pt_not_on_line()
 
     def go(self):
         pass
+
+def is_point_on_arc():
+    e = EArc(mn_scale(200), mn_coord(40, 500), mn_coord(300, 500))
+    p = EPoint(mn_coord(100,500))
+    e.add_label(str(e.is_point_on_arc(p)))
+
 
 def arc_label_with_align():
 
@@ -91,6 +97,13 @@ def intersect_line():
     for i in intersections:
         EPoint(i)
 
+def tangent_pt_not_on_line():
+    a = EArc(mn_scale(200), mn_coord(650, 500), mn_coord(400, 450))
+    p = EPoint(mn_coord(550, 350)).add_label('A')
+    ELine(a.center, p).e_fade()
+    tangents_pos = a.tangent_points(p)
+    ELine(*tangents_pos).extend(mn_scale(50)).blue()
+
 
 def tangent_at_start():
     a = EArc(mn_scale(200), mn_coord(600, 500), mn_coord(340, 400))
@@ -111,10 +124,13 @@ def tangent_at_point():
     tangents_pos = a.tangent_points(mn.PI/4)
     ELine(*tangents_pos).extend(mn_scale(50)).blue()
 
-    # by coordinates
-    a = EArc(mn_scale(200), mn_coord(700, 800), mn_coord(440, 700))
-    tangents_pos = a.tangent_points(mn_coord(100,100))
+    # by point not on circle
+    a = EArc(mn_scale(200), mn_coord(600, 600), mn_coord(400, 600))
+    p = EPoint(mn_coord(500,500))
+    tangents_pos = a.tangent_points(p)
     ELine(*tangents_pos).extend(mn_scale(50)).blue()
+
+
 
 def tangents():
     a = EArc(mn_scale(200), mn_coord(300, 500), mn_coord(40, 400))

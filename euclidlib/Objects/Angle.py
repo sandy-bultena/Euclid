@@ -125,6 +125,7 @@ class EAngleBase(Arc.AbstractArc):
     @copy_transform(index=1)
     def copy_to_line(self, point: Point.EPoint, line: Line.ELine, negative=False) -> tuple[Line.ELine, EAngleBase]:
         """copy this angle to another line, point must be at either end of the line"""
+
         start, end = line.get_start_and_end()
         if not any(get_dist(x, point.get_center()) < mn_scale(0.01) for x in (start, end)):
             mn.log.error("When copying an angle to a line, "

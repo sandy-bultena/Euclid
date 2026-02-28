@@ -132,7 +132,7 @@ sub explanation {
     push @steps, sub {
         $t1->explain(
                  "Rotate the triangle so that line AB line coincides with DE.");
-        $t1->explain("... diagram is offset a bit so we can see more clearly");
+        $t1->explain("... diagram is buff a bit so we can see more clearly");
         $t{DEF}->l(1)->red();
         $t{DEF}->remove_labels();
         $t{ABC}->rotate( @D, 180, 5 );

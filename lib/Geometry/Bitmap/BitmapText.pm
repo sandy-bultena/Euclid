@@ -298,7 +298,7 @@ sub _write_text {
         push @x, $line;
         push @y, $v;
 
-        # define offset of next character
+        # define buff of next character
         my $w = 10;
         $w = 10 if lc($type) eq "text";
         $w = 8 if lc($type) eq "explain";
@@ -321,7 +321,7 @@ sub _write_text {
     my @se = ( 0, 0 );
     foreach my $pic (@pics) {
 
-        # horizontal and vertical offset
+        # horizontal and vertical buff
         my $h = shift @x;
         $v = shift @y;
         if ( !( defined $vold ) || $v != $vold ) { $l = shift @lines }

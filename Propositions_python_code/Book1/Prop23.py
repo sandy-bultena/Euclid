@@ -42,7 +42,7 @@ class Prop23(Book1Scene):
         l['CD'] = ELine(C,D)
         l['CD2'] = l['CD'].copy().extend(mn_scale(50))
 
-        p['C'] = EPoint(C)
+        p['C'] = EPoint(C).add_label('C')
 
         l['CE'] = ELine(C,E)
         l['CE2'] = l['CE'].copy().extend(mn_scale(50))
@@ -139,8 +139,8 @@ class Prop23(Book1Scene):
         p['G'] = EPoint(pts[0], label=('G', UP))
         c['F'].e_fade()
         c['A'].e_fade()
-        l['AG'] = ELine(A,p['G'], label=('c', dict(side=LineLabelSide.INSIDE)))
-        l['FG'] = ELine(p['F'],p['G'], label='e')
+        l['AG'] = ELine(A,p['G'], label=('e', dict(side=LineLabelSide.INSIDE)))
+        l['FG'] = ELine(p['F'],p['G'], label='c')
         t1.reset_bullet_symbol()
 
         self.next_page()

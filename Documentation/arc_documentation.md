@@ -266,7 +266,7 @@ calculates the directional vector describing the tangent at the start of the arc
 returns **two** coordinates which define a tangent line. 
 | parameter | type               | default                     | description                                                |
 | --------- | ------------------ | --------------------------- | -----------------------------------------------------------|
-| `angle_or_point` | `float`, `mn.Mobject`, `mn.Vect3` |         | Either an angle (float) or a Point or coordinate on the arc!! (otherwise weird stuff happens) |
+| `angle_or_point` | `float`, `mn.Mobject`, `mn.Vect3` |         | Either an angle (float) or a Point or coordinate on the arc.  If point is not on the arc, then the point on the line drawn between the given point and the center of the arc will be used for the tangent point |
 | `negative` | `bool` | `False` | which way the angle vector is rotated to determine the tangent |
 
 _Example_: tangents
@@ -299,4 +299,16 @@ _Example_: tangents
 ```
 
 
-
+_Example:_ Draw tangent when point is not on the line
+<img src="./images/arc_tangent_point_not_on_line.png" style="zoom:30%;" />
+```python
+    a = EArc(mn_scale(200), mn_coord(650, 500), mn_coord(400, 450))
+    p = EPoint(mn_coord(550, 350)).add_label('A')
+    
+    # draw this line so we can see better what is going on
+    ELine(a.center, p).e_fade()
+    
+    # draw the tangent
+    tangents_pos = a.tangent_points(p)
+    ELine(*tangents_pos).extend(mn_scale(50)).blue()
+```

@@ -65,7 +65,7 @@ sub explanation {
     my $dx3 = 60;       # length of base
     my $xds = $A[0];    # x bottom corner
     my $y3 = 80;        # height
-    my $dx4 = 20;       # offset
+    my $dx4 = 20;       # buff
 
     my @D = ($C[4]+20,$C[5]-10,
             $C[4]+20+$dx3, $C[5]-10,

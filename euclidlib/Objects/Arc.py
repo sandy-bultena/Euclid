@@ -8,7 +8,7 @@ import manimlib as mn
 
 from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
-from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
 from . import Circle
 from . import Line
 from . import Text
@@ -194,10 +194,16 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
     def tangent_points(self, angle_or_point: float | mn.Mobject | mn.Vect3, negative=False) -> tuple[mn.Vect3, mn.Vect3]:
         """return point, and tangent direction at that point on the arc"""
-        if isinstance(angle_or_point, (float, np.float32, np.float64)):
-            t_point = self.point_at_angle(angle_or_point)
-        else:
+
+        # angle_or_point is a point, convert to angle
+        angle = angle_or_point
+        if not isinstance(angle_or_point, (float, np.float32, np.float64)):
             t_point = convert_to_coord(angle_or_point)
+            angle = mn.angle_of_vector( t_point-self.center)
+
+        # from angle, get a point on the arc
+        t_point = self.point_at_angle(angle)
+
         rotation = mn.PI / 2 * (1 if negative != (self.e_angle > 0) else -1)
         vec = t_point - self.v
         return t_point, t_point + mn.rotate_vector(vec / 2, rotation)
@@ -301,7 +307,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
 
         x0, y0, _ = other.get_start()
         x1, y1, _ = other.get_end()
-        m = other.slope
+        m = other.e_slope
 
         if not math.isinf(m):
             # math:
@@ -386,6 +392,22 @@ class AbstractArc(Da.Dashable, mn.Arc):
             return self.intersect_selection(other)
         return super().intersect(other)
 
+    def is_point_on_arc(self,pt: Point.EPoint | mn.Vect3) -> bool:
+        pt = convert_to_coord(pt)
+        return abs(get_dist(pt, self.center) - self.radius) < mn_scale(1) and self.is_within_arc_angles(pt)
+
+    # --------------------------------------------------------------------------------------------------------
+    # is point on arc (actually angle is within range of arc, but not actually on the arc??)
+    # --------------------------------------------------------------------------------------------------------
+    def is_within_arc_angles(self, pt: Point.EPoint | mn.Vect3) -> bool:
+        pt = convert_to_coord(pt)
+        c = self.center
+        vec = pt - c
+        angle = mn.angle_of_vector(vec) % mn.TAU
+        start_angle, end_angle = (x % mn.TAU for x in (self.e_start_angle, self.e_end_angle))
+        return start_angle * 0.9999 <= angle <= 1.0001 * end_angle
+
+
 # ==============================================================================================================
 # EArc
 # ==============================================================================================================
@@ -405,7 +427,6 @@ class EArc(AbstractArc):
         :param radius:
         :param point1: a point object or a vector
         :param point2: a point object or a vector
-        :param clockwise:
         :param kwargs: animation stuff
         """
 
@@ -424,8 +445,8 @@ class EArc(AbstractArc):
         c2 = Circle.VirtualCircle(point2, point2 + radius * mn.RIGHT)
         ps = c1.intersect(c2)
 
-        arc1 = self._calculate_angle(ps[0],point1,point2)
-        arc2 = self._calculate_angle(ps[1],point1,point2)
+        arc1 = self._calculate_angles(ps[0], point1, point2)
+        arc2 = self._calculate_angles(ps[1], point1, point2)
         arc = arc1 if arc1[0] <= arc2[0] else arc2
         if big:
             arc = arc1 if arc1[0] > arc2[0] else arc2
@@ -444,7 +465,9 @@ class EArc(AbstractArc):
         c1.e_remove()
         c2.e_remove()
 
-    def _calculate_angle(self, center, point1, point2):
+    @staticmethod
+    def _calculate_angles(center: mn.Vect3, point1:mn.Vect3, point2:mn.Vect3):
+        """returns total angle, start point, end point, centre of arc"""
         v1 = point1 - center
         v2 = point2 - center
         diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
@@ -493,15 +516,6 @@ class EArc(AbstractArc):
             perp.e_remove()     
         return results
     
-    # --------------------------------------------------------------------------------------------------------
-    # is point on arc
-    # --------------------------------------------------------------------------------------------------------
-    def is_point_on_arc(self, pt: mn.Vect3) -> bool:
-        c = self.center
-        vec = pt - c
-        angle = mn.angle_of_vector(vec) % mn.TAU
-        start_angle, end_angle = (x % mn.TAU for x in (self.e_start_angle, self.e_end_angle))
-        return start_angle * 0.9999 <= angle <= 1.0001 * end_angle
 
     # --------------------------------------------------------------------------------------------------------
     # intersect
@@ -515,10 +529,10 @@ class EArc(AbstractArc):
             pts = [pts]
         for p in pts:
             if isinstance(other,EArc):
-                if self.is_point_on_arc(p) and other.is_point_on_arc(p):
+                if self.is_within_arc_angles(p) and other.is_within_arc_angles(p):
                     results.append(p)
             else:
-                if self.is_point_on_arc(p):
+                if self.is_within_arc_angles(p):
                     results.append(p)
 
         return results

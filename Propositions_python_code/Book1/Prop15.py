@@ -44,7 +44,7 @@ class Prop15(Book1Scene):
             p["C"] = EPoint(C, label=("C", LEFT))
             p["D"] = EPoint(D, label=("D", RIGHT))
         l["CD"] = ELine(C, D)
-        p['E'] = l['CD'].point_on_intersection(l['AB']).add_label('E', away_from = mn.midpoint(A,D))
+        p['E'] = l['CD'].intersection_e_point(l['AB']).add_label('E', away_from = mn.midpoint(A, D))
 
         self.next_page()
 

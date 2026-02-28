@@ -107,7 +107,7 @@ class Book1Prop4(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Rotate the triangle so that line AB line coincides with DE.")
-        t1.explain("... diagram is offset a bit so we can see more clearly")
+        t1.explain("... diagram is buff a bit so we can see more clearly")
 
         t['DEF'].l[0].red()
         t['ABC'].l[2].add_label('y', side=LineLabelSide.INSIDE)

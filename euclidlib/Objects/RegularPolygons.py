@@ -24,7 +24,7 @@ def pentagon(center: Point.EPoint | mn.Vect3, radius: float):
     l = Line.ELine(cl, cl + mn.DOWN * radius)
     gold = Triangle.ETriangle.golden(l, speed=0)
 
-    g2 = gold.copy_to_circle(c)
+    g2 = gold.copy_as_chord(c)
 
     with scene.simultaneous():
         l.e_remove()

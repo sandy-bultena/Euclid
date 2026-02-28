@@ -158,7 +158,7 @@ class Prop47(Book1Scene):
         with self.skip_animations_for():
             l['ALx'] = s['C'].l2.parallel(t['ABC'].p0)
             l['ALx'].prepend(200)
-        p['L'] = l['ALx'].point_on_intersection(s['C'].l3).add_label('L', DOWN)
+        p['L'] = l['ALx'].intersection_e_point(s['C'].l3).add_label('L', DOWN)
         l['AL'] = EDashedLine(A, p['L'])
         l['ALx'].e_remove()
         with self.simultaneous():

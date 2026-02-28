@@ -849,7 +849,7 @@ sub _rgb2hsl {
     else {
         $s = ($max-$min)/(2-($max+$min));
     }
-    # hue (based on offset of maximum colour)
+    # hue (based on buff of maximum colour)
     if ($r == $max) {
         $h = (0 + ($g-$b)/($max-$min))/6;
     }

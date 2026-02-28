@@ -133,10 +133,12 @@ class ECircle(mn.Circle, Arc.AbstractArc):
 
         to_remove = [pC, lC]
 
+        line_side = Line.LineLabelSide.INSIDE if negative else Line.LineLabelSide.OUTSIDE
+
         # if the point is on the circle, then draw a line perpendicular
         # to the radius
         if abs(lC.get_length() - self.r) < mn_scale(2):
-            l = lC.perpendicular(point, speed=0, inside=negative)
+            l = lC.perpendicular(point, speed=0, side = line_side)
             l.extend(self.r)
 
         # else draw a line from the point tangent to the circle
@@ -150,7 +152,7 @@ class ECircle(mn.Circle, Arc.AbstractArc):
 
             # find line perpendicular to d, and find
             # intersection with larger circle
-            lPerp = lC.perpendicular(pD, speed=0, inside=negative).e_fade()
+            lPerp = lC.perpendicular(pD, speed=0, side=line_side).e_fade()
             lPerp.extend(lC.get_length())
             p = cL.intersect(lPerp)
             pF = Point.EPoint(p[0]).e_fade()

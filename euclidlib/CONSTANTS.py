@@ -22,7 +22,10 @@ DEFAULT_SPEED = 20
 DEFAULT_TEXT_SPEED = 20
 
 # label buff for EMObject
-LABEL_BUFF = mn_constants.MED_SMALL_BUFF
+LABEL_BUFF = mn_constants.SMALL_BUFF
 LINE_LABEL_BUFF = 0.15
+
+# showing parts
+LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
 
 

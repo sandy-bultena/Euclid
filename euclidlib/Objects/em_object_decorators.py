@@ -40,11 +40,11 @@ def animate(func):
         """
         if not self.scene.is_paused():
             an = self.animate(rate_func=rate_func)
-            func(self, an, *args, **kwargs)
+            func(self, *args, anim=an, **kwargs)
             self.scene.play(CA.e_animate(an))
             return self
         else:
-            return func(self, self, *args, **kwargs)
+            return func(self, *args, anim=self, **kwargs)
 
     return animate_change
 
@@ -122,6 +122,8 @@ def copy_transform(*, index=None):
                 # pause all animations
                 with self.scene.pause_animations_for():
                     x = func(self, *args, **kwargs)
+                    if x is None:
+                        return x
 
                 if index is None:
                     # transform self into objects returned from calling func

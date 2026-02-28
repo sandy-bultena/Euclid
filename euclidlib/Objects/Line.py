@@ -3,16 +3,17 @@ from __future__ import annotations
 import math
 from enum import Enum
 from itertools import pairwise
-from typing import Optional
+from typing import Optional, Self, Callable
+import numpy as np
 
 import manimlib as mn
 from typing_extensions import deprecated
-import numpy as np
 
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 from euclidlib.Utilities.coordinate_utilities import get_dist
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects.em_object_decorators import *
+
 if TYPE_CHECKING:
     import euclidlib.Scenes.PropScene as ps
 
@@ -25,12 +26,14 @@ from . import Arc
 from . import Triangle
 from euclidlib.CONSTANTS import *
 
+
 # =====================================================================================================================
 # enum for label direction
 # =====================================================================================================================
 class LineLabelSide(Enum):
     INSIDE = 0
     OUTSIDE = 1
+
 
 # =====================================================================================================================
 # Line
@@ -47,7 +50,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         """create a new line"""
         if isinstance(start, Point.EPoint):
             start = start.get_arc_center()
-        if isinstance(end,Point.EPoint):
+        if isinstance(end, Point.EPoint):
             end = end.get_arc_center()
         self.brace = None
 
@@ -55,14 +58,14 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
 
     def __str__(self):
         return f"ELine: ({self.e_start[0]:.2f},{self.e_start[1]:.2f})-" + \
-            f"({self.e_end[0]:.2f},{self.e_end[1]:.2f}) slope={self.slope:.2f} length={self.get_length():.2f}"
+            f"({self.e_end[0]:.2f},{self.e_end[1]:.2f}) slope={self.e_slope:.2f} length={self.get_length():.2f}"
 
     # -----------------------------------------------------------------------------------------------------------------
     # this specifies the arguments for e_label_location
     # -----------------------------------------------------------------------------------------------------------------
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
-        def add_label(self, text:str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5,
+        def add_label(self, text: str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5,
                       buff=LINE_LABEL_BUFF, align=mn.ORIGIN) -> ELine:
             """
             :param text:  the label
@@ -73,6 +76,39 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             :param align: which side to align the text to
             :return: ELine
             """
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # start and end of line
+    # -----------------------------------------------------------------------------------------------------------------
+    @property
+    def e_start(self) -> mn.Vect3:
+        return self.get_start()
+
+    @property
+    def e_end(self) -> mn.Vect3:
+        return self.get_end()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # slope of line
+    # -----------------------------------------------------------------------------------------------------------------
+    @property
+    def e_slope(self) -> float:
+        (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
+        if abs(x2 - x1) < mn_scale(1):
+            if abs(y2 - y1) < mn_scale(1):
+                return math.nan
+            if y2 > y1:
+                return math.inf
+            return -math.inf
+
+        return (y2 - y1) / (x2 - x1)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # length
+    # -----------------------------------------------------------------------------------------------------------------
+    @property
+    def length(self):
+        return self.get_length()
 
     # -----------------------------------------------------------------------------------------------------------------
     # where to put the label
@@ -102,10 +138,32 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         if direction is None:
             if side == LineLabelSide.INSIDE:
                 direction = self.IN()
-            elif  LineLabelSide.INSIDE:
+            elif LineLabelSide.INSIDE:
                 direction = self.OUT()
 
         return point + (buff or self.LabelBuff) * direction
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # add/remove a brace to an ELine
+    # -----------------------------------------------------------------------------------------------------------------
+    def e_brace(self, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, buff=LabelBuff) ->mn.Brace:
+
+        # calculate the position if direction not given
+        if direction is None:
+            if side == LineLabelSide.INSIDE:
+                direction = self.IN()
+            elif LineLabelSide.INSIDE:
+                direction = self.OUT()
+
+        brace = mn.Brace(self, direction=direction, buff=buff, stroke_width=0)
+        self.scene.play(mn.FadeInFromPoint(brace, point=self.get_center()))
+        self.brace = brace
+        return brace
+
+    def e_remove_brace(self):
+        if self.brace is not None:
+            self.scene.play(mn.FadeOut(self.brace))
+        self.brace = None
 
     # -----------------------------------------------------------------------------------------------------------------
     # change direction of line
@@ -117,7 +175,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # get point at distance r along the line
     # -----------------------------------------------------------------------------------------------------------------
-    def point(self, r: float)->mn.Vect3:
+    def point(self, r: float) -> mn.Vect3:
         """get point at distance r along the line"""
         vec = self.get_unit_vector()
         return self.get_start() + r * vec
@@ -125,17 +183,17 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between two lines, or lines and a rectangle, or
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect(self, other: Circle.ECircle|Arc.EArc|Angle.EAngle, reverse=True)-> list[mn.Vect3]:
+    def intersect(self, other: Circle.ECircle | Arc.EArc | Angle.EAngle, reverse=True) -> list[mn.Vect3]:
         if isinstance(other, mn.Line):
             return self.intersect_bound_lines(other)
-        if isinstance(other, (Circle.ECircle,Arc.EArc,Angle.EAngle )):
+        if isinstance(other, (Circle.ECircle, Arc.EArc, Angle.EAngle)):
             return other.intersect(self)
         return super().intersect(other)
 
     # -----------------------------------------------------------------------------------------------------------------
     # find intersection between line and rectangle
     # -----------------------------------------------------------------------------------------------------------------
-    def intersect_selection(self, other: mn.Rectangle)->bool:
+    def intersect_selection(self, other: mn.Rectangle) -> bool:
         if other.get_arc_length() < 1e-3:
             other = mn.Rectangle(0.2, 0.2).move_to(other)
         corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
@@ -146,7 +204,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # create a point on intersection between two bound lines
     # -----------------------------------------------------------------------------------------------------------------
-    def point_on_intersection(self, other: ELine)->Optional[Point.EPoint]:
+    def intersection_e_point(self, other: ELine) -> Optional[Point.EPoint]:
         pts = self.intersect(other)
         if pts:
             return Point.EPoint(pts[0])
@@ -170,10 +228,10 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     def intersect_line(self, l2: mn.Line) -> list[mn.Vect3]:
         (x00, y00, _), (x01, y01, _) = self.get_start_and_end()
         (x10, y10, _), (x11, y11, _) = l2.get_start_and_end()
-        m1 = self.slope
+        m1 = self.e_slope
         m2 = l2.get_slope()
 
-        if abs(m1 - m2) < 0.1:
+        if abs(m1 - m2) < mn_scale(1):
             return []
 
         if abs(m1) > 1e10:
@@ -186,85 +244,55 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             x = (y11 - y00 + m1 * x00 - m2 * x11) / (m1 - m2)
             y = m1 * (x - x00) + y00
 
-        return list((convert_to_coord([x,y]),))
+        return list((convert_to_coord([x, y]),))
 
     # -----------------------------------------------------------------------------------------------------------------
     # get distance along line from point to end of line
-    # TODO: what if point is not on the line?
     # -----------------------------------------------------------------------------------------------------------------
-    def length_from_end(self, p: Point.EPoint):
+    def length_from_end(self, p: Point.EPoint) -> mn.Vect3:
         return p.distance_to(self.get_end())
 
     # -----------------------------------------------------------------------------------------------------------------
     # get distance along line from point to start of line
-    # TODO: what if point is not on the line?
     # -----------------------------------------------------------------------------------------------------------------
-    def length_from_start(self, p: Point.EPoint):
+    def length_from_start(self, p: Point.EPoint) -> mn.Vect3:
         return p.distance_to(self.get_start())
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # start and end of line
-    # -----------------------------------------------------------------------------------------------------------------
-    @property
-    def e_start(self) -> float:
-        return self.get_start()
-
-    @property
-    def e_end(self) -> float:
-        return self.get_end()
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # slope of line
-    # -----------------------------------------------------------------------------------------------------------------
-    @property
-    def slope(self) -> float:
-        (x1, y1, _), (x2, y2, _) = self.get_start_and_end()
-        if abs(x2 - x1) < mn_scale(1):
-            if abs(y2 - y1) < mn_scale(1):
-                return math.nan
-            if y2 > y1:
-                return math.inf
-            return -math.inf
-
-        return (y2 - y1) / (x2 - x1)
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # length
-    # -----------------------------------------------------------------------------------------------------------------
-    @property
-    def length(self):
-        return self.get_length()
 
     # -----------------------------------------------------------------------------------------------------------------
     # extend/prepend the line by 'r' amount
     # -----------------------------------------------------------------------------------------------------------------
-    def _extend(self, anim: ELine, r: float):
+    def _extend(self, r: float, anim: ELine) -> Self:
         e_end = self.point(r + self.get_length())
         anim.set_points_by_ends(self.get_start(), e_end)
         self.put_start_and_end_on(self.get_start(), e_end)
-
         return self
 
-    def _prepend(self, anim: ELine, r: float):
+    def _prepend(self, r: float, anim: ELine) -> Self:
         e_start = self.point(-r)
         anim.set_points_by_ends(e_start, self.get_end())
         self.put_start_and_end_on(e_start, self.get_end())
         return self
 
     @animate
-    def extend(self, anim: ELine, r: float):
+    def extend(self, r: float, anim: ELine) -> Self:
+        """extend line past end point.
+        DO NOT PASS in `anim` to this method, as it is passed via the @animate decorator"""
         if r < 0:
-            return self._prepend(anim, -r)
-        return self._extend(anim, r)
+            return self._prepend(-r, anim)
+        return self._extend(r, anim)
 
     @animate
-    def prepend(self, anim: ELine, r: float):
+    def prepend(self, r: float, anim: ELine) -> Self:
+        """prepend line before the start point.
+        DO NOT PASS in `anim` to this method, as it is passed via the @animate decorator"""
         if r < 0:
-            return self._extend(anim, -r)
-        return self._prepend(anim, r)
+            return self._extend( -r, anim)
+        return self._prepend( r, anim)
 
     @animate
-    def extend_and_prepend(self, anim: ELine, r: float):
+    def extend_and_prepend(self, r: float, anim: ELine) -> Self:
+        """extend and prepend line.
+        DO NOT PASS in `anim` to this method, as it is passed via the @animate decorator"""
         r = abs(r)
         e_end = self.point(r + self.get_length())
         e_start = self.point(-r)
@@ -272,13 +300,13 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         self.put_start_and_end_on(e_start, e_end)
         return self
 
-    def extend_cpy(self, r: float):
+    def extend_cpy(self, r: float) -> Self:
         if r < 0:
             return self.prepend_cpy(-r)
         x2, y2, _ = self.point(r + self.get_length())
         return ELine(self.get_end(), (x2, y2, 0))
 
-    def prepend_cpy(self, r: float):
+    def prepend_cpy(self, r: float) -> Self:
         x2, y2, _ = self.point(-r)
         return ELine(self.get_start(), (x2, y2, 0))
 
@@ -363,33 +391,39 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         return lCF, pF
 
     # -----------------------------------------------------------------------------------------------------------------
-    # copy line to another line?
+    # copy line to another line, where point should be on the line!!
     # - note that copy_transform adjusts the animation speeds etc, before running this code (in EuclidMObject)
     #   args to copy_transform ... (self: EMObject, *args, speed=-1, no_anim=False, **kwargs)
+    # - the index refers to which item of the returend ites should be transformed (assuming speed < 0)
+    #     in this case the line is copies and transformed into the correct position if speed < 0
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform(index=0)
-    def copy_to_line(self, target: Point.EPoint, target_line: ELine):
-        tp = target
-        if not isinstance(target, Point.EPoint):
+    def copy_to_line(self, target_point: Point.EPoint, target_line: ELine)->tuple[ELine, Point.EPoint]:
+        tp = target_point
+        if not isinstance(target_point, Point.EPoint):
             tp = Point.VirtualPoint(tp)
 
-        target_coord = convert_to_coord(target)
-        lx, px = self.copy_to_point(target, speed=0)
+        target_coord = convert_to_coord(target_point)
+        if not target_line._is_point_on_line(target_coord):
+            print(f"WARNING: copy_to_line: {str(target_point)} must be on {target_line}")
+
+        lx, px = self.copy_to_point(target_point, speed=0)
         if lx is None or px is None:
             raise Exception("Failed To Copy To Point")
 
-        c = Circle.ECircle(target, lx.get_end())
+        c = Circle.ECircle(target_point, lx.get_end())
 
-        clone = target_line.copy()
+        # find the two intersection points between the two lines
+        clone: ELine = target_line.copy()
         for _ in range(1000):
             p = c.intersect(clone)
-            if p is not None and len(p):
+            if p is not None and len(p)>1:
                 break
-            if target_line.length_from_end(tp) > target_line.length_from_start(tp):
-                clone.extend(c.get_radius() / 2)
-            else:
-                clone.prepend(c.get_radius() / 2)
+            clone.extend(c.get_radius() / 2)
+            clone.prepend(c.get_radius() / 2)
+
+        # this gets executed only if we cannot find 2 intersection points for the clone line
         else:
             with self.scene.simultaneous():
                 px.e_remove()
@@ -398,19 +432,30 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                 clone.e_remove()
             return lx, px
 
-        ref_p = min(p, key=lambda x:
-                                    abs(
-                                        mn.angle_of_vector(x - target_coord) -
-                                        mn.angle_of_vector(self.get_vector())
-                                        )
-                    )
-        np = Point.EPoint(ref_p)
-        nl = ELine(tp, np)
+        # -----------------------------------------------------------------------------------------------------------
+        # choose the end point to be in the same direction as the target line
+        # -----------------------------------------------------------------------------------------------------------
+        tx1,ty1,_ = target_line.e_start
+        tx2,ty2,_ =  target_line.e_end
+        px1, py1, _ = target_coord
 
-        if abs(self.get_length() - nl.get_length()) > mn_scale(0.1):
-            np.e_remove()
-            nl.extend(self.get_length() - nl.get_length())
-            np = Point.EPoint(nl.get_end())
+        end = np.array([0,0,0])
+        for pt in p:
+            px2,py2,_ = pt
+
+            # vertical
+            if abs(ty2 - ty1) < 1e-10:
+                if (tx2 >= tx1 and px2 >= px1) or (tx2 <= tx1 and px2 <= px1):
+                    end = pt
+                    break
+
+            # everything else
+            else:
+                if (ty2 >= ty1 and py2 >= py1) or (ty2 <= ty1 and py2 <= py1):
+                    end = pt
+
+        end_pt = Point.EPoint(convert_to_coord(end))
+        nl = ELine(target_point, end_pt)
 
         with self.scene.simultaneous():
             px.e_remove()
@@ -420,22 +465,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                 tp.e_remove()
             if clone.in_scene():
                 clone.e_remove()
-        return nl, np
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # add/remove a brace to an ELine
-    # -----------------------------------------------------------------------------------------------------------------
-    def e_brace(self, direction=None, buff=LabelBuff * 2):
-        if not direction:
-            direction = self.OUT()
-        brace = mn.Brace(self, direction=direction, buff=buff)
-        self.scene.play(mn.FadeInFromPoint(brace, point=self.e_label.get_center()))
-        self.brace = brace
-
-    def e_remove_brace(self):
-        if self.brace is not None:
-            self.scene.play(mn.FadeOut(self.brace))
-        self.brace = None
+        return nl, end_pt
 
     # -----------------------------------------------------------------------------------------------------------------
     # rotate to
@@ -452,7 +482,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # split string into parts
     # -----------------------------------------------------------------------------------------------------------------
-    def e_split(self, *points: mn.Mobject | mn.Vect3):
+    def e_split(self, *points: mn.Mobject | mn.Vect3) -> list[ELine]:
         cls = type(self)
         coords = [self.get_start(), *map(self.pointify, points), self.get_end()]
         lines = [
@@ -466,7 +496,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # bisect the line
     # -----------------------------------------------------------------------------------------------------------------
     @anim_speed
-    def bisect(self)->Point.EPoint:
+    def bisect(self) -> Point.EPoint:
         cls = type(self)
         c1 = Circle.ECircle(*self.get_start_and_end()[::-1]).e_fade()
         c2 = Circle.ECircle(*self.get_start_and_end()).e_fade()
@@ -587,22 +617,22 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def perpendicular(self, p: Point.EPoint, /, inside=False, negative=False):
-        inside = inside or negative
-        rs = mn.get_norm(self.pointify(p) - self.get_start())
-        re = mn.get_norm(self.pointify(p) - self.get_end())
+    def perpendicular(self, point: Point.EPoint, /, side=LineLabelSide.OUTSIDE, **kwargs) -> ELine:
+        inside = side == LineLabelSide.INSIDE
+        rs = mn.get_norm(self.pointify(point) - self.get_start())
+        re = mn.get_norm(self.pointify(point) - self.get_end())
         if (rs + re - self.get_length()) > mn_scale(0.1):
-            return self._perp_off_line(p, re, rs, speed=0)
-        return self._perp_on_line(p, re, rs, inside=inside, speed=0)
+            return self._perp_off_line(point, re, rs, speed = kwargs.get('speed',self.scene.get_current_speed()))
+        return self._perp_on_line(point, re, rs, inside=inside, speed=kwargs.get('speed',self.scene.get_current_speed()))
 
     # -----------------------------------------------------------------------------------------------------------------
     # draw a line parallel going through a point
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def parallel(self, p: Point.EPoint):
+    def parallel(self, point: Point.EPoint)->ELine:
         B, C = self.get_start_and_end()
-        A = p.coordinates
+        A = point.coordinates
 
         # make sure line goes from left to right
         if B[0] > C[0]:
@@ -615,8 +645,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             ln = ELine(B, tempC, stroke_color=mn.GREEN)
 
         # is point on the line?
-        rs = self.length_from_start(p)
-        re = self.length_from_end(p)
+        rs = self.length_from_start(point)
+        re = self.length_from_end(point)
         if abs(rs + re - self.get_length()) < mn_scale(0.1):
             clone = self.copy()
             ln.e_remove()
@@ -629,7 +659,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
 
         with self.scene.trace(mn.VGroup(lDC, lAD), "copy angle"):
             aADC = Angle.EAngle(lDC, lAD)
-            lEA, angle = aADC.copy_to_line(p, lAD, negative=True, speed=0)
+            lEA, angle = aADC.copy_to_line(point, lAD, negative=True, speed=0)
         with self.scene.trace(lEA, "extend the line"):
             lEA.prepend(mn_scale(200))
 
@@ -718,42 +748,51 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
-    def copy_to_circle(self, c: Circle.ECircle, p: Point.EPoint, negative=False):
+    def copy_as_chord(self, c: Circle.ECircle, p: Optional[Point.EPoint]=None, clockwise=False)-> Optional[ELine]:
+        """
+        Copy the line into the circle forming a chord (if possible).  If point is given and on the circle, then the
+        chord will start from there, moving anti-clockwise (unless clockwise = True)
+        """
         center = c.v
+        new_point = 0
 
         # if point not on the circle, choose random point on circle
-        new_point = 0
+        if p is None:
+            p = Point.EPoint(c.point_at_angle(0))
+
         vl = VirtualLine(center, p)
         if abs(vl.get_length() - c.radius) > mn_scale(1):
-            p = c.point_at_angle(0)
+            p = Point.EPoint(c.point_at_angle(0))
             new_point = 1
         vl.e_remove()
 
         # draw diameter of circle BC
-        lBC = ELine(p, c).extend(c.radius).e_fade()
+        lBC = VirtualLine(p, c.e_center).extend(c.radius)
+
+        # if original line equals the diameter, we are done, cleanup and return
+        if abs(lBC.get_length() - self.get_length()) < mn_scale(1):
+            if new_point:
+                p.e_remove()
+            return ELine(p, c.e_center).extend(c.radius)
 
         # if original line is too big, abort
         if lBC.get_length() - self.get_length() < mn_scale(1):
             if new_point:
                 p.e_remove()
             lBC.e_remove()
-            raise ValueError("your input line does not fit in the circle")
-
-        # if original line equals the diameter, we are done, cleanup and return
-        if abs(lBC.get_length() - self.get_length()) < 1:
-            if new_point:
-                p.e_remove()
-            return lBC
+            print("your input line does not fit in the circle")
+            return None
 
         # construct a line CE such that it is equal to the original line
-        lDE, pE = self.copy_to_point(p)
+        lDE, pE = self.copy_to_point(p, speed = self.scene.get_current_speed())
 
         # draw another circle, C centre, radius CE
         cF = Circle.ECircle(p, pE)
 
         # find intersection points between two circles
         pts = cF.intersect(c)
-        if not negative:
+
+        if not clockwise:
             pA = Point.EPoint(pts[0])
         else:
             pA = Point.EPoint(pts[1])
@@ -784,8 +823,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                           l1: ELine,
                           l2: ELine,
                           pt: Point.EPoint,
-                          angle: float,
-                          A=mn_coord(50, 450)):
+                          angle: float = 0,
+                          A=mn_coord(50, 450))->ELine:
         scene: ps.PropScene = find_scene()
         # -------------------------------------------------------------------------
         # Position the two lines so that they form a straight line (redraw both lines)
@@ -800,7 +839,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         # Draw a semi-circle on line AC
         # -------------------------------------------------------------------------
         C = lB.get_end()
-        aD = Arc.EArc.semi_circle(A, C, clockwise=True)
+        aD = Arc.EArc.semi_circle(C, A)
 
         # -------------------------------------------------------------------------
         # Draw a line perpendicular to AC, from point B, intersecting
@@ -813,8 +852,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                     break
                 lBDx.extend_and_prepend(mn_scale(100))
                 p = aD.intersect(lBDx)
-            pD = Point.EPoint(p[0])
-            lBD = cls(pB, pD)
+            pD = Point.EPoint(p[0]).add_label('pD')
+            lBD = cls(pB, pD).green()
 
         # -------------------------------------------------------------------------
         # BD is the mean proportional to AB, BC ... copy it to where the user wants it
@@ -848,7 +887,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                            l1: ELine,
                            l2: ELine,
                            pt: Point.EPoint,
-                           angle: float):
+                           angle: float=0) :
         scene: ps.PropScene = find_scene()
         # -------------------------------------------------------------------------
         # Place both lines on a common vertex
@@ -874,7 +913,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         # line as point E
         # -------------------------------------------------------------------------
         p = lAC.intersect_line(lDEx)
-        pE = Point.EPoint(p)
+        pE = Point.EPoint(p[0])
         lCE = ELine(pC, pE)
         lDEx.e_remove()
 
@@ -914,7 +953,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                             l2: ELine,
                             l3: ELine,
                             pt: Point.EPoint,
-                            angle: float,
+                            angle: float = 0,
                             D=mn_coord(30, 350)):
         scene: ps.PropScene = find_scene()
         # -------------------------------------------------------------------------
@@ -937,7 +976,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         # -------------------------------------------------------------------------
         lGH = ELine(pG, pH)
         lEFx = lGH.parallel(pE).prepend(mn_scale(200))
-        p = lEFx.intersect_line(ld1)
+        p = lEFx.intersect_line(ld1)[0]
         pF = Point.EPoint(p)
 
         # -------------------------------------------------------------------------
@@ -977,7 +1016,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
-    def subtract(self, l2: ELine):
+    def subtract(self, l2: ELine) -> ELine:
         if self.get_length() < l2.get_length():
             return self.copy()
 
@@ -995,11 +1034,11 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     # draw a square on a line
     # -----------------------------------------------------------------------------------------------------------------
-    def square(self, negative=False):
+    def square(self, clockwise=False):
         l2 = self
         p2 = Point.EPoint(l2.get_start())
         p3 = Point.EPoint(l2.get_end())
-        if negative:
+        if clockwise:
             p2, p3 = p3, p2
 
         # draw line perpendicular to line 2, at point2
@@ -1013,7 +1052,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         c.e_remove()
 
         # draw line perpendicular to line 2, at point3
-        l33 = l2.perpendicular(p3, negative=True)
+        l33 = l2.perpendicular(p3, side=LineLabelSide.INSIDE)
 
         # define 4th point at correct distance, and make line 3
         c = Circle.ECircle(p3, p2)
@@ -1041,7 +1080,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     @anim_speed
     def show_parts(self,
                    num: int,
-                   offset: float = mn_scale(6),
+                   buff: float = LINE_SHOW_PARTS_BUFF,
                    edge: mn.Vect3 = mn.RIGHT,
                    color: mn.Color = mn.GREY):
         if num < 0:
@@ -1078,8 +1117,8 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             cs = self._coord_dist(start, r * i)
             ce = self._coord_dist(start, r * (i + 1))
 
-            end1 = cs + (-sign * offset * theta_vec) + (shift * phi_vec)
-            end2 = ce + (-sign * offset * theta_vec) - (shift * phi_vec)
+            end1 = cs + (-sign * buff * theta_vec) + (shift * phi_vec)
+            end2 = ce + (-sign * buff * theta_vec) - (shift * phi_vec)
             line_parts.append(ELine(end1, end2, stroke_color=clr))
 
         return line_parts
@@ -1105,18 +1144,18 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     #     else:
     #         return super().transform_to(other, *sub_animations)
 
-
-    # # -----------------------------------------------------------------------------------------------------------------
-    # # don't know what the fuck this is for
-    # # -----------------------------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------------
+    # used by manim to figure out how to transform one line to another
+    # -----------------------------------------------------------------------------------------------------------------
+    # currently doesn't work
     # def interpolate(
     #         self,
     #         mobject1: ELine,
-    #         mobject2: Mobject,
+    #         mobject2: mn.Mobject,
     #         alpha: float,
     #         path_func: Callable[[np.ndarray, np.ndarray, float], np.ndarray] = mn.straight_path
     # ) -> Self:
-    #     if not isinstance(mobject2, ELine) or self.basic_interpolate:
+    #     if not isinstance(mobject2, ELine):
     #         return super().interpolate(mobject1, mobject2, alpha, path_func)
     #
     #     CENTER = 0
@@ -1136,7 +1175,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     #     a1 = self.get_angle()
     #     a2 = mobject2.get_angle()
     #     if abs(a2 - a1) > mn.PI:
-    #         mid_angle = mn.interpolate(a1 % mn.TAU, a2 % TAU, alpha)
+    #         mid_angle = mn.interpolate(a1 % mn.TAU, a2 % mn.TAU, alpha)
     #     else:
     #         mid_angle = mn.interpolate(a1, a2, alpha)
     #     vec = np.array([np.cos(mid_angle), np.sin(mid_angle), 0])
@@ -1154,26 +1193,29 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     #     self.locked_data_keys.remove('point')
     #     return self
 
-
     # is point on the line?
-    def _is_point_on_line(self,p: Point.EPoint| mn.Vect3) -> bool:
+    def _is_point_on_line(self, p: Point.EPoint | mn.Vect3) -> bool:
         eps = mn_scale(0.1)
 
         x0, y0, z0 = convert_to_coord(self.e_start)
         x1, y1, z1 = convert_to_coord(p)
         x2, y2, z2 = convert_to_coord(self.e_end)
 
-        if abs(self.slope)>1e10 and abs(x1-x0) > eps:
+        if abs(self.e_slope) > 1e10 and abs(x1 - x0) > eps:
             return False
 
-        y = self.slope*(x1-x0)+y0
-        if abs(y-y1) > eps:
-            return False
+        if math.isinf(self.e_slope):
+            if abs(x0 - x1) > eps:
+                return False
+        else:
+            y = self.e_slope * (x1 - x0) + y0
+            if abs(y - y1) > eps:
+                return False
 
-        x0,x2 = sorted((x0,x2))
-        y0,y2 = sorted((y0,y2))
-        return (((x0 - eps < x1 ) and (x1 < x2 + eps)) and
-                ((y0 - eps < y1 ) and (y1 < y2 + eps)) )
+        x0, x2 = sorted((x0, x2))
+        y0, y2 = sorted((y0, y2))
+        return (((x0 - eps < x1) and (x1 < x2 + eps)) and
+                ((y0 - eps < y1) and (y1 < y2 + eps)))
 
 
 class EDashedLine(ELine, mn.DashedLine):
@@ -1237,32 +1279,32 @@ class EDashedLine(ELine, mn.DashedLine):
     #     anim.set_points_by_ends(self.e_start, self.e_end)
     #     return self
 
-    @staticmethod
-    def find_in_frame(name, loop=False):
-        if loop:
-            name = name + name[0]
-        parts = [''.join(x) for x in pairwise(name)]
-        from inspect import currentframe
-        f = currentframe()
-        while f.f_back:
-            f = f.f_back
-            if 'l' in f.f_locals:
-                break
-        if f.f_back is None:
-            raise Exception("Can't Find Line dict")
-        lines = f.f_locals.get('l', {})
-
-        lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
-        if all(l is not None for l in lines):
-            return lines
-        try:
-            points = [Point.EPoint.find_in_frame(part) for part in parts]
-            vlines = [VirtualLine(*p) for p in points]
-            return vlines
-        except Exception as e:
-            raise Exception(
-                f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
-                e.args[0])
+    # @staticmethod
+    # def find_in_frame(name, loop=False):
+    #     if loop:
+    #         name = name + name[0]
+    #     parts = [''.join(x) for x in pairwise(name)]
+    #     from inspect import currentframe
+    #     f = currentframe()
+    #     while f.f_back:
+    #         f = f.f_back
+    #         if 'l' in f.f_locals:
+    #             break
+    #     if f.f_back is None:
+    #         raise Exception("Can't Find Line dict")
+    #     lines = f.f_locals.get('l', {})
+    #
+    #     lines = [lines.get(p, lines.get(p[::-1])) for p in parts]
+    #     if all(l is not None for l in lines):
+    #         return lines
+    #     try:
+    #         points = [Point.EPoint.find_in_frame(part) for part in parts]
+    #         vlines = [VirtualLine(*p) for p in points]
+    #         return vlines
+    #     except Exception as e:
+    #         raise Exception(
+    #             f"Can't find line(s) {', '.join(n for p, n in zip(lines, parts) if p is None)}\n" +
+    #             e.args[0])
 
 
 class VirtualLine(ELine):
