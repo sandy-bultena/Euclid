@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from itertools import pairwise
 from math import  cos, sin, atan
+from typing import Self, Optional
 
 import numpy as np
 import manimlib as mn
@@ -18,35 +19,45 @@ from . import Point
 from . import Angle
 from . import Circle
 
+# ====================================================================================================================
+# ETriangle
+# ====================================================================================================================
 
 class ETriangle(Polygon.EPolygon):
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # length of / angle of --- helper functions
+    # ---------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def length_of(val: float | Line.ELine):
+    def length_of(val: float | Line.ELine)->float:
         if isinstance(val, mn.TipableVMobject):
             return val.get_length()
         return val
 
     @staticmethod
-    def angle_of(val: float | Angle.EAngleBase):
+    def angle_of(val: float | Angle.EAngleBase) ->float:
         if isinstance(val, Angle.EAngleBase):
             return val.e_angle
         return val
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # Create a Triangle Side-Angle-Side
+    # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     def SAS(cls,
             base: EMObject | mn.Vect3,
             side1: float | Line.ELine,
             angle: float | Angle.EAngleBase,
             side2: float | Line.ELine,
-            **kwargs):
-        p2, p3, _ = cls.calculate_SAS(convert_to_coord(base),
+            **kwargs) -> Self:
+        p2, p3, _ = cls._calculate_SAS(convert_to_coord(base),
                                       cls.length_of(side1),
                                       cls.angle_of(angle),
                                       cls.length_of(side2))
         return cls(base, p2, p3, **kwargs)
 
     @classmethod
-    def calculate_SAS(cls, point: mn.Vect3, r1: float, angle: float, r2: float):
+    def _calculate_SAS(cls, point: mn.Vect3, r1: float, angle: float, r2: float):
         x1, y1, _ = point
         theta = atan((r1 - r2 * cos(angle)) /
                      (r2 * sin(angle)))
@@ -59,6 +70,9 @@ class ETriangle(Polygon.EPolygon):
         y3 = y2 = y1 - h1
         return np.array([x2, y2, 0]), np.array([x3, y3, 0]), d1 + d2
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # Create a Triangle Side-Side-Side
+    # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     def SSS(cls,
             base: EMObject | mn.Vect3,
@@ -67,19 +81,23 @@ class ETriangle(Polygon.EPolygon):
             point_labels: Polygon.LABEL_ARGS = (None, None, None),
             **kwargs):
         assert (len(sides) == 3)
+
+        # find the vertices
         coord = convert_to_coord(base)
         r = [cls.length_of(s) for s in sides]
 
-        p1, p2, p3 = cls.calculate_SSS(coord, *r)
+        p1, p2, p3 = cls._calculate_SSS(coord, *r)
         if p2 is None:
             return p1
         center = mn.center_of_mass([p1, p2, p3])
 
+        # create label properties
         labels_full = [cls._filter_side_labels(x) for x in labels]
         point_labels_full = [
             cls._filter_point_labels_with_center(x, center)
             for x in point_labels]
 
+        # create point2 (why)
         p = Point.EPoint(p2, label=point_labels_full[1])
 
         c1 = Circle.ECircle(p2, p2 + mn.RIGHT * r[0], temp_line_label=labels_full[0])
@@ -110,7 +128,7 @@ class ETriangle(Polygon.EPolygon):
         return new
 
     @classmethod
-    def calculate_SSS(cls, coord: mn.Vect3, *r: float):
+    def _calculate_SSS(cls, coord: mn.Vect3, *r: float)->tuple[Optional[mn.Vect3], Optional[mn.Vect3], Optional[mn.Vect3]]:
         next = coord + mn.RIGHT * r[1]
         c1 = Circle.VirtualCircle(coord, coord + mn.RIGHT * r[0])
         c2 = Circle.VirtualCircle(next, next + mn.RIGHT * r[2])

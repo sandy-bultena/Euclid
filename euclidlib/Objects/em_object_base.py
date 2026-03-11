@@ -43,7 +43,6 @@ class EMObject(mn.VMobject):
                  skip_anim=False,
                  debug=False,
                  scene = None,
-                 label_args: tuple[str, ...] | str | None = None,
                  label: tuple[str, ...] | str | None = None,
                  **kwargs):
         """
@@ -53,7 +52,6 @@ class EMObject(mn.VMobject):
         :param delay_anim: do animation later
         :param skip_anim: skip animation altogether
         :param debug: print extra info if debug
-        :param label_args: labels with options
         :param label: same as above
         :param kwargs: extra stuff to pass to manim
         """
@@ -82,23 +80,22 @@ class EMObject(mn.VMobject):
         self.cached_opacity = 1
         self.e_stroke_color:mn.Color = mn.WHITE
         self.e_fill_color:Optional[mn.Color] = None
-        self.e_fill_opacity_factor = 0.5
+        self.e_fill_opacity_factor = E_FILL_OPACITY_FACTOR
 
         # create the manim object
         super().__init__(*args, **kwargs)
 
         # handle the label stuff
-        label_args = label_args or label
-        if label_args:
+        if label:
 
             # label is defined as a simple string (label="A")
-            if isinstance(label_args, str):
-                string = label_args
+            if isinstance(label, str):
+                string = label
                 label_args = ()
 
             # label is defined as a string, with additional arguments (label=("A",arg,...,{key=value,...})
             else:
-                string, *label_args = label_args
+                string, *label_args = label
 
             # split label args into arguments vs keyword arguments
             if label_args and isinstance(label_args[-1], dict):

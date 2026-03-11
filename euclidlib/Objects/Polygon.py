@@ -6,7 +6,8 @@ from typing import  Any,  TypedDict, TYPE_CHECKING, Optional
 
 from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
-from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, euclid_coord
+from . import Triangle as Tri
 
 from . import em_group_object as GroupObject
 
@@ -40,15 +41,35 @@ ANGLE_SIZE_ARGS = (tuple[float] |
 class OPTIONS(TypedDict):
     point_labels: LABEL_ARG
     labels: LABEL_ARG
-    angles: FULL_ANGLES_ARG
+    angle_info: FULL_ANGLES_ARG
     fill: tuple[mn.Color, float] | None
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# find the common vertices between lines (for forming a polygon)
+# ---------------------------------------------------------------------------------------------------------------
+def find_vertices(*lines: Line.ELine) -> Optional[list[mn.Vect3]]:
+    coords = []
+    for l1, l2 in pairwise((*lines, lines[0])):
+        common, _, _ = Angle.angle_coords(l1, l2)
+        if common is None:
+            mn.log.warning("Your polygon lines should touch each other!")
+            return []
+        coords.append(common)
+    return coords
+
+
+# ===================================================================================================================
+# EPolygon
+# ===================================================================================================================
 class EPolygon(GroupObject.EGroupedObjects, EMObject, mn.Polygon):
     _area: float | None
 
     MAX_SIZE = 0
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # vectors
+    # ---------------------------------------------------------------------------------------------------------------
     def IN(self, v: mn.Vect3):
         center = self.get_center_of_mass()
         direction = center - v
@@ -59,6 +80,9 @@ class EPolygon(GroupObject.EGroupedObjects, EMObject, mn.Polygon):
         direction = v - center
         return mn.normalize(direction)
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # change the size of the polygon - create properties l0,l1,l2 etc
+    # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     def update_size(cls, sizes):
         if cls.MAX_SIZE >= sizes:
@@ -77,40 +101,49 @@ setattr(cls, 'p{i}', property(p))
             """)
         cls.MAX_SIZE = sizes
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # assemble
+    # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     def assemble(cls,
-                 lines: Optional[list[Line.ELine] | str] = None,
-                 points: Optional[ list[Point.EPoint] | str] = None,
+                 lines: Optional[ list[Line.ELine] ] = None,
+                 points: Optional[ list[Point.EPoint] ] = None,
                  angles: Optional[ list[Angle.EAngleBase]] = None,
-                 **kwargs):
+                 **kwargs) -> Optional[EPolygon]:
+        """
+        Given line, point and angle objects, assemble them into a polygon object
+        :param lines: a list of lines (in order) that define the polygon shape
+        :param points: a list of points that define the polygon vertices
+        :param angles: a list of angles that are part of the polygon
+        :param kwargs: animation arguments
+        :return: If the number of sides of the polygon equals the number of specified lines,
+                and all the lines connect to one another appropriately, then EPolygon, else None
+        """
+
+        # if points were defined, get the coordinates of the vertices
         if points:
-            if isinstance(points, str):
-                points = Point.EPoint.find_in_frame(points)
             coords = [p.get_center() for p in points]
+
+        # if lines were defined, find the vertices where the lines touch
         elif lines:
-            if isinstance(lines, str):
-                lines = Line.ELine.find_in_frame(lines, loop=True)
-            tmp_lines = lines + [lines[0]]
-            coords = []
-            for l1, l2 in pairwise(tmp_lines):
-                common, _, _ = Angle.angle_coords(l1, l2)
-                if common is None:
-                    mn.log.warning("Your polygon lines should touch each other!")
-                    return
-                coords.append(common)
+            coords = find_vertices(*lines)
+            if len(coords) == 0:
+                return None
         else:
             mn.log.warning("Need to provide lines or points")
             return
 
         return cls(*coords, **kwargs, _assemble_flag=True, _lines=lines, _points=points, _angles=angles)
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # constructor
+    # ---------------------------------------------------------------------------------------------------------------
     def __init__(
             self, *points: mn.Vect3 | mn.Mobject | str,
             speed = None,
             point_labels: LABEL_ARG | None = None,
             labels: LABEL_ARG | None = None,
-            angles: ANGLE_ARGS | None = None,
-            angle_sizes: ANGLE_SIZE_ARGS | None = None,
+            angle_info: ANGLE_ARGS | None = None,
             fill: tuple[mn.Color, float] | None = None,
             z_index=-1,
             animate_part=('set_e_fill',),
@@ -122,63 +155,74 @@ setattr(cls, 'p{i}', property(p))
             _angles: list[Angle.EAngleBase | None] | None = None,
             **kwargs
     ):
-        if points and isinstance(points[0], str):
-            point_names = list(points[0])
-            points = Point.EPoint.find_in_frame(point_names)
+        """
+        Create a polygon
+        :param points: coordinates or EPoint
+        :param speed: how fast to draw
+        :param point_labels: labels for the points
+        :param labels: labels for the lines
+        :param angle_info: labels for each angle
+        :param fill: what colour to fill the polygon, or colour, opacity
+        :param z_index: where is this (on top of all others, below, etc)
+        :param animate_part:
+        :param delay_anim:
+        :param skip_anim:
+        :param kwargs:
+        """
 
-        if all(isinstance(p, Line.ELine) for p in points):
-            lines = [p for p in points]
-            tmp_lines = lines + [points[0]]
-            points = []
-            for l1, l2 in pairwise(tmp_lines):
-                s1, e1 = l1.get_start_and_end()
-                s2, e2 = l2.get_start_and_end()
-                if (abs(np.linalg.norm(s2 - s1)) < EPSILON or
-                        abs(np.linalg.norm(e2 - s1)) < EPSILON):
-                    points.append(e1)
-                else:
-                    points.append(s1)
+        # ------------------------------------------------------------------------------------------------------------
+        #  save the vertices as coordinates
+        # ------------------------------------------------------------------------------------------------------------
+        # if lines were given instead of points, find the coordinates for the points
+        # if all(isinstance(p, Line.ELine) for p in points):
+        #     lines = [p for p in points]
+        #     points = find_vertices(lines)
+        # assert (points is not None)
 
-        assert all(p is not None for p in points)
+        # save the vertices in self (coordinates, not EPoints)
+        self.vertices = [convert_to_coord(p) for p in points]
+        self.sides = len(self.vertices)
+        self.update_size(self.sides)
+        if self.sides:
+            self.vertices.append(self.vertices[0])
 
+        # ------------------------------------------------------------------------------------------------------------
+        # create an options dictionary for point_labels, labels, angle_info and fill
+        # ------------------------------------------------------------------------------------------------------------
         self.options: OPTIONS = {
             k: locals()[k]
-            for k in ('point_labels', 'labels', 'angles', 'fill')
+            for k in ('point_labels', 'labels', 'angle_info', 'fill')
             if locals()[k] is not None
         }
+
+        # ------------------------------------------------------------------------------------------------------------
+        # define the speed (use current speed as default value)
+        # ------------------------------------------------------------------------------------------------------------
         self.speed = speed
         if self.speed is None:
             scene = find_scene()
             self.speed = scene.get_current_speed()
-        self.vertices = [convert_to_coord(p) for p in points]
-        self.sides = len(self.vertices)
-        self.update_size(self.sides)
-        if _assemble_flag and _lines:
-            self.lines: list[Line.ELine] = _lines
-        else:
-            self.lines: list[Line.ELine] = []
 
-        if _assemble_flag and _points:
-            self.points: list[Point.EPoint] = _points
-        else:
-            self.points: list[Point.EPoint] = []
+        # ------------------------------------------------------------------------------------------------------------
+        # if this polygon is built with pre-existing objects, save them
+        # ------------------------------------------------------------------------------------------------------------
+        self.lines: list[Line.ELine] = _lines if _assemble_flag and _lines else []
+        self.points: list[Point.EPoint] = _points if _assemble_flag and _points else []
+        self.angles: list[Angle.EAngleBase | None] = _angles if _assemble_flag and _angles else [None] * self.sides
 
-        if _assemble_flag and _angles:
-            self.angles: list[Angle.EAngleBase | None] = _angles
-        else:
-            self.angles: list[Angle.EAngleBase | None] = [None] * self.sides
-
+        # ------------------------------------------------------------------------------------------------------------
+        # create the generic EObject
+        # ------------------------------------------------------------------------------------------------------------
         super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
                          delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
-        if self.sides:
-            self.vertices.append(self.vertices[0])
-        self.define_sub_objs(delay_anim, skip_anim)
-        if 'fill' in self.options:
-            if delay_anim:
-                self.set_fill(*self.options['fill'])
-            else:
-                self.e_fill(*self.options['fill'])
 
+
+        # ------------------------------------------------------------------------------------------------------------
+        # create all the lines, points, etc, if they don't already exist
+        # ------------------------------------------------------------------------------------------------------------
+        self.define_sub_objs(delay_anim, skip_anim)
+
+        # if lines etc already exist (via _assemble_flag), then set them all back to normal (no fade)
         if _assemble_flag:
             with self.scene.simultaneous():
                 if _lines:
@@ -194,162 +238,37 @@ setattr(cls, 'p{i}', property(p))
                         if a is not None:
                             a.e_normal()
 
-    def e_fill(self, color: mn.ManimColor = None, opacity=1):
-        self.options['fill'] = (color, opacity)
-        return super().e_fill(color, opacity)
 
-    def e_unfill(self):
-        try:
-            del self.options['fill']
-            super().e_unfill()
-        except KeyError:
-            pass
+        # ------------------------------------------------------------------------------------------------------------
+        # fill the polygon with colour
+        # ------------------------------------------------------------------------------------------------------------
+        if 'fill' in self.options:
+            fill_option = self.options['fill']
+            if isinstance(fill_option,str):
+                fill_option = (fill_option,)
+            if delay_anim:
+                self.set_fill(*fill_option)
+            else:
+                self.e_fill(*fill_option)
 
-    def get_group(self):
-        return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
 
-    def _filter_point_labels(self, args: LABEL_ARG):
-        if args is None:
-            return None
-        if isinstance(args, str):
-            args = (args,)
-        if len(args) == 1:
-            args = *args, dict(away_from='center')
-        if not (args and isinstance(args[-1], dict)):
-            return args
-        for x in ('away_from', 'towards'):
-            if isinstance(y := args[-1].get(x), str) and y == 'center_f':
-                args[-1][x] = self.get_center_of_mass
-            if isinstance(y, str) and y == 'center':
-                args[-1][x] = self.get_center_of_mass()
-        return args
-
-    @staticmethod
-    def _filter_point_labels_with_center(args: LABEL_ARG, center):
-        if args is None:
-            return None
-        if isinstance(args, str):
-            args = (args,)
-        if len(args) == 1:
-            args = *args, dict(away_from='center')
-        if not (args and isinstance(args[-1], dict)):
-            return args
-        for x in ('away_from', 'towards'):
-            if isinstance(y := args[-1].get(x), str) and y == 'center':
-                args[-1][x] = center
-        return args
-
-    @staticmethod
-    def _filter_side_labels(args: LABEL_ARG):
-        if args is None:
-            return None
-        if isinstance(args, str):
-            args = (args,)
-        if len(args) == 1:
-            args = *args, dict(side=Line.LineLabelSide.OUTSIDE)
-        return args
-
-    def define_points(self, delay_anim=False, skip_anim=False):
-        if self.points:
-            return
-        labels = self.options.get('point_labels', [()] * self.sides)
-        with self.scene.simultaneous_speed(self.speed):
-            self.points = [
-                Point.EPoint(coord,
-                         scene=self.scene,
-                         label_args=self._filter_point_labels(args),
-                         delay_anim=delay_anim,
-                         skip_anim=skip_anim,
-                         )
-                for coord, args
-                in zip(self.vertices, labels)]
-
-    def define_lines(self, delay_anim=False, skip_anim=False):
-        if self.lines:
-            return
-        with self.scene.simultaneous_speed(self.speed):
-            labels = self.options.get('labels', [()] * self.sides)
-            line_points = [(p0,p1) for p0,p1 in pairwise(self.vertices)]
-            self.lines = [Line.ELine(*pts,
-                                  delay_anim=True,
-                                  label_args=self._filter_side_labels(args)
-                                  )
-                          for pts,args in zip(line_points,labels)]
-            if not delay_anim:
-                for l in self.lines:
-                    l.e_draw(skip_anim=skip_anim)
-
-    def define_sub_objs(self, delay_anim=False, skip_anim=False):
-        self.define_points(delay_anim=delay_anim, skip_anim=skip_anim)
-        self.define_lines(delay_anim=delay_anim, skip_anim=skip_anim)
-
-        with self.scene.simultaneous_speed(self.speed):
-            if 'angles' in self.options:
-                self.set_angles(*self.options['angles'], delay_anim=delay_anim, skip_anim=skip_anim)
-
-    def set_labels(self, *labels: LABEL_ARG):
-        for l, label_data in zip(self.lines, labels):
-            label_data = self._filter_side_labels(label_data)
-            if label_data:
-                l.add_label(*label_data)
-        return self
-
-    def set_point_labels(self, *labels: LABEL_ARG):
-        for p, label_data in zip(self.points, labels):
-            label_data = self._filter_point_labels(label_data)
-            p.add_label(*label_data)
-        return self
-
-    def set_angles(self, *angle_data: str | float | None, delay_anim=False, skip_anim=False):
-        names, sizes = angle_data[:self.sides], angle_data[self.sides:]
-        names_and_sizes = zip_longest(names, sizes, fillvalue=mn_scale(40))
-        line_pairs = pairwise([self.lines[-1]] + self.lines)
-
-        if not self.angles:
-            self.angles = [
-                Angle.EAngle(l1, l2, size=size, label_args=name, scene=self.scene, delay_anim=delay_anim,
-                         skip_anim=skip_anim)
-                for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
-                if name is not None
-            ]
-        else:
-            for i, ((l1, l2), (name, size)) in enumerate(zip(line_pairs, names_and_sizes)):
-                if not name:
-                    continue
-                old = self.angles[i]
-                if old is not None:
-                    old.e_remove()
-                self.angles[i] = Angle.EAngle(l1, l2, size=size, label_args=name, scene=self.scene)
-        return self
-
-    def remove_angles(self):
-        if self.a is None:
-            return
-        for a in self.a:
-            if a is not None:
-                a.e_remove()
-
-    def draw_angles(self):
-        if self.a is None:
-            return
-        for a in self.a:
-            if a is not None:
-                a.e_draw()
-
+    # ---------------------------------------------------------------------------------------------------------------
+    # properties
+    # ---------------------------------------------------------------------------------------------------------------
     @property
-    def l(self):
+    def l(self)->list[Line.ELine]:
         return self.lines
 
     @property
-    def p(self):
+    def p(self)->list[Point.EPoint]:
         return self.points
 
     @property
-    def a(self):
+    def a(self)->list[Angle.EAngle]:
         return self.angles
 
     @property
-    def v(self):
+    def v(self)->list[mn.Vect3]:
         return self.vertices
 
     if TYPE_CHECKING:
@@ -369,32 +288,236 @@ setattr(cls, 'p{i}', property(p))
         p3: Point.EPoint
         p4: Point.EPoint
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # fill and unfill
+    # ---------------------------------------------------------------------------------------------------------------
+    def e_fill(self, color: mn.ManimColor = None, opacity=1):
+        self.options['fill'] = (color, opacity)
+        return super().e_fill(color, opacity)
+
+    def e_unfill(self):
+        try:
+            del self.options['fill']
+            super().e_unfill()
+        except KeyError:
+            pass
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # required for EGroupedObjects to return all the parts that make up the polygon
+    # ---------------------------------------------------------------------------------------------------------------
+    def get_group(self):
+        return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # define the lines and points and maybe angles of the polygon
+    # ---------------------------------------------------------------------------------------------------------------
+    def define_sub_objs(self, delay_anim=False, skip_anim=False):
+        self.define_points(delay_anim=delay_anim, skip_anim=skip_anim)
+        self.define_lines(delay_anim=delay_anim, skip_anim=skip_anim)
+
+        with self.scene.simultaneous_speed(self.speed):
+            if 'angle_info' in self.options:
+                names, sizes = self.options['angle_info'][:self.sides], self.options['angle_info'][self.sides:]
+                self.set_angles(names, sizes, delay_anim=delay_anim, skip_anim=skip_anim)
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # define points
+    # ---------------------------------------------------------------------------------------------------------------
+    def define_points(self, delay_anim=False, skip_anim=False):
+
+        # points already exist, do nothing
+        if self.points:
+            return
+
+        # default labels is undefined
+        labels = self.options.get('point_labels', [()] * self.sides)
+
+        # create all the points
+        with self.scene.simultaneous_speed(self.speed):
+            self.points = [
+                Point.EPoint(coord,
+                         scene=self.scene,
+                         label=self._filter_point_labels(args),
+                         delay_anim=delay_anim,
+                         skip_anim=skip_anim,
+                         )
+                for coord, args
+                in zip(self.vertices, labels)]
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # define lines
+    # ---------------------------------------------------------------------------------------------------------------
+    def define_lines(self, delay_anim=False, skip_anim=False):
+        if self.lines:
+            return
+        with self.scene.simultaneous_speed(self.speed):
+            labels = self.options.get('labels', [()] * self.sides)
+            line_points = [(p0,p1) for p0,p1 in pairwise(self.vertices)]
+            self.lines = [Line.ELine(*pts,
+                                  delay_anim=True,
+                                  label=self._filter_side_labels(args)
+                                  )
+                          for pts,args in zip(line_points,labels)]
+            if not delay_anim:
+                for l in self.lines:
+                    l.e_draw(skip_anim=skip_anim)
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # set up the angles
+    # ----------------------------------------------------------------------------------------------------------------
+    def set_angles(self, names: list[str], sizes: float[str] = None, delay_anim=False, skip_anim=False):
+        sizes = [] if sizes is None else sizes
+        names = names if names is not None else []
+
+        names_and_sizes = zip_longest(names, sizes, fillvalue=ANGLE_SIZE)
+        line_pairs = pairwise([self.lines[-1]] + self.lines)
+
+        if not self.angles:
+            self.angles = [
+                Angle.EAngle(l1, l2, size=size, label=name, scene=self.scene, delay_anim=delay_anim,
+                         skip_anim=skip_anim)
+                for (l1, l2), (name, size) in zip(line_pairs, names_and_sizes)
+                if name is not None
+            ]
+        else:
+            for i, ((l1, l2), (name, size)) in enumerate(zip(line_pairs, names_and_sizes)):
+                if not name:
+                    continue
+                old = self.angles[i]
+                if old is not None:
+                    old.e_remove()
+                self.angles[i] = Angle.EAngle(l1, l2, size=size, label=name, scene=self.scene)
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # set line labels
+    # ----------------------------------------------------------------------------------------------------------------
+    def set_labels(self, *labels: LABEL_ARG):
+        for l, label_data in zip(self.lines, labels):
+            label_data = self._filter_side_labels(label_data)
+            if label_data:
+                l.add_label(*label_data)
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # set point labels
+    # ----------------------------------------------------------------------------------------------------------------
+    def set_point_labels(self, *labels: LABEL_ARG):
+        for p, label_data in zip_longest(self.points, labels, fillvalue=None):
+            label_data = self._filter_point_labels(label_data)
+            if label_data:
+                p.add_label(*label_data)
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # convert point label args to either (str,) or (str,dict) or (str,str)
+    # ----------------------------------------------------------------------------------------------------------------
+    def _filter_point_labels(self, args: LABEL_ARG):
+        return EPolygon._filter_point_labels_with_center(args, self.get_center_of_mass())
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # filter label arguments to be compatible with what is required for add_label
+    # ----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def _filter_point_labels_with_center(args: LABEL_ARG, center):
+
+        # no labels, do nothing
+        if args is None:
+            return None
+
+        # if its a single string, turn it into a tuple
+        if isinstance(args, str):
+            args = (args,)
+
+        # if direction is not specified, default to away_from='center'
+        if len(args) == 1:
+            args = *args, dict(away_from='center')
+
+        # if args doesn't have a dictionary at the end, just return args
+        if not (args and isinstance(args[-1], dict)):
+            return args
+
+        # if away_from=center or towards=center, replace center with the coordinates of the center of mass
+        for x in ('away_from', 'towards'):
+            if isinstance(y := args[-1].get(x), str) and y == 'center':
+                args[-1][x] = center
+        return args
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # filter line labels to be compatible with what is required for add_label
+    # ----------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def _filter_side_labels(args: LABEL_ARG):
+        if args is None:
+            return None
+        if isinstance(args, str):
+            args = (args,)
+        if len(args) == 1:
+            args = *args, dict(side=Line.LineLabelSide.OUTSIDE)
+        return args
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # remove angles
+    # ----------------------------------------------------------------------------------------------------------------
+    def remove_angles(self):
+        if self.a is None:
+            return
+        for a in self.a:
+            if a is not None:
+                a.e_remove()
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # draw angles
+    # ----------------------------------------------------------------------------------------------------------------
+    def draw_angles(self):
+        if self.a is None:
+            return
+        for a in self.a:
+            if a is not None:
+                a.e_draw()
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # highlight
+    # ----------------------------------------------------------------------------------------------------------------
     def highlight(self):
         return self.animate(rate_func=mn.there_and_back).set_fill(mn.RED, opacity=1)
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # replace line
+    # ----------------------------------------------------------------------------------------------------------------
     def replace_line(self, index, newline: Line.ELine):
         self.lines[index].e_delete()
         self.lines[index] = newline
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # replace point
+    # ----------------------------------------------------------------------------------------------------------------
     def replace_point(self, index, newpoint: Point.EPoint):
         self.points[index].e_delete()
         self.points[index] = newpoint
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # move point (move specific point an update polygon)
+    # ----------------------------------------------------------------------------------------------------------------
     def move_point_to(self, index: int, dest: Point.EPoint | mn.Vect3):
         if hasattr(self, '_angle_values'):
             del self._angle_values
+
+        # update stored info
         dest = convert_to_coord(dest)
         self.vertices[index] = dest
         self.vertices[-1] = self.vertices[0]
 
+        # set the label updaters so that the labels move as the lines are modified
         all_parts = [*self.p, *self.a, *self.l]
         all_labels = [a.e_label for a in all_parts if a is not None and a.e_label is not None]
 
         for label in all_labels:
             label.enable_updaters()
 
+        # move the point, lines, etc as required
         with self.scene.simultaneous():
-            pass
             self.scene.play(self.p[index].animate.move_to(dest))
             self.scene.play(self.l[index].animate.put_start_and_end_on(dest, self.l[index].get_end()))
             self.scene.play(self.l[(index - 1) % self.sides].animate.put_start_and_end_on(
@@ -409,18 +532,25 @@ setattr(cls, 'p{i}', property(p))
                     self.scene.play(mn.Transform(old_angle, new_angle))
                     l2.e_remove()
                     l1.e_remove()
-        self.vertices[index] = dest
-        self.vertices[-1] = self.vertices[0]
-        self.scene.play(self.animate.set_points_as_corners(self.vertices))
+
+            # update the actual Polygon object
+            self.scene.play(self.animate.set_points_as_corners(self.vertices))
+
         for label in all_labels:
             label.disable_updaters()
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # Creation/Removal Of
+    # ----------------------------------------------------------------------------------------------------------------
     def CreationOf(self, *args, **kwargs):
         return [mn.FadeIn(self)]
 
     def RemovalOf(self, *args, **kwargs):
         return [mn.FadeOut(self)]
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # intersects (to be updated later
+    # ----------------------------------------------------------------------------------------------------------------
     def intersect(self, other: mn.Mobject, reverse=True):
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
@@ -429,33 +559,28 @@ setattr(cls, 'p{i}', property(p))
     def intersect_selection(self, other: mn.Rectangle):
         return False
 
-    # def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
-    #     repeat_last = lambda a: chain(a[:-1], repeat(a[-1]))
-    #     line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.l), other.lines)]
-    #     point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.p), other.points)]
-    #     angle_transforms = [us.transform_to(them, anim=anim)
-    #                         for us, them in zip(self.a, other.angles)
-    #                         if us is not None and them is not None]
-    #     return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
-    #                                 anim=anim)
-
+    # ----------------------------------------------------------------------------------------------------------------
+    # copy to parallelogram on a point
+    # ----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
     def copy_to_parallelogram_on_point(self, point: Point.EPoint, angle: Angle.EAngleBase, /, negative=False):
         coords = convert_to_coord(point)
         line = Line.ELine(coords, coords + mn_scale(200 if not negative else -200, 0, 0))
-        print("speed", self.speed)
         para = self.copy_to_parallelogram_on_line(line, angle, speed=0)
         line.e_remove()
         return para
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # copy to parallelogram on line
+    # ----------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
     def copy_to_parallelogram_on_line(self, line: Line.ELine, angle: Angle.EAngleBase):
+
         # ------------------------------------------------------------------------
         # get a list of triangles that make up the polygon
         # ------------------------------------------------------------------------
-        print("speed", self.speed)
         triangles = self.copy_to_triangles()
 
         # ------------------------------------------------------------------------
@@ -484,26 +609,33 @@ setattr(cls, 'p{i}', property(p))
                 x.e_remove()
         return poly
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # copy to triangles
+    # ----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def copy_to_triangles(self):
-        from . import Triangle as Tri
+    def copy_to_triangles(self) -> list[Tri.ETriangle]:
+        '''Take a given polygon, and create a set of triangles, equivalent to the initial polygon'''
+
         triangles = []
         sides = self.sides
         coords = [p.get_center() for p in self.points]
-        print("copy_to_triangles: speed",self.speed)
         new = EPolygon(*coords)
+
         while sides > 3:
-            # calculate the index with the most 'narrow' extension
+
+            # calculate the index with the smallest angle
             min_index, min_angle = min(enumerate(new.angle_values), key=lambda a: a[1])
 
             # chop this section off - step 1 calculate points
             if min_index == new.sides - 1:
                 triangle_points = [new.p[min_index - 1], new.p[min_index], new.p[0]]
                 new_points = new.p[:-1]
+
             elif min_index == 0:
                 triangle_points = [new.p[sides - 1], new.p[min_index], new.p[min_index + 1]]
                 new_points = new.p[1:]
+
             else:
                 triangle_points = [new.p[min_index + x] for x in (-1, 0, 1)]
                 new_points = new.p[:min_index] + new.p[min_index + 1:]
@@ -511,8 +643,7 @@ setattr(cls, 'p{i}', property(p))
             # create and save new triangle, update polygon
             triangles.append(Tri.ETriangle(*triangle_points))
             new2 = EPolygon(*new_points, delay_anim=True)
-            print("playing replacement transform")
-            self.scene.play(mn.ReplacementTransform(new, new2))
+            new.e_remove()
             new = new2
             sides = new.sides
 
@@ -663,20 +794,31 @@ setattr(cls, 'p{i}', property(p))
 
         return final
 
-    def reposition(self, *new_coords, anim=False):
-        assert (len(self.points) == len(new_coords))
-        new_poly = EPolygon(*new_coords, **self.options, delay_anim=True)
-        if anim:
-            self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
-        else:
-            self.scene.remove(*self.get_e_family())
-        self.lines = new_poly.lines
-        self.angles = new_poly.angles
-        self.points = new_poly.points
-        self.become(new_poly)
-        self.scene.add(*self.get_e_family())
-        if anim:
-            self.scene.remove(new_poly)
+    # def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
+    #     repeat_last = lambda a: chain(a[:-1], repeat(a[-1]))
+    #     line_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.l), other.lines)]
+    #     point_transforms = [us.transform_to(them, anim=anim) for us, them in zip(repeat_last(self.p), other.points)]
+    #     angle_transforms = [us.transform_to(them, anim=anim)
+    #                         for us, them in zip(self.a, other.angles)
+    #                         if us is not None and them is not None]
+    #     return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
+    #                                 anim=anim)
+
+    # # not used
+    # def reposition(self, *new_coords, anim=False):
+    #     assert (len(self.points) == len(new_coords))
+    #     new_poly = EPolygon(*new_coords, **self.options, delay_anim=True)
+    #     if anim:
+    #         self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
+    #     else:
+    #         self.scene.remove(*self.get_e_family())
+    #     self.lines = new_poly.lines
+    #     self.angles = new_poly.angles
+    #     self.points = new_poly.points
+    #     self.become(new_poly)
+    #     self.scene.add(*self.get_e_family())
+    #     if anim:
+    #         self.scene.remove(new_poly)
 
     def area(self) -> float:
         return self.get_arc_length()
@@ -691,3 +833,9 @@ setattr(cls, 'p{i}', property(p))
                 t.e_delete()
         self._area = area
         return area
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # polygons don't have labels
+    # -----------------------------------------------------------------------------------------------------------------
+    def add_label(self, *args, **kwargs):
+        pass

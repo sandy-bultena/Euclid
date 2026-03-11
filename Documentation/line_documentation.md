@@ -14,7 +14,7 @@ def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None =
 | `start`           | `Point.EPoint, mn.Vect3` |         | the coordinates or point of the start of the line            |
 | `end`             | `Point.EPoint, mn.Vect3` |         | the coordinates or point of the end of the line              |
 | `stroke_width` | `float` | 2        | the width of the line outlining the object |
-| `label`/`label_args` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here |
+| `label` | `str`, `tuple[str,dict]` | `None`         | Instead of using the method `add_label`, you can add a label here |
 | `**kwargs`           |                          |         | Extra arguments for the animation                            |
 
 _Example:_

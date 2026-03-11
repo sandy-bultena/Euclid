@@ -23,8 +23,8 @@ class Book1Prop1(Book1Scene):
         # -------------------------------------------------------------------------------------------------------------
         t1.title("Construction:")
         t1.explain("Start with line segment AB")
-        p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
-        p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+        p['A'] = EPoint(A, scene=self, label=('A', LEFT))
+        p['B'] = EPoint(B, scene=self, label=('B', RIGHT))
         l['AB'] = ELine(p['A'], p['B'], scene=self)
 
         # -------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class Book1Prop1(Book1Scene):
         self.next_page()
         t1.explain("Label the intersection point C")
         pts = c['A'].intersect(c['B'])
-        p['C'] = EPoint(pts[0], scene=self, label_args=('C', UP))
+        p['C'] = EPoint(pts[0], scene=self, label=('C', UP))
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()

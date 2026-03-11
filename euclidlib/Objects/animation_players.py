@@ -127,7 +127,7 @@ class EMObjectPlayer:
     #
     # Example - using one of the 'methods' - Notice you call e_to_corner(), and then call the player
     #           as a function to get it to display
-    #        line = ELine([2,0,0],[0,2,0],label_args=('a', mn.UP, {'alpha':0.3}))
+    #        line = ELine([2,0,0],[0,2,0],label=('a', mn.UP, {'alpha':0.3}))
     #        line.e_to_corner(mn.UR)(run_time=2)
     #
     # ----------------------------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ class EMObjectPlayer:
     def _e_color(self, color: mn.Color):
         if not self.eobj.is_frozen:
             self.main_animate = True
-            self.e_normal.anim.set_color(color=color)
+            self.e_normal.anim.set_color(color=color, recurse=False)
         return self
 
     @property

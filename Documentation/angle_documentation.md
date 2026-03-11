@@ -12,7 +12,7 @@
 | -------------------- | ------------------------ | -------------- | ------------------------------------------------------------ |
 | `l1`                 | `ELine`                  |                | one of the two lines denoting the angle                      |
 | `l2`                 | `ELine`                  |                | the second of the two lines denoting the angle (the two lines ***must*** have a common vertex!) |
-| `size`               | `float`                  | `mn_scale(40)` | The radius of the arc which indicates the angle              |
+| `size`               | `float`                  | `ANGLE_SIZE` | The radius of the arc which indicates the angle              |
 | `no_right`           | `bool`                   | `False`        | If set to True, the angle will be indicated by an arc, even if the angle is 90 degrees |
 | `gnomon`             | `bool`                   | `False`        | Is  or is not an angle describing an gnomon (the part of a parallelogram left when a similar parallelogram has been taken from its corner) |
 | `stroke_width` | `float` | 2        | the width of the line outlining the object |

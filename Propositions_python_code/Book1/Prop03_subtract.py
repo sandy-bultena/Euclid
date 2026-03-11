@@ -44,19 +44,19 @@ class Book1Prop3(Book1Scene):
         t1.explain("Start with line AB and line CD, where CD is larger than AB")
 
         with self.simultaneous():
-            p['A'] = EPoint(A, scene=self, label_args=('A', LEFT))
-            p['B'] = EPoint(B, scene=self, label_args=('B', RIGHT))
+            p['A'] = EPoint(A, scene=self, label=('A', LEFT))
+            p['B'] = EPoint(B, scene=self, label=('B', RIGHT))
             l['AB'] = ELine(p['A'], p['B'], scene=self)
 
-            p['C'] = EPoint(C, scene=self, label_args=('C', DOWN))
-            p['D'] = EPoint(D, scene=self, label_args=('D', DOWN))
+            p['C'] = EPoint(C, scene=self, label=('C', DOWN))
+            p['D'] = EPoint(D, scene=self, label=('D', DOWN))
             l['CD'] = ELine(p['C'], p['D'], scene=self)
         self.next_page()
 
         # ------------------------------------------------------------------------
         t1.explain("Construct a line that is equal to CD minus AB")
 
-        p['F'] = EPoint(F, scene=self, label_args=('F', RIGHT))
+        p['F'] = EPoint(F, scene=self, label=('F', RIGHT))
         l['DF'] = ELine(D, F, scene=self, stroke_color=BLUE)
         self.next_page()
 
@@ -86,7 +86,7 @@ class Book1Prop3(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Define the intersection of the circle and CD as F")
         pts = c['E'].intersect(l['CD'])
-        p['F'] = EPoint(pts[0], scene=self, label_args=('F', UR))
+        p['F'] = EPoint(pts[0], scene=self, label=('F', UR))
         l['CF'] = ELine(C, p['F'], scene=self)
         self.next_page()
 

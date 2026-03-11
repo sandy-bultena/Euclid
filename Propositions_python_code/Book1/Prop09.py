@@ -35,7 +35,7 @@ class Prop09(Book1Scene):
         t1.explain("Start with two straight lines joined at a single point")
         l['AC_'] = ELine(B,A)
         l['AB_'] = ELine(A,C)
-        p['A'] = EPoint(A, label_args=('A', DOWN))
+        p['A'] = EPoint(A, label=('A', DOWN))
 
         self.next_page()
 
@@ -224,7 +224,7 @@ class Prop09(Book1Scene):
         t1.explain("Or angle CAD is half the angle CAB")
         with self.simultaneous():
             a['DAB'].e_remove()
-            a['CAB'] = EAngle(*self.lines('CAB'), label_args=(r'2\alpha', 0.75), size=mn_scale(80))
+            a['CAB'] = EAngle(*self.lines('CAB'), label=(r'2\alpha', 0.75), size=mn_scale(80))
 
         with self.simultaneous():
             t2.e_fade()

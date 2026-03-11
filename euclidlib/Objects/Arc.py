@@ -369,20 +369,23 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # ----------------------------------------------------------------------------------------------------------
     # intersect selection (which would me a rectangle)
     # ----------------------------------------------------------------------------------------------------------
-    def intersect_selection(self, other: mn.Rectangle)->bool:
+    def intersect_selection(self, other: mn.Rectangle)->tuple[mn.Vect3,...]:
         """Does this circle intersect with the specified rectangle?"""
         corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
-        return any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners))
+        if any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners)):
+            return [[0,0,0],]
+        else:
+            return []
 
     # ----------------------------------------------------------------------------------------------------------
     # generic intersect
     # ----------------------------------------------------------------------------------------------------------
-    def intersect(self, other: mn.Mobject, reverse=True) ->  Optional[tuple[mn.Vect3,...]| bool]:
+    def intersect(self, other: mn.Mobject, reverse=True) ->  tuple[mn.Vect3,...]:
         """
         find intersection points, or true/false if other is a Rectangle
         :param other: Arc, Line or Rectangle
         :param reverse: not used
-        :return:
+        :return: tuple[mn.Vect3,...]
         """
         if isinstance(other, AbstractArc):
             return self.intersect_circle(other)
@@ -538,6 +541,6 @@ class EArc(AbstractArc):
         return results
 
     def __str__(self):
-        return f"EArc center=({self.center[0]:.2f},{self.center[1]:.2f},{self.center[2]:.2f}) "+ \
+        return f"EArc center=({self.vx:.2f},{self.vy:.2f}) "+ \
                 f"radius={self.radius}"
 

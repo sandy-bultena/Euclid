@@ -52,16 +52,16 @@ class Book1Prop4(Book1Scene):
 
         t['ABC'] = ETriangle(A, B, C,
                              scene=self,
-                             point_labels=[('A', dict(away_from='center_f')), ('B', dict(away_from='center_f')),
-                                                ('C', dict(away_from='center_f'))],
+                             point_labels=[('A', dict(away_from='center')), ('B', dict(away_from='center')),
+                                                ('C', dict(away_from='center'))],
                              labels=['x', (), 'y'],
                              angles=[r'\alpha', None, None, mn_scale(20)]
                              )
 
         t['DEF'] = ETriangle(D, E, F,
                              scene=self,
-                             point_labels=[('D', dict(away_from='center_f')), ('E', dict(away_from='center_f')),
-                                                ('F', dict(away_from='center_f'))],
+                             point_labels=[('D', dict(away_from='center')), ('E', dict(away_from='center')),
+                                                ('F', dict(away_from='center'))],
                              labels=['x', (), 'y'],
                              angles=[r'\alpha', None, None]
                              )

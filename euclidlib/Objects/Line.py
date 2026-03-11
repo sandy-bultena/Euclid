@@ -53,12 +53,12 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         if isinstance(end, Point.EPoint):
             end = end.get_arc_center()
         self.brace = None
+        self._name = f"ELine: {start} {end} "
 
         super().__init__(start, end, *args, **kwargs)
 
     def __str__(self):
-        return f"ELine: ({self.e_start[0]:.2f},{self.e_start[1]:.2f})-" + \
-            f"({self.e_end[0]:.2f},{self.e_end[1]:.2f}) slope={self.e_slope:.2f} length={self.get_length():.2f}"
+        return self._name
 
     # -----------------------------------------------------------------------------------------------------------------
     # this specifies the arguments for e_label_location

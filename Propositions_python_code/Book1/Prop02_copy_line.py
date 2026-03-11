@@ -34,10 +34,10 @@ class Book1Prop2(Book1Scene):
         t1.title("Construction:")
         t1.explain("Start with line segment AB and Point C")
 
-        p['A'] = EPoint(A, label_args=('A', dict(away_from=B)))
-        p['B'] = EPoint(B, label_args=('B', dict(away_from=A)))
+        p['A'] = EPoint(A, label=('A', dict(away_from=B)))
+        p['B'] = EPoint(B, label=('B', dict(away_from=A)))
         l['AB'] = ELine(p['A'], p['B'], stroke_color=BLUE)
-        p['C'] = EPoint(C, label_args=('C', dict(away_from=A)))
+        p['C'] = EPoint(C, label=('C', dict(away_from=A)))
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class Book1Prop2(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Label the intersection of the circle and line AD as E")
         pts = c['A'].intersect(l['AD'])
-        p['E'] = EPoint(pts[0], label_args=('E', DL))
+        p['E'] = EPoint(pts[0], label=('E', DL))
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class Book1Prop2(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Label the intersection of the circle and line CD as F")
         pts = c['D'].intersect(l['CD'])
-        p['F'] = EPoint(pts[0], label_args=('F', RIGHT))
+        p['F'] = EPoint(pts[0], label=('F', RIGHT))
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -125,8 +125,8 @@ class Book1Prop2(Book1Scene):
             p['E'].e_draw()
             p['F'].e_draw()
         with self.simultaneous():
-            l['DE'] = ELine(p['D'], p['E'], label_args=('y', dict(side=LineLabelSide.INSIDE)))
-            l['DF'] = ELine(p['D'], p['F'], label_args=('y'))
+            l['DE'] = ELine(p['D'], p['E'], label=('y', dict(side=LineLabelSide.INSIDE)))
+            l['DF'] = ELine(p['D'], p['F'], label=('y'))
         with self.simultaneous():
             eq_ad_dc_x.e_fade()
         eq_de_df_y = t2.math("DE = DF = y")
@@ -142,7 +142,7 @@ class Book1Prop2(Book1Scene):
             l['AD'].e_fade()
             l['DE'].e_fade()
 
-        l['AE'] = ELine(A, p['E'], label_args=('x-y', dict(align=RIGHT, side=LineLabelSide.INSIDE)))
+        l['AE'] = ELine(A, p['E'], label=('x-y', dict(align=RIGHT, side=LineLabelSide.INSIDE)))
         t2.e_normal()
         eq_ae_eq_ad_m_de = t2.math("AE = AD - DE")
         eq_ae_eq_x_m_y = t2.math("AE = x  - y")
@@ -157,7 +157,7 @@ class Book1Prop2(Book1Scene):
             l['CD'].e_fade()
             l['DF'].e_fade()
 
-        l['CF'] = ELine(C, p['F'], label_args=('x-y', dict(align=LEFT)))
+        l['CF'] = ELine(C, p['F'], label=('x-y', dict(align=LEFT)))
 
         with self.simultaneous():
             eq_ae_eq_ad_m_de.e_fade()
@@ -231,10 +231,10 @@ class Book1Prop2(Book1Scene):
 
         t3.title("But what if?")
         t3.explain("Start with line segment AB and point C")
-        p['A'] = EPoint(A, label_args=('A', dict(away_from=B)))
-        p['B'] = EPoint(C, label_args=('B', dict(away_from=A)))
+        p['A'] = EPoint(A, label=('A', dict(away_from=B)))
+        p['B'] = EPoint(C, label=('B', dict(away_from=A)))
         l['AB'] = ELine(p['A'], p['B'], stroke_color=BLUE)
-        p['C'] = EPoint(D, label_args=('C', dict(away_from=A)))
+        p['C'] = EPoint(D, label=('C', dict(away_from=A)))
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -271,7 +271,7 @@ class Book1Prop2(Book1Scene):
         # ------------------------------------------------------------------------
         t3.explain("Label the intersection of the circle and line AD as E")
         pts = c['A'].intersect(l['AD'])
-        p['E'] = EPoint(pts[0], label_args=('E', RIGHT))
+        p['E'] = EPoint(pts[0], label=('E', RIGHT))
         self.next_page()
 
         # ------------------------------------------------------------------------
@@ -283,7 +283,7 @@ class Book1Prop2(Book1Scene):
         # ------------------------------------------------------------------------
         t3.explain("Label the intersection of the circle and line CD as F")
         pts = c['D'].intersect(l['CD'])
-        p['F'] = EPoint(pts[0], label_args=('F', RIGHT))
+        p['F'] = EPoint(pts[0], label=('F', RIGHT))
         self.next_page()
 
         # ------------------------------------------------------------------------

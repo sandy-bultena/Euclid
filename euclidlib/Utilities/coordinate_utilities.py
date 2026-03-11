@@ -64,6 +64,9 @@ def euclid_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDAr
         z / E_TO_M_SCALE
     ])
 
+def euclid_scale(x: float)->float:
+    return x/E_TO_M_SCALE
+
 def mn_scale(f, *rest) -> float | npt.NDArray[float]:
     """
     changes the euclid length and converts to the appropriate manim length

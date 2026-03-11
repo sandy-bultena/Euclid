@@ -28,6 +28,12 @@ if TYPE_CHECKING:
 # Get the pts where the angle (arc) starts and stops
 # ===============================================================================================================
 def angle_coords(l1: Line.ELine, l2: Line.ELine) -> ANGLE_DATA:
+    """
+    given two lines, find the common point between two lines, and the points where the arc starts and stops
+    :param l1: line 1
+    :param l2: line 2
+    :return: common point coordinates, arc_start coordinates, arc_end coordinates
+    """
     (l1x0, l1y0, _), (l1x1, l1y1, _) = l1.get_start(), l1.get_end()
     (l2x0, l2y0, _), (l2x1, l2y1, _) = l2.get_start(), l2.get_end()
 
@@ -71,6 +77,7 @@ def angle_coords(l1: Line.ELine, l2: Line.ELine) -> ANGLE_DATA:
 # get angle between two points
 # ===============================================================================================================
 def angleOf(p0: mn.Vect3, p1: mn.Vect3):
+    """get angle of vector between two points"""
     return math.atan2(
         p1[1] - p0[1],
         p1[0] - p0[0],
@@ -397,18 +404,16 @@ class Gnomon(ArcAngle):
 # ==============================================================================================================
 # EAngle - whoa - EAngle is not a class... didn't know that
 # ==============================================================================================================
-def EAngle(l1: Line.ELine | str,
+def EAngle(l1: Line.ELine,
            l2: Line.ELine = None,
-           size: float = mn_scale(40),
+           size: float = ANGLE_SIZE,
            no_right: bool = False,
            gnomon: bool = False,
            **kwargs) -> Gnomon| ArcAngle| RightAngle:
 
-    # to be deleted later, I don't want to support this, its too weird
-    if isinstance(l1, str):
-        l1, l2 = Line.ELine.find_in_frame(l1)
-
     assert (l2 is not None)
+    if size is None:
+        size = ANGLE_SIZE
 
     # ----------------------------------------------------------------------------------------------------------
     # get info about the angle

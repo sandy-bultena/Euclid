@@ -114,6 +114,7 @@ def font_change():
     t1.explain("font size is whatever the default is")
     t1.explain('font_size = 32', font_size=32)
     t1.explain("font_size = 8", font_size=8)
+
 def vertical_spacing():
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("line one")

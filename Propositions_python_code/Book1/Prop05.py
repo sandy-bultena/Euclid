@@ -90,7 +90,7 @@ class Prop05(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Define a point along the extension of AB")
         D = l['BY'].point(mn_scale(100))
-        p['D'] = EPoint(D, label_args=('D', dict(away_from=C)))
+        p['D'] = EPoint(D, label=('D', dict(away_from=C)))
         l['BD'] = ELine(B, D)
         l['BD'].add_label('x', side=LineLabelSide.INSIDE)
         t2.math('BD = x')
@@ -139,7 +139,7 @@ class Prop05(Book1Scene):
             l['BD'].e_normal()
             l['AC'].e_remove()
         with self.simultaneous():
-            l['AC'] = ELine(A, C, label_args='r')
+            l['AC'] = ELine(A, C, label='r')
             l['CD'] = ELine(C, p['D'])
         t['ADC'] = ETriangle(p['C'], p['A'], p['D']).e_fill(BLUE_E)
         t2.math(r'AD=x+r,\quad \measuredangle DAC = \gamma,\quad AC = r')
