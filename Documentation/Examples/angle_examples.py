@@ -14,6 +14,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
+        print(mn.__version__)
         bisect()
 
     def go(self):
