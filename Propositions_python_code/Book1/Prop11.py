@@ -2,7 +2,6 @@ import sys
 import os
 
 sys.path.append(os.getcwd())
-from euclidlib.Objects import EquilateralTriangle
 from euclidlib.Scenes.BookScene import Book1Scene
 from euclidlib.Objects import *
 from typing import Dict
@@ -92,7 +91,7 @@ class Prop11(Book1Scene):
         c['C'].e_fade()
         t1.explain("Construct an equilateral triangle on DE and label the {nb: vertex "
                    "(I.1)}")
-        t[1] = EquilateralTriangle.build(p['D'], p['E'], speed=2)
+        t[1] = ETriangle.build_equilateral(p['D'], p['E'], speed=2)
         l['DF'], l['EF'], p['F'] = t[1].l[2], t[1].l[1], t[1].p[-1]
         p['F'].add_label('F', UP)
 

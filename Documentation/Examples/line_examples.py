@@ -13,11 +13,35 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        copy_to_line2()
+        perpendicular2()
 
     def go(self):
         pass
 
+def perpendicular2():
+    # inside/outside doesn't seem to be working properly... test
+    l0 = ELine([-5.7,  0.,   0.],[-3., - 1.5,0.])
+    l2 = ELine([-3.5,  1.,   0., ], [-5.7,  0.,   0. ])
+    l0.add_label('0',side=Line.LineLabelSide.INSIDE)
+    l2.add_label('2',side=Line.LineLabelSide.INSIDE)
+    p = l0.bisect()
+    l0.perpendicular(p, side=Line.LineLabelSide.INSIDE).blue()
+    l0.perpendicular(p, side=Line.LineLabelSide.OUTSIDE).green()
+    p = l2.bisect()
+    l2.perpendicular(p, side=Line.LineLabelSide.INSIDE).blue()
+    l2.perpendicular(p, side=Line.LineLabelSide.OUTSIDE).green()
+
+    pass
+
+def golden():
+    t1 = TextBox(mn_coord(300,300))
+    t1.math(r"AB\times PB = AP\times AP")
+
+    a = EPoint(mn_coord(300,350), label=('A',mn.LEFT))
+    b = EPoint(mn_coord(600,350), label=('B',mn.RIGHT))
+    l2 = ELine(a,b,label=r'\rightarrow')
+    p = l2.golden_ratio()
+    p.blue().add_label("P",mn.DOWN)
 
 def square():
     l2 = ELine(mn_coord(300,150),mn_coord(400,150)).add_label(r'\rightarrow')

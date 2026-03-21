@@ -89,7 +89,7 @@ class Prop07(Book1Scene):
                    "definition, so the base angles must be equal (I.6)")
         with self.simultaneous():
             t['CBD'].e_fade()
-        t['CAD'].set_angles(r'\alpha', None, r'\alpha', mn_scale(20), 0, mn_scale(55))
+        t['CAD'].set_angles((r'\alpha', mn_scale(20)), None, (r'\alpha', mn_scale(55)))
 
         t2.e_fade(*t2.except_index(0))
         t2.math(r'\measuredangle ACD = \measuredangle CDA = \alpha')
@@ -102,7 +102,7 @@ class Prop07(Book1Scene):
         with self.simultaneous():
             t['CAD'].e_fade()
             t['CBD'].e_normal()
-        t['CBD'].set_angles(r'\beta', None, r'\beta', mn_scale(55), 0, mn_scale(20))
+        t['CBD'].set_angles((r'\beta', mn_scale(55)), None, (r'\beta', mn_scale(20)))
         with self.simultaneous():
             t2.white(1)
             t2.e_fade(*t2.except_index(1))

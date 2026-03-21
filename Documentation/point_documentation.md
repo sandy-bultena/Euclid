@@ -29,7 +29,8 @@ def __init__(self, center, label, fill_color, radius, **kwargs):
 
 ## Label
 
-### `add_label(self, text, direction, side, alpha, buff, align) -> ELine`
+### `add_label(self, text, direction, buff, away_from, towards, align) -> ELine`
+
 
 | name        | type                   | default      | description                                                  |
 | ----------- | ---------------------- | ------------ | ------------------------------------------------------------ |

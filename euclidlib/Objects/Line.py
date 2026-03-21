@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 from . import Point
 from . import Circle
 from . import Angle
-from . import EquilateralTriangle
 from . import Dashable
 from . import Arc
 from . import Triangle
@@ -65,6 +64,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     if TYPE_CHECKING:
         # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
+        # which in turn uses e_label_location to figure out where to put the label
         def add_label(self, text: str, direction: mn.Vect3 = None, side=LineLabelSide.OUTSIDE, alpha=0.5,
                       buff=LINE_LABEL_BUFF, align=mn.ORIGIN) -> ELine:
             """
@@ -341,7 +341,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         l['AC'] = ELine(A, C, scene=self.scene).e_fade()
 
         # construct equilateral on above line (D = apex of triangle)
-        t[1] = EquilateralTriangle.build(A, C)
+        t[1] = Triangle.ETriangle.build_equilateral(A, C)
         p['D'] = t[1].p[-1]
         l['AD'] = t[1].l[2]
         l['CD'] = t[1].l[1]
@@ -355,7 +355,6 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         def find_extended_intersection(p1, p2, circle, line, extend_dir=1, find_min=False):
             c[circle] = Circle.ECircle(p1, p2, scene=self.scene).e_fade()
             pts = c[circle].intersect(l[line])
-            # self.add(l[line])
             for _ in range(15):
                 if pts and not find_min:
                     break
@@ -553,64 +552,53 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         return lfinal
 
     # -----------------------------------------------------------------------------------------------------------------
-    # drop a perpendicular from the line
+    # draw a perpendicular from the line
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def _perp_on_line(self, p: Point.EPoint, dist_end: float, dist_start: float, /, inside=False):
+    def _perp_on_line(self, p: Point.EPoint, dist_end: float, dist_start: float, /, direction=None) -> ELine:
+
+        # get direction vector
+        direction = self.IN if direction is None else direction
+
         A, B = self.get_start_and_end()
-        C = self.pointify(p)
-        l: dict[str, ELine] = {}
-        p: dict[str, Point.EPoint] = {}
-        c: dict[str, Circle.ECircle] = {}
+        C = convert_to_coord(p)
+        #p: dict[str, Point.EPoint] = {}
         ln: ELine = self.copy().e_fade()
 
         radius = max(dist_start, dist_end)
         ln.extend(dist_start - dist_end)
-        c['C'] = Circle.ECircle(C, C + mn.RIGHT * radius)
+        c_C = Circle.ECircle(C, C + mn.RIGHT * radius)
 
         # define two points equidistance from our initial point
-        pts = c['C'].intersect(ln)
-        p['D'] = Point.EPoint(pts[0])
-        p['E'] = Point.EPoint(pts[1])
+        pts = c_C.intersect(ln)
+        pD = Point.EPoint(pts[0])
+        pE = Point.EPoint(pts[1])
 
-        c['C'].e_remove()
+        c_C.e_remove()
 
         # find 3rd point of equilateral triangle, without drawing lines
-        c1 = Circle.ECircle(p['D'], p['E'])
-        c2 = Circle.ECircle(p['E'], p['D'])
+        c1 = Circle.ECircle(pD, pE)
+        c2 = Circle.ECircle(pE, pD)
         pts = c1.intersect(c2)
 
-        # if point is at either end of the line, check for positive/negative
-        # options, otherwise go with defaults;
-        if mn.get_norm(A - C) < mn_scale(.1) or mn.get_norm(B - C) < mn_scale(.1):
-            l1 = ELine(C, pts[1], delay_anim=True)
-            l2 = ELine(C, pts[0], delay_anim=True)
-            a1 = Angle.calculateAngle(self, l1)
-            a2 = Angle.calculateAngle(self, l2)
+        # of the two points, which one is in the preferred direction?
+        pt = pts[0]
+        for point in pts:
+            vl = VirtualLine(C,point)
+            if get_dist(direction, vl.get_unit_vector()) < 0.01:
+                pt = point
+            vl.e_remove()
 
-            if inside:
-                l2, l1 = l1, l2
-
-            if abs(a1 - mn.PI / 2) < 0.1 * mn.DEGREES:
-                l['CF'] = l1
-                l2.e_delete()
-            elif abs(a2 - mn.PI / 2) < 0.1 * mn.DEGREES:
-                l['CF'] = l2
-                l1.e_delete()
-            else:
-                raise ArithmeticError(f"Bad Angles {a1=} and {a2=}")
-            l['CF'].e_draw()
-        else:
-            l['CF'] = ELine(C, pts[int(inside)])
+        line = ELine(C, pt)
 
         with self.scene.simultaneous():
-            p['D'].e_remove()
-            p['E'].e_remove()
+            pD.e_remove()
+            pD.e_remove()
             c1.e_remove()
             c2.e_remove()
             ln.e_remove()
-        return l['CF']
+        return line
 
     # -----------------------------------------------------------------------------------------------------------------
     # perpendicular
@@ -618,12 +606,23 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     @log
     @anim_speed
     def perpendicular(self, point: Point.EPoint, /, side=LineLabelSide.OUTSIDE, **kwargs) -> ELine:
-        inside = side == LineLabelSide.INSIDE
+
+        # get final direction vector of perpendicular (needed only if its a point on the line)
+        if side == LineLabelSide.OUTSIDE:
+            direction_vector = self.OUT()
+        else:
+            direction_vector = self.IN()
+
+        # is the point on the line or not?
         rs = mn.get_norm(self.pointify(point) - self.get_start())
         re = mn.get_norm(self.pointify(point) - self.get_end())
+
+        # point is not on the line
         if (rs + re - self.get_length()) > mn_scale(0.1):
             return self._perp_off_line(point, re, rs, speed = kwargs.get('speed',self.scene.get_current_speed()))
-        return self._perp_on_line(point, re, rs, inside=inside, speed=kwargs.get('speed',self.scene.get_current_speed()))
+
+        # point is on the line
+        return self._perp_on_line(point, re, rs, direction=direction_vector, speed=kwargs.get('speed',self.scene.get_current_speed()))
 
     # -----------------------------------------------------------------------------------------------------------------
     # draw a line parallel going through a point
@@ -699,16 +698,18 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def golden_ration(self, negative=False):
+    def golden_ratio(self, reverse=False):
+        '''Find a point P on line AB such that AB x PB = AP x AP (extreme and mean ratio)'''
+
         # take care of negative/positive stuff
         start, end = self.get_start_and_end()
-        if negative:
+        if reverse:
             end, start = start, end
 
         # drop a perpendicular from the starting point
         pA = Point.EPoint(start)
         l3t = self.perpendicular(pA).e_fade()
-        if l3t.get_length() < self.get_length():
+        if l3t.length < self.get_length():
             l3t.extend(self.get_length())
         pA.e_remove()
 

@@ -300,8 +300,14 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # ----------------------------------------------------------------------------------------------------------
     # intersect line
     # ----------------------------------------------------------------------------------------------------------
-    def intersect_line(self, other: Line.ELine) -> Optional[tuple[mn.Vect3,...]] :
-        """Find the two points (or None) where a line intersects a circle"""
+    def intersect_line(self, other: Line.ELine, infinite:bool = False) -> Optional[tuple[mn.Vect3,...]] :
+        """
+        Find the two points (or None) where a line intersects a circle
+        :param other: the line
+        :param infinite: assume the line is infinite (default = False)
+        :return:
+        """
+
         x, y, _ = self.center
         r = self.radius
 
@@ -350,6 +356,9 @@ class AbstractArc(Da.Dashable, mn.Arc):
             x4 = x0
             y3 = (-b + math.sqrt(sqr)) / (2 * a)
             y4 = (-b - math.sqrt(sqr)) / (2 * a)
+
+        if infinite:
+            return np.array((x3, y3, 0)), np.array((x4, y4, 0))
 
         results = []
         max_x = max(x1, x0)

@@ -50,7 +50,7 @@ class Prop09(Book1Scene):
             l['AB'] = ELine(A, p['B'])
             l['AC'] = ELine(A, p['C'])
             l['BC'] = ELine(p['B'], p['C'])
-            t[1] = EquilateralTriangle.build(p['C'], p['B'])
+            t[1] = ETriangle.build_equilateral(p['C'], p['B'])
         l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
         l['AD'] = ELine(A, p['D'])
         a['DAC'] = EAngle(l['AD'],l['AC'], label=r'\alpha')
@@ -89,7 +89,7 @@ class Prop09(Book1Scene):
                    r"and label the vertex {nb:D (I.1)}")
         c['A'].e_fade()
         l['BC'].e_draw()
-        t[1] = EquilateralTriangle.build(p['C'], p['B'])
+        t[1] = ETriangle.build_equilateral(p['C'], p['B'])
         l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
         t[1].l[0].e_delete()
         p['D'].add_label('D', DOWN)

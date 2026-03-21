@@ -107,7 +107,9 @@ Generally speaking, it is not necessary to transform an angle using a transforma
 
 ### `copy_to_line(point, line, negative, speed)-> tuple[ELine, EAngleBase]`
 
-Takes an existing angle, and copies that angle onto another line.
+Takes an existing angle, and copies that angle onto another line.  
+
+> Note: angle is calculated from `line` to the new calculated line, so <font color='red'>`___`</font>`/` would be a positive angle if <font color='red'>`___`</font> was the original line
 
 | parameter  | type     | default | description                                                  |
 | ---------- | -------- | ------- | ------------------------------------------------------------ |

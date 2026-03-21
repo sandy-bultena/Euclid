@@ -60,7 +60,7 @@ class Prop45(Book1Scene):
                    "such that it is equal in area to the polygon ABCD")
         p['x'] = EPoint(K)
         with self.skip_animations_for(False):
-            s['x'] = s['ABCD'].copy_to_parallelogram_on_point(p['x'], a['E'], negative=True, speed=self.default_speed)
+            s['x'] = s['ABCD'].copy_to_parallelogram_on_point(p['x'], a['E'], speed=self.default_speed)
         s['x'].e_draw()
         s['x'].e_fill(BLUE_D)
         s['x'].set_angles(None, r'\epsilon')

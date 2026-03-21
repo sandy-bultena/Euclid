@@ -160,7 +160,8 @@ def {name}(self, *indices, **kwargs):
 
 
     def __str__(self):
-        return f"EIndexedGroup, {self.get_group()}"
+        return "EIndexedGroup"
+        #return f"EIndexedGroup, {self.get_group()}"
 
     if TYPE_CHECKING:
         def blue(self, *index:(int|slice))-> EIndexedGroup|EMObject: ...

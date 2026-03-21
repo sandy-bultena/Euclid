@@ -36,8 +36,7 @@ class Prop18(Book1Scene):
         t['ABC'] = ETriangle(
             A,B,C,
             point_labels='ABC',
-            angles=r'\alpha \beta \gamma '.split(),
-            angle_sizes=[None, 60, None],
+            angles=(r'\alpha', (r'\beta',mn_scale(60)), r'\gamma'),
             labels=[None, 'a', 'b']
         )
         a['a'], a['b'], a['c'] = t['ABC'].a
@@ -127,7 +126,7 @@ class Prop18(Book1Scene):
             t['ABD'].a[0].e_normal()
             #a['a'].e_fade()
             #p['A'].e_fade()
-        t['DBC'].set_angles(None, r'\theta', None, 0, mn_scale(15), 0)
+        t['DBC'].set_angles(None, (r'\theta', mn_scale(15)), None)
         with self.simultaneous():
             t['DBC'].e_fill(GREEN_E)
 

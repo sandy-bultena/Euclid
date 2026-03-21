@@ -406,7 +406,7 @@ class Gnomon(ArcAngle):
 # ==============================================================================================================
 def EAngle(l1: Line.ELine,
            l2: Line.ELine = None,
-           size: float = ANGLE_SIZE,
+           size: Optional[float] = None,
            no_right: bool = False,
            gnomon: bool = False,
            **kwargs) -> Gnomon| ArcAngle| RightAngle:

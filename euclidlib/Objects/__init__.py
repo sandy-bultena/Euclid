@@ -17,4 +17,4 @@ from .Text import EText, EMarkupText, EStringObj, ETexText, Label
 from .Parallelogram import EParallelogram
 from .Square import ESquare
 from . import RegularPolygons
-from . import EquilateralTriangle
+

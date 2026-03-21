@@ -236,6 +236,35 @@ _Example:_ instersection_point
         EPoint(i)
 ```
 
+
+
+### `golden_ratio(class, reverse)->EPoint`
+
+Find a point P on line AB such that AB x PB = AP x AP (extreme and mean ratio)
+| variable | type    | default | description    |
+| -------- | ------- | ------- | -------------- |
+| `reverse`  | `bool` |         | reverse the direction of the line before finding the point |
+| `speed`    | `float` | -1      | If `speed` is greater than zero it sets the speed of the animation the transformation |
+| `**kwargs` |         |         | animation arguments                                          |
+
+_Example:_
+<img src="./images/line_golden.png"  style="zoom:30%;" />
+
+```python
+    t1 = TextBox(mn_coord(300,300))
+    t1.math(r"AB\times PB = AP\times AP")
+
+    a = EPoint(mn_coord(300,350), label=('A',mn.LEFT))
+    b = EPoint(mn_coord(600,350), label=('B',mn.RIGHT))
+    l2 = ELine(a,b,label=r'\rightarrow')
+    p = l2.golden_ratio()
+    p.blue().add_label("P",mn.DOWN)
+```
+
+
+
+
+
 ## Modify Line Methods
 
 ### `e_split(self, points) -> list[Eline]`

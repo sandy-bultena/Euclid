@@ -26,7 +26,7 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # initialize
     # ----------------------------------------------------------------------------------------------------------------
-    def __init__(self, center, label=None, fill_color=mn.WHITE, radius=mn_scale(10), **kwargs):
+    def __init__(self, center, label=None, fill_color=mn.WHITE, radius=DEFAULT_POINT_SIZE, **kwargs):
         animate_part = kwargs.get('animate_part', None)
         self._original_center = center
         super().__init__(
@@ -153,6 +153,10 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     @property
     def coordinates(self):
+        return convert_to_coord(self.get_center())
+
+    @property
+    def coords(self):
         return convert_to_coord(self.get_center())
 
     @property

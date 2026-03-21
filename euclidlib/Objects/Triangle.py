@@ -9,9 +9,9 @@ import numpy as np
 import manimlib as mn
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects.em_object_decorators import *
-from euclidlib.Utilities.coordinate_utilities import convert_to_coord, mn_scale
+from euclidlib.Utilities.coordinate_utilities import convert_to_coord, mn_scale, get_dist
 
-from . import Polygon
+from . import Polygon, Parallelogram
 from . import em_group_object as GroupObject
 from . import Parallelogram as Para
 from . import Line
@@ -23,7 +23,7 @@ from . import Circle
 # ETriangle
 # ====================================================================================================================
 
-class ETriangle(Polygon.EPolygon):
+class ETriangle(Polygon.EPolygonBase):
 
     # ---------------------------------------------------------------------------------------------------------------
     # length of / angle of --- helper functions
@@ -45,19 +45,35 @@ class ETriangle(Polygon.EPolygon):
     # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     def SAS(cls,
-            base: EMObject | mn.Vect3,
+            point: Point.EPoint | mn.Vect3,
             side1: float | Line.ELine,
             angle: float | Angle.EAngleBase,
-            side2: float | Line.ELine,
+            side3: float | Line.ELine,
+            labels: Polygon.LABEL_ARGS = None,
+            point_labels: Polygon.LABEL_ARGS = None,
             **kwargs) -> Self:
-        p2, p3, _ = cls._calculate_SAS(convert_to_coord(base),
+        '''
+        create a Triangle with 1st and 3rd side defined, with the angle defined
+
+        the triangle will always be drawn such that the calculated line will be horizontal
+        :param point: coordinate of one vertex of the triangle
+        :param side1: length of one side
+        :param angle: angle
+        :param side3: length of other side
+        :param labels: iterable defining label arguments
+        :param point_labels: iterable defining point label arguments
+        :param kwargs: animation arguments
+        :return:
+        '''
+
+        p2, p3, _ = cls._calculate_SAS(convert_to_coord(point),
                                       cls.length_of(side1),
                                       cls.angle_of(angle),
-                                      cls.length_of(side2))
-        return cls(base, p2, p3, **kwargs)
+                                      cls.length_of(side3))
+        return cls(point, p2, p3, labels=labels, point_labels=point_labels, **kwargs)
 
     @classmethod
-    def _calculate_SAS(cls, point: mn.Vect3, r1: float, angle: float, r2: float):
+    def _calculate_SAS(cls, point: mn.Vect3, r1: float, angle: float, r2: float)->tuple[np.array, np.array, float]:
         x1, y1, _ = point
         theta = atan((r1 - r2 * cos(angle)) /
                      (r2 * sin(angle)))
@@ -77,10 +93,12 @@ class ETriangle(Polygon.EPolygon):
     def SSS(cls,
             base: EMObject | mn.Vect3,
             *sides: float | Line.ELine,
-            labels: Polygon.LABEL_ARGS = (None, None, None),
-            point_labels: Polygon.LABEL_ARGS = (None, None, None),
+            labels: Polygon.LABEL_ARGS = None,
+            point_labels: Polygon.LABEL_ARGS = None,
             **kwargs):
         assert (len(sides) == 3)
+
+        speed = kwargs.pop('speed',-1)
 
         # find the vertices
         coord = convert_to_coord(base)
@@ -89,42 +107,33 @@ class ETriangle(Polygon.EPolygon):
         p1, p2, p3 = cls._calculate_SSS(coord, *r)
         if p2 is None:
             return p1
-        center = mn.center_of_mass([p1, p2, p3])
 
-        # create label properties
-        labels_full = [cls._filter_side_labels(x) for x in labels]
-        point_labels_full = [
-            cls._filter_point_labels_with_center(x, center)
-            for x in point_labels]
+        # animate the construction
+        if speed > 0:
+            c1 = Circle.ECircle(p2, p2 + mn.RIGHT * r[0])
+            c1.e_fade()
+            l2 = Line.ELine(p2, p3)
 
-        # create point2 (why)
-        p = Point.EPoint(p2, label=point_labels_full[1])
+            c2 = Circle.ECircle(p3, p3 + r[2] * mn.RIGHT)
+            c2.e_fade()
 
-        c1 = Circle.ECircle(p2, p2 + mn.RIGHT * r[0], temp_line_label=labels_full[0])
-        c1.e_fade()
+            new = cls(p1, p2, p3,
+                      labels=labels,
+                      point_labels=point_labels,
+                      **kwargs)
 
-        l2 = Line.ELine(p2, p3, label=labels_full[1])
-        nextp = Point.EPoint(p3, label=point_labels_full[2])
+            with new.scene.simultaneous():
+                c1.e_remove()
+                c2.e_remove()
+                l2.e_remove()
 
-        c2 = Circle.ECircle(p3, p3 + r[2] * mn.RIGHT, temp_line_label=labels_full[2])
-        c2.e_fade()
+        # just create the triangle, with no animation of construction
+        else:
+            new = cls(p1, p2, p3,
+                      labels=labels,
+                      point_labels=point_labels,
+                      **kwargs)
 
-        new = cls(p1, p2, p3,
-                  labels=[labels_full[0], None, labels_full[2]],
-                  point_labels=[point_labels_full[0], None, None],
-                  **kwargs)
-        if p.e_label is not None:
-            p.e_label.transfer_ownership(new.p[1])
-        if nextp.e_label is not None:
-            nextp.e_label.transfer_ownership(new.p[2])
-        if l2.e_label is not None:
-            l2.e_label.transfer_ownership(new.l[1])
-        with new.scene.simultaneous():
-            c1.e_remove()
-            c2.e_remove()
-            p.e_remove()
-            nextp.e_remove()
-            l2.e_remove()
         return new
 
     @classmethod
@@ -144,9 +153,15 @@ class ETriangle(Polygon.EPolygon):
             xy1 = p3s[1]
         return xy1, coord, next
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # parallelogram
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def parallelogram(self, angle: Angle.EAngleBase):
+    def parallelogram(self, angle: Angle.EAngleBase) -> tuple[Parallelogram.EParallelogram, Angle.EAngle]:
+        '''Create a parallelogram from the triangle'''
+
+        # bisect the 2nd line
         point = self.l[1].bisect(speed=0)
         l = Line.ELine(self.p[1], self.p[2])
         l.e_fade()
@@ -187,49 +202,59 @@ class ETriangle(Polygon.EPolygon):
 
         return poly, angle2
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # copy to parallelogram on line
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
-    def copy_to_parallelogram_on_line(self, line: Line.ELine, angle: Angle.EAngleBase):
+    def copy_to_parallelogram_on_line(self, line: Line.ELine, angle: Angle.EAngleBase, speed = -1):
         # create parallelogram equal in size to triangle (I.42)
-        s1, a2 = self.parallelogram(angle, speed=0)
+        s1, a2 = self.parallelogram(angle, speed=speed)
         a2.e_remove()
 
         # copy this parallelogram to the line
-        s4 = s1.copy_to_line(line, speed=0)
+        s4 = s1.copy_to_line(line, speed=speed)
         s1.e_remove()
         return s4
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # circumscribe
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
     def circumscribe(self):
         # bisect two sides of the triangle
-        pD = self.l0.bisect()
-        pE = self.l2.bisect()
+        pD = self.l[0].bisect()
+        pE = self.l[2].bisect()
 
         # Find the centre of the circle
-        l1 = self.l0.perpendicular(pD, inside=True)
-        l2 = self.l2.perpendicular(pE, inside=True)
-        p=  l1.intersect_line(l2)[0]
-
-        c = Circle.ECircle(p, self.p0)
+        l1 = self.l[0].perpendicular(pD, side = Line.LineLabelSide.INSIDE)
+        l2 = self.l[2].perpendicular(pE, side = Line.LineLabelSide.INSIDE)
+        p =  l1.intersect_line(l2)[0]
+        p2 = Point.EPoint(p)
+        c = Circle.ECircle(p, self.p[0])
 
         with self.scene.simultaneous():
             l1.e_remove()
             l2.e_remove()
             pD.e_remove()
             pE.e_remove()
+            p2.e_remove()
 
         return c
 
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # circumscribe
+    # ---------------------------------------------------------------------------------------------------------------
     @classmethod
     @class_anim_speed
-    def golden(cls, line: Line.ELine, negative=False):
-        pC = line.golden_ration(speed=0)
+    def golden(cls, line: Line.ELine, clockwise=False):
+        pC = line.golden_ratio()
         pB = Point.EPoint(line.get_end())
         cA = Circle.ECircle(*line.get_start_and_end())
         lAC = Line.ELine(line.get_start(), pC).red()
-        lBD = lAC.copy_as_chord(cA, pB, negative=negative)
+        lBD = lAC.copy_as_chord(cA, pB, clockwise=clockwise)
 
         # which way to construct triangle? make sure angles are less than 90
         a = Angle.EAngle(line, lBD)
@@ -247,15 +272,21 @@ class ETriangle(Polygon.EPolygon):
             cA.e_remove()
         return t
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # copy to circle
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
     def copy_to_circle(self, circle: Circle.ECircle) -> ETriangle:
-        if self.is_clockwise:
+        '''In a given circle to inscribe a triangle equiangular with a given triangle (IV-II)'''
+
+        if not self.is_clockwise:
             angles: GroupObject.EIndexedGroup[Angle.EAngleBase] = GroupObject.EIndexedGroup(
                 Angle.EAngle(l2, l1, delay_anim=True)
                 for (l1, l2) in pairwise([self.lines[-1]] + self.lines)
             )
             a1, a2 = angles[2], angles[1]
+
         else:
             angles: GroupObject.EIndexedGroup[Angle.EAngleBase] = GroupObject.EIndexedGroup(
                 Angle.EAngle(l1, l2, delay_anim=True)
@@ -273,14 +304,22 @@ class ETriangle(Polygon.EPolygon):
         # Copy the angle E to line GH, at point A (I.23)
         with with_objects(*a1.copy_to_line(pA, lAH)) as (la1, a1):
             la1.extend(2 * circle.radius)
-            pts = circle.intersect(la1)
-            pC = Point.EPoint(pts[0])
+            pts = circle.intersect_line(la1,infinite=True)
+
+            # pick the point that is not pA
+            for p in pts:
+                if get_dist(pA, p) > .01:
+                    pC = Point.EPoint(p)
 
         # Copy the angle L to line GH, at point A (I.23)
         with with_objects(*a2.copy_to_line(pA, lGA, negative=True)) as (la2, a2):
             la2.extend(2 * circle.radius)
-            pts = circle.intersect(la2)
-            pB = Point.EPoint(pts[1])
+            pts = circle.intersect_line(la2, infinite=True)
+
+            # pick the point that is not pA
+            for p in pts:
+                if get_dist(pA, p) > .01:
+                    pB = Point.EPoint(p)
 
         # create new triangle
         t = ETriangle(pA, pB, pC)
@@ -296,9 +335,30 @@ class ETriangle(Polygon.EPolygon):
 
         return t
 
-    def true_area(self) -> float:
-        a = self.l0.get_length()
-        b = self.l1.get_length()
-        c = self.l2.get_length()
-        s = .5 * (a + b + c)
-        return math.sqrt(s * (s-a) * (s-b) * (s-c))
+
+    @anim_speed
+    @staticmethod
+    def build_equilateral(p1: [mn.Vect3 | Point.EPoint], p2: [mn.Vect3 | Point.EPoint]):
+        """build an equilateral triangle where p1 and p2 are the points defining the base"""
+        c1 = Circle.ECircle(p1, p2).e_fade()
+        c2 = Circle.ECircle(p2, p1).e_fade()
+
+        pts = c1.intersect(c2)
+        l1 = Line.VirtualLine(p1, p2)
+        l2 = Line.VirtualLine(p2, pts[0])
+
+        th = Angle.calculateAngle(l2, l1)
+        if th < mn.PI:
+            C = pts[0]
+        else:
+            C = pts[1]
+
+        p = Point.EPoint(C)
+        t = ETriangle(p1, p2, C)
+        with p.scene.simultaneous():
+            c1.e_remove()
+            c2.e_remove()
+            l1.e_remove()
+            l2.e_remove()
+        t.replace_point(-1, p)
+        return t

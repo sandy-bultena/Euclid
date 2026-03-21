@@ -22,15 +22,96 @@ class Book1Prop1(PropScene):
     def go(self):
         pass
 
-def parallelogram():
-    poly = EPolygon(mn_coord(200, 200), mn_coord(150,300), mn_coord(200, 400), mn_coord(400,450), mn_coord(400, 400),
-                    mn_coord(370,300))
-    l1 = ELine(mn_coord(200,700), mn_coord(400,700),label='a')
-    l2 = ELine(mn_coord(250,150), mn_coord(350,150))
-    l3 = ELine(mn_coord(250,150), mn_coord(350, 50))
-    angle = EAngle(l2,l3,label=r'\alpha')
-    poly.copy_to_parallelogram_on_line(l1,angle)
+def polygon():
 
+    t1 = TextBox(mn_coord(300,100))
+    t1.math(r"A_a = A_c\quad\quad b\sim d")
+
+    p = EPoint(mn_coord(700, 400))
+
+    # create polygon 1
+    poly1 = EPolygon(mn_coord(200, 200), mn_coord(150,300), mn_coord(200, 400), mn_coord(400,450), mn_coord(400, 400),
+                    mn_coord(370,300)).e_fill(mn.BLUE).add_label("a")
+
+    # create polygon 2
+    poly2 = EPolygon(mn_coord(500, 200), mn_coord(500, 400),  mn_coord(550, 400), mn_coord(600,300),
+                     ).e_fill(mn.GREEN).add_label("b")
+
+    poly1.copy_to_polygon_shape(p, poly2).e_fill(Colour.add(mn.BLUE, mn.GREEN)).add_label('c')
+
+
+def similar_shape():
+    # create polygon
+    poly = EPolygon(mn_coord(300, 200), mn_coord(250,300), mn_coord(300, 400), mn_coord(500,450), mn_coord(500, 400),
+                    mn_coord(470,300))
+
+    # create line to draw
+    p0 = mn_coord(600, 200)
+    p1 = p0 + 0.75*poly.l[0].get_length()*poly.l[0].get_unit_vector()
+    l1 = ELine(p0,p1,label='a')
+
+    # copy to line animating intermediate steps
+    poly.copy_to_similar_shape(l1, speed=2)
+
+    # create line to draw
+    p0 = mn_coord(900, 200)
+    p1 = p0 + 0.75 * poly.l[0].get_length() * poly.l[0].get_unit_vector()
+    l1 = ELine(p0, p1, label='a')
+
+    # copy to line without animating intermediate steps
+    poly.copy_to_similar_shape(l1)
+
+
+def rectangle():
+    t1 = TextBox(mn_coord(300,100))
+    t1.explain(r"both polygons have the same area")
+    poly = EPolygon(mn_coord(300, 200), mn_coord(250,300), mn_coord(300, 400), mn_coord(500,450), mn_coord(500, 400),
+                    mn_coord(470,300)).e_fill(mn.BLUE)
+    p1 = EPoint( mn_coord(700,400),label=('a',mn.DL))
+    p2 = poly.copy_to_rectangle(p1)
+    p2.e_fill(mn.GREEN)
+
+
+def parallelogram_on_point():
+    t1 = TextBox(mn_coord(300,100))
+    t1.explain(r"both polygons have the same area")
+
+    l2 = ELine(mn_coord(50,300), mn_coord(150,350))
+    l3 = ELine(mn_coord(50,300), mn_coord(150,250))
+    angle = EAngle(l2,l3,label=r'\alpha')
+
+    poly = EPolygon(mn_coord(300, 200), mn_coord(250,300), mn_coord(300, 400), mn_coord(500,450), mn_coord(500, 400),
+                    mn_coord(470,300)).e_fill(mn.BLUE)
+    p1 = EPoint( mn_coord(700,400),label=('a',mn.DL))
+
+    p2 = poly.copy_to_parallelogram_on_point(p1,angle)
+    poly.copy_to_rectangle(p1)
+    p2.add_angles(None,r'\alpha')
+    p2.e_fill(mn.GREEN)
+
+
+    p2 = poly.copy_to_parallelogram_on_point(p1, angle, negative=True)
+    p2.add_angles(None, r'\alpha')
+    p2.e_fill(mn.GREEN_E)
+
+
+def parallelogram():
+    # create angle
+    l2 = ELine(mn_coord(50,300), mn_coord(150,350))
+    l3 = ELine(mn_coord(50,300), mn_coord(150,250))
+    angle = EAngle(l2,l3,label=r'\alpha')
+
+    # create parallelogram with intermediate animation
+    poly = EPolygon(mn_coord(300, 200), mn_coord(250,300), mn_coord(300, 400), mn_coord(500,450), mn_coord(500, 400),
+                    mn_coord(470,300)).e_fill(mn.BLUE)
+    l1 = ELine(mn_coord(300,700), mn_coord(500,700),label='a')
+    poly.copy_to_parallelogram_on_line(l1,angle, speed=2)
+
+    # create parallelogram no intermediate animation
+    poly = EPolygon(mn_coord(600, 200), mn_coord(550,300), mn_coord(600, 400), mn_coord(800,450), mn_coord(800, 400),
+                    mn_coord(770,300)).e_fill(mn.GREEN)
+    l1 = ELine(mn_coord(600,700), mn_coord(800,700),label='a')
+    poly.copy_to_parallelogram_on_line(l1,angle)
 
 def triangles():
     poly = EPolygon(mn_coord(200, 200), mn_coord(150,300), mn_coord(200, 400), mn_coord(400,450), mn_coord(400, 400),
@@ -42,103 +123,3 @@ def triangles():
         colour = Colour.darken(colour)
     print(triangles)
 
-def move_point_to():
-    p_other = EPoint(mn_coord(50, 50))
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350),
-                    labels=['A','B','C'], angle_info=['a','b','c'])
-    poly.e_fill(mn.BLUE)
-
-    poly.move_point_to(0, p_other)
-
-def replace_line():
-    l =  ELine(mn_coord(100, 100),mn_coord(100, 300)).dash()
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350))
-    poly.replace_line(0,l)
-
-def replace_point():
-    p =  EPoint(mn_coord(100, 100)).add_label("A").red()
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350))
-    poly.replace_point(0,p)
-
-def draw_angles():
-    # create, remove and add
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350))
-    poly.set_angles((r'\beta', None, r'\alpha'))
-    poly.remove_angles()
-    poly.set_angles((None,'A',None), (None, ANGLE_SIZE*0.75))
-
-    # do same as above, but redraw afterwards
-    poly = EPolygon(mn_coord(400, 100), mn_coord(400, 300), mn_coord(600, 350))
-    poly.set_angles((r'\beta', None, r'\alpha'))
-    poly.remove_angles()
-    poly.set_angles((None,'A',None), (None, ANGLE_SIZE*0.75))
-    ##########
-    poly.draw_angles()
-    ##########
-
-def set_angles():
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350))
-    poly.set_angles((r'\beta', None, r'\alpha'))
-
-    # add 'A' angle to the second vertex
-    poly.set_angles((None,'A',None), (None, ANGLE_SIZE*0.75))
-
-    # rename the first angle to 'B' and change its size
-    poly.set_angles(("B", None, None), (ANGLE_SIZE*1.5, ))
-
-
-def assemble():
-    p1 = EPoint(mn_coord(100, 100))
-    p2 = EPoint(mn_coord(100, 300))
-    p3 = EPoint(mn_coord(300, 350))
-
-    line1 = ELine(mn_coord(100, 100), mn_coord(100, 300))
-    line2 = ELine(mn_coord(100, 300), mn_coord(300, 350))
-    line3 = ELine(mn_coord(300, 350), mn_coord(100, 100))
-
-    poly = EPolygon.assemble(points=[p1, p2, p3], lines=[line1, line2, line3]).e_fill(mn.BLUE)
-
-    # line2 and poly[1] point to the same object
-    line2.red()
-
-
-def assemble_lines_dont_match_points():
-    p1=EPoint(mn_coord(100,100))
-    p2=EPoint(mn_coord(100,300))
-    p3=EPoint(mn_coord(300,350))
-
-    line1 = ELine( mn_coord(100,100), mn_coord(100,300))
-    line2 = ELine( mn_coord(100,300), mn_coord(300,450))
-    line3 = ELine( mn_coord(300,450), mn_coord(100,100))
-
-    poly = EPolygon.assemble(points=[p1,p2,p3],lines=[line1,line2,line3]).e_fill(mn.BLUE)
-    poly.l[1].red()
-
-def basic():
-    # angle radius size default is ANGLE_SIZE, 'None' size reverts to default size,
-    p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450),
-             labels=['A', 'B', 'C'],
-             point_labels=['b', 'c', 'a'],
-             angle_info=[r'\beta', r'\gamma', r'\alpha', None, mn_scale(60)],
-             fill=mn.BLUE
-             )
-    print([a*180/mn.PI for a in p.angle_values])
-
-    # fill can be colour, or [colour, opacity]
-    EPolygon(mn_coord(500, 100), mn_coord(500, 400), mn_coord(900, 450),
-             labels=['A', 'B', 'C'],
-             point_labels=['b', 'c', 'a'],
-             angle_info=[r'\beta', r'\gamma', r'\alpha', ANGLE_SIZE * 2, None, ANGLE_SIZE / 2],
-             fill=[mn.GREEN, 0.50]
-             )
-
-def add_label():
-    poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350)).e_fill(mn.BLUE_A)
-
-    poly.set_labels(r'1^{st}',r'2^{nd}')
-    poly.set_point_labels(
-         None,
-         None,
-         (r'3^{rd}', dict(away_from=poly)
-         ),
-    )

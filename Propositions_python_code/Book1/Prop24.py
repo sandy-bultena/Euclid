@@ -162,7 +162,7 @@ class Prop24(Book1Scene):
         t1.explain("Angles DFG and DGF are equal since the "
                    "the triangle is an isosceles triangle (I.5)")
 
-        t['DFG'].set_angles(None, r'\epsilon', (r'\epsilon', dict(alpha=0.6)), 0, mn_scale(25), mn_scale(25))
+        t['DFG'].set_angles(None, (r'\epsilon',mn_scale(25)), (r'\epsilon',  mn_scale(25)) )
         t['DFG'].e_fill(GREEN_D)
         t['ABC'].e_unfill()
 
@@ -188,7 +188,7 @@ class Prop24(Book1Scene):
             t['DEF'].l[2].e_normal()
             t['DEG'].l[1].e_fade()
             t['DFG'].a[1].e_normal()
-        t['EFG'].set_angles(None, (r'\beta', dict(alpha=0.25)), None, 0, mn_scale(15), 0)
+        t['EFG'].set_angles(None, (r'\beta', mn_scale(15)), None)
 
         with self.simultaneous():
             t2.e_fade()
@@ -217,9 +217,9 @@ class Prop24(Book1Scene):
         with self.simultaneous():
             t['DEF'].l[2].e_fade()
             t['EFG'].l[2].e_normal()
-        t['DFG'].set_angles(None, None, (r'\epsilon', dict(alpha=0.6)), 0, mn_scale(40), mn_scale(25 * 1.5))
+        t['DFG'].set_angles(None, None, (r'\epsilon', mn_scale(25 * 1.5)))
         t['DFG'].a[2].red()
-        t['EFG'].set_angles(None, None, r'\theta', 0, mn_scale(40), mn_scale(40 * 1.5))
+        t['EFG'].set_angles(None, None, (r'\theta',mn_scale(40 * 1.5)))
         with self.simultaneous():
             t2.e_fade()
             t2.white(-1)

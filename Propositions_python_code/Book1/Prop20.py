@@ -94,7 +94,7 @@ class Prop20(Book1Scene):
         l['AD'] = ELine(A, p['D'])
         t['ACD'] = ETriangle.assemble(lines=[t['ABC'].l[2], l['CD'], l['AD']])
         with self.simultaneous():
-            t['ACD'].set_angles(r'\theta', None, r'\theta', mn_scale(50), None, mn_scale(50))
+            t['ACD'].set_angles((r'\theta', mn_scale(50)), None, (r'\theta', mn_scale(50)))
         t['ACD'].e_fill(BLUE_D)
 
         with self.simultaneous():

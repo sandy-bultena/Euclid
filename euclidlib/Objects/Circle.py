@@ -7,6 +7,8 @@ import numpy as np
 from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord
 from euclidlib.CONSTANTS import *
+from ..Scenes.animate_state import AnimState
+
 if TYPE_CHECKING:
     pass
     #import euclidlib.Scenes.PropScene as ps
@@ -26,8 +28,8 @@ class ECircle(mn.Circle, Arc.AbstractArc):
     # -----------------------------------------------------------------------------------------------------------------
     def __init__(self, center: Point.EPoint| mn.Vect3, point, temp_line_label=None, *args, **kwargs):
         """
-        :param center: centre of circle
-        :param point: point on circle circumference
+        :param center: Point.EPoint| mn.Vect3 - centre of circle
+        :param point: Point.EPoint| mn.Vect3 - point on circle circumference
         :param temp_line_label: maybe initial line has a label?
         """
         self.e_center = convert_to_coord(center)
@@ -58,19 +60,22 @@ class ECircle(mn.Circle, Arc.AbstractArc):
                           label=self.temp_line_label,
                           delay_anim=True)
 
-        # draw the line to create the 'swoop' of drawing a circle
-        self.animation_objects.append(tmpLine)
-        tmpLine.e_draw(
-            anim_args=dict(
-                run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
-            ))
+        # only draw the swoop line if drawing is NORMAL
+        if self.scene.animateState[-1] == AnimState.NORMAL:
 
-        # at every frame, set the points of the line to the animation of the drawing circle
-        tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+            # draw the line to create the 'swoop' of drawing a circle
+            self.animation_objects.append(tmpLine)
+            tmpLine.e_draw(
+                anim_args=dict(
+                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+                ))
 
-        # as the temp line is being drawn, if it has a label, allow label to be updated as the circle is drawn
-        if tmpLine.e_label is not None:
-            tmpLine.e_label.enable_updaters()
+            # at every frame, set the points of the line to the animation of the drawing circle
+            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+
+            # as the temp line is being drawn, if it has a label, allow label to be updated as the circle is drawn
+            if tmpLine.e_label is not None:
+                tmpLine.e_label.enable_updaters()
 
         return super().CreationOf(*args, **kwargs)
 

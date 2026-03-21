@@ -394,7 +394,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         new = self._generate_text_no_anim(text, old.style, **kwargs)
         new.next_to(old.get_right(), mn.RIGHT, buff=mn.SMALL_BUFF)
         new.e_draw()
-        print("adding submobjects to old")
         old.add(*new.submobjects)
 
     def e_append_morph(self, index, text: str, color: Optional[mn.Color] = None, transform_args=None, **kwargs):

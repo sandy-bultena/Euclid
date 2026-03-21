@@ -129,7 +129,7 @@ class Prop06(Book1Scene):
         with self.simultaneous():
             t['ABC'].l[0].e_normal()
             t['BCD'].l[1].e_normal()
-        t['BCD'].set_angles(None, r'\alpha', None, 0, mn_scale(70), 0)
+        t['BCD'].set_angles(None, (r'\alpha', mn_scale(70)), None)
 
         with self.simultaneous():
             t2.math(r"\therefore\quad \measuredangle DCB = \measuredangle ABC = \alpha").shift(RIGHT / 2)

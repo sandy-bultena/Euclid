@@ -146,7 +146,7 @@ class Prop16(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Thus, angles BAE and ECF are equal (I.4)")
         a['b'].e_normal()
-        t['CEF'].set_angles(r'\beta', None, None, mn_scale(40))  # Look Out For
+        t['CEF'].set_angles((r'\beta', mn_scale(40)), None, None)
         t2.math(r'\measuredangle{BAE} = \measuredangle{ECF} = \beta')
 
         self.next_page()
@@ -239,8 +239,8 @@ class Prop16(Book1Scene):
             t['ABE'] = ETriangle.assemble(lines=self.lines('ABEA'), angles=[None, None, None]).e_fill(GREEN_E)
             a['g'].e_normal()
             t['CEF'] = ETriangle.assemble(lines=self.lines('CEFC')).e_fill(BLUE_E)
-            t['ABE'].set_angles(None, None, r'\epsilon', mn_scale(20))
-            t['CEF'].set_angles(None, r'\epsilon', None, mn_scale(20))
+            t['ABE'].set_angles(None, None, (r'\epsilon', mn_scale(20)))
+            t['CEF'].set_angles(None, (r'\epsilon', mn_scale(20)), None)
             t['ABC'].e_fade()
             t['ABE'].e_normal()
 
@@ -248,7 +248,7 @@ class Prop16(Book1Scene):
 
         # ------------------------------------------------------------------------
         a['g'].e_normal()
-        t['CEF'].set_angles(r'\gamma', None, None, mn_scale(60))
+        t['CEF'].set_angles((r'\gamma', mn_scale(60)), None, None)
 
         self.next_page()
 

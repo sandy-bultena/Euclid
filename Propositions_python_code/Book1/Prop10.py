@@ -56,7 +56,7 @@ class Prop10(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Construct an equilateral triangle on AB and label the {nb:vertex C (I.1)}")
-        t[1] = EquilateralTriangle.build(A, B, speed=2*self.default_speed)
+        t[1] = ETriangle.build_equilateral(A, B, speed=2*self.default_speed)
         p['C'] = t[1].p[-1]
         l['BC'], l['AC'] = t[1].l[1:]
         t[1].l[0].e_remove()

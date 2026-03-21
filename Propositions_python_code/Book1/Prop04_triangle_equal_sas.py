@@ -55,7 +55,7 @@ class Book1Prop4(Book1Scene):
                              point_labels=[('A', dict(away_from='center')), ('B', dict(away_from='center')),
                                                 ('C', dict(away_from='center'))],
                              labels=['x', (), 'y'],
-                             angles=[r'\alpha', None, None, mn_scale(20)]
+                             angles=[(r'\alpha', mn_scale(20)), None, None,]
                              )
 
         t['DEF'] = ETriangle(D, E, F,
@@ -75,6 +75,8 @@ class Book1Prop4(Book1Scene):
             t['DEF'].set_labels((), ('z', RIGHT), ())
             t['ABC'].set_angles(None, r'\gamma', r'\beta')
             t['DEF'].set_angles(None, r'\gamma', r'\beta')
+        t2.explain("Pause here and look to see if angles are set")
+        print("angles for ABC are:", t['ABC'].a)
         self.next_page()
 
         # ------------------------------------------------------------------------

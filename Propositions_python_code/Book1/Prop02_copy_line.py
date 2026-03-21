@@ -5,7 +5,6 @@ sys.path.append(os.getcwd())
 from euclidlib.Scenes.BookScene import Book1Scene
 
 from euclidlib.Objects import *
-from euclidlib.Objects import EquilateralTriangle
 from typing import Dict
 
 
@@ -47,7 +46,7 @@ class Book1Prop2(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Construct an equilateral triangle on line AC (I.1)")
-        t[1] = EquilateralTriangle.build(A, C)
+        t[1] = ETriangle.build_equilateral(A, C)
         p['D'] = t[1].p[-1]
         self.remove(l['AC'])
         l['AC'] = t[1].l[0]
@@ -244,7 +243,7 @@ class Book1Prop2(Book1Scene):
 
         # ------------------------------------------------------------------------
         t3.explain("Construct an equilateral triangle on line AC")
-        t[2] = EquilateralTriangle.build(A, D)
+        t[2] = ETriangle.build_equilateral(A, D)
         p['D'] = t[2].p[-1]
         with self.simultaneous():
             l['AD'] = t[2].l[2]

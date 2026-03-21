@@ -10,10 +10,19 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        draw_tangent()
+        intersect2()
 
     def go(self):
         pass
+
+def intersect2():
+    tri = ETriangle(mn_coord(130,400),mn_coord(400,450),mn_coord(350,300)).e_fill(mn.BLUE)
+    c1 = ECircle(mn_coord(200,200),mn_coord(275,275))
+    l = ELine([-4.99999919,  3.06066012,  0.        ], [-5.155053 ,  1.5876596  , 0.       ])
+    p = c1.intersect_line(l, infinite=True)
+    print(p)
+    #tri.copy_to_circle(c1,speed=2)
+
 
 def draw_tangent():
     c1 = ECircle(mn_coord(200,200),mn_coord(275,275))

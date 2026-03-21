@@ -1,22 +1,29 @@
 from __future__ import annotations
 
-import euclidlib.Utilities.calculate_points as cp
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
 
-from . import Polygon
+from . import Polygon, PolygonBase
 from . import Point
 from . import Line
 
+# ====================================================================================================================
+# EParallelogram
+# ====================================================================================================================
 
 class EParallelogram(Polygon.EPolygon):
     def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
         if len(points) == 3:
-            super().__init__(*cp.parallelogram(*points), **kwargs)
-        else:
-            super().__init__(*points, **kwargs)
+            x, y, z = map(convert_to_coord, points)
+            diff = y - x
+            points = ( x, y, z, z - diff)
 
+        super().__init__(*points, **kwargs)
+
+    # ---------------------------------------------------------------------------------------------------------------
+    # create the parallelogram's complement
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     def _create_complement(self, line: Line.ELine):
         with self.scene.trace(line, "defines point 1 and 2 of 1st line of new parallelogram"):
@@ -62,6 +69,9 @@ class EParallelogram(Polygon.EPolygon):
 
         return poly
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # move the parallelogram to an edge
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     def _move_to_edge(self, point1: Point.EPoint, point2: Point.EPoint):
         l1 = Line.ELine(point1, point2)
@@ -73,7 +83,7 @@ class EParallelogram(Polygon.EPolygon):
             self.set_angles(None, " ", None)
             flag += 1
 
-        l2, a2 = self.a[1].copy_to_line(point2, l1, negative=True)
+        l2, a2 = self.a[1].copy_to_line(point2, l1)
         if flag:
             self.a[1].e_remove()
         l2.e_fade()
@@ -93,6 +103,9 @@ class EParallelogram(Polygon.EPolygon):
 
         return parall
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # copy to line
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
     def copy_to_line(self, line: Line.ELine):
@@ -104,7 +117,7 @@ class EParallelogram(Polygon.EPolygon):
                 t1.e_fade()
 
         with self.scene.trace(line, "copy line to our extension"):
-            l4, p4 = line.copy_to_line(self.p[2], t2, speed=0)
+            l4, p4 = line.copy_to_line(self.p[2], t2)
             l4.red()
             t2.e_remove()
             p4.e_remove()
@@ -115,6 +128,7 @@ class EParallelogram(Polygon.EPolygon):
 
         p6 = Point.EPoint(line.get_start())
         p7 = Point.EPoint(line.get_end())
+
         y = x._move_to_edge(p6, p7)
 
         with self.scene.simultaneous():
@@ -125,6 +139,9 @@ class EParallelogram(Polygon.EPolygon):
 
         return y
 
+    # ---------------------------------------------------------------------------------------------------------------
+    # copy to point
+    # ---------------------------------------------------------------------------------------------------------------
     @log
     @copy_transform()
     def copy_to_point(self, point: EMObject | mn.Vect3):
@@ -145,11 +162,11 @@ class EParallelogram(Polygon.EPolygon):
 
         # copy angle2 to line2
         flag = False
-        if self.a1 is None:
+        if self.a[1] is None:
             self.set_angles(None, ' ')
             flag = True
 
-        l1, a2 = self.a1.copy_to_line(np2, nl2, negative=True)
+        l1, a2 = self.a[1].copy_to_line(np2, nl2, negative=True)
         l1.extend(self.l0.get_length()).e_fade()
         if flag:
             self.a1.e_remove()

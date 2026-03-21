@@ -46,8 +46,7 @@ class Prop05(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("Then the angles at the base ACB and ABC are equal")
         t2.math(r"\alpha = \theta")
-        t['ABC'].set_angles(None, r'\alpha', r'\theta',
-                            None, mn_scale(30), mn_scale(30))
+        t['ABC'].set_angles(None, (r'\alpha',mn_scale(30)), (r'\theta',mn_scale(30)))
 
         self.next_page()
 

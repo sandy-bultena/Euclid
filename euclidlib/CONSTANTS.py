@@ -18,7 +18,7 @@ DEFAULT_EDGE_BUFFER = mn_constants.DEFAULT_MOBJECT_TO_EDGE_BUFFER
 BOOK_SCENE_GRID_OPACITY = .3
 
 # Default speed for running animations
-DEFAULT_SPEED = 1
+DEFAULT_SPEED = 20
 DEFAULT_TEXT_SPEED = 20
 
 # label buff for EMObject
@@ -34,3 +34,6 @@ ANGLE_SIZE = coordinate_utilities.mn_scale(40)
 
 # default 'max' opacity for fill colour
 E_FILL_OPACITY_FACTOR = 0.60
+
+# default size of a point
+DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(7)

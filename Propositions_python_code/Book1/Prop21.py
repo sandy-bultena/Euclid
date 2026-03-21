@@ -277,7 +277,7 @@ class Prop21(Book1Scene):
             t['DBC'].e_fade()
             t['EDC'].e_normal()#.remove_labels()
             t['DBC'].a[0].e_normal()
-            t['EDC'].set_angles(r'\epsilon', None, None, mn_scale(20))
+            t['EDC'].set_angles((r'\epsilon', mn_scale(20)), None, None)
             for pts in t['ABC'].p:
                 pts.e_normal()
 

@@ -47,18 +47,22 @@ class Prop47(Book1Scene):
         # ----------------------------------------------
         t1.title("In other words:")
         t1.explain("Given a right angle triangle ABC")
-        t['ABC'] = ETriangle(A,B,C, point_labels='ABC', angles=' ')
+        t['ABC'] = ETriangle(A,B,C, point_labels=['A','B','C'], angles=' ')
 
         self.next_page()
 
         # ------------------------------------------------------------------------
-        s['B'] = ESquare(B, A, point_labels=['F', None, None, 'G'])
-        s['A'] = ESquare(A, C, point_labels=['H', None, None, 'K'])
-        s['C'] = ESquare(C, B, point_labels=['E', None, None, 'D'])
+        s['B'] = ESquare(A, B, point_labels=['G', None, None, 'F'])
+        s['A'] = ESquare(C, A, point_labels=['K', None, None, 'H'])
+        s['C'] = ESquare(B, C, point_labels=['D', None, None, 'E'])
 
-        self.extract_all(l, p, a, s, 'FBAG', 'B')
-        self.extract_all(l, p, a, s, 'HACK', 'A')
-        self.extract_all(l, p, a, s, 'ECBD', 'C')
+        G,_,_,F = s['B'].p
+        K,_,_,H = s['A'].p
+        D,_,_,E = s['C'].p
+
+        self.extract_all(l, p, a, s, 'GABF', 'B')
+        self.extract_all(l, p, a, s, 'KCAH', 'A')
+        self.extract_all(l, p, a, s, 'DBCE', 'C')
 
         with self.staggered_animation():
             t3.explainM('$ABFG$ is a square', fill_color=BLUE)
@@ -97,9 +101,11 @@ class Prop47(Book1Scene):
             t3.e_fade()
             t3.blue(0)
 
-        s['B'].p[3].e_normal()
-        s['B'].set_angles(None, None, " ", 0, 0, mn_scale(30))
-        l['GC'] = ELine(s['B'].p[3], C)
+        with self.simultaneous():
+            s['B'].p[2].e_normal()
+            s['B'].set_angles(None, (" ",mn_scale(30)) )
+            l['GC'] = ELine(G, C)
+            G.lift().e_normal()
         l['GC'].notice()
         t2.e_fade()
         t2.math('GA,AC = GC')
@@ -110,12 +116,13 @@ class Prop47(Book1Scene):
         t1.explain("Similarly for line BH{nb}(I.14)")
         with self.simultaneous():
             l['GC'].e_fade()
-            s['B'].a[2].e_remove()
-            s['B'].p[3].e_fade()
-            s['A'].p[0].e_normal()
+            s['B'].a[1].e_remove()
+            G.e_fade()
 
-        s['A'].set_angles(None, " ", None, 0, mn_scale(30))
-        l['BH'] = ELine(s['A'].p[0], B)
+        with self.simultaneous():
+            H.e_normal()
+            s['A'].set_angles(None, None, (" ", mn_scale(30)), None)
+            l['BH'] = ELine(H, B)
         l['BH'].notice()
 
         with self.simultaneous():
@@ -130,18 +137,18 @@ class Prop47(Book1Scene):
         with self.simultaneous():
             t2.e_fade()
             l['BH'].e_fade()
-            s['A'].p[2].e_remove()
-            s['A'].a[1].e_remove()
+            H.e_remove()
+            s['A'].a[2].e_remove()
             s['A'].p[0].e_fade()
         t1.explain("Angles FBA and CBD are both right angles")
         t1.explain("Adding angle ABC to both demonstrates that angles "
                    "FBC and ABD are also equal")
 
         with self.simultaneous():
-            s['B'].p[0].e_normal()
-            s['B'].l[0].e_normal()
-            s['C'].p[3].e_normal()
-            s['C'].l[2].e_normal()
+            D.e_normal()
+            s['B'].l[2].e_normal()
+            F.e_normal()
+            s['C'].l[0].e_normal()
 
         a['FBC'] = EAngle(*self.lines('FBC',2), size=mn_scale(15), label=r'\gamma')
         a['ABD'] = EAngle(*self.lines('ABD',2), size=mn_scale(25), label=r'\gamma')
@@ -157,7 +164,7 @@ class Prop47(Book1Scene):
         t1.explain("Draw a line from A, parallel to BD")
         with self.skip_animations_for():
             l['ALx'] = s['C'].l2.parallel(t['ABC'].p0)
-            l['ALx'].prepend(200)
+            l['ALx'].extend(200)
         p['L'] = l['ALx'].intersection_e_point(s['C'].l3).add_label('L', DOWN)
         l['AL'] = EDashedLine(A, p['L'])
         l['ALx'].e_remove()
@@ -170,10 +177,10 @@ class Prop47(Book1Scene):
 
         # ------------------------------------------------------------------------
         t1.explain("Draw lines AD and FC, and consider triangles FBC and ABD")
-        l['FC'] = ELine(s['B'].p0, C)
-        l['AD'] = ELine(A, s['C'].p3)
-        s['ABD'] = ETriangle.assemble(lines=[t['ABC'].l0, s['C'].l2, l['AD']])
-        s['FBC'] = ETriangle.assemble(lines=[s['B'].l0, t['ABC'].l1, l['FC']])
+        l['FC'] = ELine(F, C)
+        l['AD'] = ELine(A, D)
+        s['ABD'] = ETriangle.assemble(lines=[t['ABC'].l0, s['C'].l0, l['AD']])
+        s['FBC'] = ETriangle.assemble(lines=[s['B'].l2, t['ABC'].l1, l['FC']])
 
         with self.simultaneous():
             t['ABC'].l0.e_fade()
@@ -209,6 +216,8 @@ class Prop47(Book1Scene):
         with self.simultaneous():
             l['CAX'] = t['ABC'].l2.copy().extend_and_prepend(mn_scale(200))
             l['FBX'] = s['B'].l0.copy().extend_and_prepend(mn_scale(350))
+            s['ABD'].e_fade()
+            #s['ABD'].e_unfill()
 
         with self.simultaneous():
             l['FBX'] = l['FBX'].dash()
@@ -280,14 +289,14 @@ class Prop47(Book1Scene):
         with self.simultaneous():
             s['C'].e_normal()
             s['A'].e_normal()
-        l['AE'] = ELine(A, s['C'].p0)
-        l['BK'] = ELine(B, s['A'].p3)
+        l['AE'] = ELine(A, E)
+        l['BK'] = ELine(B, K)
         with self.simultaneous():
-            s['BCK'] = ETriangle.assemble(lines=[t['ABC'].l1, s['A'].l2, l['BK']])
-            s['ECA'] = ETriangle.assemble(lines=[s['C'].l0, t['ABC'].l2, l['AE']])
+            s['BCK'] = ETriangle.assemble(lines=[t['ABC'].l1, s['A'].l0, l['BK']])
+            s['ECA'] = ETriangle.assemble(lines=[s['C'].l2, t['ABC'].l2, l['AE']])
         with self.simultaneous():
-            s['BCK'].set_angles(None, r'\sigma', None, 0, mn_scale(15))
-            s['ECA'].set_angles(None, r'\sigma', None, 0, mn_scale(25))
+            s['BCK'].set_angles(None, (r'\sigma', mn_scale(15)), None)
+            s['ECA'].set_angles(None, (r'\sigma', mn_scale(25)), None)
         with self.simultaneous():
             s['BCK'].e_fill(GREEN_D)
             s['ECA'].e_fill(GREEN_D)
