@@ -1,40 +1,34 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
+from typing import Iterable, Self, Callable, TYPE_CHECKING
 
-from .EucidMObject import *
-from . import Circle as C
-from .utils import call_or_get
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Utilities.coordinate_utilities import convert_to_coord, call_or_get, mn_scale
+import manimlib as mn
+from euclidlib.CONSTANTS import *
 
 
-def darken(colour: ManimColor):
-   return [
-       mn.interpolate_color(color, BLACK, 2/3)
-       for color in mn.listify(colour)
-   ]
+def darken(colour: mn.ManimColor):
+    return [
+        mn.interpolate_color(color, mn.BLACK, 2 / 3)
+        for color in mn.listify(colour)
+    ]
 
+
+# ================================================================================================================
+# Point is just a manim circle
+# ================================================================================================================
 class EPoint(EMObject, mn.Circle):
-    CONSTRUCTION_TIME=0.25
-    LabelBuff = mn.MED_SMALL_BUFF
+    CONSTRUCTION_TIME = 0.25
+    LabelBuff = POINT_LABEL_BUFF
 
-    @staticmethod
-    def find_in_frame(names) -> List[EPoint]:
-        from inspect import currentframe
-        point_names = list(names)
-        f = currentframe()
-        while (f := f.f_back) is not None:
-            if 'p' in f.f_locals or all(p in f.f_locals for p in point_names):
-                break
-        if f is None:
-            raise Exception(f"Can't Find Points dict or Point variables {', '.join(names)}")
-        points = [f.f_locals.get(p, f.f_locals.get('p', {}).get(p)) for p in names]
-        if all(p is not None for p in points):
-            return points
-
-        raise Exception(f"Can't find point(s) {', '.join( n for p, n in zip(points, names) if p is None)}")
-
-    def __init__(self, center, animate_part=None, *args, fill_color=mn.WHITE, radius=0.075, **kwargs):
+    # ----------------------------------------------------------------------------------------------------------------
+    # initialize
+    # ----------------------------------------------------------------------------------------------------------------
+    def __init__(self, center, label=None, fill_color=mn.WHITE, radius=DEFAULT_POINT_SIZE, **kwargs):
+        animate_part = kwargs.get('animate_part', None)
+        self._original_center = center
         super().__init__(
             arc_center=convert_to_coord(center),
             radius=radius,
@@ -43,14 +37,18 @@ class EPoint(EMObject, mn.Circle):
             fill_color=fill_color,
             fill_opacity=1.0,
             animate_part=['set_fill', 'set_stroke'] if animate_part is None else animate_part,
-            *args,
+            label = label,
             **kwargs)
         self.z_index += 2
 
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # set the colour (not part of the user animation stuff, used by create_target,
+    #                 which is used by manim during transformations)
+    # ----------------------------------------------------------------------------------------------------------------
     def set_color(
             self,
-            color: ManimColor | Iterable[ManimColor] | None,
+            color: mn.ManimColor | Iterable[mn.ManimColor] | None,
             opacity: float | Iterable[float] | None = None,
             recurse: bool = True
     ) -> Self:
@@ -58,13 +56,45 @@ class EPoint(EMObject, mn.Circle):
         self.set_stroke(darken(color), opacity=opacity, recurse=recurse)
         return self
 
-    def e_label_point(self,
-                      direction: mn.Vect3 = None,
-                      buff: float = None,
-                      *,
-                      away_from: Callable[[], mn.Vect3] | float = None,
-                      towards: Callable[[], mn.Vect3] | float = None,
-                      ):
+    # -----------------------------------------------------------------------------------------------------------------
+    # this specifies the arguments for e_label_location
+    # -----------------------------------------------------------------------------------------------------------------
+    if TYPE_CHECKING:
+        # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
+        def add_label(self, text: str, direction: mn.Vect3 = mn.UP,
+                      buff=POINT_LABEL_BUFF, away_from=None, towards=None, align=mn.ORIGIN) -> EPoint:
+            """
+            add the label
+
+            away_from, and towards accept the following:
+
+                * a function that returns a coordinate (`mn.Vect3`)
+
+                * a coordinate (`mn.Vect3`)
+
+                * an `mn.Object` where the center of that object will be used as the coordinates
+
+            :param text:  the label
+            :param direction: what direction do you want to put the label (up, down, right, left) (overides 'side' parameter)
+            :param buff: how far away from the line do you want the label
+            :param away_from: direction is away from this coordinate value
+            :param towards: (same as away from)
+            :param align: which side to align the text to
+            :return: EPoint
+            """
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # get the point where the label should be drawn
+    # ----------------------------------------------------------------------------------------------------------------
+    # this is a callback routine from the lambda that is used for Label, to keep the label in the correct position
+    # if this point is moved
+    def e_label_location(self,
+                         direction: mn.Vect3 = mn.UP,
+                         buff: float = None,
+                         *,
+                         away_from: Callable[[], mn.Vect3] | float = None,
+                         towards: Callable[[], mn.Vect3] | float = None,
+                         ):
         center = self.get_arc_center()
         if away_from is not None:
             direction = mn.normalize(center - call_or_get(away_from))
@@ -72,30 +102,70 @@ class EPoint(EMObject, mn.Circle):
             direction = mn.normalize(call_or_get(towards) - center)
         return center + direction * (buff or self.LabelBuff)
 
-    def distance_to(self, position: mn.Vect3):
-        x0, y0, *_ = self.get_arc_center()
-        x1, y1, *_ = position
+    # ----------------------------------------------------------------------------------------------------------------
+    # get distance between this point, and an x,y,z position (always a positive number)
+    # ----------------------------------------------------------------------------------------------------------------
+    def distance_to(self, position: mn.Vect3) -> float:
+        x0, y0, z0 = self.get_arc_center()
+        x1, y1, z1 = position
         dx = x1 - x0
         dy = y1 - y0
-        return math.sqrt(dx**2 + dy**2)
+        dz = z1 - z0
+        return math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # get distance between two points
+    # ----------------------------------------------------------------------------------------------------------------
     @classmethod
-    def distance_between(cls, p1: EPoint | Vect3, p2: EPoint | Vect3):
-        return mn.get_dist(convert_to_coord(p1), convert_to_coord(p2))
+    def distance_between(cls, p1: EPoint | mn.Vect3, p2: EPoint | mn.Vect3):
+        x0, y0, z0 = convert_to_coord(p1)
+        x1, y1, z1 = convert_to_coord(p2)
+        dx = x1 - x0
+        dy = y1 - y0
+        dz = z1 - z0
+        return math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
 
-    def highlight(self, color=RED, scale=2.0, **args):
+    # ----------------------------------------------------------------------------------------------------------------
+    # highlight the point
+    # ----------------------------------------------------------------------------------------------------------------
+    def highlight(self, color=mn.RED, scale=2.0, **args):
         target = self.animate(rate_func=mn.there_and_back, **args)
         target.scale(scale)
         target.set_color(color)
         return target
 
-    def intersect(self, other: Mobject, reverse=True):
+    # ----------------------------------------------------------------------------------------------------------------
+    # two points overlap - maybe used when interacting with mouse selection??
+    # ----------------------------------------------------------------------------------------------------------------
+    def intersect(self, other: mn.Mobject, reverse=True):
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
-        super().intersect(other)
+        return super().intersect(other)
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # is point touching a rectangle?
+    # ----------------------------------------------------------------------------------------------------------------
     def intersect_selection(self, other: mn.Rectangle):
         return other.is_touching(self)
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # coordinates
+    # ----------------------------------------------------------------------------------------------------------------
+    @property
+    def coordinates(self):
+        return convert_to_coord(self.get_center())
+
+    @property
+    def coords(self):
+        return convert_to_coord(self.get_center())
+
+    @property
+    def original_center(self):
+        return self._original_center
+
+    def __str__(self):
+        # do NOT call self.get_center() as it messes up stuff in manim!!!!
+        return f"Point: ({self.original_center})"
 
 
 class VirtualPoint(EPoint):

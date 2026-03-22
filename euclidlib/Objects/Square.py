@@ -1,22 +1,28 @@
 from __future__ import annotations
+import manimlib as mn
+from typing import cast
+from euclidlib.Utilities.calculate_points import square
+from euclidlib.Objects.em_object_base import EMObject
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.find_scene import find_scene
+if TYPE_CHECKING:
+    from euclidlib.Scenes.PropScene import PropScene
 
-from euclidlib.Objects import Polygon
-from euclidlib.Objects import Parallelogram
-from euclidlib.Objects import CalculatePoints
-from euclidlib.Objects import Point
-from euclidlib.Objects import Line
-from euclidlib.Objects import Circle
-from euclidlib.Objects.EucidMObject import *
+from . import Parallelogram
+from . import Point
+from . import Line
+from . import Circle
 
 class ESquare(Parallelogram.EParallelogram):
-    def __init__(self, *points: EMObject | Vect3, **kwargs):
-        self.scene = find_scene()
+    def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
+        self.scene: PropScene  =  find_scene()
+
         if len(points) == 4:
-            super().__init__(*points, **kwargs, point_calc=CalculatePoints.square)
+            super().__init__(*points, **kwargs, point_calc=square)
             return
 
         if len(points) == 3:
-            super().__init__(*CalculatePoints.square(*points), **kwargs)
+            super().__init__(*square(*points), **kwargs)
             return
 
         with self.scene.pause_animations_for(True):
@@ -32,4 +38,4 @@ class ESquare(Parallelogram.EParallelogram):
             c.e_delete()
             p1.e_delete()
 
-        super().__init__(*CalculatePoints.square(*points, point3), **kwargs)
+        super().__init__(*square(*points, point3), **kwargs)

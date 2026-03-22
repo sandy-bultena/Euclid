@@ -1990,7 +1990,7 @@ sub show_parts {
     my $self = shift;
     Validate::Inputs( \@_, [qw(number)], [qw(number text text)] );
     my $num    = shift;
-    my $offset = shift || 6;
+    my $buff = shift || 6;
     my $edge   = shift || 'right';
     my $colour = shift || 'grey';
     my $cn     = $self->canvas;
@@ -2011,7 +2011,7 @@ sub show_parts {
     # length of "part"
     my $r = $self->length / $num;
 
-    # line angles and offset angles
+    # line angles and buff angles
     my $phi   = deg2rad( $self->angle() );
     my $theta = deg2rad( $self->angle() + 90 );
 
@@ -2052,10 +2052,10 @@ sub show_parts {
 
         # shift line appropriately
         my @ends = (
-               -$sign * $offset * cos($theta) + $xsign * $shift * cos($phi) + $cs[0],
-               -$sign * $offset * sin($theta) + $ysign * $shift * sin($phi) + $cs[1],
-               -$sign * $offset * cos($theta) - $xsign * $shift * cos($phi) + $ce[0],
-               -$sign * $offset * sin($theta) - $ysign * $shift * sin($phi) + $ce[1]
+               -$sign * $buff * cos($theta) + $xsign * $shift * cos($phi) + $cs[0],
+               -$sign * $buff * sin($theta) + $ysign * $shift * sin($phi) + $cs[1],
+               -$sign * $buff * cos($theta) - $xsign * $shift * cos($phi) + $ce[0],
+               -$sign * $buff * sin($theta) - $ysign * $shift * sin($phi) + $ce[1]
         );
         my $new_colour = Colour->darken(5,$colour);
         push @line_parts, Line->new( $cn, @ends )->colour($new_colour);

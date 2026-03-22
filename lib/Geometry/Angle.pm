@@ -451,7 +451,7 @@ B<Returns>
 sub label {
     my $self = shift;
     Validate::Inputs( \@_, [], [qw(text text)] );
-    my $text = shift || "";
+    my $text_str = shift || "";
     my $size;
     eval { no warnings; $size = shift || ''; $size = int($size) };
 
@@ -486,15 +486,15 @@ sub label {
     # ------------------------------------------------------------------------
     # determine position of the mid-arc
     # ------------------------------------------------------------------------
-    my $offset = 20;
-    if ( abs( $e - 90 ) < .001 ) { $offset = 30 }
-    my $x = $v->[0] + cos( deg2rad( $s + 0.5 * $e ) ) * ( $o + $offset );
-    my $y = $v->[1] - sin( deg2rad( $s + 0.5 * $e ) ) * ( $o + $offset );
+    my $buff = 20;
+    if ( abs( $e - 90 ) < .001 ) { $buff = 30 }
+    my $x = $v->[0] + cos( deg2rad( $s + 0.5 * $e ) ) * ( $o + $buff );
+    my $y = $v->[1] - sin( deg2rad( $s + 0.5 * $e ) ) * ( $o + $buff );
 
     # ------------------------------------------------------------------------
     # create the label
     # ------------------------------------------------------------------------
-    $self->SUPER::_draw_label( $cn, $x, $y, $text, 'exactly' );
+    $self->SUPER::_draw_label( $cn, $x, $y, $text_str, 'exactly' );
     return $self;
 }
 

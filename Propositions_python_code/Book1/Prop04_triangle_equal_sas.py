@@ -1,0 +1,226 @@
+import sys
+import os
+
+sys.path.append(os.getcwd())
+from euclidlib.Scenes.BookScene import Book1Scene
+from euclidlib.Objects import *
+from typing import Dict
+
+
+class Book1Prop4(Book1Scene):
+    steps = []
+    title = (
+        "If two triangles have two sides equal to two sides respectively, "
+        "and have the angles contained by the equal straight lines equal, "
+        "then they also have the base equal to the base, the triangle equals "
+        "the triangle, and the remaining angles equal the remaining angles "
+        "respectively, namely those opposite the equal sides."
+    )
+
+    def go(self):
+        t1 = TextBox(mn_coord(800, 200), line_width=mn_scale(550))
+        t2 = TextBox(mn_coord(40, 400), line_width=mn_scale(550))
+
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, Angle] = {}
+
+        A = mn_coord(300, 250)
+        B = mn_coord(100, 250)
+        C = mn_coord(250, 450)
+
+        D = mn_coord(400, 400)
+        E = mn_coord(600, 400)
+        F = mn_coord(450, 200)
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        # In Other Words
+        # ------------------------------------------------------------------------
+        t1.title("In other words:")
+        t1.explain(
+            "If two triangles have two sides which are "
+            "equivalent, and if the angles between the two "
+            "sides are also equivalent, "
+            "(side-angle-side SAS)..."
+        )
+        t2.math("AB = DE", is_axiom = True)
+        t2.math("AC = DF", is_axiom = True)
+        t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
+
+        t['ABC'] = ETriangle(A, B, C,
+                             scene=self,
+                             point_labels=[('A', dict(away_from='center')), ('B', dict(away_from='center')),
+                                                ('C', dict(away_from='center'))],
+                             labels=['x', (), 'y'],
+                             angles=[(r'\alpha', mn_scale(20)), None, None,]
+                             )
+
+        t['DEF'] = ETriangle(D, E, F,
+                             scene=self,
+                             point_labels=[('D', dict(away_from='center')), ('E', dict(away_from='center')),
+                                                ('F', dict(away_from='center'))],
+                             labels=['x', (), 'y'],
+                             angles=[r'\alpha', None, None]
+                             )
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("... then they are equal in all respects")
+        t2.math(r"\triangle ABC = \triangle DEF")
+        with self.simultaneous():
+            t['ABC'].set_labels((), ('z', LEFT), ())
+            t['DEF'].set_labels((), ('z', RIGHT), ())
+            t['ABC'].set_angles(None, r'\gamma', r'\beta')
+            t['DEF'].set_angles(None, r'\gamma', r'\beta')
+        t2.explain("Pause here and look to see if angles are set")
+        print("angles for ABC are:", t['ABC'].a)
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        # Proof
+        # ------------------------------------------------------------------------
+        t1.down()
+        t2.e_remove()
+        with self.simultaneous():
+            t['ABC'].l[1].remove_label()
+            t['DEF'].l[1].remove_label()
+            t['ABC'].a[1].e_remove()
+            t['DEF'].a[1].e_remove()
+            t['ABC'].a[2].e_remove()
+            t['DEF'].a[2].e_remove()
+        t1.title("Proof:")
+        eq1 = t2.math("AB = DE", is_axiom = True)
+        eq2 = t2.math("AC = DF", is_axiom = True)
+        eq3 = t2.math(r"\measuredangle BAC = \measuredangle FDE", is_axiom = True)
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Move triangle ABC such that point A coincides "
+                   "with point{nb}D")
+
+        with self.simultaneous():
+            t['ABC'].green()
+        with self.simultaneous():
+            t['ABC'].lift.e_move(np.array([D[0] - A[0], D[1] - A[1], 0]))(run_time=2)
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Rotate the triangle so that line AB line coincides with DE.")
+        t1.explain("... diagram is buff a bit so we can see more clearly")
+
+        t['DEF'].l[0].red()
+        t['ABC'].l[2].add_label('y', side=LineLabelSide.INSIDE)
+
+        with self.simultaneous():
+            t['DEF'].remove_labels()
+
+        with self.simultaneous():
+            t['ABC'].e_rotate(D, PI)(run_time=2)
+
+        with self.simultaneous():
+            t['ABC'].e_move(mn_scale(20, -10, 0))(run_time=1)
+
+
+        t['ABC'].l[0].red()
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Since lines AB and DE are the same lengths, "
+                   "the endpoints are congruent")
+
+        with self.simultaneous(run_time=1):
+            t['ABC'].white()
+            t['DEF'].white()
+
+        with self.simultaneous(run_time=1):
+            t['DEF'].l[1].e_fade()
+            t['DEF'].l[2].e_fade()
+            t['ABC'].l[1].e_fade()
+            t['ABC'].l[2].e_fade()
+
+            t['DEF'].a[0].e_remove()
+            t['ABC'].a[0].e_remove()
+
+            t['ABC'].p[2].e_fade()
+            t['DEF'].p[2].e_fade()
+
+        t2.fade_text_objs(eq2, eq3)
+        eq4 = t2.math("A = D")
+        eq5 = t2.math("B = E")
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Line AC coincides with DF since they are the "
+                   "same length and the angles "
+                   "BAC and EDF are equal ")
+
+        t['DEF'].a[0].e_draw()
+        a['ABC'] = EAngle(t['ABC'].l[0], t['ABC'].l[2], label=r'\alpha', size=mn_scale(20), scene=self)
+        with self.simultaneous():
+            t['ABC'].l[2].e_normal()
+            t['DEF'].l[2].e_normal()
+            t['ABC'].p[2].e_normal()
+            t['DEF'].p[2].e_normal()
+
+        t2.fade_text_objs(eq1, eq4, eq5)
+        t2.normalize_text_objs(eq2, eq3)
+        eq6 = t2.math("C = F")
+        eq7 = t2.math("AC = DF")
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Since the points B coincides with E and C with F, "
+                   "then the lines BC coincides with EF"
+                   "... based on the implicit  understanding that there is only one "
+                   "straight path between two points")
+
+        with self.simultaneous():
+            a['ABC'].e_fade()
+            t['DEF'].a[0].e_fade()
+
+        # with self.simultaneous():
+        #     t['ABC'].p[1].notice()
+        #     t['DEF'].p[1].notice()
+        #     t['ABC'].p[2].notice()
+        #     t['DEF'].p[2].notice()
+
+        with self.simultaneous():
+            t['ABC'].p[0].e_fade()
+            t['DEF'].p[0].e_fade()
+            t['ABC'].p[1].red()
+            t['DEF'].p[1].red()
+            t['ABC'].p[2].red()
+            t['DEF'].p[2].red()
+
+        with self.simultaneous():
+            t['ABC'].l[0].e_fade()
+            t['DEF'].l[0].e_fade()
+            t['ABC'].l[2].e_fade()
+            t['DEF'].l[2].e_fade()
+
+        with self.simultaneous():
+            t['ABC'].l[1].e_normal()
+            t['DEF'].l[1].e_normal()
+
+        t2.fade_text_objs(eq1,eq2,eq3,eq4,eq7)
+        t2.normalize_text_objs(eq6, eq5)
+        eq8 = t2.math("BC = EF")
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("From common notion 4, things which coincide "
+                   "with one another, equal one another")
+
+        t2.normalize_text_objs()
+
+        with self.simultaneous():
+            t['ABC'].e_fade.white()
+            t['DEF'].e_fade.white()
+
+        t2.math(r"\triangle ABC \equiv \triangle DEF")
+        self.next_page()
+

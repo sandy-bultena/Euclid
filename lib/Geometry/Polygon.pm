@@ -2481,7 +2481,7 @@ B<Returns>
 sub label {
     my $self = shift;
     Validate::Inputs( \@_, [], [qw(text)] );
-    my $text = shift || "";
+    my $text_str = shift || "";
 
     # ------------------------------------------------------------------------
     # get info from the object data
@@ -2510,7 +2510,7 @@ sub label {
     # ------------------------------------------------------------------------
     # create the label
     # ------------------------------------------------------------------------
-    $self->SUPER::_draw_label( $cn, $x, $y, $text, 'exactly' );
+    $self->SUPER::_draw_label( $cn, $x, $y, $text_str, 'exactly' );
     return $self;
 }
 

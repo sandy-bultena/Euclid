@@ -9,6 +9,12 @@ To create videos and PDF documents that can describe Euclid's Elements in a more
 * PDFs: 	Look in the `Propositions/PDF` folder
 * Videos: https://www.youtube.com/sandybultena
 
+## Documentation and Examples
+
+[Documentation](./Documenation)
+
+[Examples](./Documentation/Examples)
+
 ## Raison d'être
 
 Many moons ago, I wnated to revisit my university geometry course, by going through all the examples in the text book.  Unfortunately, the textbook assumed I had remembered all of my rudimentary geometry, which I had not.
@@ -27,17 +33,34 @@ Some comments on my youtube channel have been written by people who are obviousl
 
 ## Tools
 
-I am a coder by profession and hobby.  I did not like the tools that were available, so I created my own.
+I am a coder by profession and hobby.  I did not like the tools that were available, so I created my own in perl/Tk.  However, as time passed, it was no longer feasible to maintain perl/Tk (it stopped working on my new Mac) so I commissioned Alex Emily Oxorn to rewrite the tools in python using 3b1b manim libraries.
 
-### Software Framework
+### Current Software Framework
 
-I created a set of perl modules that are used to create animations.  These libraries can be found in the `lib` folder of this repository
+This library, located in directory `./euclidlib`
 
 #### Third Party
 
-* Perl
-* Tcl::Tk (perl library)
-* PDF::API2 (perl library)
+* Python 3.12
+* manimlib v1.7.1 by 3b1b [github](https://github.com/3b1b/manim) (this in turn requires 3rd party software)
+
+## Authors & Copyright
+
+### Creative Content (videos / presentation, etc):
+
+​	(c) Sandy Bultena 2013, 2014, 2015, 2016, 2017, 2018, 2026 
+
+​	licensed under the http://creativecommons.org/llicenses/by-nc/3.0
+
+​       * Note that Book1 python propositions were translated from perl to python by Alex Emily Oxorn
+
+### Software:
+
+​	(_library using manimgl_) (`./euclidlib`) (c) Alex Emily Oxorn 2026
+
+​	(_library using perl/tk_) (`./lib`) (c) Sandy Bultena 2013, 2014, 2015, 2016, 2017, 2018. 
+
+​	
 
 ## Issues
 

@@ -1,0 +1,145 @@
+import sys
+import os
+
+sys.path.append(os.getcwd())
+
+from euclidlib.Scenes.BookScene import Book1Scene
+from euclidlib.Objects import *
+from typing import Dict
+
+
+class Prop32(Book1Scene):
+    steps = []
+    title = ("In any triangle, if one of the sides is produced, "
+             "then the exterior angle equals the sum of the two "
+             "interior and opposite angles, and the sum of the three "
+             "interior angles of the triangle equals two right angles.")
+
+    def go(self):
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
+        t2 = TextBox(mn_coord(475, 175))
+        t3 = TextBox(mn_coord(475, 500))
+
+        l: Dict[str | int, ELine] = {}
+        p: Dict[str | int, EPoint] = {}
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        a: Dict[str | int, EAngleBase] = {}
+        eq: Dict[str | int, EStringObj] = {}
+
+        A = mn_coord(250, 200)
+        B = mn_coord(75, 400)
+        C = mn_coord(350, 400)
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        # In Other Words
+        # ----------------------------------------------
+        t1.title("In other words:")
+        t1.explain(r"Given a triangle ABC, and line BC extended to point{nb}D")
+        t['ABC'] = ETriangle(A,B,C,
+                             point_labels='ABC',
+                             angles=r'\gamma \alpha \beta'.split())
+        l['BC'] = t['ABC'].l[1].copy().extend(mn_scale(200))
+        p['D'] = EPoint(l['BC'].get_end(), label=('D', dict(away_from=B)))
+
+        l['BC'], l['CD'] = l['BC'].e_split(t['ABC'].p[-1])
+
+        l['BC'].e_delete()
+        a['DCA'] = EAngle(l['CD'], t['ABC'].l[2], size=mn_scale(60), label=r'\delta')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain(r"Angle DCA is equal to the sum of ABC and CAB")
+        t2.math(r'\delta = \gamma + \alpha')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain(r"The sum of the angles BCA, ABC and CAB is two right angles")
+        t2.math(r'\beta + \gamma + \alpha = \rightangle + \rightangle')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        # Proof
+        # ----------------------------------------------
+        t1.down()
+        t1.title("Proof:")
+        with self.simultaneous():
+            t2.e_remove()
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Create a line parallel to AB, at point C{nb}(I.31)")
+        a['DCA'].e_fade()
+        l['CE'] = t['ABC'].l[0].parallel(t['ABC'].p[-1])
+        with self.simultaneous():
+            t['ABC'].e_fade()
+            t['ABC'].l[0].e_normal()
+            t['ABC'].p[0].e_normal()
+            t['ABC'].p[1].e_normal()
+            t['ABC'].p[2].e_normal()
+            l['CD'].e_fade()
+
+        p['E'] = EPoint(l['CE'].get_start(), label=('E', UP))
+        l['CE'], l['XC'] = l['CE'].e_split(t['ABC'].p[-1])
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        l['AB'] = t['ABC'].l[0].copy().prepend(mn_scale(40))
+        l['AB'].extend(mn_scale(40))
+        l['CD'].e_fade()
+        t['ABC'].a[0].e_normal()
+        t['ABC'].l[2].e_normal()
+
+        t1.explain("Since lines AB and CE are parallel, and line AC crosses them, "
+                   "then angles BAC and ACE are equal (I.29)")
+
+        a['ECA'] = EAngle(l['CE'], t['ABC'].l[2], size=mn_scale(20), label=r'\gamma')
+        t3.math(r'\measuredangle{BAC} = \measuredangle{ACE} = \gamma')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.staggered_animation():
+            t['ABC'].e_normal()
+            l['CD'].e_normal()
+            t['ABC'].l[2].e_fade()
+            t['ABC'].a[0].e_fade()
+            t['ABC'].a[2].e_fade()
+            a['ECA'].e_fade()
+
+        t1.explain("Since lines AB and CE are parallel, and line BC crosses them, "
+                   "then angles ABC and ECD are equal (I.29)")
+
+        a['ECD'] = EAngle(l['CD'], l['CE'], size=mn_scale(25), label=r'\alpha')
+        t3.math(r'\measuredangle{ABC} = \measuredangle{ECD} = \alpha')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.staggered_animation():
+            t['ABC'].e_normal()
+            a['ECA'].e_normal()
+            a['DCA'].e_normal()
+
+        t1.explain("Angle ACD equals the sum of angles ACE and ECD")
+        t3.math(r'\delta = \gamma = \alpha')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("The sum of angles ACD and ACB is two right angles\\{nb}(I.13)")
+        t3.math(r'\beta = \delta = \rightangle + \rightangle')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Therefore sum of angles ACE, ECD, and ACB is two right angles")
+        t3.math(r'\therefore\ \beta + \gamma + \alpha = \rightangle + \rightangle')
+

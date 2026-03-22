@@ -1,15 +1,29 @@
 from __future__ import annotations
 
 import itertools
+import math
+from enum import Enum
 
-from euclidlib.Objects.EucidMObject import *
-from euclidlib.Objects import Circle as Cir
-from manimlib import TAU
-from . import Line as Ln
-from . import Text as T
-from . import Point as P
+import manimlib as mn
+
+from euclidlib.Objects.em_object_base import *
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
+from . import Circle
+from . import Line
+from . import Text
+from . import Point
 from euclidlib.Objects import Dashable as Da
+DEG = mn.TAU/360
 
+class ArcLabelLocation(Enum):
+    BY_ALPHA = 0
+    AT_START = 1
+    AT_END = None
+
+# ==============================================================================================================
+# Abstract Arc
+# ==============================================================================================================
 class AbstractArc(Da.Dashable, mn.Arc):
     size: float
     e_angle: float
@@ -18,10 +32,13 @@ class AbstractArc(Da.Dashable, mn.Arc):
     vx: float
     vy: float
 
+    # ----------------------------------------------------------------------------------------------------------
+    # Constructor
+    # ----------------------------------------------------------------------------------------------------------
     def __init__(
             self,
             start_angle: float = 0,
-            angle: float = TAU / 4,
+            angle: float = mn.TAU / 4,
             radius: float = 1.0,
             *args,
             **kwargs
@@ -34,26 +51,45 @@ class AbstractArc(Da.Dashable, mn.Arc):
         self.size = radius
         super().__init__(start_angle, angle, radius, *args, **kwargs)
 
+    # ----------------------------------------------------------------------------------------------------------
+    # properties
+    # ----------------------------------------------------------------------------------------------------------
     @property
-    def v(self) -> Vect3:
+    def v(self) -> mn.Vect3:
         return self.get_arc_center()
 
     @property
-    def center(self) -> Vect3:
+    def center(self) -> mn.Vect3:
         return self.get_arc_center()
 
     @property
-    def r(self):
+    def r(self)->float:
         return self.size
 
     @property
-    def radius(self):
+    def radius(self)->float:
         return self.size
 
     @property
-    def arc(self):
+    def arc(self)->float:
         return self.e_angle
 
+    if TYPE_CHECKING:
+        # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
+        def add_label(self, text: str, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF, align=mn.ORIGIN) -> AbstractArc:
+            """
+            where is the arc label located?
+            :param text: string
+            :param where: decided by alpha, or start or end of arc
+            :param alpha: what fraction along the arc do you want the label
+            :param buff: how far from arc do you want the label
+            :param align: which side to align the text to
+            :return Self:
+            """
+
+    # ----------------------------------------------------------------------------------------------------------
+    # method called by manim... used when constructing
+    # ----------------------------------------------------------------------------------------------------------
     def pointwise_become_partial(self, start: AbstractArc, a: float, b: float) -> Self:
         if a <= 0:
             self.e_start_angle = start.e_start_angle
@@ -66,6 +102,11 @@ class AbstractArc(Da.Dashable, mn.Arc):
             self.e_end_angle = mn.interpolate(start.e_start_angle, start.e_end_angle, b)
         return super().pointwise_become_partial(start, a, b)
 
+    # ----------------------------------------------------------------------------------------------------------
+    # override manim's interpolate function,
+    # - by keeping track of the arc center and the start/stop of the arc, the label will be
+    #   updated as the Arc object is manipulated
+    # ----------------------------------------------------------------------------------------------------------
     def interpolate(
             self,
             mobject1: AbstractArc,
@@ -78,87 +119,136 @@ class AbstractArc(Da.Dashable, mn.Arc):
         self.e_end_angle = mn.interpolate(mobject1.e_end_angle, mobject2.e_end_angle, alpha)
         return super().interpolate(mobject1, mobject2, alpha, path_func)
 
-    def get_arc_center(self) -> Vect3:
+    # ----------------------------------------------------------------------------------------------------------
+    # Faster method of getting arc center than the one manim uses
+    # ----------------------------------------------------------------------------------------------------------
+    def get_arc_center(self) -> mn.Vect3:
         return np.array([self.vx, self.vy, 0])
 
-    def shift(self, vector: Vect3) -> Self:
+    # ----------------------------------------------------------------------------------------------------------
+    # shift: part of manim transformation routines, but keep track of centre of arc
+    # ----------------------------------------------------------------------------------------------------------
+    def shift(self, vector: mn.Vect3) -> Self:
         self.vx += vector[0]
         self.vy += vector[1]
         return super().shift(vector)
 
+    # ----------------------------------------------------------------------------------------------------------
+    # rotate - but keep track of start and stop angle - not for user consumption!
+    # ----------------------------------------------------------------------------------------------------------
     def rotate(self, angle: float, *args, **kwargs) -> Self:
         self.e_start_angle += angle
         self.e_end_angle += angle
         return super().rotate(angle, *args, **kwargs)
 
-    def proportion_angle(self, alpha: float):
+    # ----------------------------------------------------------------------------------------------------------
+    # get angle proportionally between start and end of this arc
+    # ----------------------------------------------------------------------------------------------------------
+    def proportion_angle(self, alpha: float) -> float:
         interp = mn.interpolate(self.e_start_angle, self.e_end_angle, alpha)
         return interp
 
-    def get_bisect(self, alpha=0.5):
-        return self.proportion_angle(alpha)
+    # ----------------------------------------------------------------------------------------------------------
+    # same as proportional_angle, but with alpha = 0.5
+    # ----------------------------------------------------------------------------------------------------------
+    def get_bisect(self) -> float:
+        return self.proportion_angle(0.5)
 
+    # ----------------------------------------------------------------------------------------------------------
+    # Get the vector that points in direction of angle
+    # ----------------------------------------------------------------------------------------------------------
     @staticmethod
-    def vector_of_angle(angle):
+    def vector_of_angle(angle)->mn.Vect3:
         return np.array([math.cos(angle), math.sin(angle), 0.0])
 
-    def get_bisect_dir(self, alpha=0.5):
-        bisect = self.get_bisect(alpha)
-        return self.vector_of_angle(bisect)
+    # ----------------------------------------------------------------------------------------------------------
+    # convert proportional angle to direction vector
+    # ----------------------------------------------------------------------------------------------------------
+    def proportional_angle_dir(self, alpha=0.5):
+        angle = self.proportion_angle(alpha)
+        return self.vector_of_angle(angle)
 
-    def highlight(self, color=RED, scale=2.0, **args):
-        return (self.animate(rate_func=mn.there_and_back, **args)
-                .set_stroke(color=color, width=scale * float(self.get_stroke_width())))
-
-    def init_label(self, labels: str | List[str], *args, **extra_args):
+    # ----------------------------------------------------------------------------------------------------------
+    # initialize label or labels (not animated) (calling 'add_label' does the animations)
+    # ----------------------------------------------------------------------------------------------------------
+    def init_label(self, labels: str | list[str], *args, **extra_args):
         if isinstance(labels, str):
             return super().init_label(labels, *args, **extra_args)
-        return T.LabelGroup(
+        return Text.LabelGroup(
             labels,
             self,
             itertools.repeat(args),
             itertools.repeat(extra_args)
         )
 
+    # ----------------------------------------------------------------------------------------------------------
+    # what are the tangent directions
+    # ----------------------------------------------------------------------------------------------------------
     def tangent_at_start(self):
-        dir = -PI / 2 if self.e_angle > 0 else PI / 2
+        dir = -mn.PI / 2 if self.e_angle > 0 else mn.PI / 2
         return self.vector_of_angle(self.e_start_angle + dir)
 
     def tangent_at_end(self):
-        dir = PI / 2 if self.e_angle > 0 else -PI / 2
+        dir = mn.PI / 2 if self.e_angle > 0 else -mn.PI / 2
         return self.vector_of_angle(self.e_end_angle + dir)
 
-    def tangent_points(self, angle_or_point: float | Mobject | Vect3, negative=False):
-        if isinstance(angle_or_point, (float, np.float32, np.float64)):
-            t_point = self.point_at_angle(angle_or_point)
-        else:
+    def tangent_points(self, angle_or_point: float | mn.Mobject | mn.Vect3, negative=False) -> tuple[mn.Vect3, mn.Vect3]:
+        """return point, and tangent direction at that point on the arc"""
+
+        # angle_or_point is a point, convert to angle
+        angle = angle_or_point
+        if not isinstance(angle_or_point, (float, np.float32, np.float64)):
             t_point = convert_to_coord(angle_or_point)
-        rotation = PI / 2 * (1 if (negative != self.e_angle > 0) else -1)
+            angle = mn.angle_of_vector( t_point-self.center)
+
+        # from angle, get a point on the arc
+        t_point = self.point_at_angle(angle)
+
+        rotation = mn.PI / 2 * (1 if negative != (self.e_angle > 0) else -1)
         vec = t_point - self.v
         return t_point, t_point + mn.rotate_vector(vec / 2, rotation)
 
-    def e_label_point(self, index=0, alpha=0.5, buff=None):
-        if index == 0:
-            bisect_dir = self.get_bisect_dir(alpha)
+    # ----------------------------------------------------------------------------------------------------------
+    # e_label_location
+    # - where is the label located?
+    # ----------------------------------------------------------------------------------------------------------
+    def e_label_location(self, where=ArcLabelLocation.BY_ALPHA, alpha=0.5, buff=LABEL_BUFF):
+        if where == ArcLabelLocation.BY_ALPHA:
+            bisect_dir = self.proportional_angle_dir(alpha)
             try:
-                base = self.point_from_proportion(alpha)
+                base = self.point_from_proportion(alpha) # manimlib stuff
             except AssertionError:
                 base = self.get_arc_center() + bisect_dir * self.size
             return base + bisect_dir * (buff or self.LabelBuff)
-        if index == 1:
-            return self.get_start() + self.tangent_at_start() * (buff or self.LabelBuff)
-        return self.get_end() + self.tangent_at_end() * (buff or self.LabelBuff)
 
-    def point_at_angle(self, angle):
+        if where == ArcLabelLocation.AT_START:
+            return self.get_start() + self.tangent_at_start() * buff
+
+        return self.get_end() + self.tangent_at_end() * buff
+
+    # ----------------------------------------------------------------------------------------------------------
+    # return the coordinates on the arc at a given angle
+    # ----------------------------------------------------------------------------------------------------------
+    def point_at_angle(self, angle) -> mn.Vect3:
         alpha = (angle - self.e_start_angle) / self.e_angle
         return self.point_from_proportion(alpha)
 
-    def e_point_at_angle(self, angle):
-        return P.EPoint(self.point_at_angle(angle))
+    # ----------------------------------------------------------------------------------------------------------
+    # return a point on the arc at a given angle
+    # ----------------------------------------------------------------------------------------------------------
+    def e_point_at_angle(self, angle) ->Point.EPoint:
+        """create and return a EPoint object on the arc, located at angle (in radians),
+        IF it falls into the range within the arc, otherwise defaults at 'start' or 'stop' of angle """
+        return Point.EPoint(self.point_at_angle(angle))
     
-    def intersect_circle(self, other: AbstractArc) -> Vect3 | None:
+    # ----------------------------------------------------------------------------------------------------------
+    # intersect two circles
+    # ----------------------------------------------------------------------------------------------------------
+    def intersect_circle(self, other: AbstractArc) -> tuple[mn.Vect3,...]:
+        """Find the two points (or None) where two circles intersect"""
+
         p2, r2 = other.center, other.radius
-        base = Ln.VirtualLine(self.center, p2, scene=self.scene, stroke_color=BLUE)
+        base = Line.VirtualLine(self.center, p2, scene=self.scene, stroke_color=mn.BLUE)
         d = base.get_length()
 
         # divide d into d1, d2,
@@ -174,7 +264,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         # if hsqr is negative, then the circles don't intersect
         if hsqr < 0:
             base.e_remove()
-            return None
+            return []
 
         h = math.sqrt(hsqr)
 
@@ -192,8 +282,8 @@ class AbstractArc(Da.Dashable, mn.Arc):
         p1x = px - py + sy
         p1y = py + px - sx
 
-        hline1 = Ln.VirtualLine((px, py), (p4x, p4y), scene=self.scene)
-        hline2 = Ln.VirtualLine((px, py), (p1x, p1y), scene=self.scene)
+        hline1 = Line.VirtualLine((px, py), (p4x, p4y), scene=self.scene)
+        hline2 = Line.VirtualLine((px, py), (p1x, p1y), scene=self.scene)
 
         h1 = hline1.point(h)
         h2 = hline2.point(h)
@@ -207,13 +297,23 @@ class AbstractArc(Da.Dashable, mn.Arc):
         else:
             return h1, h2
 
-    def intersect_line(self, other: Ln.ELine) -> Vect3 | None:
+    # ----------------------------------------------------------------------------------------------------------
+    # intersect line
+    # ----------------------------------------------------------------------------------------------------------
+    def intersect_line(self, other: Line.ELine, infinite:bool = False) -> Optional[tuple[mn.Vect3,...]] :
+        """
+        Find the two points (or None) where a line intersects a circle
+        :param other: the line
+        :param infinite: assume the line is infinite (default = False)
+        :return:
+        """
+
         x, y, _ = self.center
         r = self.radius
 
         x0, y0, _ = other.get_start()
         x1, y1, _ = other.get_end()
-        m = other.get_e_slope()
+        m = other.e_slope
 
         if not math.isinf(m):
             # math:
@@ -257,6 +357,9 @@ class AbstractArc(Da.Dashable, mn.Arc):
             y3 = (-b + math.sqrt(sqr)) / (2 * a)
             y4 = (-b - math.sqrt(sqr)) / (2 * a)
 
+        if infinite:
+            return np.array((x3, y3, 0)), np.array((x4, y4, 0))
+
         results = []
         max_x = max(x1, x0)
         min_x = min(x1, x0)
@@ -270,118 +373,101 @@ class AbstractArc(Da.Dashable, mn.Arc):
         if min_x - epsilon <= x4 <= max_x + epsilon and min_y - epsilon <= y4 < max_y + epsilon:
             results.append(np.array((x4, y4, 0)))
 
-        return results
+        return tuple(results)
 
-    def intersect_selection(self, other: mn.Rectangle):
-        corners = [other.get_corner(x) for x in [UL, UR, DR, DL, UL]]
-        return any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners))
+    # ----------------------------------------------------------------------------------------------------------
+    # intersect selection (which would me a rectangle)
+    # ----------------------------------------------------------------------------------------------------------
+    def intersect_selection(self, other: mn.Rectangle)->tuple[mn.Vect3,...]:
+        """Does this circle intersect with the specified rectangle?"""
+        corners = [other.get_corner(x) for x in [mn.UL, mn.UR, mn.DR, mn.DL, mn.UL]]
+        if any(self.intersect(mn.Line(x, y)) for x, y in itertools.pairwise(corners)):
+            return [[0,0,0],]
+        else:
+            return []
 
-    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | List[Vect3] | None:
+    # ----------------------------------------------------------------------------------------------------------
+    # generic intersect
+    # ----------------------------------------------------------------------------------------------------------
+    def intersect(self, other: mn.Mobject, reverse=True) ->  tuple[mn.Vect3,...]:
+        """
+        find intersection points, or true/false if other is a Rectangle
+        :param other: Arc, Line or Rectangle
+        :param reverse: not used
+        :return: tuple[mn.Vect3,...]
+        """
         if isinstance(other, AbstractArc):
             return self.intersect_circle(other)
-        if isinstance(other, Ln.ELine):
+        if isinstance(other, Line.ELine):
             return self.intersect_line(other)
         if isinstance(other, mn.Rectangle):
             return self.intersect_selection(other)
         return super().intersect(other)
 
+    def is_point_on_arc(self,pt: Point.EPoint | mn.Vect3) -> bool:
+        pt = convert_to_coord(pt)
+        return abs(get_dist(pt, self.center) - self.radius) < mn_scale(1) and self.is_within_arc_angles(pt)
+
+    # --------------------------------------------------------------------------------------------------------
+    # is point on arc (actually angle is within range of arc, but not actually on the arc??)
+    # --------------------------------------------------------------------------------------------------------
+    def is_within_arc_angles(self, pt: Point.EPoint | mn.Vect3) -> bool:
+        pt = convert_to_coord(pt)
+        c = self.center
+        vec = pt - c
+        angle = mn.angle_of_vector(vec) % mn.TAU
+        start_angle, end_angle = (x % mn.TAU for x in (self.e_start_angle, self.e_end_angle))
+        return start_angle * 0.9999 <= angle <= 1.0001 * end_angle
+
+
+# ==============================================================================================================
+# EArc
+# ==============================================================================================================
 
 class EArc(AbstractArc):
-    @classmethod
-    def semi_circle(cls, p1: P.EPoint | Vect3, p2: P.EPoint | Vect3, clockwise=False):
-        with Ln.VirtualLine(p1, p2) as d:
-            r = d.get_length() / 2 + mn_scale(0.0001)
-        return cls(r, p1, p2, clockwise=clockwise)
 
-    def create_pie(self, **kwargs):
-        pie = EMObject(stroke_width=0, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
-        pie.set_points(self.get_points())
-        pie.add_points_as_corners([self.v, self.get_start()])
-        return pie
-
-    @anim_speed
-    def bisect(self):
-        line = Ln.ELine(*self.get_start_and_end())
-        p3 = line.bisect()
-        perp = line.perpendicular(p3)
-        perp.extend_and_prepend(2 * self.radius)
-        
-        pts : List[Vect3] | None = self.intersect(perp)
-        results = None
-        if pts:
-            results = P.EPoint(pts[0])
-
-        with self.scene.simultaneous():
-            p3.e_remove()
-            line.e_remove()
-            perp.e_remove()     
-        return results
-    
-    def intersect(self, other: mn.Mobject, reverse=True) -> Vect3 | None:
-        pts = super().intersect(other, reverse) or []
-        # do the points actually intersect the arc (as opposed to the
-        # circle defining the arc?)
-
-        c = self.center
-        with Cir.VirtualCircle(c, c + RIGHT * self.radius) as virt:
-            results = []
-            start_angle, end_angle = sorted((x+0.0001*DEG) % TAU for x in (self.e_start_angle, self.e_end_angle))
-
-            if not isinstance(pts, (list, tuple)):
-                pts = [pts]
-            for p in pts:
-                angle = virt.angle_of_point(p)
-                if start_angle <= angle <= end_angle:
-                    results.append(p)
-
-        return results
-
+    # --------------------------------------------------------------------------------------------------------
+    # Constructor
+    # --------------------------------------------------------------------------------------------------------
     def __init__(self,
                  radius: float,
-                 point1: EMObject | Vect3,
-                 point2: EMObject | Vect3,
-                 big=None,
-                 clockwise=False,
+                 point1: EMObject | mn.Vect3,
+                 point2: EMObject | mn.Vect3,
+                 big = False,
                  **kwargs):
-
-        if isinstance(big, bool):
-            mn.log.warn("big is deprecated, use clockwise=bool")
+        """
+        :param radius:
+        :param point1: a point object or a vector
+        :param point2: a point object or a vector
+        :param kwargs: animation stuff
+        """
 
         point1 = convert_to_coord(point1)
         point2 = convert_to_coord(point2)
+        self.point1_coord = point1
+        self.point2_coord = point2
 
-        d = Ln.VirtualLine(point1, point2)
+        d = Line.VirtualLine(point1, point2)
         if radius < d.get_length() / 2:
             raise ValueError(f"radius of curvature too small for points\n\t"
                              f"need at least {d.get_length() / 2}\n\t"
                              f"radius given is {radius}")
 
-        c1 = Cir.VirtualCircle(point1, point1 + radius * RIGHT)
-        c2 = Cir.VirtualCircle(point2, point2 + radius * RIGHT)
+        c1 = Circle.VirtualCircle(point1, point1 + radius * mn.RIGHT)
+        c2 = Circle.VirtualCircle(point2, point2 + radius * mn.RIGHT)
         ps = c1.intersect(c2)
-        center = ps[0]
-        v1 = point1 - center
-        v2 = point2 - center
-        diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
 
-        if isinstance(big, bool):
-            diff %= TAU
-            if (big and diff < PI) or (diff > PI and not big):
-                center = ps[1]
-                v1 = point1 - center
-                v2 = point2 - center
-                diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
-                diff %= TAU
-        else:
-            if clockwise and diff > 0:
-                diff -= TAU
-            elif not clockwise and diff < 0:
-                diff += TAU
+        arc1 = self._calculate_angles(ps[0], point1, point2)
+        arc2 = self._calculate_angles(ps[1], point1, point2)
+        arc = arc1 if arc1[0] <= arc2[0] else arc2
+        if big:
+            arc = arc1 if arc1[0] > arc2[0] else arc2
 
+        diff, v1, _, center = arc
 
         super().__init__(
-            mn.angle_of_vector(v1),
-            diff,
+            start_angle = mn.angle_of_vector(v1),
+            angle = diff,
             radius=radius,
             arc_center=center,
             **kwargs
@@ -390,3 +476,80 @@ class EArc(AbstractArc):
         d.e_remove()
         c1.e_remove()
         c2.e_remove()
+
+    @staticmethod
+    def _calculate_angles(center: mn.Vect3, point1:mn.Vect3, point2:mn.Vect3):
+        """returns total angle, start point, end point, centre of arc"""
+        v1 = point1 - center
+        v2 = point2 - center
+        diff = mn.angle_of_vector(v2) - mn.angle_of_vector(v1)
+
+        if diff < 0:
+            diff += mn.TAU
+        return diff, v1, v2, center
+
+    # --------------------------------------------------------------------------------------------------------
+    # create a semi-circle
+    # --------------------------------------------------------------------------------------------------------
+    @classmethod
+    def semi_circle(cls, p1: Point.EPoint | mn.Vect3, p2: Point.EPoint | mn.Vect3, **kwargs):
+        with Line.VirtualLine(p1, p2) as d:
+            r = d.get_length() / 2 + mn_scale(0.0001)
+        return cls(r, p1, p2, **kwargs)
+
+    # --------------------------------------------------------------------------------------------------------
+    # turn an arc segment into a pie shape
+    # --------------------------------------------------------------------------------------------------------
+    def create_pie(self, **kwargs):
+        """Turn an arc segment into a slice of pie :) yummy!"""
+        pie = EMObject(stroke_width=1, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
+        pie.set_points(self.get_points())
+        pie.add_points_as_corners([self.v, self.get_start()])
+        return pie
+
+    # --------------------------------------------------------------------------------------------------------
+    # bisect the arc
+    # --------------------------------------------------------------------------------------------------------
+    @anim_speed
+    def bisect(self, **kwargs)->Optional[Point.EPoint]:
+        line = Line.ELine(*self.get_start_and_end())
+        p3 = line.bisect()
+        perp = line.perpendicular(p3,**kwargs)
+        perp.extend_and_prepend(2 * self.radius,**kwargs)
+        
+        pts : list[mn.Vect3] | None = self.intersect(perp)
+        results = None
+        if pts:
+            results = Point.EPoint(pts[0])
+
+        with self.scene.simultaneous():
+            p3.e_remove()
+            line.e_remove()
+            perp.e_remove()     
+        return results
+    
+
+    # --------------------------------------------------------------------------------------------------------
+    # intersect
+    # --------------------------------------------------------------------------------------------------------
+    def intersect(self, other: mn.Mobject, reverse=True) -> list[mn.Vect3]:
+        pts = super().intersect(other, reverse) or []
+
+        # if an object is used as a context manager, it is removed at the end of the block
+        results = []
+        if not isinstance(pts, (list, tuple)):
+            pts = [pts]
+        for p in pts:
+            if isinstance(other,EArc):
+                if self.is_within_arc_angles(p) and other.is_within_arc_angles(p):
+                    results.append(p)
+            else:
+                if self.is_within_arc_angles(p):
+                    results.append(p)
+
+        return results
+
+    def __str__(self):
+        return f"EArc center=({self.vx:.2f},{self.vy:.2f}) "+ \
+                f"radius={self.radius}"
+
