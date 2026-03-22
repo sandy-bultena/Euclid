@@ -46,17 +46,17 @@ This library, located in directory `./euclidlib`
 
 ## Authors & Copyright
 
-### Videos:
+### Creative Content (videos / presentation, etc):
 
 ​	(c) Sandy Bultena 2013, 2014, 2015, 2016, 2017, 2018, 2026 
 
 ​	licensed under the http://creativecommons.org/llicenses/by-nc/3.0
 
+​       * Note that Book1 python propositions were translated from perl to python by Alex Emily Oxorn
+
 ### Software:
 
 ​	(_library using manimgl_) (`./euclidlib`) (c) Alex Emily Oxorn 2026
-
-​	(_euclid propositions code_) (`./Propositions_perl_code`, `./Propositions_python_code`)
 
 ​	(_library using perl/tk_) (`./lib`) (c) Sandy Bultena 2013, 2014, 2015, 2016, 2017, 2018. 
 

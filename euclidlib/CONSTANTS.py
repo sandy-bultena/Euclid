@@ -3,6 +3,7 @@ import manimlib.constants as mn_constants
 
 # what is the 'smallest' measurement for comparing floats
 EPSILON = coordinate_utilities.mn_scale(1)
+ANGLE_EPSILON = .5 * mn_constants.DEGREES
 
 # how faded will the objects be (obj.e_fade())
 DEFAULT_FADE_OPACITY = 0.30
