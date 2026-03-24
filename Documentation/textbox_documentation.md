@@ -34,6 +34,7 @@ _Example:_ `line_width` and `alignment`
 ```
 
 _Example:_ `buff_size`
+
 <img src="./images/textbox_buff_size.png" alt="textbox_params" style="zoom:30%;" />
 
 ```python
