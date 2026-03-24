@@ -304,6 +304,11 @@ Modify the shape of the polygon by moving a point from its current location to a
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/c841ee65-5432-45f0-ad5c-a9d09e1b148f
+
+
     <source src="./images/polygon_move_point_to.mp4" type="video/mp4">
 </video>
 
