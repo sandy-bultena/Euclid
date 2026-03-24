@@ -409,8 +409,15 @@ creates a line as a chord within a circle, with the same length as `self`
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/668fcd9c-5342-4a14-bb5a-069a47ab8c7d
+
+
     <source src="./images/line_as_chord.mp4" type="video/mp4">
+	
 </video>
+
 
 ```python
     # copy line as chord, starting at angle 0 (default) with full animation
@@ -446,7 +453,13 @@ Takes a line (`self`) and makes a copy of it onto another line (`target_line`), 
 
 _Example:_ copy to point with and without animation
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/7dab3047-2d23-4e76-909e-f4628d916bf6
+
+
     <source src="./images/line_copy_to_line.mp4" type="video/mp4">
+	
 </video>
 
 ```python
@@ -491,6 +504,11 @@ Take a given line, and create a new line that starts at `target` and is the same
 
 _Example:_ copy to point with and without animation
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/a6595958-fa01-482b-8596-5c9624b8f688
+
+
     <source src="./images/line_to_point.mp4" type="video/mp4">
 </video>
 
@@ -522,6 +540,11 @@ creates a line parallel to `self` goint through the specified point
 
 _Example:_ draw perpendicular from point to line and draw perpendicular from point of line
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/ac9d67df-9d1f-4482-b2c5-d9014fec8001
+
+
     <source src="./images/line_parallel.mp4" type="video/mp4">
 </video>
 
@@ -549,8 +572,14 @@ Draws a line perpendicular to `self` which starts at the specified point
 
 _Example:_ draw perpendicular from point to line and draw perpendicular from point of line
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/f700f6ad-980b-424d-9418-a362d5c31e39
+
+
     <source src="./images/line_perpendicular.mp4" type="video/mp4">
 </video>
+
 ```python
     l = ELine(mn_coord(400,420),mn_coord(150,300))
 
@@ -576,8 +605,14 @@ By default, the square is drawn from the start of the line in an anti-clockwise 
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/05a14feb-5607-4702-85c2-15ad82f9abf0
+
+
     <source src="./images/line_square.mp4" type="video/mp4">
 </video>
+
 ```python
     l2 = ELine(mn_coord(300,150),mn_coord(400,150)).add_label(r'\rightarrow')
     l3, l4, l1 = l2.square(speed=2)
@@ -606,7 +641,6 @@ _Example:_
     l2.green()
     l3.red()
     l4.white()
-
 ```
 
 
@@ -615,6 +649,7 @@ _Example:_
 
 
 ### `mean_proportional(cls, l1, l2, pt, angle)`
+
 CLASS METHOD!! Take two lines and construct a third line of length that is the mean proportional of the first and second line.
 | name        | type              | default                 | description                                                  |
 | ----------- | ----------------- | ----------------------- | ------------------------------------------------------------ |
@@ -627,6 +662,11 @@ CLASS METHOD!! Take two lines and construct a third line of length that is the m
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/1661b029-d36a-4ceb-9b8a-c2a41bbc5b16
+
+
     <source src="./images/line_mean_proportional.mp4" type="video/mp4">
 </video>
 
@@ -654,8 +694,14 @@ CLASS METHOD!! Calculate the third proportional $x$ ($a:b = b:x$)
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/23504dcc-e6b8-4d1a-9647-4814e2911619
+
+
     <source src="./images/line_third.mp4" type="video/mp4">
 </video>
+
 ```python
     t1 = TextBox(mn_coord(400, 50))
     t1.math(r"a:b = b:x")
@@ -688,8 +734,14 @@ CLASS METHOD!! Calculate the fourth proportional $x$ ($a:b = c:x$)
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/2130c77e-c1c1-4762-aff6-2b0a11293ffc
+
+
     <source src="./images/line_fourth.mp4" type="video/mp4">
 </video>
+
 ```python
     t1 = TextBox(mn_coord(300, 50))
     t1.math(r"a:b = c:x")
