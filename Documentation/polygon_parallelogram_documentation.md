@@ -34,11 +34,9 @@ Create a Triangle with 1st and 3rd side defined, with the angle defined
 | `speed`    | `float` | -1      | If greater than zero, animates the construction steps, otherwise just draws the new Parallelogram |
 | `**kwargs` |         |         | Animation arguments                                          |
 
-
-<video controls width="300" height="200" poster="placeholder_image.png">
-    
 https://github.com/user-attachments/assets/4341338c-f644-4a77-a5e4-c9f8c91d586e
 
+<video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/parallelogram_copy_to_line.mp4" type="video/mp4">
 </video>
 
