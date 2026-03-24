@@ -39,6 +39,10 @@ create a new parallelogram that is the same area as this polygon, where one side
 
 _Example:_
 
+
+https://github.com/user-attachments/assets/ec17fdeb-2e3f-46ef-b35d-61defc4ca5c2
+
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/polygon_parallelogram_line.mp4" type="video/mp4">
 </video>
@@ -122,6 +126,9 @@ create a new parallelogram that is similar in shape to the original, and the 1st
 
 _Example:_
 
+
+https://github.com/user-attachments/assets/20789ad0-eaa5-4b05-986c-8a3449cb5b28
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/polygon_copy_to_similar.mp4" type="video/mp4">
 </video>
@@ -161,8 +168,12 @@ Create a new polygon which is similar to the polygon passed as a parameter, but 
 
 _Example:_
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+https://github.com/user-attachments/assets/e6f40cb1-267d-464d-9d24-57cf19b56ea7
+
     <source src="./images/polygon_copy_to_polygon.mp4" type="video/mp4">
 </video>
+
 ```python
     t1 = TextBox(mn_coord(300,100))
     t1.math(r"A_a = A_c\quad\quad b\sim c")
