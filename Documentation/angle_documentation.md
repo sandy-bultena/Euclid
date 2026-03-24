@@ -120,6 +120,11 @@ Takes an existing angle, and copies that angle onto another line.
 
 _Example:_ Copy to line, no construction animation (click to play)
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/6eeeb07e-24d0-4b7a-ac0f-ebf0e30e164f
+
+
     <source src="./images/angle_copy_to_line_speed_0.mp4" type="video/mp4">
 </video>
 ```python
@@ -132,6 +137,11 @@ _Example:_ Copy to line, no construction animation (click to play)
 
 _Example:_ Copy to line, with construction animation (click to play)
 <video controls width="300" height="200" poster="placeholder_image.png">
+
+
+https://github.com/user-attachments/assets/4370117b-84f0-4518-bc75-fde06e96c71c
+
+
     <source src="./images/angle_copy_to_line_speed_1.mp4" type="video/mp4">
 </video>
 
