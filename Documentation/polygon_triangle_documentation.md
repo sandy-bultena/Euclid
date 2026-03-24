@@ -81,9 +81,15 @@ _Example:_
 | `**kwargs`     |                     |         | Extra arguments passed to EPolygonBase                       |
 
 _Example:_
+
+
+https://github.com/user-attachments/assets/e1a91d37-d55b-478a-8277-6bd2deabe7a8
+
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/triangle_equilateral.mp4" type="video/mp4">
 </video>
+
 ```python
     t1 = TextBox(mn_coord(100, 50))
     t1.explain("Construct an equilateral triangle")
@@ -107,9 +113,14 @@ copy the triangle to a parallelogram with  interior angle `angle` and where the 
 
 _Example:_
 
+
+https://github.com/user-attachments/assets/2582fe6f-2558-4297-af69-677f6fa3c0d1
+
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/triangle_parallelogram.mp4" type="video/mp4">
 </video>
+
 ```python
     tri = ETriangle(mn_coord(130,400),mn_coord(400,450),mn_coord(350,300)).e_fill(mn.BLUE)
     l1 = ELine(mn_coord(300,150), mn_coord(400,150))
@@ -166,9 +177,15 @@ draw a circle around a triangle
 | `**kwargs` |          |         | Animation arguments                                          |
 
 _Example:_
+
+
+https://github.com/user-attachments/assets/1aa77dbb-d248-4262-b70b-71d8e1f7de0d
+
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/triangle_circumscribe.mp4" type="video/mp4">
 </video>
+
 ```python
     tri = ETriangle(mn_coord(130,400),mn_coord(400,550),mn_coord(350,300)).e_fill(mn.BLUE)
     c = tri.circumscribe(speed=2)
@@ -184,6 +201,11 @@ In a given circle to inscribe a triangle equiangular with a given triangle
 | `**kwargs`     |                     |         | Animation arguments     |
 
 _Example:_
+
+
+https://github.com/user-attachments/assets/847056d0-80be-489c-971e-b2d5c2954639
+
+
 <video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/triangle_copy_to_circle.mp4" type="video/mp4">
 </video>
