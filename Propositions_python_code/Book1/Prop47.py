@@ -1,0 +1,397 @@
+import sys
+import os
+
+import numpy as np
+
+sys.path.append(os.getcwd())
+
+from euclidlib.Scenes.BookScene import Book1Scene
+from euclidlib.Objects import *
+from typing import Dict
+
+
+class Prop47(Book1Scene):
+    steps = []
+    title = ("In right-angled triangles the square on the side opposite "
+             "the right angle equals the sum of the squares on the sides "
+             "containing the right angle.")
+
+    def go(self):
+        t1 = TextBox(mn_coord(775, 150), line_width=mn_scale(575))
+        t2 = TextBox(mn_coord(500, 175))
+        t3 = TextBox(mn_coord(500, 175))
+
+        l: Dict[str | int, ELine] = self.l
+        p: Dict[str | int, EPoint] = self.p
+        c: Dict[str | int, ECircle] = {}
+        t: Dict[str | int, ETriangle] = {}
+        s: Dict[str | int, EPolygon] = {}
+        a: Dict[str | int, EAngleBase] = {}
+        eq: Dict[str | int, EStringObj] = {}
+
+        top = 325
+        bot = 425
+        A_base = np.array([220, top, 0])
+        B_base = np.array([145, bot, 0])
+
+        side = -1 * (B_base[0] - A_base[0]) / (bot - top)
+        b = A_base[1] - side * A_base[0]
+        C_base = np.array([(1 / side) * (bot - b), bot, 0])
+
+        A = mn_coord(*A_base)
+        B = mn_coord(*B_base)
+        C = mn_coord(*C_base)
+
+        # ----------------------------------------------
+        # In Other Words
+        # ----------------------------------------------
+        t1.title("In other words:")
+        t1.explain("Given a right angle triangle ABC")
+        t['ABC'] = ETriangle(A,B,C, point_labels=['A','B','C'], angles=' ')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        s['B'] = ESquare(A, B, point_labels=['G', None, None, 'F'])
+        s['A'] = ESquare(C, A, point_labels=['K', None, None, 'H'])
+        s['C'] = ESquare(B, C, point_labels=['D', None, None, 'E'])
+
+        G,_,_,F = s['B'].p
+        K,_,_,H = s['A'].p
+        D,_,_,E = s['C'].p
+
+        self.extract_all(l, p, a, s, 'GABF', 'B')
+        self.extract_all(l, p, a, s, 'KCAH', 'A')
+        self.extract_all(l, p, a, s, 'DBCE', 'C')
+
+        with self.staggered_animation():
+            t3.explainM('$ABFG$ is a square', fill_color=BLUE)
+            t3.explainM('$ACKH$ is a square', fill_color=BLUE)
+            t3.explainM('$BCDE$ is a square', fill_color=BLUE)
+        t2.next_to(t3, DOWN, buff=0, aligned_edge=LEFT)
+        t2.down()
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Then the sum of the squares of lines AB and AC equals the square of BC")
+        t2.math(r'\square AB + \square AC = \square BC')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        # Proof
+        # ----------------------------------------------
+        with self.staggered_animation():
+            t1.e_remove()
+            t2.e_remove()
+        t2.next_to(t3, DOWN, aligned_edge=LEFT)
+        t1.title("Proof:")
+        with self.simultaneous():
+            s['A'].e_fade()
+            s['B'].e_fade()
+            s['C'].e_fade()
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("By construction, angle GAB is a right angle, as is BAC, "
+                   "therefore lines GA and AC form a single line GC{nb}(I.14)")
+        with self.simultaneous():
+            t3.e_fade()
+            t3.blue(0)
+
+        with self.simultaneous():
+            s['B'].p[2].e_normal()
+            s['B'].set_angles(None, (" ",mn_scale(30)) )
+            l['GC'] = ELine(G, C)
+            G.lift().e_normal()
+        l['GC'].notice()
+        t2.e_fade()
+        t2.math('GA,AC = GC')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Similarly for line BH{nb}(I.14)")
+        with self.simultaneous():
+            l['GC'].e_fade()
+            s['B'].a[1].e_remove()
+            G.e_fade()
+
+        with self.simultaneous():
+            H.e_normal()
+            s['A'].set_angles(None, None, (" ", mn_scale(30)), None)
+            l['BH'] = ELine(H, B)
+        l['BH'].notice()
+
+        with self.simultaneous():
+            t3.e_fade()
+            t3.blue(1)
+            t2.e_fade()
+        t2.math('BA,AH = BH')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.simultaneous():
+            t2.e_fade()
+            l['BH'].e_fade()
+            H.e_remove()
+            s['A'].a[2].e_remove()
+            s['A'].p[0].e_fade()
+        t1.explain("Angles FBA and CBD are both right angles")
+        t1.explain("Adding angle ABC to both demonstrates that angles "
+                   "FBC and ABD are also equal")
+
+        with self.simultaneous():
+            D.e_normal()
+            s['B'].l[2].e_normal()
+            F.e_normal()
+            s['C'].l[0].e_normal()
+
+        a['FBC'] = EAngle(*self.lines('FBC',2), size=mn_scale(15), label=r'\gamma')
+        a['ABD'] = EAngle(*self.lines('ABD',2), size=mn_scale(25), label=r'\gamma')
+
+        with self.simultaneous():
+            t3.e_fade()
+            t3.e_normal().blue(0, 2)
+            t2.math(r'\measuredangle{FBC} = \rightangle + \measuredangle{ABC} = \measuredangle{ABD}')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Draw a line from A, parallel to BD")
+        with self.skip_animations_for():
+            l['ALx'] = s['C'].l2.parallel(t['ABC'].p0)
+            l['ALx'].extend(200)
+        p['L'] = l['ALx'].intersection_e_point(s['C'].l3).add_label('L', DOWN)
+        l['AL'] = EDashedLine(A, p['L'])
+        l['ALx'].e_remove()
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_fade()
+        t2.math(r'AL \parallel BD')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Draw lines AD and FC, and consider triangles FBC and ABD")
+        l['FC'] = ELine(F, C)
+        l['AD'] = ELine(A, D)
+        s['ABD'] = ETriangle.assemble(lines=[t['ABC'].l0, s['C'].l0, l['AD']])
+        s['FBC'] = ETriangle.assemble(lines=[s['B'].l2, t['ABC'].l1, l['FC']])
+
+        with self.simultaneous():
+            t['ABC'].l0.e_fade()
+            t['ABC'].l1.e_fade()
+            t['ABC'].l2.e_fade()
+            t['ABC'].a0.e_fade()
+            s['ABD'].e_normal()
+            s['FBC'].e_normal()
+            l['AL'].e_fade()
+            t2.e_fade()
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explainM(r"The two triangles are equal, FB equals AB, BC equals "
+                    r"BD, with a common angle $\gamma$(I.4)")
+        s['ABD'].e_fill(BLUE_D)
+        s['FBC'].e_fill(BLUE_D)
+        with self.simultaneous():
+            t3.e_normal(0, 2)
+            t2.e_normal(-2)
+            t2.math(r'\triangle FBC = \triangle ABD')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("The square AB and the triangle FBC share the same base, and are "
+                    "enclosed by the same parallel lines GC,FB "
+                    "thus FBC "
+                    "is one half ABFG{nb}(I.41)")
+
+        t['ABC'].l2.e_normal()
+        with self.simultaneous():
+            l['CAX'] = t['ABC'].l2.copy().extend_and_prepend(mn_scale(200))
+            l['FBX'] = s['B'].l0.copy().extend_and_prepend(mn_scale(350))
+            s['ABD'].e_fade()
+            #s['ABD'].e_unfill()
+
+        with self.simultaneous():
+            l['FBX'] = l['FBX'].dash()
+            l['CAX'] = l['CAX'].dash()
+
+        s['B'].e_normal()
+        s['B'].e_fill(BLUE)
+        s['FBC'].e_fill(BLUE_D)
+        with self.simultaneous():
+            t3.e_fade()
+            t3.blue(0)
+            t2.e_fade()
+        t2.math(r'\triangle FBC = \frac{1}{2} \square AB')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.simultaneous():
+            s['B'].e_fade()
+            s['FBC'].e_fade()
+            l['FBX'].e_remove()
+            l['CAX'].e_remove()
+
+        t1.explain("The triangle ABD equals half the parallelogram BDL{nb}(I.41)")
+        s['ABD'].e_normal()
+        s['BDL'] = EParallelogram(*self.points('BDL')).e_fill(BLUE_D)
+
+        s['BDL'].l0.e_normal()
+        with self.simultaneous():
+            l['ALx'] = l['AL'].extend_and_prepend(mn_scale(150))
+            l['BCx'] = s['BDL'].l0.copy().extend_and_prepend(mn_scale(150))
+
+        with self.simultaneous():
+            l['BCx'] = l['BCx'].dash()
+
+        with self.simultaneous():
+            t3.e_fade()
+            t2.e_fade()
+            t2.e_normal(3)
+        t2.math(r'\triangle ABD = \frac{1}{2} \parallelogram BDL')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Therefore, the square of AB equals the polygon BDL")
+        with self.simultaneous():
+            l['ALx'].e_remove()
+            l['BCx'].e_remove()
+            with self.freeze(*s['ABD'].l, *s['FBC'].l):
+                s['ABD'].e_remove()
+                s['FBC'].e_remove()
+            t['ABC'].e_normal()
+            s['B'].e_normal()
+
+            l['FC'].e_remove()
+            l['AD'].e_remove()
+            a['FBC'].e_remove()
+            a['ABD'].e_remove()
+
+            t2.e_fade()
+            t3.e_fade()
+            t2.e_normal(slice(-3))
+        t2.math(r'\square AB = \parallelogram BDL')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Applying the same logic as before, triangles BCK and AEC are equal{nb}(I.4)")
+        with self.simultaneous():
+            s['C'].e_normal()
+            s['A'].e_normal()
+        l['AE'] = ELine(A, E)
+        l['BK'] = ELine(B, K)
+        with self.simultaneous():
+            s['BCK'] = ETriangle.assemble(lines=[t['ABC'].l1, s['A'].l0, l['BK']])
+            s['ECA'] = ETriangle.assemble(lines=[s['C'].l2, t['ABC'].l2, l['AE']])
+        with self.simultaneous():
+            s['BCK'].set_angles(None, (r'\sigma', mn_scale(15)), None)
+            s['ECA'].set_angles(None, (r'\sigma', mn_scale(25)), None)
+        with self.simultaneous():
+            s['BCK'].e_fill(GREEN_D)
+            s['ECA'].e_fill(GREEN_D)
+
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_normal(1, 2)
+            t2.math(r'\measuredangle{BCK} = \measuredangle{ACE}')
+            t2.math(r'\triangle{ECA} = \triangle{BCK}')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Triangle BCK is half of the square AC")
+        with self.simultaneous():
+            s['ECA'].e_fade()
+            s['A'].e_normal()
+            s['A'].e_fill(GREEN)
+        with self.simultaneous():
+            s[1] = t['ABC'].l0.copy().dash().extend_and_prepend(mn_scale(300))
+            s[2] = s['A'].l2.copy().dash().extend_and_prepend(mn_scale(300))
+
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_fade()
+            t3.e_normal(1)
+
+        t2.math(r'\triangle BCK = \frac{1}{2} \square AC')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        with self.simultaneous():
+            s[1].e_remove()
+            s[2].e_remove()
+
+        t1.explain("Triangle ECA is half the parallelogram CEL{nb}(I.41)")
+
+        with self.simultaneous():
+            s['BCK'].e_fade()
+            s['ECA'].e_normal()
+            s['A'].e_fade()
+
+        s['CEL'] = EParallelogram(*self.points('CEL'), skip_anim=True)
+        s['CEL'].e_fill(GREEN)
+
+        with self.simultaneous():
+            s[1] = s['C'].l0.copy().dash().extend_and_prepend(mn_scale(300))
+            s[2] = l['AL'].copy().dash().extend_and_prepend(mn_scale(100))
+
+
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_fade()
+            t3.e_normal(2)
+            t2.e_normal(3)
+
+        t2.math(r'\triangle ECA = \frac{1}{2} \parallelogram CEL')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("Therefore the square of AC equals the parallelogram{nb}CEL")
+
+        with self.simultaneous():
+            s[1].e_remove()
+            s[2].e_remove()
+            l['AE'].e_remove()
+            l['BK'].e_remove()
+            s['ECA'].e_unfill()
+            s['ECA'].remove_angles()
+            s['BCK'].e_unfill()
+            s['BCK'].remove_angles()
+            s['A'].e_normal()
+
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_fade()
+            t2.e_normal(slice(-3))
+        t2.math(r'\square AC = \parallelogram CEL')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("The square of line BC equals the sum of BDL and CEL")
+        with self.simultaneous():
+            t2.e_fade()
+            t3.e_fade()
+        t2.math(r'\square BC = \parallelogram BDL + \parallelogram CEL')
+
+        self.next_page()
+
+        # ------------------------------------------------------------------------
+        t1.explain("The sum of the squares of lines AB and AC equals the square of BC")
+        with self.simultaneous():
+            t2.e_fade()
+            t2.e_normal(7, 12, -1)
+        t2.math(r'\square AB + \square AC = \square BC')

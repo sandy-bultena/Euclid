@@ -287,7 +287,7 @@ B<Returns>
 sub label {
     my $self = shift;
     Validate::Inputs( \@_, [], [qw(text number)] );
-    my $text = shift || "";
+    my $text_str = shift || "";
     my $size = shift;
 
     # ------------------------------------------------------------------------
@@ -331,9 +331,9 @@ sub label {
     # ------------------------------------------------------------------------
     # create the label
     # ------------------------------------------------------------------------
-    my @text = split( "", $text );
-    $self->_draw_label($cn,[$xs,$ys,$text[0],'exactly'],[$xm,$ym,$text[1],'exactly']
-    ,[$xe,$ye,$text[2],'exactly']);
+    my @text_str = split( "", $text_str );
+    $self->_draw_label($cn,[$xs,$ys,$text_str[0],'exactly'],[$xm,$ym,$text_str[1],'exactly']
+    ,[$xe,$ye,$text_str[2],'exactly']);
 
     return $self;
 }

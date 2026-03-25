@@ -1,48 +1,37 @@
 from __future__ import annotations
 
 import math
-from itertools import pairwise
-
-from euclidlib.Objects.EucidMObject import *
-from euclidlib.Objects import Line as L
-from euclidlib.Objects import Arc
-from euclidlib.Objects import Point
 import manimlib as mn
-from euclidlib.Objects import Dashable as Da
+import numpy as np
 
+from euclidlib.Objects.em_object_decorators import *
+from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord
+from euclidlib.CONSTANTS import *
+from ..Scenes.animate_state import AnimState
 
+if TYPE_CHECKING:
+    pass
+    #import euclidlib.Scenes.PropScene as ps
+from . import Line
+from . import Arc
+from . import Point
+
+# =====================================================================================================================
+# Circle
+# =====================================================================================================================
 class ECircle(mn.Circle, Arc.AbstractArc):
-    CONSTRUCTION_TIME = 0.75
+    CONSTRUCTION_TIME = 2.00
     AUX_CONSTRUCTION_TIME = 0.25
 
-    def CreationOf(self, *args, **kwargs):
-        tmpLine = L.ELine(self.e_center, self.get_end(),
-                          stroke_color=mn.RED,
-                          label=self.temp_line_label,
-                          delay_anim=True)
-        if self.scene.animateState[-1] == ps.AnimState.NORMAL:
-            self.animation_objects.append(tmpLine)
-            tmpLine.e_draw(
-                anim_args=dict(
-                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
-                ))
-            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
-            if tmpLine.e_label is not None:
-                tmpLine.e_label.enable_updaters()
-        return super().CreationOf(*args, **kwargs)
-
-    def e_label_point(self, angle: float, outside=True, buff=None):
-        direction = np.array([np.cos(angle), np.sin(angle), 0.0])
-        try:
-            edge = self.point_at_angle(angle)
-        except AssertionError:
-            try:
-                edge = self.point_from_proportion((angle%TAU)/TAU)
-            except AssertionError:
-                edge = self.get_right()
-        return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
-
-    def __init__(self, center, point, temp_line_label=None, *args, **kwargs):
+    # -----------------------------------------------------------------------------------------------------------------
+    # initialization
+    # -----------------------------------------------------------------------------------------------------------------
+    def __init__(self, center: Point.EPoint| mn.Vect3, point, temp_line_label=None, *args, **kwargs):
+        """
+        :param center: Point.EPoint| mn.Vect3 - centre of circle
+        :param point: Point.EPoint| mn.Vect3 - point on circle circumference
+        :param temp_line_label: maybe initial line has a label?
+        """
         self.e_center = convert_to_coord(center)
         self.e_point = convert_to_coord(point)
         self.temp_line_label = temp_line_label
@@ -62,19 +51,86 @@ class ECircle(mn.Circle, Arc.AbstractArc):
             **kwargs
         )
 
-    def angle_of_point(self, point: Point.EPoint | Vect3):
+    # -----------------------------------------------------------------------------------------------------------------
+    # CreationOf - how to animate the drawing of a circle
+    # -----------------------------------------------------------------------------------------------------------------
+    def CreationOf(self, *args, **kwargs):
+        tmpLine = Line.ELine(self.e_center, self.get_end(),
+                          stroke_color=mn.RED,
+                          label=self.temp_line_label,
+                          delay_anim=True)
+
+        # only draw the swoop line if drawing is NORMAL
+        if self.scene.animateState[-1] == AnimState.NORMAL:
+
+            # draw the line to create the 'swoop' of drawing a circle
+            self.animation_objects.append(tmpLine)
+            tmpLine.e_draw(
+                anim_args=dict(
+                    run_time=self.AUX_CONSTRUCTION_TIME if not self.temp_line_label else self.AUX_CONSTRUCTION_TIME * 2
+                ))
+
+            # at every frame, set the points of the line to the animation of the drawing circle
+            tmpLine.f_always.set_points_by_ends(lambda: self.e_center, lambda: self.get_end())
+
+            # as the temp line is being drawn, if it has a label, allow label to be updated as the circle is drawn
+            if tmpLine.e_label is not None:
+                tmpLine.e_label.enable_updaters()
+
+        return super().CreationOf(*args, **kwargs)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # this specifies the arguments for e_label_location
+    # -----------------------------------------------------------------------------------------------------------------
+    if TYPE_CHECKING:
+        # add_label is defined in em_object_base, which in turn calls self.init_label(*args,**kwargs)
+        def add_label(self, text: str, angle: float=45, outside=True, buff=LABEL_BUFF, align=mn.ORIGIN) -> ECircle:
+            """
+            :param text:
+            :param angle: where to draw
+            :param outside: inside or outside of the circle
+            :param buff: how far away from the circle
+            :param align: which side to align the text to
+            :return: ECircle
+            """
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # this method (called by the Label object (see Text.py)) defines where the label will be
+    # -----------------------------------------------------------------------------------------------------------------
+    def e_label_location(self, angle: float=mn.PI/4, outside=True, buff=LABEL_BUFF):
+        direction = np.array([np.cos(angle), np.sin(angle), 0.0])
+        try:
+            edge = self.point_at_angle(angle)
+        except AssertionError:
+            try:
+                edge = self.point_from_proportion((angle%mn.TAU)/mn.TAU)
+            except AssertionError:
+                edge = self.get_right()
+        return edge + direction * (buff or self.LabelBuff) * (1 if outside else -1)
+
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # angle of point
+    # -----------------------------------------------------------------------------------------------------------------
+    def angle_of_point(self, point: Point.EPoint | mn.Vect3):
+        """return the angle corresponding to a point on the circle"""
         p = convert_to_coord(point)
         c = self.center
         vec = p - c
-        return mn.angle_of_vector(vec) % TAU
+        return mn.angle_of_vector(vec) % mn.TAU
 
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # draw tangent
+    # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def draw_tangent(self, point: Mobject | Vect3, negative=False):
+    def draw_tangent(self, point: mn.Mobject | mn.Vect3, negative=False) -> Line.ELine:
+        """draw line from a point such that it just touches the circle"""
+
         # draw line from point to centre of circle
         pC = Point.EPoint(self.v)
-        lC = L.ELine(point, pC)
+        lC = Line.ELine(point, pC)
 
         # if point is inside circle, then we can't do this
         if lC.get_length() - self.r < mn_scale(-1):
@@ -82,37 +138,46 @@ class ECircle(mn.Circle, Arc.AbstractArc):
 
         to_remove = [pC, lC]
 
+        line_side = Line.LineLabelSide.INSIDE if negative else Line.LineLabelSide.OUTSIDE
+
         # if the point is on the circle, then draw a line perpendicular
         # to the radius
         if abs(lC.get_length() - self.r) < mn_scale(2):
-            l = lC.perpendicular(point, speed=0, inside=negative)
+            l = lC.perpendicular(point, speed=0, side = line_side)
             l.extend(self.r)
+
         # else draw a line from the point tangent to the circle
         else:
             # find where line from centre intersects small circle
-            p: Tuple[Vect3, Vect3] = self.intersect(lC)
+            p: tuple[mn.Vect3, mn.Vect3] = self.intersect(lC)
             pD = Point.EPoint(p[0]).e_fade()
+
             # draw larger circle, and where line from centre intersects small circle
             cL = ECircle(self.v, point).e_fade()
+
             # find line perpendicular to d, and find
             # intersection with larger circle
-            lPerp = lC.perpendicular(pD, speed=0, inside=negative).e_fade()
+            lPerp = lC.perpendicular(pD, speed=0, side=line_side).e_fade()
             lPerp.extend(lC.get_length())
             p = cL.intersect(lPerp)
             pF = Point.EPoint(p[0]).e_fade()
+
             # draw line from point F to centre of circle
-            lF = L.ELine(pF, pC).e_fade()
+            lF = Line.ELine(pF, pC).e_fade()
+
             # find intersection of this line with original circle
             p = self.intersect(lF)
+
             # fiddle around because round off errors might make point B
             # just outside the circle
-            radial = L.ELine(self.get_center(), p[0])
+            radial = Line.ELine(self.get_center(), p[0])
             if radial.get_length() > self.radius:
                 p = (radial.point(self.radius),)
             radial.e_remove()
             pB = Point.EPoint(p[0]).e_fade()
+
             # draw the tangent
-            l = L.ELine(point, pB)
+            l = Line.ELine(point, pB)
 
             to_remove.extend([pB, radial, lF, pF, lPerp, cL, pD])
 
