@@ -13,10 +13,23 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        perpendicular2()
+        transform()
 
     def go(self):
         pass
+
+def transform_circle():
+    l = ELine(mn_coord(350,120),mn_coord(150,100)).blue()
+    with l.scene.pause_animations_for():
+        l2 = ECircle(mn_coord(200,350), mn_coord(350,200), )
+    l.scene.play(l.transform_to(l2))
+
+def transform():
+    l = ELine(mn_coord(350,120),mn_coord(150,100)).blue()
+    with l.scene.pause_animations_for():
+        l2 = ELine(mn_coord(200,350), mn_coord(350,200), )
+    l.scene.play(l.transform_to(l2))
+
 
 def perpendicular2():
     # inside/outside doesn't seem to be working properly... test
