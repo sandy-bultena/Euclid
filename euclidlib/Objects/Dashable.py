@@ -3,6 +3,7 @@ import manimlib as mn
 import numpy as np
 import euclidlib.Objects.em_object_base as EM
 from euclidlib.Objects.em_group_object  import EIndexedGroup, EGroupedObjects
+from euclidlib.CONSTANTS import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord
 
 from . import Line
@@ -40,7 +41,7 @@ class Dashable(EGroupedObjects):
     def dash(self,
              dash_length: float = mn.DEFAULT_DASH_LENGTH,
              positive_space_ratio: float = 0.5,
-             final_opacity=0,
+             final_opacity=0.1,
              delay_anim=False):
         """
         Creates a NEW dashed object overlaying this particular object
@@ -69,6 +70,7 @@ class Dashable(EGroupedObjects):
 
         # define what happens while the animation is happening
         self.dash_ref.disable_updaters()
+
         def updater(dash_ref: DashPath):
             dash_ref.become(DashPath(self, dash_length, positive_space_ratio, delay_anim=True))
         self.dash_ref.add_updater(updater, call=False)
@@ -93,6 +95,15 @@ class Dashable(EGroupedObjects):
             cpy.dash_ref = self.dash_ref.copy(deep)
         cpy.tick_marks = self.tick_marks.copy(deep)
         return cpy
+
+    # ------------------------------------------------------------------------------------------------------------
+    # remove the dashes
+    # ------------------------------------------------------------------------------------------------------------
+    def un_dash(self, final_opacity=1):
+        with self.scene.simultaneous():
+            self.remove_dash()
+            self.scene.play(self.animate.set_stroke(opacity=final_opacity))
+        self.dash_ref = None
 
 
     # ------------------------------------------------------------------------------------------------------------
@@ -130,17 +141,22 @@ class Dashable(EGroupedObjects):
 
     # ------------------------------------------------------------------------------------------------------------
     # tick_abs
-    #   - no idea what this does
+    #   set a tick an absolute length along the line/arc
     # ------------------------------------------------------------------------------------------------------------
     def tick_abs(self, at_length, tick_size=mn.SMALL_BUFF, label=None, delay_anim=False):
         alpha = at_length / self.get_arc_length()
         self.tick_prop(alpha, tick_size, label, delay_anim)
 
+    # ------------------------------------------------------------------------------------------------------------
+    # tick_prop
+    #    set a tick proportionally along the line
+    # ------------------------------------------------------------------------------------------------------------
     def tick_prop(self, alpha, tick_size=mn.SMALL_BUFF, label=None, delay_anim=False):
         direction = self._find_normal_vec(alpha)
         if direction[1] < 0:
             direction = -direction
         point = self.point_from_proportion(alpha)
+
         if isinstance(label, str):
             label = (label, -direction, dict(buff=mn.SMALL_BUFF/2 + Line.ELine.LabelBuff))
 
@@ -152,15 +168,23 @@ class Dashable(EGroupedObjects):
         ))
         self.tick_mark_alphas.append(alpha)
 
-    def even_ticks(self, period: float, tick_size=mn.SMALL_BUFF, labels=()):
+    # ------------------------------------------------------------------------------------------------------------
+    # ticks_evenly
+    #    set ticks evenly along the line/arc
+    # ------------------------------------------------------------------------------------------------------------
+    def ticks_evenly(self, period: float, tick_size=mn.SMALL_BUFF, labels=()):
         self.clear_ticks()
-        position = period
+        position = 0
         label_iter = iter(labels)
+
         with self.scene.staggered_animation():
-            while position < (self.get_arc_length() - mn_scale(1)):
+            while position <= (self.get_arc_length() + EPSILON):
                 self.tick_abs(position, tick_size, label=next(label_iter, None))
                 position += period
 
+    # ------------------------------------------------------------------------------------------------------------
+    # remove the ticks
+    # ------------------------------------------------------------------------------------------------------------
     def clear_ticks(self):
         if self.tick_marks:
             with self.scene.simultaneous():
@@ -169,28 +193,15 @@ class Dashable(EGroupedObjects):
             self.tick_mark_alphas.clear()
 
 
-    def un_dash(self, final_opacity=1):
-        with self.scene.simultaneous():
-            self.remove_dash()
-            self.scene.play(self.animate.set_stroke(opacity=final_opacity))
-        self.dash_ref = None
 
-
+# ==============================================================================================================
+# class DashPath
+# ==============================================================================================================
 class DashPath(mn.DashedVMobject, EM.EMObject):
-    def CreationOf(self, *args, **kwargs):
-        return [mn.FadeIn(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
 
-    def RemovalOf(self, *args, **kwargs):
-        return [mn.FadeOut(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
-
-    @staticmethod
-    def calculate_num_dashes(vmobject_ref: mn.VMobject, dash_length: float, positive_space_ratio: float) -> int:
-        try:
-            full_length = dash_length / positive_space_ratio
-            return int(np.ceil(vmobject_ref.get_arc_length() / full_length))
-        except ZeroDivisionError:
-            return 1
-
+    # ----------------------------------------------------------------------------------------------------------
+    # constructor
+    # ----------------------------------------------------------------------------------------------------------
     def __init__(self,
                  vmobject_ref: mn.VMobject,
                  dash_length: float = mn.DEFAULT_DASH_LENGTH,
@@ -200,6 +211,29 @@ class DashPath(mn.DashedVMobject, EM.EMObject):
         super().__init__(vmobject_ref, num_dashes=num_dashes, positive_space_ratio=positive_space_ratio, **kwargs)
         self.set_stroke(opacity=1)
 
+    # ----------------------------------------------------------------------------------------------------------
+    # creation of and removal of animaitons
+    # ----------------------------------------------------------------------------------------------------------
+    def CreationOf(self, *args, **kwargs):
+        return [mn.FadeIn(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+
+    def RemovalOf(self, *args, **kwargs):
+        return [mn.FadeOut(self, *args, **kwargs, run_time=self.CONSTRUCTION_TIME)]
+
+    # ----------------------------------------------------------------------------------------------------------
+    # number of dashes
+    # ----------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def calculate_num_dashes(vmobject_ref: mn.VMobject, dash_length: float, positive_space_ratio: float) -> int:
+        try:
+            full_length = dash_length / positive_space_ratio
+            return int(np.ceil(vmobject_ref.get_arc_length() / full_length))
+        except ZeroDivisionError:
+            return 1
+
+    # ----------------------------------------------------------------------------------------------------------
+    # what to do while updating
+    # ----------------------------------------------------------------------------------------------------------
     def enable_updaters(self):
         self.resume_updating()
 
