@@ -10,30 +10,25 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        fading()
+        append()
 
     def go(self):
         pass
 
-def fading():
-    l = ELine([-1,0,0],[1,0,0])
-    l.blue()
+def append():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("Hello")
+    t1.e_append(-1," World")
+    t1.e_append(-1,"!")
+    t1.math("a=b")
+    t1.math("x=y")
+    t1.e_append(-2,r"\quad ...")
+
+def colouring():
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("green")
     t1.explain("green")
     t1.green(1)
-
-    # t2 = TextBox(mn_coord(120, 20))
-    # t2.explain("white")
-    # t2.explain("blue")
-    # t2.explain("white faded")
-    # t2.explain("blue")
-    # t2.explain("blue")
-    # t2.explain("white")
-    #
-    # t1.green()  # change all text elements in TextBox to green
-    # # t2.blue(1, slice(3, 5))  # change [1] and [3:5] text elements to blue
-    # # t2.e_fade(2)  # fade 3rd text element
 
 
 def bulletted_list():

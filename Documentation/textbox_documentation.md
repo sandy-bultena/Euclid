@@ -217,6 +217,21 @@ _Example_: Continuing on same line
     t1.math(r"\quad \leftarrow \text{see!!}", same_line=True)
 ```
 
+`e_append` will add text to an existing line
+
+_Example:_ Using append
+<img src="./images/textbox_append.png" alt="" style="zoom:30%;" />
+
+```python
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("Hello")
+    t1.e_append(-1," World")
+    t1.e_append(-1,"!")
+    t1.math("a=b")
+    t1.math("x=y")
+    t1.e_append(-2,r"\quad ...")
+```
+
 
 
 #### Aligning Math Formulas
