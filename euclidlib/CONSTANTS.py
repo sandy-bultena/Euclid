@@ -34,7 +34,7 @@ LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
 ANGLE_SIZE = coordinate_utilities.mn_scale(40)
 
 # default 'max' opacity for fill colour
-E_FILL_OPACITY_FACTOR = 0.60
+E_FILL_OPACITY_FACTOR = .5
 
 # default size of a point
-DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(7)
+DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(5)

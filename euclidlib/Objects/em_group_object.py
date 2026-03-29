@@ -71,6 +71,7 @@ class EGroupedObjects(EMObject):
         exec(f'''
 @property
 def {name}(self, *args):
+    print("EGroupPlayer(",self,").{name}()")
     return EGroupPlayer(self).{name}'''.strip())
 
     for name in EMObjectPlayer.get_methods():
@@ -142,19 +143,22 @@ def {name}(self, *indices, **kwargs):
     objs = [*self.get_group(), *self.get_manager()] 
 
     if indices:
+        print("indices were found");
         objs = []
         for index in indices:
             if isinstance(index,slice):
                 objs.extend(self[index])
             else:
                 objs.append(self[index])
-
-    with self.scene.simultaneous():
+    print("objs to modify",objs)
+    #with self.scene.simultaneous():
+    if True:
         for obj in objs:
             if isinstance(obj, EGroupedObjects):
+                print(f"Running: EGroupPlayer(",obj,").{name}(**kwargs)")
                 EGroupPlayer(obj).{name}(**kwargs)
             else:
-                EMObjectPlayer(obj).{name}(**kwargs)
+                EGroupPlayer(obj).{name}(**kwargs)
     return self
 '''.strip())
 

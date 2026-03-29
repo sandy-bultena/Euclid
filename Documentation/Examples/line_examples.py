@@ -13,7 +13,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        transform()
+        bisect()
 
     def go(self):
         pass
@@ -365,7 +365,7 @@ def e_split():
 
 def bisect():
     l = ELine(mn_coord(250,300),mn_coord(150,100)).green()
-    p = l.bisect(speed=1)
+    p = l.bisect()
     p.add_label("B")
 
 def extend():

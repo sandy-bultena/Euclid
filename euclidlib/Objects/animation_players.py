@@ -293,11 +293,14 @@ class EGroupPlayer:
     instead of EPlayer (example... Polygon)
     """
     def __init__(self, group: EGroupedObjects):
+        print("in eGroupPlayer")
         self.obj = group
         self.group = group.get_group() or ()
         self.manager = group.get_manager() or ()
         self.main_obj = (*self.manager, *self.group)[-1]
         self.players = [EMObjectPlayer(sub) for sub in [*self.group, *self.manager] if isinstance(sub, base.EMObject)]
+        print(f"{self.obj}, {self.group}, {self.manager}, {self.main_obj}")
+        print(self.players)
 
     def __str__(self):
         return ", ".join(str(g) for g in self.group)
@@ -328,7 +331,7 @@ def {name}(self):
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, frac_speed=0.2, scale_factor=3, color=mn.RED):
+    def notice(self, frac_speed=0.9, scale_factor=13, color=mn.RED):
         for player in self.players:
             player.notice(frac_speed=frac_speed, scale_factor=scale_factor,color=color)
         return self

@@ -415,7 +415,7 @@ https://github.com/user-attachments/assets/668fcd9c-5342-4a14-bb5a-069a47ab8c7d
 
 
     <source src="./images/line_as_chord.mp4" type="video/mp4">
-	
+
 </video>
 
 
@@ -459,7 +459,7 @@ https://github.com/user-attachments/assets/7dab3047-2d23-4e76-909e-f4628d916bf6
 
 
     <source src="./images/line_copy_to_line.mp4" type="video/mp4">
-	
+
 </video>
 
 ```python
