@@ -48,7 +48,7 @@ class Prop5(Book2Scene):
         p['C'].e_draw()
         p['D'] = EPoint(D, label=('D', UP))
 
-        t2.math(r'AC = CB,\quad AD = AC+AD,\quad DB = BC-CD', ).e_fill(mn.BLUE)
+        t2.math(r'AC = CB,\quad AD = AC+AD,\quad DB = BC-CD').blue()
         t3.next_to(t2, DOWN)
 
         # -------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,8 @@ class Prop5(Book2Scene):
 
         with self.simultaneous():
             t3.e_fade()
-        t3.math(r'\square CH = \square HF\\ \therefore\  \square CM = \square DF')
+        t3.math(r'\quad\square CH = \square HF')
+        t3.math(r' \therefore\  \square CM = \square DF', align_str="=")
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
@@ -163,28 +164,27 @@ class Prop5(Book2Scene):
             s['DM'].e_fill(BLUE_E)
             s['CH'].e_fill(BLUE_E)
 
-        with self.simultaneous():
-            t3.green(1)
-        t3.math(r'\square AL = \square CM')
+        t3.e_fade(0)
+        t3.math(r'\square AL = \square CM', align="=")
 
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("which means that AL and DF are also equal")
-        t3.e_append(-1, r"= \square DF")
-        with self.simultaneous():
-            l['D'].e_normal()
-            l['LM'].e_fade()
-            s['DM'].e_fill(BLUE_E)
-            s['HF'].e_fill(BLUE_E)
-            s['CH'].e_unfill()
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("Let CH be added to each of AL and DF. "
-                   "Now AH is equal to gnomon NOP")
-        a['NOP'] = EAngle(l["LH"],l["HG"], size=mn_scale(60), label=(list('ONP'),), gnomon=True)
-        s['CH'].e_fill(TEAL)
-        t3.math(r'\square AH = NOP')
+        # # -------------------------------------------------------------------------------------------------------------
+        # self.next_page()
+        # t1.explain("which means that AL and DF are also equal")
+        # t3.e_append(-1, r"= \square DF")
+        # with self.simultaneous():
+        #     l['D'].e_normal()
+        #     l['LM'].e_fade()
+        #     s['DM'].e_fill(BLUE_E)
+        #     s['HF'].e_fill(BLUE_E)
+        #     s['CH'].e_unfill()
+        #
+        # # -------------------------------------------------------------------------------------------------------------
+        # self.next_page()
+        # t1.explain("Let CH be added to each of AL and DF. "
+        #            "Now AH is equal to gnomon NOP")
+        # a['NOP'] = EAngle(l["LH"],l["HG"], size=mn_scale(60), label=(list('ONP'),), gnomon=True)
+        # s['CH'].e_fill(TEAL)
+        # t3.math(r'\square AH = NOP')
 
         # # -------------------------------------------------------------------------------------------------------------
         # self.next_page()

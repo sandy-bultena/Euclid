@@ -21,7 +21,7 @@ def fading():
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("green")
     t1.explain("green")
-    t1[0].green()
+    t1.green(1)
 
     # t2 = TextBox(mn_coord(120, 20))
     # t2.explain("white")
