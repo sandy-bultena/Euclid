@@ -145,6 +145,7 @@ class EMObjectPlayer:
 
     @property
     def e_normal(self):
+        self.eobj.lift()
         if not self.eobj.is_frozen:
             self.main_animate = self.label_animate = True
             for method in self.o_animate_part:

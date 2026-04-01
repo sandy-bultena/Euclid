@@ -15,10 +15,26 @@ class Book1Prop1(PropScene):
 
     def run_full(self):
         print(mn.__version__)
-        bisect()
+        gnomon()
 
     def go(self):
         pass
+
+def gnomon():
+    l1 = ELine(mn_coord(130,400),mn_coord(130,150), label='x')
+    l2 = ELine(mn_coord(130,400),mn_coord(500,400))
+    #a = EAngle(l2,l1, label="A")
+    a = EAngle(l2,l1,label=list('ABC'), gnomon=True)
+    a.scene.wait(5)
+    a.e_fade()
+    #l1.e_fade()
+    a.scene.wait(5)
+    a.e_normal()
+    a.scene.wait(5)
+
+    a.add_label(*'XYZ')
+
+
 
 def highlight():
     l1 = ELine(mn_coord(130,400),mn_coord(500,150))

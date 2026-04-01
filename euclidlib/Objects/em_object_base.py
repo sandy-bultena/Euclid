@@ -212,9 +212,14 @@ class EMObject(mn.VMobject):
         # if this object is currently visible, than animate
         if self.visible():
 
-            # transform old label to new label
-            if self.e_label is not None:
+            # transform old label to new label if possible
+            if self.e_label is not None and hasattr(self.e_label, 'get_symbol_substrings'):
                 self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
+
+            # if old label is there but cannot be transformed, remove it and redraw it
+            elif self.e_label is not None:
+                self.remove_label()
+                self.scene.play(*new_label.CreationOf())
 
             # use animations to create new label
             else:

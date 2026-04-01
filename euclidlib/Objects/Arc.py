@@ -11,7 +11,6 @@ from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
 from . import Circle
 from . import Line
-from . import Text
 from . import Point
 from euclidlib.Objects import Dashable as Da
 DEG = mn.TAU/360
@@ -167,19 +166,6 @@ class AbstractArc(Da.Dashable, mn.Arc):
     def proportional_angle_dir(self, alpha=0.5):
         angle = self.proportion_angle(alpha)
         return self.vector_of_angle(angle)
-
-    # ----------------------------------------------------------------------------------------------------------
-    # initialize label or labels (not animated) (calling 'add_label' does the animations)
-    # ----------------------------------------------------------------------------------------------------------
-    def init_label(self, labels: str | list[str], *args, **extra_args):
-        if isinstance(labels, str):
-            return super().init_label(labels, *args, **extra_args)
-        return Text.LabelGroup(
-            labels,
-            self,
-            itertools.repeat(args),
-            itertools.repeat(extra_args)
-        )
 
     # ----------------------------------------------------------------------------------------------------------
     # what are the tangent directions
