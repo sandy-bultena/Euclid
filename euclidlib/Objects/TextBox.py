@@ -412,7 +412,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # managing location of new text strings
     # -----------------------------------------------------------------------------------------------------------------
     def down(self, buff=mn.MED_SMALL_BUFF):
-        self.extra_buffer_size = buff
+        self.extra_buffer_size += buff
 
     def indent(self, buff=mn.MED_SMALL_BUFF):
         self.indent_value += buff

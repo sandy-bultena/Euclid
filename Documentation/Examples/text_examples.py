@@ -10,10 +10,25 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        append()
+        down()
 
     def go(self):
         pass
+
+def down():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("hi")
+    t1.down()
+    t1.down()
+    t1.down()
+    t1.down()
+    t1.explain("bonjour")
+    t2 = TextBox(mn_coord(120, 20))
+    t2.explain("hi")
+    t2.down()
+    t2.explain("bonjour")
+    t2.explain("adieu")
+    t1.explain("adieu")
 
 def append():
     t1 = TextBox(mn_coord(20, 20))

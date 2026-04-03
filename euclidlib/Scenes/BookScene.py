@@ -17,7 +17,7 @@ from euclidlib.Utilities import Colour
 from euclidlib.Scenes.PropScene import PropScene
 import roman
 
-DEG = 180/mn.PI
+DEG = mn.PI/180
 
 
 def get_TOC(toc):
@@ -284,28 +284,33 @@ class Book2Scene(BookScene):
 class Book3Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_scale(600),
+                            line_width=mn_scale(550),
                             alignment='e'
                             )
         with self.simultaneous():
             super().title_page()
 
             with self.pause_animations_for() as draw:
-                title_box.fancy("A circle is a round straight line with a hole in the middle.", font_size=48,
+                title_box.fancy("A circle is a round straight line with a hole in the middle.", font_size=24,
                                 write_simultaneous=True)
+                title_box.indent()
                 title_box.explain("""
                 - <b>Mark Twain</b>,
                   quoting a schoolchild in "-English as She Is Taught-"
                 """, font_size=16)
 
-                title_box[-1].align_to(title_box[-2], mn.RIGHT)
+                title_box.unindent()
+                title_box.down()
+                title_box.down()
+                title_box.down()
                 title_box.down()
                 title_box.fancy("If people stand in a circle long enough, "
-                                "they'll eventually begin to dance.", font_size=48, write_simultaneous=True)
+                                "they'll eventually begin to dance.", font_size=24, write_simultaneous=True)
+                title_box.indent()
                 title_box.explain("""
                 <b>George Carlin</b>, Napalm and Silly Putty (2001)
                 """, font_size=16)
-                title_box[-1].align_to(title_box[-2], mn.RIGHT)
+                #title_box[-1].align_to(title_box[-2], mn.RIGHT)
                 draw.append(title_box)
 
             c1 = mn_coord(260, 360)
@@ -333,7 +338,7 @@ class Book3Scene(BookScene):
                 lFG = ELine(c2, pG)
 
                 pH = cA.e_point_at_angle(-mn.PI/4).add_label('H', away_from=c2)
-                lFH = ELine(c2, pG)
+                lFH = ELine(c2, pH)
 
                 draw.extend([cA, pE, pF, pA, lFA, pD, lFD, pB, lFB, pC, lFC, pG, lFG, pH, lFH])
                 draw.append(ELine(pB, pE))
