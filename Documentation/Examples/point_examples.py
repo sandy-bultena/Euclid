@@ -12,10 +12,14 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        move_to()
+        notice()
 
     def go(self):
         pass
+
+def notice():
+    p1 = EPoint([1,1,0])
+    p1.notice()
 
 def move_to():
 

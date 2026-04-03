@@ -20,12 +20,12 @@ BOOK_SCENE_GRID_OPACITY = .3
 
 # Default speed for running animations
 DEFAULT_SPEED = 2
-DEFAULT_TEXT_SPEED = 2
+DEFAULT_TEXT_SPEED = 20
 
 # label buff for EMObject
 LABEL_BUFF = mn_constants.MED_SMALL_BUFF*.8
 LINE_LABEL_BUFF = 0.15
-POINT_LABEL_BUFF = mn_constants.MED_SMALL_BUFF
+POINT_LABEL_BUFF = mn_constants.MED_SMALL_BUFF*.75
 
 # showing parts
 LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
@@ -38,3 +38,8 @@ E_FILL_OPACITY_FACTOR = .5
 
 # default size of a point
 DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(5)
+
+# for notice()
+NOTICE_FRAC_SPEED = 0.5
+NOTICE_SCALE_FACTOR = 3
+NOTICE_COLOUR = mn_constants.RED

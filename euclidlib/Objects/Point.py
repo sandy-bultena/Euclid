@@ -126,15 +126,6 @@ class EPoint(EMObject, mn.Circle):
         return math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
 
     # ----------------------------------------------------------------------------------------------------------------
-    # highlight the point
-    # ----------------------------------------------------------------------------------------------------------------
-    def highlight(self, color=mn.RED, scale=2.0, **args):
-        target = self.animate(rate_func=mn.there_and_back, **args)
-        target.scale(scale)
-        target.set_color(color)
-        return target
-
-    # ----------------------------------------------------------------------------------------------------------------
     # two points overlap - maybe used when interacting with mouse selection??
     # ----------------------------------------------------------------------------------------------------------------
     def intersect(self, other: mn.Mobject, reverse=True):

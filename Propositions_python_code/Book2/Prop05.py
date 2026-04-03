@@ -164,70 +164,73 @@ class Prop5(Book2Scene):
             s['DM'].e_fill(BLUE_E)
             s['CH'].e_fill(BLUE_E)
 
-        t3.e_fade(0)
-        t3.math(r'\square AL = \square CM', align="=")
+        t3.e_fade()
+        t3.math(r'\square AL = \square CM', align_str="=")
 
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explain("which means that AL and DF are also equal")
-        # t3.e_append(-1, r"= \square DF")
-        # with self.simultaneous():
-        #     l['D'].e_normal()
-        #     l['LM'].e_fade()
-        #     s['DM'].e_fill(BLUE_E)
-        #     s['HF'].e_fill(BLUE_E)
-        #     s['CH'].e_unfill()
-        #
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explain("Let CH be added to each of AL and DF. "
-        #            "Now AH is equal to gnomon NOP")
-        # a['NOP'] = EAngle(l["LH"],l["HG"], size=mn_scale(60), label=(list('ONP'),), gnomon=True)
-        # s['CH'].e_fill(TEAL)
-        # t3.math(r'\square AH = NOP')
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explain("which means that AL and DF are also equal")
+        t3.e_normal(1)
+        t3.e_append(-1, r"= \square DF")
+        with self.simultaneous():
+            l['D'].e_normal()
+            l['LM'].e_fade()
+            s['DM'].e_fill(BLUE_E)
+            s['HF'].e_fill(BLUE_E)
+            s['CH'].e_unfill()
 
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explain("For a proof showing that DM and LG are squares, see II.4 ")
-        # with self.simultaneous():
-        #     t3.e_fade()
-        # t3.math(r'DH = DB\ ,\ \square LG = \square CD')
-        #
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explainM("AH is equal to the rectangle formed by $AD,DH$, "
-        #             r"and also by $AD,DB$, therefore $AD \cdot DB$ "
-        #             "is equal to the gnomon $NOP$")
-        # with self.simultaneous():
-        #     t3.e_fade()
-        #     t3.e_normal(-1, -2)
-        # t3.math(r'\square AH = AD \cdot DB = NOP')
-        #
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explain("LG is equal to the square on CD, add it "
-        #            "to both AH and NOP, retaining the equality")
-        #
-        # s['LG'] = EPolygon('LEGH', skip_anim=True).e_fill(PINK)
-        #
-        # with self.simultaneous():
-        #     t3.e_fade()
-        #     t3.e_normal(-2)
-        # t3.math(r"AD \cdot DB + CD \cdot CD = NOP + \square LG")
-        #
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # t1.explain("But CF is equal to the square on CB, which is also equal "
-        #            "to the gnomon NOP added to the rectangle LG, "
-        #            "we have demonstrated the proof for this postulate")
-        #
-        # with self.simultaneous():
-        #     t3.e_fade()
-        #     t3.e_normal(-1)
-        # t3.math(r"AD \cdot DB + CD \cdot CD = CB \cdot CB")
-        #
-        # # -------------------------------------------------------------------------------------------------------------
-        # self.next_page()
-        # with self.simultaneous():
-        #     t3.e_fade()
-        #     t3.e_normal(-1)
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explain("Let CH be added to each of AL and DF. "
+                   "Now AH is equal to gnomon NOP")
+        l['LH']=VirtualLine(L,H)
+        l['HG']=VirtualLine(H,G)
+        a['NOP'] = EAngle(l["LH"],l["HG"], size=mn_scale(60), label=(*'NOP',), gnomon=True)
+        s['CH'].e_fill(TEAL)
+        t3.math(r'\square AH = NOP', align_str="=")
+
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explain("For a proof showing that DM and LG are squares, see II.4 ")
+        with self.simultaneous():
+            t3.e_fade()
+        t3.math(r'DH = DB\ ,\ \square LG = \square CD')
+
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explainM("AH is equal to the rectangle formed by $AD,DH$, "
+                    r"and also by $AD,DB$, therefore $AD \cdot DB$ "
+                    "is equal to the gnomon $NOP$")
+        with self.simultaneous():
+            t3.e_fade()
+            t3.e_normal(-1, -2)
+        t3.math(r'\square AH = AD \cdot DB = NOP', align_str="=")
+
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explain("LG is equal to the square on CD, add it "
+                   "to both AH and NOP, retaining the equality")
+
+        s['LG'] = EPolygon(L,E,G,H, skip_anim=True).e_fill(PINK)
+
+        with self.simultaneous():
+            t3.e_fade()
+            t3.e_normal(-2)
+        t3.math(r"AD \cdot DB + CD \cdot CD = NOP + \square LG", align_str="=")
+
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        t1.explain("But CF is equal to the square on CB, which is also equal "
+                   "to the gnomon NOP added to the rectangle LG, "
+                   "we have demonstrated the proof for this postulate")
+
+        with self.simultaneous():
+            t3.e_fade()
+            t3.e_normal(-1)
+        t3.math(r"AD \cdot DB + CD \cdot CD = CB \cdot CB", align_str="=")
+
+        # -------------------------------------------------------------------------------------------------------------
+        self.next_page()
+        with self.simultaneous():
+            t3.e_fade()
+            t3.e_normal(-1)

@@ -145,7 +145,6 @@ class EMObjectPlayer:
 
     @property
     def e_normal(self):
-        self.eobj.lift()
         if not self.eobj.is_frozen:
             self.main_animate = self.label_animate = True
             for method in self.o_animate_part:
@@ -196,7 +195,7 @@ class EMObjectPlayer:
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, frac_speed=0.2, scale_factor=3, color = mn.RED):
+    def notice(self, frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR):
         self.eobj.scene.play(Indicate(self.eobj, color=color, scale_factor=scale_factor, run_time=10*frac_speed))
         return self
 
@@ -329,9 +328,11 @@ def {name}(self):
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, frac_speed=0.9, scale_factor=13, color=mn.RED):
-        for player in self.players:
-            player.notice(frac_speed=frac_speed, scale_factor=scale_factor,color=color)
+    def notice(self, frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR):
+
+        with self.obj.scene.simultaneous():
+            for player in self.players:
+                player.notice(frac_speed=frac_speed, scale_factor=scale_factor,color=color)
         return self
 
     # ----------------------------------------------------------------------------------------------------------------
