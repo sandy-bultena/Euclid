@@ -179,7 +179,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return self.vector_of_angle(self.e_end_angle + dir)
 
     def tangent_points(self, angle_or_point: float | mn.Mobject | mn.Vect3, negative=False) -> tuple[mn.Vect3, mn.Vect3]:
-        """return point, and tangent direction at that point on the arc"""
+        """return points defining a tangent line"""
 
         # angle_or_point is a point, convert to angle
         angle = angle_or_point
@@ -216,6 +216,8 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # return the coordinates on the arc at a given angle
     # ----------------------------------------------------------------------------------------------------------
     def point_at_angle(self, angle) -> mn.Vect3:
+        if angle < 0:
+            angle = angle+2*mn.PI
         alpha = (angle - self.e_start_angle) / self.e_angle
         return self.point_from_proportion(alpha)
 
