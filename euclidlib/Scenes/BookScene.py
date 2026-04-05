@@ -8,14 +8,16 @@ from __future__ import annotations
 
 import re
 from itertools import pairwise
+
 from euclidlib.Objects import *
 from euclidlib.CONSTANTS import *
+from euclidlib.Utilities import Colour
 
 
 from euclidlib.Scenes.PropScene import PropScene
 import roman
 
-DEG = 180/mn.PI
+DEG = mn.PI/180
 
 
 def get_TOC(toc):
@@ -79,7 +81,6 @@ class BookScene(PropScene):
 
         t.title_screen("Euclid's Elements", write_simultaneous=True)
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
-        t.fancy("Fancy quote")
 
     # -----------------------------------------------------------------------------------------------------------------
     # table of contents
@@ -126,7 +127,7 @@ class BookScene(PropScene):
 
         # draw the grid
         line_options = dict(
-            stroke_color=mn.WHITE,
+            stroke_color=STROKE_COLOUR,
             stroke_width=0.5,
             stroke_opacity=BOOK_SCENE_GRID_OPACITY,
         )
@@ -149,58 +150,60 @@ class BookScene(PropScene):
 
 
 class Book1Scene(BookScene):
-    def title_page(self):
-        title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_scale(550),
-                            alignment='w'
-                            )
-        with self.simultaneous():
-            super().title_page()
-            title_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
-                            "you were not born to be a scientific thinker.", font_size=24, write_simultaneous=True)
-            title_box.explain("-Albert Einstein", font_size=18)
 
-            # top = 400
-            # bot = top + 100
-            # left = 945
-            # right = 75 + left
-            # A_base = np.array([right, top, 0])
-            # B_base = np.array([left, bot, 0])
-            #
-            # side = -1 * (B_base[0] - A_base[0]) / (bot - top)
-            # b = A_base[1] - side * A_base[0]
-            # C_base = np.array([(1 / side) * (bot - b), bot, 0])
-            #
-            # A = mn_coord(*A_base)
-            # B = mn_coord(*B_base)
-            # C = mn_coord(*C_base)
-            #
-            # tABC = ETriangle('ABC', point_labels='ABC', angles=' ')
-            # sB = ESquare(B, A, point_labels=['F', None, None, 'G'])
-            # sA = ESquare(A, C, point_labels=['H', None, None, 'K'])
-            # sC = ESquare(C, B, point_labels=['E', None, None, 'D'])
-            #
-            # sABD = ETriangle.assemble(lines=[tABC.l0, sC.l2, EDashedLine(A, sC.p3)])
-            # sFBC = ETriangle.assemble(lines=[sB.l0, tABC.l1, EDashedLine(sB.p0, C)])
-            # sBCK = ETriangle.assemble(lines=[tABC.l1, sA.l2, EDashedLine(B, sA.p3)])
-            # sECA = ETriangle.assemble(lines=[sC.l0, tABC.l2, EDashedLine(A, sC.p0)])
-            #
-            # with self.pause_animations_for():
-            #     lAlx = sC.l2.parallel(tABC.p0)
-            # pL = EPoint(lAlx.intersect(sC.l3), label=('L', mn.DOWN))
-            #
-            # sBDL = EParallelogram(B, sC.p3, pL)
-            # sCEL = EParallelogram(C, sC.p0, pL)
-            #
-            # sA.e_fill(mn.GREEN)
-            # sCEL.e_fill(mn.GREEN)
-            # sECA.e_fill(mn.GREEN_D)
-            # sBCK.e_fill(mn.GREEN_D)
-            #
-            # sB.e_fill(mn.BLUE)
-            # sBDL.e_fill(mn.BLUE)
-            # sABD.e_fill(mn.BLUE_D)
-            # sFBC.e_fill(mn.BLUE_D)
+    # -----------------------------------------------------------------------------------------------------------------
+    # title page for Book 1
+    # -----------------------------------------------------------------------------------------------------------------
+    def title_page(self):
+
+        xc = 0
+        yc = mn_scale(100)
+        quote_box = TextBox([xc,yc,0],
+                            line_width=mn_scale(550),
+                            alignment='e'
+                            )
+
+        with self.simultaneous():
+        #if True:
+            super().title_page()
+            quote_box.fancy("If Euclid did not kindle your youthful enthusiasm, "
+                            "you were not born to be a scientific thinker.", font_size=24, write_simultaneous=True)
+            quote_box.explain("-Albert Einstein", font_size=18)
+
+            top = 400
+            bot = top + 100
+            A_base = np.array([250, top, 0])
+            B_base = np.array([175, bot, 0])
+
+            slope = -1 * (B_base[0] - A_base[0]) / (bot - top)
+            b = A_base[1] - slope * A_base[0]
+            C_base = np.array([(1 / slope) * (bot - b), bot, 0])
+
+            A = mn_coord(*A_base)
+            B = mn_coord(*B_base)
+            C = mn_coord(*C_base)
+
+            tABC = ETriangle(A,B,C, point_labels=['A','B','C'])
+
+            sB = ESquare(A, B).e_fill(mn.BLUE)
+            sA = ESquare(C, A).e_fill(mn.GREEN)
+            sC = ESquare(B, C)
+            l0 = ELine(A, sC.p0)
+            l1 = ELine(sB.p3, C)
+            l2 = ELine(B, sA.p0)
+            l3 =  ELine(A, sC.p3)
+            with self.pause_animations_for():
+                lAlx = sC.l2.parallel(tABC.p0)
+            p = lAlx.intersect_line(sC.l3)
+            pL = EPoint(lAlx.intersect_line(sC.l3)[0], label=('L', mn.DOWN))
+            sBDL = EParallelogram(C, sC.p3, pL).e_fill(mn.GREEN)
+            sCEL = EParallelogram(B, sC.p0, pL).e_fill(mn.BLUE)
+
+        with self.simultaneous():
+            sABD = ETriangle.assemble(lines=[tABC.l0, sC.l0 , l0]).e_fill(mn.BLUE)
+            sFBC = ETriangle.assemble(lines=[sB.l2, tABC.l1, l1]).e_fill(mn.BLUE)
+            sBCK = ETriangle.assemble(lines=[tABC.l1, sA.l0, l2]).e_fill(mn.GREEN)
+            sECA = ETriangle.assemble(lines=[sC.l2, tABC.l2, l3]).e_fill(mn.GREEN)
 
 
 class Book2Scene(BookScene):
@@ -216,11 +219,11 @@ class Book2Scene(BookScene):
                 title_box.fancy("It is a remarkable fact in the history of geometry, "
                                 "that the Elements of Euclid, "
                                 "written two thousand years ago, are still regarded by many as the best "
-                                "introduction to the mathematical sciences.", font_size=48, write_simultaneous=True)
+                                "introduction to the mathematical sciences.", font_size=24, write_simultaneous=True)
                 title_box.explain("""
                 - Florian Cajori,
                   A History of Mathematics (1893)
-                """, font_size=16)
+                """, font_size=18)
 
                 title_box[-1].align_to(title_box[-2], mn.RIGHT)
 
@@ -250,12 +253,12 @@ class Book2Scene(BookScene):
 
                 diag = ELine(mn_coord(450, 700), mn_coord(650, 600))
                 l1 = ELine(mn_coord(500, 700), mn_coord(550, 600))
-                cross = l1.intersect(diag)
+                cross = l1.intersect(diag)[0]
                 p = EPoint(cross)
                 l2 = para.l0.parallel(p)
                 l3 = ELine(
-                    l2.intersect(para.l3),
-                    l2.intersect(para.l1),
+                    l2.intersect_line(para.l3)[0],
+                    l2.intersect_line(para.l1)[0],
                 )
                 ar1 = ELine(mn_coord(650, 660),
                             mn_coord(690, 660))
@@ -281,28 +284,33 @@ class Book2Scene(BookScene):
 class Book3Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
-                            line_width=mn_scale(600),
+                            line_width=mn_scale(550),
                             alignment='e'
                             )
         with self.simultaneous():
             super().title_page()
 
             with self.pause_animations_for() as draw:
-                title_box.fancy("A circle is a round straight line with a hole in the middle.", font_size=48,
+                title_box.fancy("A circle is a round straight line with a hole in the middle.", font_size=24,
                                 write_simultaneous=True)
+                title_box.indent()
                 title_box.explain("""
                 - <b>Mark Twain</b>,
                   quoting a schoolchild in "-English as She Is Taught-"
                 """, font_size=16)
 
-                title_box[-1].align_to(title_box[-2], mn.RIGHT)
+                title_box.unindent()
+                title_box.down()
+                title_box.down()
+                title_box.down()
                 title_box.down()
                 title_box.fancy("If people stand in a circle long enough, "
-                                "they'll eventually begin to dance.", font_size=48, write_simultaneous=True)
+                                "they'll eventually begin to dance.", font_size=24, write_simultaneous=True)
+                title_box.indent()
                 title_box.explain("""
                 <b>George Carlin</b>, Napalm and Silly Putty (2001)
                 """, font_size=16)
-                title_box[-1].align_to(title_box[-2], mn.RIGHT)
+                #title_box[-1].align_to(title_box[-2], mn.RIGHT)
                 draw.append(title_box)
 
             c1 = mn_coord(260, 360)
@@ -330,7 +338,7 @@ class Book3Scene(BookScene):
                 lFG = ELine(c2, pG)
 
                 pH = cA.e_point_at_angle(-mn.PI/4).add_label('H', away_from=c2)
-                lFH = ELine(c2, pG)
+                lFH = ELine(c2, pH)
 
                 draw.extend([cA, pE, pF, pA, lFA, pD, lFD, pB, lFB, pC, lFC, pG, lFG, pH, lFH])
                 draw.append(ELine(pB, pE))

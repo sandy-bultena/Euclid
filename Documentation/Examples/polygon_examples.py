@@ -16,7 +16,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        parallelogram()
+        polygon()
 
 
     def go(self):

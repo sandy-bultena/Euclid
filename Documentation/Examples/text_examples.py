@@ -10,10 +10,69 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        bulletted_list()
+        remove()
 
     def go(self):
         pass
+
+def remove():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.e_remove(-1)
+    t1.e_remove(-2)
+    t1.e_remove(-3)
+    t1.explain("should not be way down")
+
+def delete_last():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.delete_last()
+    t1.delete_last()
+    t1.delete_last()
+    t1.explain("should not be way down")
+
+
+def colours():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("hi")
+    t1.blue()
+
+def down():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("hi")
+    t1.down()
+    t1.down()
+    t1.down()
+    t1.down()
+    t1.explain("bonjour")
+    t2 = TextBox(mn_coord(120, 20))
+    t2.explain("hi")
+    t2.down()
+    t2.explain("bonjour")
+    t2.explain("adieu")
+    t1.explain("adieu")
+
+def append():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("Hello")
+    t1.e_append(-1," World")
+    t1.e_append(-1,"!")
+    t1.math("a=b")
+    t1.math("x=y")
+    t1.e_append(-2,r"\quad ...")
+
+def colouring():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("green")
+    t1.explain("green")
+    t1.green(1)
+
 
 def bulletted_list():
     t1 = TextBox(mn_coord(20, 20))

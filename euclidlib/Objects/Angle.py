@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import itertools
 
 from euclidlib.Objects.em_object_base import *
@@ -11,6 +12,8 @@ from . import Line
 from . import Point
 from . import Circle
 from . import Arc
+from . import Text
+
 import math
 
 # ===============================================================================================================
@@ -325,7 +328,7 @@ class EAngleBase(Arc.AbstractArc):
 
 # ==============================================================================================================
 # Arc Angle class
-# - base class for Angle and Gnomon
+# - base class for Angle and GnomonAngle
 # ==============================================================================================================
 class ArcAngle(EAngleBase, mn.Arc):
     def __init__(self,
@@ -393,12 +396,32 @@ class RightAngle(EAngleBase):
 
 
 # ==============================================================================================================
-# Gnomon
-# - not sure why we have an empty class, but I guess I'll figure out why later
+# GnomonAngle
 # ==============================================================================================================
-class Gnomon(ArcAngle):
-    """the part of a parallelogram left when a similar parallelogram has been taken from its corner."""
-    pass
+class GnomonAngle(ArcAngle):
+    """Gnomon: the part of a parallelogram left when a similar parallelogram has been taken from its corner."""
+
+    # ----------------------------------------------------------------------------------------------------------
+    # initialize label or labels (not animated) (calling 'add_label' does the animations)
+    # ----------------------------------------------------------------------------------------------------------
+    def init_label(self, *args, **extra_args):
+        """
+        create 3 labels for the angle defining a gnomon (or any angle that is greater than 180 degrees
+        NOTE: The location of the labels for a gnomon is predefined and cannot be changed
+        :param args: maximum 3 text labels for each text, followed by arguments that apply to all three labels
+        :param extra_args: arguments that apply for each of the three labels
+        :return:
+        """
+
+        label_text, args = (args[:3], args[3:])
+        labels = []
+        for txt,where in zip(label_text,(Arc.ArcLabelLocation.AT_START, Arc.ArcLabelLocation.BY_ALPHA, Arc.ArcLabelLocation.AT_END)):
+            kwargs = copy.deepcopy(extra_args)
+            kwargs["where"] = where
+            labels.append( (txt, args, kwargs))
+
+        return Text.LabelGroup(labels, self)
+
 
 
 # ==============================================================================================================
@@ -409,7 +432,7 @@ def EAngle(l1: Line.ELine,
            size: Optional[float] = None,
            no_right: bool = False,
            gnomon: bool = False,
-           **kwargs) -> Gnomon| ArcAngle| RightAngle:
+           **kwargs) -> GnomonAngle | ArcAngle | RightAngle:
 
     assert (l2 is not None)
     if size is None:
@@ -436,7 +459,7 @@ def EAngle(l1: Line.ELine,
             th_diff = th_diff - mn.TAU
         elif -mn.PI < th_diff < mn.PI:
             th_diff = mn.TAU + th_diff
-        return Gnomon(l1, l2, size, data, th1, th_diff, **kwargs)
+        return GnomonAngle(l1, l2, size, data, th1, th_diff, **kwargs)
 
     # ----------------------------------------------------------------------------------------------------------
     # Just a regular angle

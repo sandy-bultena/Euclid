@@ -29,7 +29,7 @@ _Example:_
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450),
              labels=['A', 'B', 'C'],
              point_labels=['b', 'c', 'a'],
-             angles=[r'\beta', r'\gamma', r'\alpha', None, mn_scale(60)],
+             angles=[r'\beta', (r'\gamma',mn_scale(60)), r'\alpha', None, ],
              fill=mn.BLUE
              )
     print([a*180/mn.PI for a in p.angle_values])
@@ -38,9 +38,10 @@ _Example:_
     EPolygon(mn_coord(500, 100), mn_coord(500, 400), mn_coord(900, 450),
              labels=['A', 'B', 'C'],
              point_labels=['b', 'c', 'a'],
-             angles=[r'\beta', r'\gamma', r'\alpha', ANGLE_SIZE * 2, None, ANGLE_SIZE / 2],
+             angles=[(r'\beta',ANGLE_SIZE * 2), r'\gamma', (r'\alpha',ANGLE_SIZE / 2), ],
              fill=[mn.GREEN, 0.50]
              )
+
 ```
 
 
@@ -304,11 +305,6 @@ Modify the shape of the polygon by moving a point from its current location to a
 
 _Example:_ 
 <video controls width="300" height="200" poster="placeholder_image.png">
-
-
-https://github.com/user-attachments/assets/c841ee65-5432-45f0-ad5c-a9d09e1b148f
-
-
     <source src="./images/polygon_move_point_to.mp4" type="video/mp4">
 </video>
 

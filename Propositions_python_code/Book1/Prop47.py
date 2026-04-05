@@ -65,9 +65,9 @@ class Prop47(Book1Scene):
         self.extract_all(l, p, a, s, 'DBCE', 'C')
 
         with self.staggered_animation():
-            t3.explainM('$ABFG$ is a square', fill_color=BLUE)
-            t3.explainM('$ACKH$ is a square', fill_color=BLUE)
-            t3.explainM('$BCDE$ is a square', fill_color=BLUE)
+            t3.explainM('$ABFG$ is a square', fill_color=E_BLUE)
+            t3.explainM('$ACKH$ is a square', fill_color=E_BLUE)
+            t3.explainM('$BCDE$ is a square', fill_color=E_BLUE)
         t2.next_to(t3, DOWN, buff=0, aligned_edge=LEFT)
         t2.down()
 

@@ -8,6 +8,7 @@ import re
 import manimlib as mn
 from functools import reduce, partial
 
+from euclidlib.CONSTANTS import *
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects import CustomAnimation as CA, EGroupedObjects, EIndexedGroup
 
@@ -142,14 +143,14 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     # -----------------------------------------------------------------------------------------------------------------
     # create or remove
     # -----------------------------------------------------------------------------------------------------------------
-    def CreationOf(self, *args, stroke_color=mn.WHITE, stroke_width=0.5, **kwargs):
+    def CreationOf(self, *args, stroke_color=STROKE_COLOUR, stroke_width=0.5, **kwargs):
         return [mn.Write(self,
                          stroke_color=stroke_color,
                          stroke_width=stroke_width,
                          lag_ratio=(0.02 if self.write_simultaneous else -1),
                          **kwargs, )]
 
-    def RemovalOf(self, *args, stroke_color=mn.RED_A, stroke_width=0.5, lag_ratio=0, **kwargs):
+    def RemovalOf(self, *args, stroke_color=TEXT_REMOVAL_STROKE_COLOUR, stroke_width=0.5, lag_ratio=0, **kwargs):
         return [CA.UnWrite(self,
                            stroke_color=stroke_color,
                            stroke_width=stroke_width,
@@ -247,7 +248,7 @@ class ETex(EStringObj, mn.Tex):
 
     def __init__(self, text, *args, is_axiom=False,  **kwargs):
         if is_axiom:
-            kwargs['fill_color'] = mn.BLUE
+            kwargs['fill_color'] = E_BLUE
         super().__init__(
             text,
             *args,
@@ -321,21 +322,36 @@ class Label(ETex):
 
 
 # =====================================================================================================================
-# A group of labels (maybe used for tick marks??)
+# A group of labels (used for a gnomon)
 # =====================================================================================================================
 class LabelGroup(EIndexedGroup[Label]):
 
     # -----------------------------------------------------------------------------------------------------------------
     # initialize
     # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, texts: list[str], em_object: EMObject, pos_args: Iterable[tuple], kw_args: Iterable[dict[str, Any]]):
+    def __init__(self, labels, em_object: EMObject):
+
+        """
+        :param labels: a list of labels where each label could contain positional arguments and keyword arguments
+        :param em_object: the object that this label will be attached to
+        """
         self.em_object = em_object
-        super().__init__(
-            (Label(txt, em_object, *pos, index=i, **kw)
-            for txt, pos, kw, i
-            in zip(texts, pos_args, kw_args, itertools.count())),
-            delay_anim=True
-        )
+        super().__init__(animate_part=['set_e_fill'])
+
+        with self.scene.simultaneous():
+            for txt, pos, kw in labels:
+                self.add(Label (txt, em_object, *pos, **kw))
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # defining how 'e_set_fill' will work for a label group
+    # -----------------------------------------------------------------------------------------------------------------
+    def set_e_fill(self, *args, **kwargs):
+        print("in grouped label e_set_fill")
+        with self.scene.simultaneous():
+            for label in self:
+                if isinstance(label, Label):
+                    label.set_fill(*args, **kwargs)
+
 
     # -----------------------------------------------------------------------------------------------------------------
     # overload CreationOf by specifying
@@ -367,6 +383,13 @@ class LabelGroup(EIndexedGroup[Label]):
     def disable_updaters(self):
         for x in self:
             x.suspend_updating()
+
+    # apply the manim 'become' to all labels
+    def become(self,obj,*args):
+        with self.scene.simulataneous():
+            for label in self:
+                if isinstance(label, Label):
+                    super().become(label,*args)
 
     # -----------------------------------------------------------------------------------------------------------------
     # change the EMObject that these labels are associated with

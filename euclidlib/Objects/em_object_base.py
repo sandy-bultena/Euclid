@@ -38,6 +38,8 @@ class EMObject(mn.VMobject):
     def __init__(self,
                  *args,
                  stroke_width: float = 2,
+                 fill_color=FILL_COLOUR,
+                 stroke_color=STROKE_COLOUR,
                  animate_part=None,
                  delay_anim=False,
                  skip_anim=False,
@@ -66,6 +68,8 @@ class EMObject(mn.VMobject):
 
         # set stroke width accordingly
         kwargs['stroke_width'] = stroke_width
+        kwargs['stroke_color'] = stroke_color
+        kwargs['fill_color'] = fill_color
         if self.Virtual:
             kwargs['stroke_opacity'] = 0.5 if self.scene.debug else 0.0
             kwargs['stroke_width'] = 2 * stroke_width
@@ -78,7 +82,7 @@ class EMObject(mn.VMobject):
         self.animation_objects: list[mn.Mobject] = []
         self.e_label = None
         self.cached_opacity = 1
-        self.e_stroke_color:mn.Color = mn.WHITE
+        self.e_stroke_color:mn.Color = stroke_color
         self.e_fill_color:Optional[mn.Color] = None
         self.e_fill_opacity_factor = E_FILL_OPACITY_FACTOR
 
@@ -125,7 +129,7 @@ class EMObject(mn.VMobject):
         def e_fade(self) -> EMObject: ...
         def e_normal(self)-> EMObject: ...
         def lift(self)-> EMObject: ...
-        def notice(self,frac_speed=0.2, scale_factor=2, color = mn.YELLOW)-> EMObject: ...
+        def notice(self,frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR)-> EMObject: ...
 
         def e_move(self, vector: mn.Vect3) -> EMObjectPlayer: ...
 
@@ -212,9 +216,14 @@ class EMObject(mn.VMobject):
         # if this object is currently visible, than animate
         if self.visible():
 
-            # transform old label to new label
-            if self.e_label is not None:
+            # transform old label to new label if possible
+            if self.e_label is not None and hasattr(self.e_label, 'get_symbol_substrings'):
                 self.scene.play(mn.TransformMatchingStrings(self.e_label, new_label, run_time=0.5))
+
+            # if old label is there but cannot be transformed, remove it and redraw it
+            elif self.e_label is not None:
+                self.remove_label()
+                self.scene.play(*new_label.CreationOf())
 
             # use animations to create new label
             else:
@@ -478,7 +487,7 @@ class EMObject(mn.VMobject):
         self.e_fill_color = color
 
         self.scene.play(
-            self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=False)
+            self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=True)
         )
         return self
 

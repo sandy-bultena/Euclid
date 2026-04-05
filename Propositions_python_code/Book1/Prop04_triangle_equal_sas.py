@@ -133,8 +133,8 @@ class Book1Prop4(Book1Scene):
                    "the endpoints are congruent")
 
         with self.simultaneous(run_time=1):
-            t['ABC'].white()
-            t['DEF'].white()
+            t['ABC'].default_color()
+            t['DEF'].default_color()
 
         with self.simultaneous(run_time=1):
             t['DEF'].l[1].e_fade()
@@ -218,8 +218,8 @@ class Book1Prop4(Book1Scene):
         t2.normalize_text_objs()
 
         with self.simultaneous():
-            t['ABC'].e_fade.white()
-            t['DEF'].e_fade.white()
+            t['ABC'].e_fade.default_color()
+            t['DEF'].e_fade.default_color()
 
         t2.math(r"\triangle ABC \equiv \triangle DEF")
         self.next_page()

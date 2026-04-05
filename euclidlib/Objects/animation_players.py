@@ -159,28 +159,41 @@ class EMObjectPlayer:
     def _e_color(self, color: mn.Color):
         if not self.eobj.is_frozen:
             self.main_animate = True
-            self.e_normal.anim.set_color(color=color, recurse=False)
+            self.e_normal.anim.set_color(color=color, recurse=True)
         return self
 
     @property
     def green(self):
-        return self._e_color(mn.GREEN)
+        return self._e_color(E_GREEN)
 
     @property
     def blue(self):
-        return self._e_color(mn.BLUE)
+        return self._e_color(E_BLUE)
 
     @property
     def red(self):
-        return self._e_color(mn.RED)
+        return self._e_color(E_RED)
 
     @property
     def white(self):
         return self._e_color(mn.WHITE)
 
     @property
+    def black(self):
+        return self._e_color(mn.BLACK)
+
+    @property
     def grey(self):
         return self._e_color(mn.GREY)
+
+
+    @property
+    def normal_color(self):
+        return self._e_color(STROKE_COLOUR)
+
+    @property
+    def default_color(self):
+        return self._e_color(STROKE_COLOUR)
 
     # ----------------------------------------------------------------------------------------------------------------
     # bring object to top
@@ -195,7 +208,7 @@ class EMObjectPlayer:
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, frac_speed=0.2, scale_factor=3, color = mn.RED):
+    def notice(self, frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR):
         self.eobj.scene.play(Indicate(self.eobj, color=color, scale_factor=scale_factor, run_time=10*frac_speed))
         return self
 
@@ -328,9 +341,11 @@ def {name}(self):
     # ----------------------------------------------------------------------------------------------------------------
     # make the object temporarily noticeable
     # ----------------------------------------------------------------------------------------------------------------
-    def notice(self, frac_speed=0.2, scale_factor=3, color=mn.RED):
-        for player in self.players:
-            player.notice(frac_speed=frac_speed, scale_factor=scale_factor,color=color)
+    def notice(self, frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR):
+
+        with self.obj.scene.simultaneous():
+            for player in self.players:
+                player.notice(frac_speed=frac_speed, scale_factor=scale_factor,color=color)
         return self
 
     # ----------------------------------------------------------------------------------------------------------------

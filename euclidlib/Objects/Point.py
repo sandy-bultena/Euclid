@@ -26,14 +26,14 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # initialize
     # ----------------------------------------------------------------------------------------------------------------
-    def __init__(self, center, label=None, fill_color=mn.WHITE, radius=DEFAULT_POINT_SIZE, **kwargs):
+    def __init__(self, center, label=None, fill_color=FILL_COLOUR, radius=DEFAULT_POINT_SIZE, **kwargs):
         animate_part = kwargs.get('animate_part', None)
         self._original_center = center
         super().__init__(
             arc_center=convert_to_coord(center),
             radius=radius,
-            stroke_color=darken(mn.GREY),
-            stroke_width=2,
+            stroke_color=POINT_STROKE_COLOR,
+            stroke_width=1,
             fill_color=fill_color,
             fill_opacity=1.0,
             animate_part=['set_fill', 'set_stroke'] if animate_part is None else animate_part,
@@ -124,15 +124,6 @@ class EPoint(EMObject, mn.Circle):
         dy = y1 - y0
         dz = z1 - z0
         return math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
-
-    # ----------------------------------------------------------------------------------------------------------------
-    # highlight the point
-    # ----------------------------------------------------------------------------------------------------------------
-    def highlight(self, color=mn.RED, scale=2.0, **args):
-        target = self.animate(rate_func=mn.there_and_back, **args)
-        target.scale(scale)
-        target.set_color(color)
-        return target
 
     # ----------------------------------------------------------------------------------------------------------------
     # two points overlap - maybe used when interacting with mouse selection??

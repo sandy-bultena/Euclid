@@ -11,7 +11,6 @@ from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
 from . import Circle
 from . import Line
-from . import Text
 from . import Point
 from euclidlib.Objects import Dashable as Da
 DEG = mn.TAU/360
@@ -169,19 +168,6 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return self.vector_of_angle(angle)
 
     # ----------------------------------------------------------------------------------------------------------
-    # initialize label or labels (not animated) (calling 'add_label' does the animations)
-    # ----------------------------------------------------------------------------------------------------------
-    def init_label(self, labels: str | list[str], *args, **extra_args):
-        if isinstance(labels, str):
-            return super().init_label(labels, *args, **extra_args)
-        return Text.LabelGroup(
-            labels,
-            self,
-            itertools.repeat(args),
-            itertools.repeat(extra_args)
-        )
-
-    # ----------------------------------------------------------------------------------------------------------
     # what are the tangent directions
     # ----------------------------------------------------------------------------------------------------------
     def tangent_at_start(self):
@@ -193,7 +179,7 @@ class AbstractArc(Da.Dashable, mn.Arc):
         return self.vector_of_angle(self.e_end_angle + dir)
 
     def tangent_points(self, angle_or_point: float | mn.Mobject | mn.Vect3, negative=False) -> tuple[mn.Vect3, mn.Vect3]:
-        """return point, and tangent direction at that point on the arc"""
+        """return points defining a tangent line"""
 
         # angle_or_point is a point, convert to angle
         angle = angle_or_point
@@ -230,6 +216,8 @@ class AbstractArc(Da.Dashable, mn.Arc):
     # return the coordinates on the arc at a given angle
     # ----------------------------------------------------------------------------------------------------------
     def point_at_angle(self, angle) -> mn.Vect3:
+        if angle < 0:
+            angle = angle+2*mn.PI
         alpha = (angle - self.e_start_angle) / self.e_angle
         return self.point_from_proportion(alpha)
 
@@ -502,7 +490,7 @@ class EArc(AbstractArc):
     # --------------------------------------------------------------------------------------------------------
     def create_pie(self, **kwargs):
         """Turn an arc segment into a slice of pie :) yummy!"""
-        pie = EMObject(stroke_width=1, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
+        pie = EMObject(stroke_width=2, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
         pie.set_points(self.get_points())
         pie.add_points_as_corners([self.v, self.get_start()])
         return pie

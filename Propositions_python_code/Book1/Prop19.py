@@ -42,7 +42,7 @@ class Prop19(Book1Scene):
                              labels='cab',
                              angles=r'\alpha \beta \gamma'.split()
                              )
-        t2.math(r'\beta > \alpha\ \text{and} \ \beta > \gamma', fill_color=BLUE)
+        t2.math(r'\beta > \alpha\ \text{and} \ \beta > \gamma', is_axiom=True)
 
         self.next_page()
 

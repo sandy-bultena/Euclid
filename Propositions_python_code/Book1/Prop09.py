@@ -80,7 +80,7 @@ class Prop09(Book1Scene):
         p['C'].add_label('C', UP).e_draw()
         l['AB'].e_draw()
         l['AC'].e_draw()
-        t2.math('AC = AB', fill_color=BLUE)
+        t2.math('AC = AB', is_axiom=True)
 
         self.next_page()
 
@@ -93,7 +93,7 @@ class Prop09(Book1Scene):
         l['CD'], l['BD'], p['D'] = t[1].l[2], t[1].l[1], t[1].p[2]
         t[1].l[0].e_delete()
         p['D'].add_label('D', DOWN)
-        t2.math('CB = BD = DC', fill_color=BLUE)
+        t2.math('CB = BD = DC', is_axiom=True)
 
         self.next_page()
 
@@ -137,7 +137,7 @@ class Prop09(Book1Scene):
             l['AC'].red()
         with self.simultaneous():
             t2.e_fade()
-            t2.white(0)
+            t2.default_color(0)
             t2.math('AB = AC')
 
         self.next_page()
@@ -147,15 +147,15 @@ class Prop09(Book1Scene):
                    "are sides of an equilateral triangle")
         with self.simultaneous():
             c['A'].e_remove()
-            l['AB'].white()
-            l['AC'].white()
+            l['AB'].default_color()
+            l['AC'].default_color()
         with self.simultaneous():
             l['BD'].red.e_normal()
             l['BC'].e_normal()
             l['CD'].red.e_normal()
             t[1].e_fill(BLUE_D)
             t2.e_fade()
-            t2.white(1)
+            t2.default_color(1)
         t2.math("DB = DC")
 
         self.next_page()
@@ -167,15 +167,15 @@ class Prop09(Book1Scene):
             t[1].e_unfill()
             l['AD'].e_normal()
             l['BC'].e_remove()
-            l['BD'].white()
-            l['CD'].white()
+            l['BD'].default_color()
+            l['CD'].default_color()
         with self.simultaneous():
             t[3] = ETriangle(l['AB'], l['BD'], l['AD']).e_fill(GREEN_E)
             t[2] = ETriangle(l['AC'], l['CD'], l['AD']).e_fill(PINK)
 
         with self.simultaneous():
             t2.e_fade()
-            t2.white(4, 3)
+            t2.default_color(4, 3)
 
         self.next_page()
 
@@ -212,7 +212,7 @@ class Prop09(Book1Scene):
             l['BD'].e_remove()
         with self.simultaneous():
             t2.e_fade()
-            t2.white(5)
+            t2.default_color(5)
         t2.math(
             r'\measuredangle CAB = 2 \measuredangle CAD',
         )

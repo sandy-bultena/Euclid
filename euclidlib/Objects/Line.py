@@ -155,7 +155,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             elif LineLabelSide.INSIDE:
                 direction = self.OUT()
 
-        brace = mn.Brace(self, direction=direction, buff=buff, stroke_width=0)
+        brace = mn.Brace(self, direction=direction, buff=buff, stroke_width=0, fill_color=STROKE_COLOUR)
         self.scene.play(mn.FadeInFromPoint(brace, point=self.get_center()))
         self.brace = brace
         return brace
@@ -1135,20 +1135,31 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
 
         return (radius / norm_delta) * delta + pt
 
-    # def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
-    #     if np.dot(self.get_unit_vector(), other.get_unit_vector()) < 0:
-    #         if anim is mn.TransformFromCopy:
-    #             cpy = self.copy().invert_start_and_end()
-    #         else:
-    #             cpy = self.invert_start_and_end()
-    #         return super(ELine, cpy).transform_to(other, *sub_animations, anim=mn.ReplacementTransform)
-    #     else:
-    #         return super().transform_to(other, *sub_animations)
+    # -----------------------------------------------------------------------------------------------------------------
+    # line transformations
+    # -----------------------------------------------------------------------------------------------------------------
+    def transform_to(self, other: Self, *sub_animations, anim: Type[mn.Animation] = mn.TransformFromCopy):
 
-    # -----------------------------------------------------------------------------------------------------------------
-    # used by manim to figure out how to transform one line to another
-    # -----------------------------------------------------------------------------------------------------------------
-    # currently doesn't work
+        # prevent the rotation of the line if one line goes left to right and the other right to left (or equivalent)
+        try:
+            if np.dot(self.get_unit_vector(), other.get_unit_vector()) < 0:
+                if anim is mn.TransformFromCopy:
+                    cpy = self.copy().invert_start_and_end()
+                else:
+                    cpy = self.invert_start_and_end()
+                return super(ELine, cpy).transform_to(other, *sub_animations, anim=mn.ReplacementTransform)
+
+        except AttributeError:
+            # failure may hapen if other is not a line
+            pass
+
+        # otherwise, don't make a copy, just do the transformation
+        return super().transform_to(other, *sub_animations)
+
+    # # -----------------------------------------------------------------------------------------------------------------
+    # # used by manim to figure out how to transform one line to another
+    # # -----------------------------------------------------------------------------------------------------------------
+    # # not sure what this is supposed to do
     # def interpolate(
     #         self,
     #         mobject1: ELine,

@@ -16,11 +16,29 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        draw_angles()
+        filling()
 
 
     def go(self):
         pass
+
+def filling():
+    p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))
+    p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p.scene.wait(5)
+    p.e_fade()
+    p.scene.wait(5)
+    p.e_normal()  # are the lines below the polygon?
+
+def notice():
+    p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450),
+             labels=['A', 'B', 'C'],
+             point_labels=['b', 'c', 'a'],
+             angles=[r'\beta', (r'\gamma',mn_scale(60)), r'\alpha', None, ],
+             fill=mn.BLUE
+             )
+    print("notice")
+    p.notice()
 
 def area():
     poly = ETriangle(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350))
@@ -115,7 +133,7 @@ def basic():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450),
              labels=['A', 'B', 'C'],
              point_labels=['b', 'c', 'a'],
-             angles=[r'\beta', r'\gamma', r'\alpha', None, mn_scale(60)],
+             angles=[r'\beta', (r'\gamma',mn_scale(60)), r'\alpha', None, ],
              fill=mn.BLUE
              )
     print([a*180/mn.PI for a in p.angle_values])
@@ -124,7 +142,7 @@ def basic():
     EPolygon(mn_coord(500, 100), mn_coord(500, 400), mn_coord(900, 450),
              labels=['A', 'B', 'C'],
              point_labels=['b', 'c', 'a'],
-             angles=[r'\beta', r'\gamma', r'\alpha', ANGLE_SIZE * 2, None, ANGLE_SIZE / 2],
+             angles=[(r'\beta',ANGLE_SIZE * 2), r'\gamma', (r'\alpha',ANGLE_SIZE / 2), ],
              fill=[mn.GREEN, 0.50]
              )
 

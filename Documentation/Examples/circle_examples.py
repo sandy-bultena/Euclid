@@ -10,10 +10,24 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        intersect2()
+        circle_no_label()
 
     def go(self):
         pass
+
+def tangent2():
+    C = mn_coord(225, 350)
+    r = mn_scale(180)
+    DEG = mn.PI/180
+    c = dict()
+    p = dict()
+    c['C'] = ECircle(C, C + r * RIGHT, label=('C', PI / 4))
+    A = p['A'] = c['C'].e_point_at_angle(200 * DEG)
+    B = p['B'] = c['C'].e_point_at_angle(270 * DEG)
+    c['AB'] = EArc(r / 1.7, p['A'], p['B'])
+    l_AE = ELine(*c['AB'].tangent_points(p['A'])).green()
+    l_BE = ELine(*c['AB'].tangent_points(p['B'],negative=True)).blue()
+
 
 def intersect2():
     tri = ETriangle(mn_coord(130,400),mn_coord(400,450),mn_coord(350,300)).e_fill(mn.BLUE)

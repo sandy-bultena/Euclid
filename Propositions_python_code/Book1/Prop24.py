@@ -54,9 +54,9 @@ class Prop24(Book1Scene):
                                  angles=[r'\delta'],
                                  labels=['c', None, 'b'])
 
-        t2.math(r'\alpha > \delta', fill_color=BLUE)
-        t2.math('AB = DE = c', fill_color=BLUE)
-        t2.math('AC = DF = b', fill_color=BLUE)
+        t2.math(r'\alpha > \delta', is_axiom=True)
+        t2.math('AB = DE = c', is_axiom=True)
+        t2.math('AC = DF = b', is_axiom=True)
 
         self.next_page()
 
@@ -222,7 +222,7 @@ class Prop24(Book1Scene):
         t['EFG'].set_angles(None, None, (r'\theta',mn_scale(40 * 1.5)))
         with self.simultaneous():
             t2.e_fade()
-            t2.white(-1)
+            t2.default_color(-1)
         t2.e_update(-1, r'\beta > \epsilon > \theta')
 
         self.next_page()
@@ -239,7 +239,7 @@ class Prop24(Book1Scene):
         # ------------------------------------------------------------------------
         t1.explain("The angle EFG is greater than EGF, "
                    "hence line EG is greater {nb: than EF (I.19)}")
-        t2.white(-2)
+        t2.default_color(-2)
         t2.math('EG > EF')
 
         self.next_page()
@@ -252,7 +252,7 @@ class Prop24(Book1Scene):
             t['ABC'].e_draw()
         with self.simultaneous():
             t2.e_fade()
-            t2.white(5, -1)
+            t2.default_color(5, -1)
         t2.down()
         t2.math('BC > EF')
 
@@ -276,6 +276,6 @@ class Prop24(Book1Scene):
         with self.simultaneous():
             t2.e_fade()
             t2.blue(slice(0,3))
-            t2.white(-1)
+            t2.default_color(-1)
 
 
