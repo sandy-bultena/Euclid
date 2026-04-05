@@ -490,7 +490,7 @@ class EArc(AbstractArc):
     # --------------------------------------------------------------------------------------------------------
     def create_pie(self, **kwargs):
         """Turn an arc segment into a slice of pie :) yummy!"""
-        pie = EMObject(stroke_width=1, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
+        pie = EMObject(stroke_width=2, animate_part=['set_e_fill'], skip_anim=True, **kwargs)
         pie.set_points(self.get_points())
         pie.add_points_as_corners([self.v, self.get_start()])
         return pie

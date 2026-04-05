@@ -163,9 +163,38 @@ _Example:_ Adding vertical spacing
     t1 = TextBox(mn_coord(20, 20))
     t1.explain("line one")
     t1.explain("line two")
-    t1.down()				# move down a bit
     t1.down()               # move down a bit
     t1.explain("line three")
+```
+
+### Removing text
+
+`t1.delete_last()` will remove the last line in the text box, and adjust the spacing correctly
+
+```python
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.delete_last()
+    t1.delete_last()
+    t1.delete_last()
+    t1.explain("should NOT be way down")
+```
+
+`t1[i].e_remove()` will remove the text from the scene, but it will still _be there_ as part of the collection
+
+```python
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.e_remove(-1)
+    t1.e_remove(-2)
+    t1.e_remove(-3)
+    t1.explain("SHOULD be way down")
 ```
 
 

@@ -8,6 +8,7 @@ import re
 import manimlib as mn
 from functools import reduce, partial
 
+from euclidlib.CONSTANTS import *
 from euclidlib.Objects.em_object_base import EMObject
 from euclidlib.Objects import CustomAnimation as CA, EGroupedObjects, EIndexedGroup
 
@@ -142,14 +143,14 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     # -----------------------------------------------------------------------------------------------------------------
     # create or remove
     # -----------------------------------------------------------------------------------------------------------------
-    def CreationOf(self, *args, stroke_color=mn.WHITE, stroke_width=0.5, **kwargs):
+    def CreationOf(self, *args, stroke_color=STROKE_COLOUR, stroke_width=0.5, **kwargs):
         return [mn.Write(self,
                          stroke_color=stroke_color,
                          stroke_width=stroke_width,
                          lag_ratio=(0.02 if self.write_simultaneous else -1),
                          **kwargs, )]
 
-    def RemovalOf(self, *args, stroke_color=mn.RED_A, stroke_width=0.5, lag_ratio=0, **kwargs):
+    def RemovalOf(self, *args, stroke_color=TEXT_REMOVAL_STROKE_COLOUR, stroke_width=0.5, lag_ratio=0, **kwargs):
         return [CA.UnWrite(self,
                            stroke_color=stroke_color,
                            stroke_width=stroke_width,
@@ -247,7 +248,7 @@ class ETex(EStringObj, mn.Tex):
 
     def __init__(self, text, *args, is_axiom=False,  **kwargs):
         if is_axiom:
-            kwargs['fill_color'] = mn.BLUE
+            kwargs['fill_color'] = E_BLUE
         super().__init__(
             text,
             *args,

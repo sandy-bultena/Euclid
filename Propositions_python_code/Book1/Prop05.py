@@ -40,7 +40,7 @@ class Prop05(Book1Scene):
                              )
         l['AC'], l['BC'], l['AB'] = t['ABC'].l
         p['A'], p['C'], p['B'] = t['ABC'].p
-        t2.math("AB = AC = r", fill_color=BLUE)
+        t2.math("AB = AC = r", is_axiom=True)
         self.next_page()
 
         # ------------------------------------------------------------------------

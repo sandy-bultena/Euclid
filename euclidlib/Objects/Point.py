@@ -26,14 +26,14 @@ class EPoint(EMObject, mn.Circle):
     # ----------------------------------------------------------------------------------------------------------------
     # initialize
     # ----------------------------------------------------------------------------------------------------------------
-    def __init__(self, center, label=None, fill_color=mn.WHITE, radius=DEFAULT_POINT_SIZE, **kwargs):
+    def __init__(self, center, label=None, fill_color=FILL_COLOUR, radius=DEFAULT_POINT_SIZE, **kwargs):
         animate_part = kwargs.get('animate_part', None)
         self._original_center = center
         super().__init__(
             arc_center=convert_to_coord(center),
             radius=radius,
-            stroke_color=darken(mn.GREY),
-            stroke_width=2,
+            stroke_color=POINT_STROKE_COLOR,
+            stroke_width=1,
             fill_color=fill_color,
             fill_opacity=1.0,
             animate_part=['set_fill', 'set_stroke'] if animate_part is None else animate_part,

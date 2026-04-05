@@ -155,7 +155,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             elif LineLabelSide.INSIDE:
                 direction = self.OUT()
 
-        brace = mn.Brace(self, direction=direction, buff=buff, stroke_width=0)
+        brace = mn.Brace(self, direction=direction, buff=buff, stroke_width=0, fill_color=STROKE_COLOUR)
         self.scene.play(mn.FadeInFromPoint(brace, point=self.get_center()))
         self.brace = brace
         return brace

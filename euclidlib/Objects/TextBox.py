@@ -331,11 +331,14 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # managing items
     # -----------------------------------------------------------------------------------------------------------------
-    def e_remove(self):
-        with self.scene.simultaneous():
-            for obj in self:
-                obj.e_remove()
-        self.clear()
+    def e_remove(self, index = None):
+        if index is None:
+            with self.scene.simultaneous():
+                for obj in self:
+                    obj.e_remove()
+            self.clear()
+        else:
+            self[index].e_remove()
 
     def __delitem__(self, key):
         self[key].e_remove()

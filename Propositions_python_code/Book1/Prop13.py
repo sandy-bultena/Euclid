@@ -78,7 +78,7 @@ class Prop13(Book1Scene):
             a['beta'].e_fade()
             l['AB'].e_fade()
         t1.explain("Construct a perpendicular line to point E (I.11)")
-        l['BE'] = l['CD'].perpendicular(p['B'])
+        l['BE'] = l['CD'].perpendicular(p['B'],side=LineLabelSide.INSIDE)
         p['E'] = EPoint(l['BE'].get_end(), label=('E', UP))
         a['gamma'] = EAngle(*self.lines('CBE'), label=r'\gamma')
         a['epsilon'] = EAngle(*self.lines('EBD'), size=mn_scale(20), label=r'\epsilon')

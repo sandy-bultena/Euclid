@@ -54,9 +54,9 @@ class Prop25(Book1Scene):
                       labels='cdb')
 
         with self.staggered_animation():
-            t2.math('AB = DE = c', fill_color=BLUE)
-            t2.math('AC = DF = b', fill_color=BLUE)
-            t2.math(r'BC > EF\ ,\ a > d', fill_color=BLUE)
+            t2.math('AB = DE = c', is_axiom=True)
+            t2.math('AC = DF = b', is_axiom=True)
+            t2.math(r'BC > EF\ ,\ a > d', is_axiom=True)
 
         self.next_page()
 
@@ -107,7 +107,7 @@ class Prop25(Book1Scene):
                    "CAB and FDE are equal is also wrong")
         with self.staggered_animation():
             t2.e_fade()
-            t2.white(-2)
+            t2.default_color(-2)
         with self.simultaneous():
             t2.e_append_morph(-2, r'\ \ecrossmark', RED)
 
@@ -146,7 +146,7 @@ class Prop25(Book1Scene):
                    "CAB is less than FDE is also wrong")
         with self.staggered_animation():
             t2.e_fade()
-            t2.white(-2)
+            t2.default_color(-2)
         with self.simultaneous():
             t2.e_append_morph(-2, r'\ \ecrossmark', RED)
 
@@ -166,5 +166,5 @@ class Prop25(Book1Scene):
 
         # ------------------------------------------------------------------------
         with self.staggered_animation():
-            t2.white(-1)
+            t2.default_color(-1)
             t2.blue(slice(0,3))

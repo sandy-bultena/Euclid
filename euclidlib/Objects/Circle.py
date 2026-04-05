@@ -35,8 +35,10 @@ class ECircle(mn.Circle, Arc.AbstractArc):
         self.e_center = convert_to_coord(center)
         self.e_point = convert_to_coord(point)
         self.temp_line_label = temp_line_label
-        if 'stoke_color' not in kwargs:
-            kwargs['stroke_color'] = mn.WHITE
+        if 'stroke_color' not in kwargs:
+            kwargs['stroke_color'] = STROKE_COLOUR
+        if 'fill_color' not in kwargs:
+            kwargs['fill_color'] = None
 
         dx = self.e_point[0] - self.e_center[0]
         dy = self.e_point[1] - self.e_center[1]

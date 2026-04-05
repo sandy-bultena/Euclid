@@ -13,7 +13,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        bisect()
+        brace()
 
     def go(self):
         pass

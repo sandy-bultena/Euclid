@@ -11,7 +11,9 @@ directories:
 fps: 30
 full_screen: false
 style:
-  background_color: '#000000'
+  stroke_color: "#000000"
+  fill_color: "#000000"
+  background_color: '#FFFFFF'
   font: Consolas
   tex_template: default
 universal_import_line: from manimlib import *

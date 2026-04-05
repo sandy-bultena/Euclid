@@ -75,7 +75,7 @@ class Prop2(Book3Scene):
 
         t3.explain("If AB is a straight line")
         t3.explain("and E is outside the circle...")
-        t3.math('DE > DF', fill_color=BLUE)
+        t3.math('DE > DF', fill_color=E_BLUE)
         D = p['D'] = EPoint(c['C'].get_center(), label=('D', UP))
         l['DA'] = ELine(D,A)
         l['DE'] = ELine(D,E)
@@ -127,7 +127,7 @@ class Prop2(Book3Scene):
         t1.explainM(r"Since $\alpha$ equals $\beta$, then $\gamma$ "
                     r"is also greater than $\beta$")
         with self.simultaneous():
-            t2.white()
+            t2.normal_color()
         t2.math(r'\gamma > \beta')
 
         # -------------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ class Prop2(Book3Scene):
                    "therefore DB is larger than DE")
         with self.simultaneous():
             t2.e_fade()
-            t2.white(-1)
+            t2.normal_color(-1)
         t2.math('DB > DE')
 
         # -------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ class Prop2(Book3Scene):
         t1.explain("Therefore DF is also greater than DE")
         with self.simultaneous():
             t2.e_fade()
-            t2.white(-1, -2)
+            t2.normal_color(-1, -2)
         t2.math('DF > DE')
 
         # -------------------------------------------------------------------------------------------------------------

@@ -56,7 +56,8 @@ class Prop37(Book3Scene):
 
         t1.explain("If the product AD,CD equals BD squared, "
                    "then DB touches the circle")
-        t3.math(r'AD \cdot CD = BD^2')
+        t3.math(r'AD \cdot CD = BD^2', is_axiom=True)
+        t3.math(r'\measuredangle DBF = \rightangle')
 
         # -------------------------------------------------------------------------------------------------------------
         # Proof
@@ -64,6 +65,7 @@ class Prop37(Book3Scene):
         self.next_page()
         t1.down()
         t1.title("Proof:")
+        t3.e_remove(-1)
 
         t1.explain("Draw DE such that it touches the circle (III.17)")
         l['DE'] = c[1].draw_tangent(p['D'])

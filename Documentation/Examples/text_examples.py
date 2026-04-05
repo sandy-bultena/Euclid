@@ -10,10 +10,38 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        down()
+        remove()
 
     def go(self):
         pass
+
+def remove():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.e_remove(-1)
+    t1.e_remove(-2)
+    t1.e_remove(-3)
+    t1.explain("should not be way down")
+
+def delete_last():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("some text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.explain("other text")
+    t1.delete_last()
+    t1.delete_last()
+    t1.delete_last()
+    t1.explain("should not be way down")
+
+
+def colours():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.explain("hi")
+    t1.blue()
 
 def down():
     t1 = TextBox(mn_coord(20, 20))

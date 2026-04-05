@@ -159,28 +159,41 @@ class EMObjectPlayer:
     def _e_color(self, color: mn.Color):
         if not self.eobj.is_frozen:
             self.main_animate = True
-            self.e_normal.anim.set_color(color=color)
+            self.e_normal.anim.set_color(color=color, recurse=True)
         return self
 
     @property
     def green(self):
-        return self._e_color(mn.GREEN)
+        return self._e_color(E_GREEN)
 
     @property
     def blue(self):
-        return self._e_color(mn.BLUE)
+        return self._e_color(E_BLUE)
 
     @property
     def red(self):
-        return self._e_color(mn.RED)
+        return self._e_color(E_RED)
 
     @property
     def white(self):
         return self._e_color(mn.WHITE)
 
     @property
+    def black(self):
+        return self._e_color(mn.BLACK)
+
+    @property
     def grey(self):
         return self._e_color(mn.GREY)
+
+
+    @property
+    def normal_color(self):
+        return self._e_color(STROKE_COLOUR)
+
+    @property
+    def default_color(self):
+        return self._e_color(STROKE_COLOUR)
 
     # ----------------------------------------------------------------------------------------------------------------
     # bring object to top

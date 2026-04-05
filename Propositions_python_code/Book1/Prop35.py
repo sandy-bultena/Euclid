@@ -59,9 +59,9 @@ class Prop35(Book1Scene):
                                        ('E', UP),
                                    ])
         with self.staggered_animation():
-            t2.math(r'AD \parallel BC \parallel EF', fill_color=BLUE)
-            t2.math(r'AB \parallel DC', fill_color=BLUE)
-            t2.math(r'EB \parallel FC', fill_color=BLUE)
+            t2.math(r'AD \parallel BC \parallel EF', is_axiom=True)
+            t2.math(r'AB \parallel DC', is_axiom=True)
+            t2.math(r'EB \parallel FC', is_axiom=True)
 
         self.next_page()
 

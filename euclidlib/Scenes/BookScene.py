@@ -127,7 +127,7 @@ class BookScene(PropScene):
 
         # draw the grid
         line_options = dict(
-            stroke_color=mn.WHITE,
+            stroke_color=STROKE_COLOUR,
             stroke_width=0.5,
             stroke_opacity=BOOK_SCENE_GRID_OPACITY,
         )

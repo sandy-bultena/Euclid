@@ -38,6 +38,8 @@ class EMObject(mn.VMobject):
     def __init__(self,
                  *args,
                  stroke_width: float = 2,
+                 fill_color=FILL_COLOUR,
+                 stroke_color=STROKE_COLOUR,
                  animate_part=None,
                  delay_anim=False,
                  skip_anim=False,
@@ -66,6 +68,8 @@ class EMObject(mn.VMobject):
 
         # set stroke width accordingly
         kwargs['stroke_width'] = stroke_width
+        kwargs['stroke_color'] = stroke_color
+        kwargs['fill_color'] = fill_color
         if self.Virtual:
             kwargs['stroke_opacity'] = 0.5 if self.scene.debug else 0.0
             kwargs['stroke_width'] = 2 * stroke_width
@@ -78,7 +82,7 @@ class EMObject(mn.VMobject):
         self.animation_objects: list[mn.Mobject] = []
         self.e_label = None
         self.cached_opacity = 1
-        self.e_stroke_color:mn.Color = mn.WHITE
+        self.e_stroke_color:mn.Color = stroke_color
         self.e_fill_color:Optional[mn.Color] = None
         self.e_fill_opacity_factor = E_FILL_OPACITY_FACTOR
 
@@ -483,7 +487,7 @@ class EMObject(mn.VMobject):
         self.e_fill_color = color
 
         self.scene.play(
-            self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=False)
+            self.animate.set_fill(color=color, opacity=opacity*self.e_fill_opacity_factor, recurse=True)
         )
         return self
 
