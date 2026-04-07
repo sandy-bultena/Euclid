@@ -1,6 +1,8 @@
 """The starting location for showing a proposition"""
 from __future__ import annotations
 
+import os
+import sys
 from itertools import pairwise
 import operator as op
 
@@ -13,7 +15,13 @@ from euclidlib.Objects import *
 from os import getenv
 from .animate_state import AnimState
 from euclidlib.CONSTANTS import *
+from PIL import Image
 
+
+# =====================================================================================================================
+# are we writing a video, or we doing this interactively?
+# =====================================================================================================================
+WRITE_TO_MOVIE = "-w" in sys.argv
 
 # =====================================================================================================================
 # PropScene
@@ -57,6 +65,7 @@ class PropScene(mn.InteractiveScene):
         self.to_highlight = []
         self.paused = False
         self.default_speed =float(getenv('SPEED', DEFAULT_SPEED))
+        self.slide_number = 0
 
         super().__init__(*args, **kwargs)
 
@@ -159,13 +168,13 @@ class PropScene(mn.InteractiveScene):
             else:
                 latest.add_line_to(point)
         return super().on_mouse_motion(point, d_point)
-    #
-    # # -----------------------------------------------------------------------------------------------------------------
-    # # adds a counter defining which scene is currently being played
-    # # -----------------------------------------------------------------------------------------------------------------
-    # def post_play(self):
-    #     super().post_play()
-    #     self.animationCountObject.increment_value().to_corner(DR)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # adds a counter defining which scene is currently being played
+    # -----------------------------------------------------------------------------------------------------------------
+    def post_play(self):
+        super().post_play()
+        self.animationCountObject.increment_value().to_corner(DR)
 
     # -----------------------------------------------------------------------------------------------------------------
     # adjust the run time so that it moves at a given speed (larger objects will take longer to draw)
@@ -201,11 +210,17 @@ class PropScene(mn.InteractiveScene):
         super().wait(duration / self.get_current_speed(), *args, **kwargs)
 
     # -----------------------------------------------------------------------------------------------------------------
-    # wait for user before printing next page
+    # wait for user before printing next page, unless we are creating a video
     # -----------------------------------------------------------------------------------------------------------------
     def next_page(self):
-        self.paused = True
-        self.wait_until(lambda : not self.paused, 600)
+        if WRITE_TO_MOVIE:
+            self.wait(10)
+            if os.environ.get("SAVE_MANIM_PDF", False):
+                self.save_as_png()
+        else:
+            self.paused = True
+            self.wait_until(lambda: not self.paused, 600)
+        self.slide_number += 1
 
     # -----------------------------------------------------------------------------------------------------------------
     # scale
@@ -288,12 +303,27 @@ class PropScene(mn.InteractiveScene):
         return False
 
     # -----------------------------------------------------------------------------------------------------------------
-    # not sure
+    # remove object from scene
     # -----------------------------------------------------------------------------------------------------------------
     def e_remove(self, *obj):
         with self.simultaneous():
             for o in obj:
                 o.e_remove()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # save the current scene as an image
+    # -----------------------------------------------------------------------------------------------------------------
+    def save_as_png(self):
+
+        # define name of file
+        name = f"{self.__class__.__name__}_{self.slide_number:03d}.png"
+
+        # Ensure the directory exists
+        path = os.path.join("media", "images", name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        # Save the current camera view as an image
+        Image.fromarray(self.camera.get_pixel_array()).save(path)
 
     # -----------------------------------------------------------------------------------------------------------------
     # get all the lines defined by the polygon[poly_name] and assign them to lines dictionary

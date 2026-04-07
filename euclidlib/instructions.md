@@ -85,3 +85,15 @@ in `Text:Label`, an updater is created which calls `e_label_location` on every f
 label location is defined by its updater `e_label_location`, NOT by `add_label`, or `init_label`
 
 NOTE: it is important that if the `e_label_location` is relies on elements of the object it is attached to, then those elements must be modified if the object is being modified via animations (so you must create your own animation (see Arc as an example))
+
+### images to pdfs
+```text
+Method 1: img2pdf (Lossless & Fast)
+This tool ensures the PNG is embedded directly into the PDF without re-encoding, preserving quality and reducing file size. 
+Install via pip3: pip3 install img2pdf.
+Convert: Run this in your terminal:
+bash
+img2pdf *.png -o output.pdf
+This converts all PNGs in the current folder, ordered alphabetically, into output.pdf. 
+
+```
