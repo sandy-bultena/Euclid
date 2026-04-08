@@ -10,7 +10,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        remove()
+        various_styles()
 
     def go(self):
         pass
@@ -191,6 +191,7 @@ def various_styles():
     t1.explainM(r"This is 'explainM' text, can imbed math ($\alpha + \beta = \gamma)$")
     t1.sidenote("This is 'sidenote' text")
     t1.normal("This is 'normal' text")
+    t1.bold("This is 'bold' text")
     t1.fancy("This is 'fancy' text")
     t1.math(r"\text{math:}\quad sin^2\theta + cos^2\theta = 1")
     """

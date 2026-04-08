@@ -73,6 +73,9 @@ class BookScene(PropScene):
                 lines.append(self.l[f"{c2}{c1}"])
         return lines[:num]
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # title page
+    # -----------------------------------------------------------------------------------------------------------------
     def title_page(self):
         t = TextBox((0, mn_scale(350), 0),
                     buff_size=mn.MED_LARGE_BUFF,
@@ -140,6 +143,12 @@ class BookScene(PropScene):
         grid.fix_in_frame()
         self.play(mn.FadeIn(grid))
 
+        t=TextBox(mn_coord(10,780))
+        t.sidenote(COPYRIGHT)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get proposition number
+    # -----------------------------------------------------------------------------------------------------------------
     @classmethod
     def get_prop_number(cls):
         match = re.search(r"Book(\d+).Prop(\d+)", cls.__module__)
@@ -147,7 +156,36 @@ class BookScene(PropScene):
             return 0,0
         return int(match.group(1)), int(match.group(2))
 
+    # -----------------------------------------------------------------------------------------------------------------
+    # last page with credits etc
+    # -----------------------------------------------------------------------------------------------------------------
+    def last_page(self):
+        tb = TextBox(mn_coord(300, 150))
+        tb.fancy(COPYRIGHT, font_size=36)
+        tb.bold(CODE_CC)
+        tb.explain(GENERIC_CC)
+        tb.down()
+        tb.down()
+        tb.title("Resources:")
+        tb.bold(f"Youtube Videos: ")
+        tb.sidenote(YOUTUBE_LINK, same_line=True)
+        tb.bold(f"PDFs: ")
+        tb.explain(f"{GITHUB_PDFS_LINK}", same_line=True)
+        tb.down()
+        tb.down()
+        tb.title("Additional Credits")
+        tb.bold("Source code to create videos:")
+        tb.sidenote(f"© {EUCLID_LIB_AUTHOR} - {GITHUB_EUCLID_LINK}", same_line=True)
+        tb.down()
+        tb.down()
+        tb.explain("This code could not have been created without the use of the manimgl libraries:")
+        tb.sidenote(f"© {MANIMGL_AUTHOR} - {GITHUB_MANIMGL_LINK}")
 
+
+
+# =====================================================================================================================
+# Book 1
+# =====================================================================================================================
 
 class Book1Scene(BookScene):
 
@@ -155,7 +193,6 @@ class Book1Scene(BookScene):
     # title page for Book 1
     # -----------------------------------------------------------------------------------------------------------------
     def title_page(self):
-
         xc = 0
         yc = mn_scale(100)
         quote_box = TextBox([xc,yc,0],
@@ -206,6 +243,9 @@ class Book1Scene(BookScene):
             sECA = ETriangle.assemble(lines=[sC.l2, tABC.l2, l3]).e_fill(mn.GREEN)
 
 
+# =====================================================================================================================
+# Book 2
+# =====================================================================================================================
 class Book2Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),
@@ -281,6 +321,9 @@ class Book2Scene(BookScene):
                 ar3.e_draw()
 
 
+# =====================================================================================================================
+# Book 3
+# =====================================================================================================================
 class Book3Scene(BookScene):
     def title_page(self):
         title_box = TextBox(mn_scale(0, 100, 0),

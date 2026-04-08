@@ -44,6 +44,9 @@ class PropScene(mn.InteractiveScene):
     def reset(self):
         raise NotImplementedError()
 
+    def last_page(self):
+        raise NotImplementedError()
+
 
     @mn.abstractmethod
     def go(self) -> None:
@@ -82,10 +85,20 @@ class PropScene(mn.InteractiveScene):
             traceback.print_exc()
 
     # -----------------------------------------------------------------------------------------------------------------
-    # go through all the steps, and run them
+    # clear everything from the page
+    # -----------------------------------------------------------------------------------------------------------------
+    def clear_all(self):
+        with self.simultaneous(run_time=1):
+            gg = EIndexedGroup((sub for sub in self.mobjects if isinstance(sub, EMObject)), scene=self)
+            gg.e_remove()
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # execute all the code in 'go' (which should be defined in the inherited class)
     # -----------------------------------------------------------------------------------------------------------------
     def run_full(self):
         with self.animation_speed(self._speed or 1):
+
+            # setup
             try:
                 if not self.debug:
                     self.title_page()
@@ -94,7 +107,15 @@ class PropScene(mn.InteractiveScene):
             except NotImplementedError:
                 pass
 
+            # main work
             self.go()
+
+            # denouement
+            try:
+                self.clear_all()
+                self.last_page()
+            except NotImplementedError:
+                pass
 
     # -----------------------------------------------------------------------------------------------------------------
     # selection tools

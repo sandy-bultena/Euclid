@@ -137,7 +137,7 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     # -----------------------------------------------------------------------------------------------------------------
     # highlight the text
     # -----------------------------------------------------------------------------------------------------------------
-    def highlight(self, color=mn.RED, *args, **kwargs):
+    def notice(self, color=mn.RED, *args, **kwargs):
         return mn.FlashAround(self, *args, color=color, **kwargs)
 
     # -----------------------------------------------------------------------------------------------------------------

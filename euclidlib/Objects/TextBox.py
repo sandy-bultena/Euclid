@@ -45,11 +45,12 @@ class Fonts:
 
     if sys.platform == 'darwin':  # MAC CHECK
         fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=24, font='Gotu')),
-            explain=(Text.EMarkupText, dict(font_size=16, font='Gotu')),
-            sidenote=(Text.EMarkupText, dict(font_size=16, font='Gotu', slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=16, font='Gotu')),
-            normal=(Text.EText, dict(font_size=14, font='Gotu')),
+            title=(Text.EMarkupText, dict(font_size=24, font='Verdana')),
+            explain=(Text.EMarkupText, dict(font_size=16, font='Verdana')),
+            sidenote=(Text.EMarkupText, dict(font_size=16, font='Verdana', slant='ITALIC')),
+            explainM=(Text.ETexText, dict(font_size=16, font='Verdana')),
+            normal=(Text.EText, dict(font_size=16, font='Verdana')),
+            bold=(Text.EText, dict(font_size=16, font='Verdana', weight='BOLD')),
             math=(Text.ETex, dict(font_size=22)),
             fancy=(Text.EText, dict(font_size=24, font='Charm')),
             title_screen=(Text.EText, dict(font_size=48, font='Bradley Hand')),
@@ -62,6 +63,7 @@ class Fonts:
             sidenote=(Text.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
             explainM=(Text.ETexText, dict(font_size=18, font='Arimo')),
             normal=(Text.EText, dict(font_size=16, font='Arimo')),
+            bold=(Text.EText, dict(font_size=16, font='Arimo', weight='BOLD')),
             math=(Text.ETex, dict(font_size=20)),
             fancy=(Text.EText, dict(font_size=36, font='Z003')),
             title_screen=(Text.EText, dict(font_size=128, font='Karumbi'))
@@ -73,6 +75,7 @@ class Fonts:
             sidenote=(Text.EMarkupText, dict(font_size=18, slant='ITALIC')),
             explainM=(Text.ETexText, dict(font_size=18)),
             normal=(Text.EText, dict(font_size=16)),
+            bold=(Text.EText, dict(font_size=16, weight='BOLD')),
             math=(Text.ETex, dict(font_size=20)),
             fancy=(Text.EText, dict(font_size=36)),
             title_screen=(Text.EText, dict(font_size=128))
@@ -532,6 +535,10 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     @functools.wraps(generate_text)
     def explain(self, txt:str, **kwargs) -> Text.EStringObj:
         return self.generate_text(txt, 'explain', **kwargs)
+
+    @functools.wraps(generate_text)
+    def bold(self, txt:str, **kwargs) -> Text.EStringObj:
+        return self.generate_text(txt, 'bold', **kwargs)
 
     @functools.wraps(generate_text)
     def explainM(self, txt:str, **kwargs) -> Text.EStringObj:

@@ -52,3 +52,16 @@ E_GREEN = Colour.darken(mn_constants.GREEN,20)
 E_RED = Colour.darken(mn_constants.RED,20)
 BOOK_SCENE_GRID_OPACITY = .1
 
+# copyright
+AUTHOR = "Sandy Bultena"
+YEAR = "2026"
+CODE_CC = """CC BY-NC-SA 4.0"""
+COPYRIGHT = f"Copyright © {YEAR} by {AUTHOR}"
+GENERIC_CC = """The video and PDF content is licensed under Creative Commons Attribution-NonCommercial 4.0 International. 
+To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/"""
+YOUTUBE_LINK = "https://www.youtube.com/c/SandyBultena"
+GITHUB_PDFS_LINK = "https://github.com/sandy-bultena/Euclid/tree/python-manim/PDFs"
+GITHUB_EUCLID_LINK = "https://github.com/sandy-bultena/Euclid/tree/python-manim"
+GITHUB_MANIMGL_LINK = "https://github.com/3b1b/manim"
+MANIMGL_AUTHOR = "3Blue1Brown"
+EUCLID_LIB_AUTHOR = "Alex Emily Oxorn"

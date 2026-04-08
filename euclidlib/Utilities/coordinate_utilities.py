@@ -51,7 +51,7 @@ def mn_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDArray[
 
 def euclid_coord(x: int | float, y: int | float, z: int | float = 0) -> npt.NDArray[float]:
     """
-    convert euclid coordinates to manim coordinates
+    convert manim coordinates to euclid coordinates
     :param x:
     :param y:
     :param z:
