@@ -8,9 +8,18 @@ from euclidlib.Objects.animation_players import EMObjectPlayer, EGroupPlayer
 from euclidlib.Objects.em_object_decorators import *
 
 
-# *********************************************************************************************************************
-# code required for objects that are collections via VGroup or similar things
-# *********************************************************************************************************************
+# =====================================================================================================================
+# E_VGroup
+# - gathers everything into an VGroup, plus labels
+# =====================================================================================================================
+def E_VGroup(*objs) -> mn.VGroup:
+    group = mn.VGroup()
+    for main_obj in objs:
+        for obj in main_obj.get_e_family():
+            group.add(obj)
+            if obj.get_label():
+                group.add(obj.get_label())
+    return group
 
 
 # =====================================================================================================================

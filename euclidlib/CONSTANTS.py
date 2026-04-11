@@ -2,6 +2,16 @@ from .Utilities import coordinate_utilities
 from .Utilities import Colour
 import manimlib.constants as mn_constants
 
+# size of the screen in old style coordinates
+E_FRAME_WIDTH = coordinate_utilities.E_WIDTH
+E_FRAME_HEIGHT = coordinate_utilities.E_HEIGHT
+M_FRAME_WIDTH = coordinate_utilities.M_WIDTH
+M_FRAME_HEIGHT = coordinate_utilities.M_HEIGHT
+M_LEFT_BORDER = -M_FRAME_WIDTH/2
+M_RIGHT_BORDER = M_FRAME_WIDTH/2
+M_TOP_BORDER = M_FRAME_HEIGHT/2
+M_BOTTOM_BORDER = -M_FRAME_HEIGHT/2
+
 # what is the 'smallest' measurement for comparing floats
 EPSILON = coordinate_utilities.mn_scale(1)
 ANGLE_EPSILON = .5 * mn_constants.DEGREES
@@ -51,6 +61,7 @@ E_BLUE = Colour.darken("#0000FF",5)
 E_GREEN = Colour.darken(mn_constants.GREEN,20)
 E_RED = Colour.darken(mn_constants.RED,20)
 BOOK_SCENE_GRID_OPACITY = .1
+TOC_HIGHLIGHT_BG = mn_constants.BLUE_B
 
 # copyright
 AUTHOR = "Sandy Bultena"
@@ -60,7 +71,7 @@ COPYRIGHT = f"Copyright © {YEAR} by {AUTHOR}"
 GENERIC_CC = """The video and PDF content is licensed under Creative Commons Attribution-NonCommercial 4.0 International. 
 To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/"""
 YOUTUBE_LINK = "https://www.youtube.com/c/SandyBultena"
-GITHUB_PDFS_LINK = "https://github.com/sandy-bultena/Euclid/tree/python-manim/PDFs"
+GITHUB_PDFS_LINK = "https://github.com/sandy-bultena/Euclid/tree/python-manim/Propositions_PDFs"
 GITHUB_EUCLID_LINK = "https://github.com/sandy-bultena/Euclid/tree/python-manim"
 GITHUB_MANIMGL_LINK = "https://github.com/3b1b/manim"
 MANIMGL_AUTHOR = "3Blue1Brown"

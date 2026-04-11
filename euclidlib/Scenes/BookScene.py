@@ -175,7 +175,7 @@ class BookScene(PropScene):
         tb.down()
         tb.title("Additional Credits")
         tb.bold("Source code to create videos:")
-        tb.sidenote(f"© {EUCLID_LIB_AUTHOR} - {GITHUB_EUCLID_LINK}", same_line=True)
+        tb.sidenote(f"© {EUCLID_LIB_AUTHOR} - {GITHUB_EUCLID_LINK}")
         tb.down()
         tb.down()
         tb.explain("This code could not have been created without the use of the manimgl libraries:")
