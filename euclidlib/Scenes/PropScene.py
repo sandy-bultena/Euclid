@@ -95,6 +95,9 @@ class PropScene(mn.InteractiveScene):
     # -----------------------------------------------------------------------------------------------------------------
     # execute all the code in 'go' (which should be defined in the inherited class)
     # -----------------------------------------------------------------------------------------------------------------
+    def table_of_contents(self, index=0):
+        pass
+
     def run_full(self):
         with self.animation_speed(self._speed or 1):
 
@@ -102,6 +105,9 @@ class PropScene(mn.InteractiveScene):
             try:
                 if not self.debug:
                     self.title_page()
+                    self.next_page()
+                    self.clear()
+                    self.table_of_contents(self.prop)
                     self.next_page()
                     self.reset()
             except NotImplementedError:
@@ -116,6 +122,20 @@ class PropScene(mn.InteractiveScene):
                 self.last_page()
             except NotImplementedError:
                 pass
+
+    def clear(self):
+        with self.simultaneous(run_time=1):
+            print()
+            print()
+            print()
+            for sub in self.mobjects:
+                print(isinstance(sub, mn.Mobject), isinstance(sub, EMObject), sub)
+            print()
+            print()
+            print()
+
+            gg = EIndexedGroup((sub for sub in self.mobjects if isinstance(sub, EMObject)), scene=self)
+            gg.e_remove()
 
     # -----------------------------------------------------------------------------------------------------------------
     # selection tools

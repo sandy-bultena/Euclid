@@ -1,105 +1,88 @@
-import sys
-import os
-
-
-sys.path.append(os.getcwd())
-
-from euclidlib.Scenes.animate_state import AnimState
-from euclidlib.Scenes.PropScene import PropScene
+# =====================================================================================================================
+# Book 2
+# =====================================================================================================================
+from euclidlib.Scenes.BookScene import BookScene, TOC, TOCEntry
+from euclidlib.Objects import *
 from euclidlib.CONSTANTS import *
-from euclidlib.Objects import *
 
 
-class Book1Prop1(PropScene):
-    title = ""
-    steps = []
+class Book2Scene(BookScene):
 
-    def run_full(self):
-        print(mn.__version__)
-        make_toc(self,9)
+    def title_page(self):
+        title_box = TextBox(mn_scale(0, 100, 0),
+                            line_width=mn_scale(600),
+                            alignment='e'
+                            )
+        with self.simultaneous():
+            super().title_page()
 
-    def go(self):
-        pass
-def text(scene):
-    t1 = TextBox(mn_coord(20, 20))
-    t1.title("some text")
+            with self.pause_animations_for():
+                title_box.fancy("It is a remarkable fact in the history of geometry, "
+                                "that the Elements of Euclid, "
+                                "written two thousand years ago, are still regarded by many as the best "
+                                "introduction to the mathematical sciences.", font_size=24, write_simultaneous=True)
+                title_box.explain("""
+                - Florian Cajori,
+                  A History of Mathematics (1893)
+                """, font_size=18)
 
+                title_box[-1].align_to(title_box[-2], mn.RIGHT)
 
-def make_toc(scene, index=0):
-    y_padding = 0.5
-    x_padding = 0.6
-    toc = TOC2("Table of Contents - Book 2")
-    col_width = M_FRAME_WIDTH/3
-    cols = [M_LEFT_BORDER, M_LEFT_BORDER+ col_width, M_LEFT_BORDER+ 2*col_width]
-    tb_title = TextBox(mn_coord(500,40,0))
-    tb_title.title(toc.title)
-    print()
-    print("=========")
-    print(f"{M_TOP_BORDER=}, {y_padding=}, {tb_title.get_bottom()}")
-    print("=========")
-    print()
+                title_box.down()
+                title_box.explain('<b>Definitions:</b>')
+                title_box.explain("Any rectangular parallelogram is said to "
+                                  "be contained by the two straight "
+                                  "lines containing the right angle.")
+                title_box.explain("And in any parallelogrammic area let any one whatever of "
+                                  "the parallelograms about its diameter with the two complements "
+                                  "be called a gnomon.")
 
-    ypos = tb_title.get_bottom()[1] - y_padding
-    xpos = cols.pop(0)
+                para = EPolygon(
+                    mn_coord(450, 700),
+                    mn_coord(600, 700),
+                    mn_coord(650, 600),
+                    mn_coord(500, 600))
+                gnomon = EPolygon(
+                    mn_coord(450, 700),
+                    mn_coord(600, 700),
+                    mn_coord(617, 667),
+                    mn_coord(517, 667),
+                    mn_coord(550, 600),
+                    mn_coord(500, 600),
+                )
+                gnomon.e_fill(mn.BLUE_D)
 
-    for prop,entry in enumerate(toc.get_entries(),start=1):
-        scene.animateState.append(AnimState.SKIP)
-        tb1 = TextBox([xpos+0.1, ypos, 0])
-        tb1.math(f"{entry.prop_num}.")
-        g = entry.diagram(xpos, ypos)
-        tb2 = TextBox([xpos+y_padding, ypos, 0], line_width=col_width)
-        if isinstance(entry.text, str):
-            tb2.math(entry.text,font_size=18)
-        else:
-            for t in entry.text:
-                tb2.math(t,font_size=18)
+                diag = ELine(mn_coord(450, 700), mn_coord(650, 600))
+                l1 = ELine(mn_coord(500, 700), mn_coord(550, 600))
+                cross = l1.intersect(diag)[0]
+                p = EPoint(cross)
+                l2 = para.l0.parallel(p)
+                l3 = ELine(
+                    l2.intersect_line(para.l3)[0],
+                    l2.intersect_line(para.l1)[0],
+                )
+                ar1 = ELine(mn_coord(650, 660),
+                            mn_coord(690, 660))
+                ar2 = ELine(mn_coord(650, 660),
+                            mn_coord(660, 650))
+                ar3 = ELine(mn_coord(650, 660),
+                            mn_coord(660, 670))
 
-        if ypos - y_padding - g.get_height() - tb2.get_height() < M_BOTTOM_BORDER + y_padding:
-            xpos = cols.pop(0)
-            ypos = tb_title.get_bottom()[1] - y_padding
+            with self.staggered_animation():
+                for x in title_box:
+                    x.e_draw()
+            with self.simultaneous():
+                para.e_draw()
+                gnomon.e_draw()
+                diag.e_draw()
+                l1.e_draw()
+                l3.e_draw()
+                ar1.e_draw()
+                ar2.e_draw()
+                ar3.e_draw()
 
-        tb1.move_to([xpos+0.1, ypos, 0], aligned_edge=UL)
-        g.move_to([xpos+x_padding,ypos,0], aligned_edge=UL)
-        tb2.move_to([xpos+x_padding, ypos - y_padding/4 - g.get_height(), 0],aligned_edge=UL)
-
-        if prop==index:
-            r = mn.Rectangle(col_width,mn.VGroup(tb1,g,tb2).get_height()+y_padding,
-                             z_index=-1, stroke_width=1, fill_color=mn.BLACK, opacity=1)
-            r.set_fill(TOC_HIGHLIGHT_BG, opacity=0.25)
-            r.set_stroke(STROKE_COLOUR)
-            r.move_to([xpos,ypos+y_padding/2,0],aligned_edge=UL)
-            scene.add(r)
-        ypos = ypos - y_padding - g.get_height() - tb2.get_height()
-        scene.animateState.pop()
-
-
-
-
-
-
-
-from dataclasses import dataclass
-from typing import Callable
-
-from euclidlib.Utilities.coordinate_utilities import mn_scale
-from euclidlib.Objects import *
-
-
-@dataclass
-class TOCEntry:
-    prop_num: int
-    text:str
-    diagram: Callable[[float,float],mn.VGroup]    # returns height of all new objects
-
-class TOC:
-    def __init__(self, title, book):
-        self.title = title
-        self.book = book
-        self.entries:list[TOCEntry] = []
-    def add_entry(self, entry:TOCEntry):
-        self.entries.append(entry)
-    def get_entries(self):
-        return self.entries
+    def get_toc(self) -> TOC:
+        return TOC2("Table of Contents - Book 2")
 
 
 class TOC2(TOC):
@@ -227,19 +210,3 @@ class TOC2(TOC):
         )
         return group
 
-
-"""
-        "Find square of polygon",
-
-            my $s = Polygon->new(
-                                  $pn,       4,        $xs + 40,  $ys + 80,
-                                  $xs + 250, $ys + 80, $xs + 280, $ys + 40,
-                                  $xs + 180, $ys
-            );
-            $s->fill($sky_blue);
-            return 120;
-        },
-}
-
-
-"""

@@ -61,7 +61,7 @@ E_BLUE = Colour.darken("#0000FF",5)
 E_GREEN = Colour.darken(mn_constants.GREEN,20)
 E_RED = Colour.darken(mn_constants.RED,20)
 BOOK_SCENE_GRID_OPACITY = .1
-TOC_HIGHLIGHT_BG = mn_constants.BLUE_B
+TOC_HIGHLIGHT_BG = mn_constants.YELLOW
 
 # copyright
 AUTHOR = "Sandy Bultena"
