@@ -19,23 +19,6 @@ import roman
 
 DEG = mn.PI/180
 
-@dataclass
-class TOCEntry:
-    prop_num: int
-    text:str
-    diagram: Callable[[float,float],mn.VGroup]    # returns height of all new objects
-
-class TOC:
-    def __init__(self, title="", book=""):
-        self.title = title
-        self.book = book
-        self.entries:list[TOCEntry] = []
-    def add_entry(self, entry:TOCEntry):
-        self.entries.append(entry)
-    def get_entries(self):
-        return self.entries
-
-
 class AttrDict[K, T](dict[K, T]):
     __slots__ = ()
     __getattr__ = dict[K, T].__getitem__
@@ -92,74 +75,6 @@ class BookScene(PropScene):
 
         t.title_screen("Euclid's Elements", write_simultaneous=True)
         t.title(f"Book {roman.toRoman(self.book)}", write_simultaneous=True)
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # table of contents
-    # -----------------------------------------------------------------------------------------------------------------
-    def get_toc(self) -> TOC:
-        return TOC()
-
-    def table_of_contents(self, index=0):
-        y_padding = 0.5
-        x_padding = 0.6
-        toc = self.get_toc()
-
-        # define columns (3 columns)
-        col_width = M_FRAME_WIDTH / 3
-        cols = [M_LEFT_BORDER, M_LEFT_BORDER + col_width, M_LEFT_BORDER + 2 * col_width]
-
-        # write the title
-        tb_title = TextBox(mn_coord(500, 40, 0))
-        tb_title.title(toc.title)
-
-        # starting ypos and xpos
-        ypos = tb_title.get_bottom()[1] - y_padding
-        xpos = cols.pop(0)
-
-        # foreach proposition, and toc entry, place in scene
-        for prop, entry in enumerate(toc.get_entries(), start=1):
-
-            # make it faster by not animating the output
-            self.animateState.append(AnimState.SKIP)
-
-            # write the proposition number
-            tb1 = TextBox([xpos + 0.1, ypos, 0])
-            tb1.math(f"{entry.prop_num}.")
-
-            # draw any required diagram
-            g = entry.diagram(xpos, ypos)
-
-            # write any required text
-            tb2 = TextBox([xpos + y_padding, ypos, 0], line_width=col_width)
-            if isinstance(entry.text, str):
-                tb2.math(entry.text, font_size=18)
-            else:
-                for t in entry.text:
-                    tb2.math(t, font_size=18)
-
-            # if we are at the bottom of the column, define the new location in the next column
-            if ypos - y_padding - g.get_height() - tb2.get_height() < M_BOTTOM_BORDER + y_padding:
-                xpos = cols.pop(0)
-                ypos = tb_title.get_bottom()[1] - y_padding
-
-            # move the textboxes and the diagrams to the required location
-            tb1.move_to([xpos + 0.1, ypos, 0], aligned_edge=UL)
-            g.move_to([xpos + x_padding, ypos, 0], aligned_edge=UL)
-            tb2.move_to([xpos + x_padding, ypos - y_padding / 4 - g.get_height(), 0], aligned_edge=UL)
-
-            # if this toc is for prop 'index', outline the entry so indicate
-            if prop == index:
-                total_height = mn.VGroup(tb1, g, tb2).get_height() + y_padding
-                width = col_width - x_padding
-                r = EPolygon((0, 0),(width,0),(width,total_height),(0,total_height), fill=TOC_HIGHLIGHT_BG)
-
-                # make the rectangle a little less cluttered
-                [p.e_remove() for p in r.p]
-                [l.grey() for l in r.l]
-                r.e_move_to([xpos+x_padding/2, ypos + y_padding / 2, 0], aligned_edge=UL)()
-
-            ypos = ypos - y_padding - g.get_height() - tb2.get_height()
-            self.animateState.pop()
 
     # -----------------------------------------------------------------------------------------------------------------
     # reset

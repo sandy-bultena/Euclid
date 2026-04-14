@@ -1,9 +1,11 @@
 # =====================================================================================================================
 # Book 2
 # =====================================================================================================================
-from euclidlib.Scenes.BookScene import BookScene, TOC, TOCEntry
+from euclidlib.Scenes.BookScene import BookScene
+from euclidlib.Scenes.table_of_contents import TOC, TOCEntry
 from euclidlib.Objects import *
 from euclidlib.CONSTANTS import *
+from euclidlib.Scenes.animate_state import AnimState
 
 
 class Book2Scene(BookScene):
@@ -81,39 +83,46 @@ class Book2Scene(BookScene):
                 ar2.e_draw()
                 ar3.e_draw()
 
-    def get_toc(self) -> TOC:
-        return TOC2("Table of Contents - Book 2")
+    def next_page_func(self):
+        self.next_page()
+        self.clear()
+
+    def draw_table_of_contents(self, index=0):
+        toc = TOC2("Table of Contents - Book 2", y_padding=0.35, next_page_func=self.next_page_func)
+        self.animateState.append(AnimState.SKIP)
+        toc.draw(self.prop)
+        self.animateState.pop()
 
 
 class TOC2(TOC):
-    def __init__(self,title):
-        super().__init__(title, 'II')
+    def __init__(self,title,book='II', **kwargs):
+        super().__init__(title,book, **kwargs)
 
-        self.add_entry(TOCEntry(1, r'A\cdot BC = A\cdot BD + A\cdot DE + A\cdot EC', self.prop01))
-        self.add_entry(TOCEntry(2, r"(AB)^2 = AB\cdot AC + AB\cdot BC", self.prop02_03_04))
-        self.add_entry(TOCEntry(3, r'AB\cdot CB = AC\cdot CB + (CB)^2', self.prop02_03_04))
-        self.add_entry(TOCEntry(4, r'(AB)^2 = (AC)^2 + (CB)^2 + 2\cdot AC\cdot CB', self.prop02_03_04))
-        self.add_entry(TOCEntry(5, r'AD\cdot DB + (CD)^2 = (CB)^2', self.prop05_09))
-        self.add_entry(TOCEntry(6, r'AD\cdot DB + (CB)^2 = (CD)^2', self.prop06_10))
-        self.add_entry(TOCEntry(7, r'(AB)^2 + (BC)^2 = (AC)^2 + 2\cdot AB\cdot BC', self.prop02_03_04))
-        self.add_entry(TOCEntry(8, r'4\cdot AB\cdot BC + (AC)^2 = (AB+BC)^2', self.prop02_03_04))
-        self.add_entry(TOCEntry(9, r'(AD)^2 + (DB)^2 = 2\cdot ((AC)^2 + (CD)^2)', self.prop05_09))
-        self.add_entry(TOCEntry(10, r'(AD)^2 + (DB)^2 = 2\cdot ((AC)^2 + (CD)^2)', self.prop06_10))
-        self.add_entry(TOCEntry(11, r'\text{Find H such that:}\quad  AB\cdot BH = (AH)^2', self.prop_11))
-        self.add_entry(TOCEntry(12, [r'\text{Cosine Law}', r'(BC)^2 = (AB)^2+(AC)^2+2\cdot AD\cdot AC'], self.prop_12))
-        self.add_entry(TOCEntry(13, [r'\text{Cosine Law}.', r'(AC)^2 = (AB)^2+(BC)^2-2\cdot BD\cdot BC'], self.prop_13))
-        self.add_entry(TOCEntry(14, r'\text{Construct square equal to polygon}', self.prop_14))
+        self.add_entry(TOCEntry(1, r'$A\cdot BC = A\cdot BD + A\cdot DE + A\cdot EC$', self.prop01))
+        self.add_entry(TOCEntry(2, r"$(AB)^2 = AB\cdot AC + AB\cdot BC$", self.prop02_03_04))
+        self.add_entry(TOCEntry(3, r'$AB\cdot CB = AC\cdot CB + (CB)^2$', self.prop02_03_04))
+        self.add_entry(TOCEntry(4, r'$(AB)^2 = (AC)^2 + (CB)^2 + 2\cdot AC\cdot CB$', self.prop02_03_04))
+        self.add_entry(TOCEntry(5, r'$AD\cdot DB + (CD)^2 = (CB)^2$', self.prop05_09))
+        self.add_entry(TOCEntry(6, r'$AD\cdot DB + (CB)^2 = (CD)^2$', self.prop06_10))
+        self.add_entry(TOCEntry(7, r'$(AB)^2 + (BC)^2 = (AC)^2 + 2\cdot AB\cdot BC$', self.prop02_03_04))
+        self.add_entry(TOCEntry(8, r'$4\cdot AB\cdot BC + (AC)^2 = (AB+BC)^2$', self.prop02_03_04))
+        self.add_entry(TOCEntry(9, r'$(AD)^2 + (DB)^2 = 2\cdot ((AC)^2 + (CD)^2)$', self.prop05_09))
+        self.add_entry(TOCEntry(10, r'$(AD)^2 + (DB)^2 = 2\cdot ((AC)^2 + (CD)^2)$', self.prop06_10))
+        self.add_entry(TOCEntry(11, r'Find H such that: $\quad  AB\cdot BH = (AH)^2$', self.prop_11))
+        self.add_entry(TOCEntry(12, [r'Cosine Law', r'$(BC)^2 = (AB)^2+(AC)^2+2\cdot AD\cdot AC$'], self.prop_12))
+        self.add_entry(TOCEntry(13, [r'Cosine Law.', r'$(AC)^2 = (AB)^2+(BC)^2-2\cdot BD\cdot BC$'], self.prop_13))
+        self.add_entry(TOCEntry(14, r'Construct a square equal to the polygon', self.prop_14))
 
     @staticmethod
     def prop01(xpos, ypos)->mn.VGroup:
         group = E_VGroup(
             EPoint((xpos + 0.8, ypos      )).add_label('A', mn.LEFT),
-            EPoint((xpos + 0.8, ypos + 0.4)).add_label('B', mn.LEFT),
-            EPoint((xpos + 3.0, ypos + 0.4)).add_label('C', mn.RIGHT),
-            EPoint((xpos + 2.0, ypos + 0.4)).add_label('D', mn.UP),
-            EPoint((xpos + 2.5, ypos + 0.4)).add_label('E', mn.UP),
+            EPoint((xpos + 0.8, ypos + 0.3)).add_label('B', mn.LEFT),
+            EPoint((xpos + 3.0, ypos + 0.3)).add_label('C', mn.RIGHT),
+            EPoint((xpos + 2.0, ypos + 0.3)).add_label('D', mn.UP),
+            EPoint((xpos + 2.5, ypos + 0.3)).add_label('E', mn.UP),
             ELine( (xpos + 0.8, ypos, 0   ), (xpos + 2.0, ypos      )),
-            ELine( (xpos + 0.8, ypos + 0.4), (xpos + 3.0, ypos + 0.4)),
+            ELine( (xpos + 0.8, ypos + 0.3), (xpos + 3.0, ypos + 0.3)),
         )
         return group
 
