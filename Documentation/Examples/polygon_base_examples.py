@@ -16,11 +16,17 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        filling()
+        moving()
 
 
     def go(self):
         pass
+
+def moving():
+    p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))
+    p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p.e_move_to((0,0,0), aligned_edge=mn.UL)()
+    p.e_fade()
 
 def filling():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))

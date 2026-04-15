@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.append(os.getcwd())
 
-from euclidlib.Scenes.BookScene import Book1Scene
+from euclidlib.Scenes.book01 import Book1Scene
 from euclidlib.Objects import *
 from typing import Dict
 

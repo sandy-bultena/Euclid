@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.getcwd())
 
-from euclidlib.Scenes.BookScene import Book2Scene
+from euclidlib.Scenes.book02 import Book2Scene
 from euclidlib.Objects import *
 
 class Prop5(Book2Scene):

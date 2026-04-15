@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.getcwd())
 
-from euclidlib.Scenes.BookScene import Book2Scene, AttrDict
+from euclidlib.Scenes.book02 import Book2Scene
 from euclidlib.Objects import *
 from typing import Dict
 

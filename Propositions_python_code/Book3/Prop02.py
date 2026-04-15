@@ -3,9 +3,8 @@ import os
 
 sys.path.append(os.getcwd())
 
-from euclidlib.Scenes.BookScene import Book3Scene, AttrDict
+from euclidlib.Scenes.book03 import Book3Scene
 from euclidlib.Objects import *
-
 
 class Prop2(Book3Scene):
     steps = []
