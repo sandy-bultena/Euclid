@@ -16,17 +16,24 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        moving()
+        fading()
 
 
     def go(self):
         pass
 
+def fading():
+    p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450), labels=('a','b','c'))
+    p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p.scene.wait(5)
+    p.e_fade()
+    p.scene.wait(5)
+    p.e_normal()
+
 def moving():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))
     p.e_fill(mn.BLUE) # # are the lines below the polygon?
     p.e_move_to((0,0,0), aligned_edge=mn.UL)()
-    p.e_fade()
 
 def filling():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))

@@ -10,6 +10,7 @@ from euclidlib.Objects.em_group_object import EIndexedGroup
 from . import Text
 from . import CustomAnimation as CA
 from . import em_object_base as base
+from ..Utilities import Colour
 
 from ..Utilities.find_scene import find_scene
 
@@ -161,6 +162,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                       same_line = False,
                       delay_anim=False,
                       skip_anim=False,
+                      colours = None,
                       break_into_parts: tuple[str, ...] | str | None = None,
                       _is_a_part: bool = False,
                       **other_options) -> EStringObj:
@@ -229,6 +231,11 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                     self.e_transform_to(newline, transform_args, transform_from)
                 else:
                     newline.e_draw(skip_anim)
+
+            # colouring parts (math mode only - for now)
+            if style == 'math' and colours is not None:
+                for txt, colour in colours:
+                    newline.set_color_by_tex(txt, Colour.darken(colour,15))
 
         # save the text object in the VGroup, only if it is not a part?
         if not _is_a_part:

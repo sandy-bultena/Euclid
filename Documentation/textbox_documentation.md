@@ -85,7 +85,7 @@ _Example:_ styles
 | Option         | Default              | Description                                                  |
 | -------------- | -------------------- | ------------------------------------------------------------ |
 | `font_size`    | depends on the style | Set the font_size                                            |
-| `fill_color`   | WHITE                | The colour of the text                                       |
+| `fill_color`   | `STROKE_COLOUR`      | The colour of the text                                       |
 | `stroke_width` | 0                    | The width of the outline of the text                         |
 | `stroke_color` | BLUE                 | The colour of the outline of the text                        |
 | `is_axiom`     | FALSE                | if set to `True`, then the colour of the text will automatically be set to the 'axiom' colour (BLUE) |
@@ -151,6 +151,15 @@ _Example:_ Changing the property after creation
     t2.e_fade(2)                # fade 3rd text element
 
 ```
+
+_Example:_ Changing the colour of part of the text
+
+```python
+        eq3 = t5.math(r"\square BH = \square BK + \square DL + \square EH",
+                     colours = (("BK", PURPLE), ("DL", GREEN), ("EH", ORANGE) ))
+```
+
+
 
 ### Additional Vertical Spacing
 
