@@ -132,7 +132,7 @@ _Example:_
 ```python
     poly = EPolygon(mn_coord(100, 100), mn_coord(100, 300), mn_coord(300, 350), label='A').e_fill(mn.BLUE)
 
-    poly.set_point_labels(
+    poly.add_point_labels(
          None,                               # point 1 label options
          ('P2', dict(direction=mn.DOWN)      # point 2 label options
          ),

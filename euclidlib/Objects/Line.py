@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from enum import Enum
 from itertools import pairwise
-from typing import Optional, Self, Callable
+from typing import Optional, Self, Callable, Type
 import numpy as np
 
 import manimlib as mn
@@ -138,7 +138,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         if direction is None:
             if side == LineLabelSide.INSIDE:
                 direction = self.IN()
-            elif LineLabelSide.INSIDE:
+            else:
                 direction = self.OUT()
 
         return point + (buff or self.LabelBuff) * direction
@@ -390,6 +390,12 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         return lCF, pF
 
     # -----------------------------------------------------------------------------------------------------------------
+    # make a virtual copy of a line (useful for temporary lines etc)
+    # -----------------------------------------------------------------------------------------------------------------
+    def vcopy(self):
+        return VirtualLine(self.start, self.end)
+
+    # -----------------------------------------------------------------------------------------------------------------
     # copy line to another line, where point should be on the line!!
     # - note that copy_transform adjusts the animation speeds etc, before running this code (in EuclidMObject)
     #   args to copy_transform ... (self: EMObject, *args, speed=-1, no_anim=False, **kwargs)
@@ -556,7 +562,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def _perp_on_line(self, p: Point.EPoint, dist_end: float, dist_start: float, /, direction=None) -> ELine:
+    def _perp_on_line(self, p: Point.EPoint, dist_end: float, dist_start: float, /, direction=None, length=mn_scale(200)) -> ELine:
 
         # get direction vector
         direction = self.IN if direction is None else direction
@@ -590,7 +596,9 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
                 pt = point
             vl.e_remove()
 
-        line = ELine(C, pt)
+        vline = VirtualLine(C, pt)
+        pt2 = vline.point(length)
+        line = ELine(C,pt2)
 
         with self.scene.simultaneous():
             pD.e_remove()
@@ -605,7 +613,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def perpendicular(self, point: Point.EPoint, /, side=LineLabelSide.OUTSIDE, **kwargs) -> ELine:
+    def perpendicular(self, point: Point.EPoint, /, side=LineLabelSide.OUTSIDE, length=mn_scale(200), **kwargs) -> ELine:
 
         # get final direction vector of perpendicular (needed only if its a point on the line)
         if side == LineLabelSide.OUTSIDE:
@@ -622,7 +630,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
             return self._perp_off_line(point, re, rs, speed = kwargs.get('speed',self.scene.get_current_speed()))
 
         # point is on the line
-        return self._perp_on_line(point, re, rs, direction=direction_vector, speed=kwargs.get('speed',self.scene.get_current_speed()))
+        return self._perp_on_line(point, re, rs, direction=direction_vector, length=length, speed=kwargs.get('speed',self.scene.get_current_speed()))
 
     # -----------------------------------------------------------------------------------------------------------------
     # draw a line parallel going through a point

@@ -42,6 +42,7 @@ TEX_REPLACE = (
     (re.compile(r'\{txt:(.*?)}'), r'\\text{\1}'),
     (re.compile(r'\{mstrike:(.*?)}'), r'\\text{\\sout{\\ensuremath{\1}}}'),
     (re.compile(r'\{strike:(.*?)}'), r'\\sout{\1}'),
+    (re.compile(r'\\square'),r'{\\scriptstyle{\\square}}')
 )
 
 # not sure what this is for
