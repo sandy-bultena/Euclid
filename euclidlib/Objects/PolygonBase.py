@@ -214,16 +214,31 @@ setattr(cls, 'p{i}', property(p))
         self.angles: list[Angle.EAngleBase | None] = _angles if _assemble_flag and _angles else [None] * self.sides
 
         # ------------------------------------------------------------------------------------------------------------
-        # create the generic EObject
+        # define the fill colours
         # ------------------------------------------------------------------------------------------------------------
-        super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
-                         delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
+        fill_colour = None
+        opacity = 0
+        if 'fill' in self.options:
+            fill_option = self.options['fill']
+            if isinstance(fill_option,str):
+                fill_colour = fill_option
+                opacity = E_FILL_OPACITY_FACTOR
+                self.options['fill'] = (fill_colour, 1)
+            else:
+                fill_colour = fill_option[0]
+                opacity = fill_option[1] * E_FILL_OPACITY_FACTOR
+
 
 
         # ------------------------------------------------------------------------------------------------------------
         # create all the lines, points, etc, if they don't already exist
         # ------------------------------------------------------------------------------------------------------------
-        self.define_sub_objs(delay_anim, skip_anim)
+        self.scene = find_scene()
+        with self.scene.simultaneous():
+            super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
+                             fill_color=fill_colour, fill_opacity=opacity,
+                             delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
+            self.define_sub_objs(delay_anim, skip_anim)
 
         # if lines etc already exist (via _assemble_flag), then set them all back to normal (no fade)
         if _assemble_flag:
@@ -240,19 +255,6 @@ setattr(cls, 'p{i}', property(p))
                     for a in _angles:
                         if a is not None:
                             a.e_normal()
-
-
-        # ------------------------------------------------------------------------------------------------------------
-        # fill the polygon with colour
-        # ------------------------------------------------------------------------------------------------------------
-        if 'fill' in self.options:
-            fill_option = self.options['fill']
-            if isinstance(fill_option,str):
-                fill_option = (fill_option,)
-            if delay_anim:
-                self.set_fill(*fill_option)
-            else:
-                self.e_fill(*fill_option)
 
         # ------------------------------------------------------------------------------------------------------------
         # add label if defined
@@ -343,8 +345,8 @@ setattr(cls, 'p{i}', property(p))
 
     def e_normal(self):
         super().e_normal()
-        if 'e_fill' in self.options:
-            self.e_fill(*self.options['e_fill'])
+        if 'fill' in self.options:
+            self.e_fill(*self.options['fill'])
 
     # ---------------------------------------------------------------------------------------------------------------
     # required for EGroupedObjects to return all the parts that make up the polygon
