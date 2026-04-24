@@ -353,6 +353,8 @@ setattr(cls, 'p{i}', property(p))
     # ---------------------------------------------------------------------------------------------------------------
     def get_group(self):
         return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
+    def get_manager(self):
+        return self
 
     # ---------------------------------------------------------------------------------------------------------------
     # define the lines and points and maybe angles of the polygon
@@ -453,7 +455,7 @@ setattr(cls, 'p{i}', property(p))
     def set_labels(self, *labels: LABEL_ARG):
         for l, label_data in zip(self.lines, labels):
             label_data = self._filter_side_labels(label_data)
-            if label_data:
+            if label_data and label_data[0]:
                 l.add_label(*label_data)
         return self
 
@@ -676,17 +678,23 @@ setattr(cls, 'p{i}', property(p))
                                     anim=anim)
 
     # # not used ??
-    # def reposition(self, *new_coords, anim=False):
-    #     assert (len(self.points) == len(new_coords))
-    #     new_poly = EPolygon(*new_coords, **self.options, delay_anim=True)
-    #     if anim:
-    #         self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
-    #     else:
-    #         self.scene.remove(*self.get_e_family())
-    #     self.lines = new_poly.lines
-    #     self.angles = new_poly.angles
-    #     self.points = new_poly.points
-    #     self.become(new_poly)
-    #     self.scene.add(*self.get_e_family())
-    #     if anim:
-    #         self.scene.remove(new_poly)
+    def reposition(self, *new_coords, anim=False):
+        assert (len(self.points) == len(new_coords))
+        new_poly = EPolygonBase(*new_coords, **self.options, delay_anim=True)
+        if anim:
+            self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
+        else:
+            self.scene.remove(*self.get_e_family())
+        self.lines = new_poly.lines
+        self.angles = new_poly.angles
+        self.points = new_poly.points
+        self.become(new_poly)
+        self.scene.add(*self.get_e_family())
+        if anim:
+            self.scene.remove(new_poly)
+        self.vertices = [convert_to_coord(p) for p in new_coords]
+        self.sides = len(self.vertices)
+        self.update_size(self.sides)
+        if self.sides:
+            self.vertices.append(self.vertices[0])
+
