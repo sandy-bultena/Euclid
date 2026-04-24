@@ -66,7 +66,7 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     # -----------------------------------------------------------------------------------------------------------------
     # initialize
     # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, txt, *args, write_simultaneous=False, style=None | str, animate_part=None, **kwargs):
+    def __init__(self, txt, *args, write_simultaneous=False, style=None | str, colours = None, animate_part=None, **kwargs):
 
         self.style = style
         self.write_simultaneous = write_simultaneous
@@ -83,6 +83,10 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
+        # colouring parts (math mode only - for now)
+        if colours is not None:
+            for txt, colour in colours:
+                self.set_color_by_tex(txt, Colour.darken(colour, 15))
 
     # -----------------------------------------------------------------------------------------------------------------
     # only 'group' like required methods
