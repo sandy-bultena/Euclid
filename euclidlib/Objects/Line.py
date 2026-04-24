@@ -563,7 +563,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     @log
     @anim_speed
     def _perp_on_line(self, p: Point.EPoint, dist_end: float, dist_start: float, /, direction=None, length=mn_scale(200)) -> ELine:
-        print("Calling perp on line!")
+
         # get direction vector
         direction = self.IN if direction is None else direction
 
@@ -599,7 +599,6 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
         vline = VirtualLine(C, pt)
         pt2 = vline.point(length)
         line = ELine(C,pt2)
-        print("Created line from", C, pt2)
 
         with self.scene.simultaneous():
             pD.e_remove()

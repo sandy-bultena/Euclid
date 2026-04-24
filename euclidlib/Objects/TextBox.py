@@ -11,6 +11,8 @@ from . import Text
 from . import CustomAnimation as CA
 from . import em_object_base as base
 from ..Utilities import Colour
+from euclidlib.CONSTANTS import *
+
 
 from ..Utilities.find_scene import find_scene
 
@@ -44,43 +46,17 @@ class StringPlacement:
 class Fonts:
     fonts: dict[str, tuple[type[Text.EStringObj], dict]]
 
-    if sys.platform == 'darwin':  # MAC CHECK
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=24, font='Verdana')),
-            explain=(Text.EMarkupText, dict(font_size=16, font='Verdana')),
-            sidenote=(Text.EMarkupText, dict(font_size=16, font='Verdana', slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=16, font='Verdana')),
-            normal=(Text.EText, dict(font_size=16, font='Verdana')),
-            bold=(Text.EText, dict(font_size=16, font='Verdana', weight='BOLD')),
-            math=(Text.ETex, dict(font_size=22)),
-            fancy=(Text.EText, dict(font_size=24, font='Charm')),
-            title_screen=(Text.EText, dict(font_size=48, font='Bradley Hand')),
-        )
-
-    elif sys.platform == 'linux':
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
-            explain=(Text.EMarkupText, dict(font_size=18, font='Arimo')),
-            sidenote=(Text.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=18, font='Arimo')),
-            normal=(Text.EText, dict(font_size=16, font='Arimo')),
-            bold=(Text.EText, dict(font_size=16, font='Arimo', weight='BOLD')),
-            math=(Text.ETex, dict(font_size=20)),
-            fancy=(Text.EText, dict(font_size=36, font='Z003')),
-            title_screen=(Text.EText, dict(font_size=128, font='Karumbi'))
-        )
-    else:
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
-            explain=(Text.EMarkupText, dict(font_size=18)),
-            sidenote=(Text.EMarkupText, dict(font_size=18, slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=18)),
-            normal=(Text.EText, dict(font_size=16)),
-            bold=(Text.EText, dict(font_size=16, weight='BOLD')),
-            math=(Text.ETex, dict(font_size=20)),
-            fancy=(Text.EText, dict(font_size=36)),
-            title_screen=(Text.EText, dict(font_size=128))
-        )
+    fonts = dict(
+        title=(Text.EMarkupText, TITLE_FONT),
+        explain=(Text.EMarkupText, EXPLAIN_FONT),
+        sidenote=(Text.EMarkupText, SIDENOTE_FONT),
+        explainM=(Text.ETexText, EXPLAINM_FONT),
+        normal=(Text.EText, NORMAL_FONT),
+        bold=(Text.EText,BOLD_FONT),
+        math=(Text.ETex,MATH_FONT),
+        fancy=(Text.EText, FANCY_FONT),
+        title_screen=(Text.EText, TITLE_SCREEN_FONT),
+    )
 
 
 
@@ -296,7 +272,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                           skip_anim,
                           ):
         text_str: str = text_obj.text
-        print("INSIDE:", type(text_obj), text_obj, text_str)
 
         # if the break_into_parts is a string instead of an array, use that to break text into its parts
         if isinstance(break_into_parts, str):

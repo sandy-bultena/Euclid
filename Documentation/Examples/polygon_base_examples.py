@@ -44,6 +44,7 @@ def fading():
 def moving():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))
     p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p.add_label("A")
     p.e_move_to((0,0,0), aligned_edge=mn.UL)()
 
 def filling():

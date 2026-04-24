@@ -183,11 +183,11 @@ setattr(cls, 'p{i}', property(p))
         assert (points is not None)
 
         # save the vertices in self (coordinates, not EPoints)
-        self.vertices = [convert_to_coord(p) for p in points]
-        self.sides = len(self.vertices)
+        vertices = [convert_to_coord(p) for p in points]
+        self.sides = len(vertices)
         self.update_size(self.sides)
         if self.sides:
-            self.vertices.append(self.vertices[0])
+            vertices.append(vertices[0])
 
         # ------------------------------------------------------------------------------------------------------------
         # create an options dictionary for point_labels, labels, angles and fill
@@ -235,7 +235,7 @@ setattr(cls, 'p{i}', property(p))
         # ------------------------------------------------------------------------------------------------------------
         self.scene = find_scene()
         with self.scene.simultaneous():
-            super().__init__(*self.vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
+            super().__init__(*vertices, stroke_width=0, z_index=z_index, animate_part=animate_part,
                              fill_color=fill_colour, fill_opacity=opacity,
                              delay_anim=delay_anim, skip_anim=skip_anim, **kwargs)
             self.define_sub_objs(delay_anim, skip_anim)
@@ -265,6 +265,10 @@ setattr(cls, 'p{i}', property(p))
     # ---------------------------------------------------------------------------------------------------------------
     # properties
     # ---------------------------------------------------------------------------------------------------------------
+    @property
+    def vertices(self):
+        return super().get_vertices()
+
     @property
     def area(self):
         # A = (1/2) \sum_{i=0}^{n-1} a_i \text{where} a_i = x_i y_{i+1} - x_{i+1} y_i
@@ -353,8 +357,6 @@ setattr(cls, 'p{i}', property(p))
     # ---------------------------------------------------------------------------------------------------------------
     def get_group(self):
         return mn.VGroup(*self.l, *self.p, *(a for a in self.a if a is not None))
-    def get_manager(self):
-        return self
 
     # ---------------------------------------------------------------------------------------------------------------
     # define the lines and points and maybe angles of the polygon
@@ -567,8 +569,9 @@ setattr(cls, 'p{i}', property(p))
 
         # update stored info
         dest = convert_to_coord(dest)
-        self.vertices[index] = dest
-        self.vertices[-1] = self.vertices[0]
+        vertices = self.vertices
+        vertices[index] = dest
+        vertices[-1] = vertices[0]
 
         # set the label updaters so that the labels move as the lines are modified
         all_parts = [*self.p, *self.a, *self.l]
@@ -587,15 +590,15 @@ setattr(cls, 'p{i}', property(p))
             for i in range(self.sides):
                 if self.angles[i] is not None:
                     old_angle = self.angles[i]
-                    l1 = Line.VirtualLine(self.vertices[(i - 1) % self.sides], self.vertices[i])
-                    l2 = Line.VirtualLine(self.vertices[i], self.vertices[i + 1])
+                    l1 = Line.VirtualLine(vertices[(i - 1) % self.sides], vertices[i])
+                    l2 = Line.VirtualLine(vertices[i], vertices[i + 1])
                     new_angle = Angle.EAngle(l1, l2, size=old_angle.size, delay_anim=True)
                     self.scene.play(mn.Transform(old_angle, new_angle))
                     l2.e_remove()
                     l1.e_remove()
 
             # update the actual Polygon object
-            self.scene.play(self.animate.set_points_as_corners(self.vertices))
+            self.scene.play(self.animate.set_points_as_corners(vertices))
 
         for label in all_labels:
             label.disable_updaters()
@@ -674,27 +677,7 @@ setattr(cls, 'p{i}', property(p))
         angle_transforms = [us.transform_to(them, anim=anim)
                             for us, them in zip(self.a, other.angles)
                             if us is not None and them is not None]
+
         return super().transform_to(other, *line_transforms, *point_transforms, *angle_transforms, *sub_animations,
                                     anim=anim)
-
-    # # not used ??
-    def reposition(self, *new_coords, anim=False):
-        assert (len(self.points) == len(new_coords))
-        new_poly = EPolygonBase(*new_coords, **self.options, delay_anim=True)
-        if anim:
-            self.scene.play(self.transform_to(new_poly, anim=mn.ReplacementTransform))
-        else:
-            self.scene.remove(*self.get_e_family())
-        self.lines = new_poly.lines
-        self.angles = new_poly.angles
-        self.points = new_poly.points
-        self.become(new_poly)
-        self.scene.add(*self.get_e_family())
-        if anim:
-            self.scene.remove(new_poly)
-        self.vertices = [convert_to_coord(p) for p in new_coords]
-        self.sides = len(self.vertices)
-        self.update_size(self.sides)
-        if self.sides:
-            self.vertices.append(self.vertices[0])
 

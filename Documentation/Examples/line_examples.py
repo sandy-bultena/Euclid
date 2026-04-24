@@ -13,7 +13,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        brace()
+        square()
 
     def go(self):
         pass
@@ -62,28 +62,28 @@ def square():
     l1.blue()
     l2.green()
     l3.red()
-    l4.white()
+    l4.default_color()
 
     l2 = ELine(mn_coord(550,150),mn_coord(450,150)).add_label(r'\leftarrow')
     l3, l4, l1 = l2.square()
     l1.blue()
     l2.green()
     l3.red()
-    l4.white()
+    l4.default_color()
 
     l2 = ELine(mn_coord(450,300),mn_coord(550,300)).add_label(r'\rightarrow')
     l3, l4, l1 = l2.square(clockwise=True)
     l1.blue()
     l2.green()
     l3.red()
-    l4.white()
+    l4.default_color()
 
     l2 = ELine(mn_coord(400,300),mn_coord(300,300)).add_label(r'\leftarrow')
     l3, l4, l1 = l2.square(clockwise=True)
     l1.blue()
     l2.green()
     l3.red()
-    l4.white()
+    l4.default_color()
 
 
 def fourth_proportional():

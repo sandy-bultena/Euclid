@@ -10,10 +10,17 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        various_styles()
+        parts()
 
     def go(self):
         pass
+
+def parts():
+    t3 = TextBox(mn_coord(20, 20))
+    eq = t3.math('z=x+y',break_into_parts=['z','=x+y'])
+
+    eq = t3.math(r'\square CH = \square HF', break_into_parts=[r'\square CH', r'=', r'\square HF'])
+
 
 def remove():
     t1 = TextBox(mn_coord(20, 20))
