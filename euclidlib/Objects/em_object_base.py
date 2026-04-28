@@ -58,6 +58,9 @@ class EMObject(mn.VMobject):
         :param kwargs: extra stuff to pass to manim
         """
 
+        # save the drawn state so we don't have to redraw later
+        self.drawn = False
+
         # can't do anything unless we have a scene object to draw to
 
         if scene is None:
@@ -192,7 +195,8 @@ class EMObject(mn.VMobject):
     # Note: get_fill_opacity is a manim property
     # -----------------------------------------------------------------------------------------------------------------
     def visible(self) -> bool:
-        return self.in_scene() and (self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0)
+        return self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0
+        #return True
 
     # -----------------------------------------------------------------------------------------------------------------
     # add a label
@@ -332,9 +336,9 @@ class EMObject(mn.VMobject):
     def e_draw(self, skip_anim=False, anim_args=None, removal_args=None):
         """draws the object on the scene"""
 
-        # if it's already visible, don't bother
-        if self.visible():
-            return
+        # # if it's already visible, don't bother
+        # if  self.in_scene() and (self.get_stroke_opacity() != 0 or self.get_fill_opacity() != 0):
+        #     return None
 
         # setup animation and removal animation arguments
         anim_args = anim_args or dict()
@@ -370,6 +374,7 @@ class EMObject(mn.VMobject):
             self.scene.add(self)
             if self.scene.debug:
                 self.scene.update_frame()
+        self.drawn = True
         return self
 
     # -----------------------------------------------------------------------------------------------------------------

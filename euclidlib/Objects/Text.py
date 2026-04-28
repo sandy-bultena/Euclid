@@ -83,7 +83,7 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
-        # colouring parts (math mode only - for now)
+        # colouring parts
         if colours is not None:
             for txt, colour in colours:
                 self.set_color_by_tex(txt, Colour.darken(colour, 15))

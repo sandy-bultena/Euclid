@@ -74,8 +74,8 @@ class EuclidAnimation(mn.Animation):
         # enable all the updaters for dashes and labels
         if self.mobject.e_label:
             self.mobject.e_label.enable_updaters()
-        if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
-            self.mobject.dash_ref.enable_updaters()
+        # if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
+        #     self.mobject.dash_ref.enable_updaters()
 
     # ----------------------------------------------------------------------------------------------------------------
     # clean up after the animation
@@ -86,8 +86,8 @@ class EuclidAnimation(mn.Animation):
         # disable all the updaters for dashes and labels
         if self.mobject.e_label:
             self.mobject.e_label.disable_updaters()
-        if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
-            self.mobject.dash_ref.disable_updaters()
+        # if hasattr(self.mobject, 'dash_ref') and self.mobject.dash_ref is not None:
+        #     self.mobject.dash_ref.disable_updaters()
 
 
 # ====================================================================================================================
