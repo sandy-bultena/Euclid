@@ -66,7 +66,7 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
     # -----------------------------------------------------------------------------------------------------------------
     # initialize
     # -----------------------------------------------------------------------------------------------------------------
-    def __init__(self, txt, *args, write_simultaneous=False, style=None | str, animate_part=None, **kwargs):
+    def __init__(self, txt, *args, write_simultaneous=False, style=None | str, colours = None, animate_part=None, **kwargs):
 
         self.style = style
         self.write_simultaneous = write_simultaneous
@@ -83,6 +83,10 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
             animate_part=['set_fill'] if animate_part is None else animate_part,
             **kwargs
         )
+        # colouring parts
+        if colours is not None:
+            for txt, colour in colours:
+                self.set_color_by_tex(txt, Colour.darken(colour, 15))
 
     # -----------------------------------------------------------------------------------------------------------------
     # only 'group' like required methods
@@ -278,7 +282,7 @@ class Label(ETex):
         self.args = args
         self.extra_args = extra_args
         self.align = align
-        super().__init__(text, font_size=20, scene=em_object.scene, delay_anim=True)
+        super().__init__(text, font_size=LABEL_FONT_SIZE, scene=em_object.scene, delay_anim=True)
 
         # if you move the object, you move the label text
         self.f_always.move_to(
@@ -347,7 +351,6 @@ class LabelGroup(EIndexedGroup[Label]):
     # defining how 'e_set_fill' will work for a label group
     # -----------------------------------------------------------------------------------------------------------------
     def set_e_fill(self, *args, **kwargs):
-        print("in grouped label e_set_fill")
         with self.scene.simultaneous():
             for label in self:
                 if isinstance(label, Label):

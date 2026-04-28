@@ -6,7 +6,6 @@
 def __init__(self, start: EMObject | mn.Vect3, end: EMObject | mn.Vect3 | None = None, *args, **kwargs):
 ```
 
-
 ## Arguments
 
 | variable          | type                     | default | description                                                  |
@@ -28,7 +27,15 @@ _Example:_
 	l2 = ELine(p1,p2).blue()
 ```
 
+## Other Constructors
 
+### `copy(self) -> ELine`
+
+Creates a copy of an existing line, in exact location, and labels
+
+### `vcopy(self) -> VirtualLine`
+
+Create a Virtual Line that is a copy of the original.  Labels are not preserved
 
 ## ELine Properties
 
@@ -534,11 +541,11 @@ creates a line parallel to `self` goint through the specified point
 
 | name        | type              | default                 | description                                                  |
 | ----------- | ----------------- | ----------------------- | ------------------------------------------------------------ |
-| `point`  | `EPoint`             |                         | the point where the perpendicular starts                     |
+| `point`  | `EPoint`             |                         | the point where the parallel line passes through |
 | `speed`    | `float` | -1      | If `speed` is greater than zero it sets the speed of the animation the transformation |
 | `**kwargs` |         |         | animation arguments                                          |
 
-_Example:_ draw perpendicular from point to line and draw perpendicular from point of line
+_Example:_ draw a line through a point that is parallel to the given line
 <video controls width="300" height="200" poster="placeholder_image.png">
 
 
@@ -567,6 +574,7 @@ Draws a line perpendicular to `self` which starts at the specified point
 | ----------- | ----------------- | ----------------------- | ------------------------------------------------------------ |
 | `point`  | `EPoint`             |                         | the point where the perpendicular starts                     |
 | `side`      | ``LineLabelSide`` | `LineLabelSide.OUTSIDE` | imagine a triangle drawn counter-clockwise, label inside or outside? |
+| `length`   | `float` | `2` _or_ `mn_scale(200)` | If drawing a perpendicular line _from_ a point on a line, then this is the length the new line will be |
 | `speed`    | `float` | -1      | If `speed` is greater than zero it sets the speed of the animation the transformation |
 | `**kwargs` |         |         | animation arguments                                          |
 
@@ -604,12 +612,12 @@ By default, the square is drawn from the start of the line in an anti-clockwise 
 | `**kwargs` |         |         | animation arguments                                          |
 
 _Example:_ 
-<video controls width="300" height="200" poster="placeholder_image.png">
 
 
 https://github.com/user-attachments/assets/05a14feb-5607-4702-85c2-15ad82f9abf0
 
 
+<video controls width="300" height="200" poster="placeholder_image.png">
     <source src="./images/line_square.mp4" type="video/mp4">
 </video>
 

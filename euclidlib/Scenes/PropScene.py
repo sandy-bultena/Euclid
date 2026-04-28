@@ -239,7 +239,7 @@ class PropScene(mn.InteractiveScene):
     # not sure why wait time should be dependent on the current speed
     # -----------------------------------------------------------------------------------------------------------------
     def wait(self, duration: float = 3, *args, **kwargs):
-        super().wait(duration / self.get_current_speed(), *args, **kwargs)
+        super().wait(duration, *args, **kwargs)
 
     # -----------------------------------------------------------------------------------------------------------------
     # wait for user before printing next page, unless we are creating a video

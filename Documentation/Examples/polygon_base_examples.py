@@ -16,23 +16,35 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        fading()
+        moving()
 
 
     def go(self):
         pass
 
+def simultaneous():
+    pp = EPoint([0,0,0])
+    with pp.scene.simultaneous():
+        p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450), labels=('a','b','c'))
+        p2= EPolygon(mn_coord(300, 100), mn_coord(300, 400), mn_coord(600, 450), fill=mn.RED,
+                     labels=('a','b','c'), point_labels=("A","B","C"))
+
 def fading():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450), labels=('a','b','c'))
-    p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p2= EPolygon(mn_coord(300, 100), mn_coord(300, 400), mn_coord(600, 450), fill=mn.RED,
+                 labels=('a','b','c'), point_labels=("A","B","C"))
+    p.e_fill(mn.BLUE)  # are the lines below the polygon?
     p.scene.wait(5)
     p.e_fade()
+    p2.e_fade()
     p.scene.wait(5)
     p.e_normal()
+    p2.e_normal()
 
 def moving():
     p= EPolygon(mn_coord(100, 100), mn_coord(100, 400), mn_coord(400, 450))
     p.e_fill(mn.BLUE) # # are the lines below the polygon?
+    p.add_label("A")
     p.e_move_to((0,0,0), aligned_edge=mn.UL)()
 
 def filling():

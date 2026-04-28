@@ -281,33 +281,50 @@ def luminosity(colour: str) -> float:
     - Parameter Colour -> The Colour whose luminosity is returned
     """
     r, g, b = rgb(colour)
-    return (r * 299 + g * 587 + b * 114) / 1437  # visual luminosity
+    return (r * 299 + g * 587 + b * 114) / 1000  # visual luminosity
+
+# --------------------------------------------------------
+# change luminosity to a given value
+# --------------------------------------------------------
+def update_luminosity(colour:str, value):
+    """
+    Returns a new colour with a given luminosity (which is dependent on the hue
+    """
+    l = luminosity(colour)
+    if l < value:
+        while value > l >= 0:
+            colour = lighten(colour,1)
+            l = luminosity(colour)
+    elif l > value:
+        while value < l <= 1:
+            colour = darken(colour,1)
+            l = luminosity(colour)
+    return colour
 
 
 # --------------------------------------------------------
 # add
 # --------------------------------------------------------
-def add(c1: str, c2: str) -> str:
+def add(c1: str, *c2s: str) -> str:
     """
-    Adds one Colour to another, assuming that the light is shining through the colors
+    Adds one Colour to others, assuming that the light is shining through the colors
 
     White (clear) covered by black will return black
 
     Black (opaque) covered by white will return black
 
     50% grey covered by 50% grey will return 75% grey
-
-    - Parameter c1 -> The first Colour to be added
-    - Parameter c1 -> The second Colour to be added
     """
     c1 = string(c1)
-    c2 = string(c2)
+    for c2 in c2s:
+        c2 = string(c2)
 
-    r1, g1, b1 = rgb(c1)
-    r2, g2, b2 = rgb(c2)
+        r1, g1, b1 = rgb(c1)
+        r2, g2, b2 = rgb(c2)
+        c1 = get_colour_string_from_rgb(r1 * r2, g1 * g2, b1 * b2)
 
     # add & convert to Colour string
-    return get_colour_string_from_rgb(r1 * r2, g1 * g2, b1 * b2)
+    return c1
 
 
 __colour_data = """

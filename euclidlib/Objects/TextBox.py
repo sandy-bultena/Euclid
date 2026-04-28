@@ -11,6 +11,8 @@ from . import Text
 from . import CustomAnimation as CA
 from . import em_object_base as base
 from ..Utilities import Colour
+from euclidlib.CONSTANTS import *
+
 
 from ..Utilities.find_scene import find_scene
 
@@ -44,43 +46,17 @@ class StringPlacement:
 class Fonts:
     fonts: dict[str, tuple[type[Text.EStringObj], dict]]
 
-    if sys.platform == 'darwin':  # MAC CHECK
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=24, font='Verdana')),
-            explain=(Text.EMarkupText, dict(font_size=16, font='Verdana')),
-            sidenote=(Text.EMarkupText, dict(font_size=16, font='Verdana', slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=16, font='Verdana')),
-            normal=(Text.EText, dict(font_size=16, font='Verdana')),
-            bold=(Text.EText, dict(font_size=16, font='Verdana', weight='BOLD')),
-            math=(Text.ETex, dict(font_size=22)),
-            fancy=(Text.EText, dict(font_size=24, font='Charm')),
-            title_screen=(Text.EText, dict(font_size=48, font='Bradley Hand')),
-        )
-
-    elif sys.platform == 'linux':
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=30, font='Arimo', weight=mn.BOLD)),
-            explain=(Text.EMarkupText, dict(font_size=18, font='Arimo')),
-            sidenote=(Text.EMarkupText, dict(font_size=18, font='Arimo', slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=18, font='Arimo')),
-            normal=(Text.EText, dict(font_size=16, font='Arimo')),
-            bold=(Text.EText, dict(font_size=16, font='Arimo', weight='BOLD')),
-            math=(Text.ETex, dict(font_size=20)),
-            fancy=(Text.EText, dict(font_size=36, font='Z003')),
-            title_screen=(Text.EText, dict(font_size=128, font='Karumbi'))
-        )
-    else:
-        fonts = dict(
-            title=(Text.EMarkupText, dict(font_size=30, weight=mn.BOLD)),
-            explain=(Text.EMarkupText, dict(font_size=18)),
-            sidenote=(Text.EMarkupText, dict(font_size=18, slant='ITALIC')),
-            explainM=(Text.ETexText, dict(font_size=18)),
-            normal=(Text.EText, dict(font_size=16)),
-            bold=(Text.EText, dict(font_size=16, weight='BOLD')),
-            math=(Text.ETex, dict(font_size=20)),
-            fancy=(Text.EText, dict(font_size=36)),
-            title_screen=(Text.EText, dict(font_size=128))
-        )
+    fonts = dict(
+        title=(Text.EMarkupText, TITLE_FONT),
+        explain=(Text.EMarkupText, EXPLAIN_FONT),
+        sidenote=(Text.EMarkupText, SIDENOTE_FONT),
+        explainM=(Text.ETexText, EXPLAINM_FONT),
+        normal=(Text.EText, NORMAL_FONT),
+        bold=(Text.EText,BOLD_FONT),
+        math=(Text.ETex,MATH_FONT),
+        fancy=(Text.EText, FANCY_FONT),
+        title_screen=(Text.EText, TITLE_SCREEN_FONT),
+    )
 
 
 
@@ -120,6 +96,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                  line_width: float = None,
                  alignment: Optional[Literal['n','e','w']]=None,
                  buff_size=mn.SMALL_BUFF,
+                 name='TextBox',
                  **kwargs):
         """
         :param absolute_position: the position to place this textbox (north-west corner)
@@ -130,7 +107,8 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         :param buff_size: space between subsequent texts being added to this textbox
         :param kwargs: additional keyword arguments being ignored here, but passed to superclass (EIndexedGroup)
         """
-
+        self.name = name
+        self.markers = []
         self.abs_position = absolute_position
         self.scene = scene
         self.scene=find_scene()
@@ -162,7 +140,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                       same_line = False,
                       delay_anim=False,
                       skip_anim=False,
-                      colours = None,
                       break_into_parts: tuple[str, ...] | str | None = None,
                       _is_a_part: bool = False,
                       **other_options) -> EStringObj:
@@ -190,8 +167,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         :param _is_a_part:
         :return:
         """
-        if style == "math":
-            print(f"TextItem ({len(self)}),  {style}({text})")
         text_class, kwargs = self._setup_kwargs(style, other_options)
 
         with self.scene.simultaneous():
@@ -199,6 +174,8 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             # create the text and fix the text in frame (is always displayed at a fixed position on the screen)
             newline = text_class(text, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
+            if style == "math":
+                print(f"{self.name}: ({len(self)}),  {style}({newline.text})")
 
             # place the text in the appropriate y position
             if same_line and len(self):
@@ -231,11 +208,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                     self.e_transform_to(newline, transform_args, transform_from)
                 else:
                     newline.e_draw(skip_anim)
-
-            # colouring parts (math mode only - for now)
-            if style == 'math' and colours is not None:
-                for txt, colour in colours:
-                    newline.set_color_by_tex(txt, Colour.darken(colour,15))
 
         # save the text object in the VGroup, only if it is not a part?
         if not _is_a_part:
@@ -316,7 +288,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         for p, t in zip(parts, text_kwargs):
             text, kwargs = t
             if kwargs is None:
-                p.next_to(text_obj[text], mn.ORIGIN, buff=0)
+                p.next_to(text_obj[p.text], mn.ORIGIN, buff=0)
 
             if not delay_anim:
                 p.e_draw(skip_anim)
@@ -337,30 +309,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             text_obj,
             **transform_args,
         ))
-
-    # -----------------------------------------------------------------------------------------------------------------
-    # managing items
-    # -----------------------------------------------------------------------------------------------------------------
-    def e_remove(self, index = None):
-        if index is None:
-            with self.scene.simultaneous():
-                for obj in self:
-                    obj.e_remove()
-            self.clear()
-        else:
-            self[index].e_remove()
-
-    def __delitem__(self, key):
-        self[key].e_remove()
-        self.remove(self[key])
-
-    def __delslice__(self, i, j):
-        for x in self[i:j]:
-            x.e_remove()
-        self.remove(*self[i:j])
-
-    def delete_last(self):
-        del self[-1]
 
     # -----------------------------------------------------------------------------------------------------------------
     # return all string objects (and any parts)
@@ -392,6 +340,41 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # managing items
     # -----------------------------------------------------------------------------------------------------------------
+    def e_remove(self, index = None):
+        if index is None:
+            with self.scene.simultaneous():
+                for obj in self:
+                    obj.e_remove()
+            self.clear()
+        else:
+            self[index].e_remove()
+
+    def __delitem__(self, key):
+        self[key].e_remove()
+        self.remove(self[key])
+
+    def __delslice__(self, i, j):
+        for x in self[i:j]:
+            x.e_remove()
+        self.remove(*self[i:j])
+
+    def add_marker(self):
+        self.markers.append(len(self))
+
+    def delete_all(self):
+        with self.scene.simultaneous():
+            while (len(self)) > 0:
+                self.delete_last()
+
+    def delete_last(self):
+        del self[-1]
+
+    def delete_until_last_marker(self):
+        marker = 0 if len(self.markers)==0 else self.markers.pop()
+        with self.scene.simultaneous():
+            while (len(self)) > marker:
+                self.delete_last()
+
     def e_update(self, index, text: str, transform_args=None, **kwargs):
         old = self[index]
         transform_args = transform_args or {}

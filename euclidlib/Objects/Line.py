@@ -613,7 +613,7 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     # -----------------------------------------------------------------------------------------------------------------
     @log
     @anim_speed
-    def perpendicular(self, point: Point.EPoint, /, side=LineLabelSide.OUTSIDE, length=mn_scale(200), **kwargs) -> ELine:
+    def perpendicular(self, point: Point.EPoint, /, side:LineLabelSide=LineLabelSide.OUTSIDE, length=mn_scale(600), **kwargs) -> ELine:
 
         # get final direction vector of perpendicular (needed only if its a point on the line)
         if side == LineLabelSide.OUTSIDE:
@@ -1041,27 +1041,28 @@ class ELine(Dashable.Dashable, EMObject, mn.Line):
     @log
     @anim_speed
     # -----------------------------------------------------------------------------------------------------------------
-    # draw a square on a line
+    # draw a square on a line, return three new lines
     # -----------------------------------------------------------------------------------------------------------------
-    def square(self, clockwise=False):
+    def square(self, clockwise=False)->tuple[ELine, ...]:
+        """draws a square on a line, returns the three new lines, not a polygon!"""
         l2 = self
         p2 = Point.EPoint(l2.get_start())
         p3 = Point.EPoint(l2.get_end())
-        if clockwise:
-            p2, p3 = p3, p2
+        side = LineLabelSide.OUTSIDE if clockwise else LineLabelSide.INSIDE
 
         # draw line perpendicular to line 2, at point2
-        l11 = l2.perpendicular(p2)
+        l11 = l2.perpendicular(p2, side=side, length = l2.length+.2 )
 
         # define 1st point at correct distance, and make line 1
         c = Circle.ECircle(p2, p3)
-        p1 = Point.EPoint(c.intersect(l11)[0])
+        ps = c.intersect(l11)
+        p1 = Point.EPoint(ps[0])
         l1, l11 = l11.e_split(p1)
         l11.e_remove()
         c.e_remove()
 
         # draw line perpendicular to line 2, at point3
-        l33 = l2.perpendicular(p3, side=LineLabelSide.INSIDE)
+        l33 = l2.perpendicular(p3, side=side , length = l2.length+.2)
 
         # define 4th point at correct distance, and make line 3
         c = Circle.ECircle(p3, p2)
