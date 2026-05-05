@@ -446,6 +446,7 @@ setattr(cls, 'p{i}', property(p))
                 if old is not None:
                     old.e_remove()
                 self.angles[i] = Angle.EAngle(l1, l2, size=size, label=name, scene=self.scene)
+        return self
 
     # for naming consistency
     def add_angles(self, *angles,  delay_anim=False, skip_anim=False):

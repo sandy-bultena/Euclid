@@ -130,7 +130,7 @@ class BookScene(PropScene):
         tb.explain(GENERIC_CC)
         tb.down()
         tb.down()
-        tb.title("Resources:")
+        tb.title("Content:")
         tb.bold(f"Youtube Videos: ")
         tb.sidenote(YOUTUBE_LINK, same_line=True)
         tb.bold(f"PDFs: ")

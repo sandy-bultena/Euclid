@@ -16,11 +16,19 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        polygon()
+        hide()
 
 
     def go(self):
         pass
+
+def hide():
+    poly1 = EPolygon(mn_coord(200, 200), mn_coord(150,300), mn_coord(200, 400), mn_coord(400,450), mn_coord(400, 400),
+                    mn_coord(370,300)).e_fill(mn.BLUE).add_label("a")
+    poly1.scene.wait(2)
+    poly1.e_hide()
+    poly1.scene.wait(2)
+    poly1.e_normal()
 
 def polygon():
 

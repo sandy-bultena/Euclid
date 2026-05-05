@@ -54,7 +54,7 @@ DEFAULT_FADE_OPACITY = 0.25
 DEFAULT_TEXT_FADE_OPACITY = 0.25
 
 # default 'max' opacity for fill colour
-E_FILL_OPACITY_FACTOR = .5
+E_FILL_OPACITY_FACTOR = .75
 
 # what is the default runtime for transformations
 DEFAULT_TRANSFORM_RUNTIME = 0.25
@@ -74,7 +74,7 @@ LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
 ANGLE_SIZE = coordinate_utilities.mn_scale(40)
 
 # default size of a point
-DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(5)
+DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(3)
 
 # for notice()
 NOTICE_FRAC_SPEED = 0.5
@@ -86,12 +86,12 @@ NOTICE_COLOUR = mn_constants.RED
 # --------------------------------------------------------
 STROKE_COLOUR = mn_constants.BLACK
 FILL_COLOUR = mn_constants.BLACK
-POINT_STROKE_COLOR = mn_constants.WHITE
+POINT_STROKE_COLOR = mn_constants.BLACK
 TEXT_REMOVAL_STROKE_COLOUR = mn_constants.BLUE
 E_BLUE = Colour.darken("#0000FF",5)
 E_GREEN = Colour.darken(mn_constants.GREEN,20)
 E_RED = Colour.darken(mn_constants.RED,20)
-BOOK_SCENE_GRID_OPACITY = .1
+BOOK_SCENE_GRID_OPACITY = 0.1
 TOC_HIGHLIGHT_BG = mn_constants.YELLOW
 
 # --------------------------------------------------------
@@ -117,13 +117,15 @@ ORANGE = Colour.add(PALE_YELLOW, PALE_PINK)
 # --------------------------------------------------------
 if sys.platform == 'darwin':  # MAC CHECK
     # Font Contenders:
-    # Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana
-    TITLE_FONT = dict(font_size=24, font='Verdana')
-    EXPLAIN_FONT = dict(font_size=16, font='Verdana')
-    EXPLAINM_FONT = dict(font_size=16, font='Verdana')
-    SIDENOTE_FONT = dict(font_size=16, font='Verdana', slant='ITALIC')
-    NORMAL_FONT = dict(font_size=16, font='Verdana')
-    BOLD_FONT = dict(font_size=16, font='Verdana', weight='BOLD')
+    # Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana, Avenir Next
+    base_font = "Avenir Next"
+    base_size=18
+    TITLE_FONT = dict(font_size=24, font=base_font, weight="BOLD")
+    EXPLAIN_FONT = dict(font_size=base_size, font=base_font)
+    EXPLAINM_FONT = dict(font_size=base_size, font=base_font)
+    SIDENOTE_FONT = dict(font_size=base_size, font=base_font, slant='ITALIC')
+    NORMAL_FONT = dict(font_size=base_size, font=base_font)
+    BOLD_FONT = dict(font_size=base_size, font=base_font, weight='BOLD')
     MATH_FONT = dict(font_size=20)
     FANCY_FONT =  dict(font_size=24, font='Charm')
     TITLE_SCREEN_FONT = dict(font_size=48, font='Bradley Hand')

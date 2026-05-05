@@ -13,10 +13,17 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        square()
+        hide()
 
     def go(self):
         pass
+
+def hide():
+    l = ELine(mn_coord(350,120),mn_coord(150,100)).blue()
+    l.scene.wait(2)
+    l.e_hide()
+    l.scene.wait(2)
+    l.e_normal()
 
 def transform_circle():
     l = ELine(mn_coord(350,120),mn_coord(150,100)).blue()

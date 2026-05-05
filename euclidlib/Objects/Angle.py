@@ -7,7 +7,6 @@ from euclidlib.Objects.em_object_base import *
 from euclidlib.Objects.em_object_decorators import *
 from euclidlib.Utilities.coordinate_utilities import mn_scale, convert_to_coord, mn_coord, get_dist
 
-
 from . import Line
 from . import Point
 from . import Circle
@@ -90,7 +89,7 @@ def angleOf(p0: mn.Vect3, p1: mn.Vect3):
 # ===============================================================================================================
 # calculate the angle between two lines
 # ===============================================================================================================
-def calculateAngle(l1: Line.ELine, l2: Line.ELine)->Optional[float]:
+def calculateAngle(l1: Line.ELine, l2: Line.ELine) -> Optional[float]:
     (vx, vy, _), vec1, vec2 = angle_coords(l1, l2)
 
     if vx is None:
@@ -185,8 +184,8 @@ class EAngleBase(Arc.AbstractArc):
                 p3 = c2.intersect(line_clone)
 
         pn3 = Point.EPoint(p3[0], fill_color=mn.GREEN)
-        l1.white()
-        c2.white.e_fade()
+        l1.e_normal()
+        c2.e_normal().e_fade()
 
         # ------------------------------------------------------------------------
         # Copy length CD, start at point A (I.2), and then construct a circle with radius CD
@@ -231,7 +230,7 @@ class EAngleBase(Arc.AbstractArc):
             final_line.e_draw()
             final_angle.e_draw()
         else:
-            lines[final_index-2].e_draw()
+            lines[final_index - 2].e_draw()
             final_line.e_draw()
             final_angle.e_draw()
 
@@ -255,7 +254,7 @@ class EAngleBase(Arc.AbstractArc):
     # bisect angle (I.9)
     # -----------------------------------------------------------------------------------------------------------------
     @anim_speed
-    def bisect(self)-> Line.ELine:
+    def bisect(self) -> Line.ELine:
         """ bisects the angle, and draws and returns all objects used in its construction """
         vx, vy, _ = self.get_arc_center()
         v1 = np.array([math.cos(self.e_start_angle), math.sin(self.e_start_angle), 0.0])
@@ -311,7 +310,7 @@ class EAngleBase(Arc.AbstractArc):
         # ------------------------------------------------------------------------
         # return new line
         # ------------------------------------------------------------------------
-        return lAD,p1
+        return lAD, p1
 
     # -----------------------------------------------------------------------------------------------------------------
     # clean_bisect - same as bisect, but removes all objects except the bisect line
@@ -351,6 +350,7 @@ class ArcAngle(EAngleBase, mn.Arc):
             **kwargs
         )
 
+
 # ==============================================================================================================
 # Right Angle class
 # - draws 'half a square' as the angle indicator instead of an arc
@@ -369,7 +369,6 @@ class RightAngle(EAngleBase):
                  **kwargs):
         self.l1 = l1
         self.l2 = l2
-        self.size = size / math.sqrt(2)
 
         super().__init__(**kwargs, delay_anim=True)
 
@@ -388,8 +387,9 @@ class RightAngle(EAngleBase):
             ])
 
         center, self.vec1, self.vec2 = angle_data
+        self.size = size / math.sqrt(2)
         self.rotate(angle1, about_point=mn.ORIGIN)
-        self.scale(size, about_point=mn.ORIGIN)
+        self.scale(self.size, about_point=mn.ORIGIN)
         self.shift(center)
         if not delay_anim:
             self.e_draw()
@@ -415,13 +415,13 @@ class GnomonAngle(ArcAngle):
 
         label_text, args = (args[:3], args[3:])
         labels = []
-        for txt,where in zip(label_text,(Arc.ArcLabelLocation.AT_START, Arc.ArcLabelLocation.BY_ALPHA, Arc.ArcLabelLocation.AT_END)):
+        for txt, where in zip(label_text, (Arc.ArcLabelLocation.AT_START, Arc.ArcLabelLocation.BY_ALPHA,
+                                           Arc.ArcLabelLocation.AT_END)):
             kwargs = copy.deepcopy(extra_args)
             kwargs["where"] = where
-            labels.append( (txt, args, kwargs))
+            labels.append((txt, args, kwargs))
 
         return Text.LabelGroup(labels, self)
-
 
 
 # ==============================================================================================================
@@ -433,7 +433,6 @@ def EAngle(l1: Line.ELine,
            no_right: bool = False,
            gnomon: bool = False,
            **kwargs) -> GnomonAngle | ArcAngle | RightAngle:
-
     assert (l2 is not None)
     if size is None:
         size = ANGLE_SIZE

@@ -16,7 +16,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        book_02_01(self)
+        moving_polygons(self)
 
 
     def go(self):
@@ -68,11 +68,11 @@ def dashed_lines(scene):
 def moving_polygons(scene):
     p1 = EPolygon([0,1,0],[1,0,0], [0,0,0], fill=BLUE, label="x")
     p2 = EPolygon([1,1,0],[0,1,0], [0,0,0], fill=BLUE, label="y")
+    p2.add_label("x+y")
     a=  ELine([0,1,0],[1,0,0])
+    a.add_label("A")
     with scene.simultaneous():
         p1.e_move([0,-1,0])(run_time=2)
-        p2.add_label("x+y")
         p2.e_move([0,1,0])(run_time=2)
-        a.add_label("A")
         a.e_move([-1,1,0])(run_time=2)
 
