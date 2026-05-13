@@ -286,9 +286,9 @@ def luminosity(colour: str) -> float:
 # --------------------------------------------------------
 # change luminosity to a given value
 # --------------------------------------------------------
-def update_luminosity(colour:str, value):
+def set_luminosity(colour:str, value):
     """
-    Returns a new colour with a given luminosity (which is dependent on the hue
+    Returns a new colour with a given luminosity (which is dependent on the hue)
     """
     l = luminosity(colour)
     if l < value:

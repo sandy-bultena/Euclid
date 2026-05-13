@@ -15,10 +15,16 @@ class Book1Prop1(PropScene):
 
     def run_full(self):
         print(mn.__version__)
-        gnomon()
+        not_right()
 
     def go(self):
         pass
+
+def not_right():
+    l1 = ELine(mn_coord(200, 400), mn_coord(500, 400))
+    l2 = ELine(mn_coord(200, 400), mn_coord(200, 600))
+    a = EAngle(l2, l1, label=r'\alpha', size=LABEL_BUFF, no_right=True)
+
 
 def gnomon():
     l1 = ELine(mn_coord(130,400),mn_coord(130,150), label='x')

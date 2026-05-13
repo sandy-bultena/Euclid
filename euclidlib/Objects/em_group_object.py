@@ -158,8 +158,8 @@ def {name}(self, *indices, **kwargs):
             else:
                 objs.append(self[index])
 
-    #with self.scene.simultaneous():
-    if True:
+    with self.scene.simultaneous():
+    # if True:
         for obj in objs:
             if isinstance(obj, EGroupedObjects):
                 EGroupPlayer(obj).{name}(**kwargs)

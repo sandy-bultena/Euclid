@@ -95,7 +95,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                  *args,
                  line_width: float = None,
                  alignment: Optional[Literal['n','e','w']]=None,
-                 buff_size=mn.SMALL_BUFF,
+                 buff_size=PARAGRAPH_BUFFER,
                  name='TextBox',
                  **kwargs):
         """
@@ -142,6 +142,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                       skip_anim=False,
                       break_into_parts: tuple[str, ...] | str | None = None,
                       _is_a_part: bool = False,
+                      colours = None,
                       **other_options) -> EStringObj:
         """
         Writes `text` to the scene in the font style `style`
@@ -165,6 +166,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         :param break_into_parts:
         :param other_options:
         :param _is_a_part:
+        :param colours: colours used to colour math "\\square"
         :return:
         """
         text_class, kwargs = self._setup_kwargs(style, other_options)
@@ -172,10 +174,9 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         with self.scene.simultaneous():
 
             # create the text and fix the text in frame (is always displayed at a fixed position on the screen)
-            newline = text_class(text, **kwargs, scene=self.scene, delay_anim=True)
+            newline = text_class(text, colours = colours, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
-            if style == "math":
-                print(f"{self.name}: ({len(self)}),  {style}({newline.text})")
+            print(f"{self.name}: ({len(self)}),  {style}({newline.text})")
 
             # place the text in the appropriate y position
             if same_line and len(self):
@@ -492,9 +493,9 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # -----------------------------------------------------------------------------------------------------------------
     # Private: generate text but don't add it to the scene
     # -----------------------------------------------------------------------------------------------------------------
-    def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, **other_options):
+    def _generate_text_no_anim(self, text: str, style: str = '', delay_anim=True, colours=None,  **other_options):
         text_class, kwargs = self._setup_kwargs(style, other_options)
-        newline = text_class(text, **kwargs, scene=self.scene, delay_anim=delay_anim)
+        newline = text_class(text, colours=colours,  **kwargs, scene=self.scene, delay_anim=delay_anim)
         newline.fix_in_frame()
         return newline
 

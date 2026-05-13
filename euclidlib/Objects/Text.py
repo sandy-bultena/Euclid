@@ -42,7 +42,7 @@ TEX_REPLACE = (
     (re.compile(r'\{txt:(.*?)}'), r'\\text{\1}'),
     (re.compile(r'\{mstrike:(.*?)}'), r'\\text{\\sout{\\ensuremath{\1}}}'),
     (re.compile(r'\{strike:(.*?)}'), r'\\sout{\1}'),
-    (re.compile(r'\\square'),r'{\\scriptstyle{\\square}}')
+    #(re.compile(r'\\square'),r'\\blacksquare')
 )
 
 # not sure what this is for
@@ -77,16 +77,51 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
         self.parts: list[EStringObj] = []
         if "stroke_width" not in kwargs:
             kwargs["stroke_width"]=0
+
+        ordered_colours = []
+        if style == "math":
+            self.text, ordered_colours = self.replace_squares(colours)
+
         super().__init__(
             self.text,
             *args,
             animate_part=['set_fill'] if animate_part is None else animate_part,
+            isolate=r"\blacksquare",
             **kwargs
         )
+
         # colouring parts
-        if colours is not None:
+        for index, colour in enumerate(ordered_colours):
+            self.get_parts_by_tex(r"\blacksquare")[index].set_color(colour)
+
+
+        if colours is not None and style is not "math":
             for txt, colour in colours:
-                self.set_color_by_tex(txt, Colour.darken(colour, 15))
+                if Colour.luminosity(colour) > MATH_SQUARE_MIN_LUMINOSITY:
+                    colour = Colour.set_luminosity(colour, MATH_SQUARE_MIN_LUMINOSITY)
+                self.set_color_by_tex(txt, colour)
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # in math mode, change \square to blacksquare, if there is a colour associated with it
+    # -----------------------------------------------------------------------------------------------------------------
+    def replace_squares(self, colours: Optional[dict[str,str]] = None) -> tuple[str, list[str]]:
+        if colours is None:
+            return self.text, []
+        final_colours = []
+        squares = [(match.span(),match.group(1)) for match in re.finditer(r'\\square\s+(\S+)', self.text)]
+        new_text = ""
+        pos = 0
+        for square in squares:
+            new_text += self.text[pos:square[0][0]]
+            if square[1] in colours:
+                final_colours.append(colours[square[1]])
+                new_text += fr'\blacksquare {square[1]}'
+            else:
+                new_text += fr'\square {square[1]}'
+            pos = square[0][1]
+
+        new_text += self.text[pos:]
+        return new_text, final_colours
 
     # -----------------------------------------------------------------------------------------------------------------
     # only 'group' like required methods

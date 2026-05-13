@@ -7,8 +7,8 @@ import manimlib.constants as mn_constants
 # --------------------------------------------------------
 # Default speed for running animations
 # --------------------------------------------------------
-DEFAULT_SPEED = 2
-DEFAULT_TEXT_SPEED = 200
+DEFAULT_SPEED = 1
+DEFAULT_TEXT_SPEED = 1
 
 # --------------------------------------------------------
 # copyright
@@ -54,7 +54,7 @@ DEFAULT_FADE_OPACITY = 0.25
 DEFAULT_TEXT_FADE_OPACITY = 0.25
 
 # default 'max' opacity for fill colour
-E_FILL_OPACITY_FACTOR = .75
+E_FILL_OPACITY_FACTOR = .50
 
 # what is the default runtime for transformations
 DEFAULT_TRANSFORM_RUNTIME = 0.25
@@ -66,6 +66,9 @@ DEFAULT_EDGE_BUFFER = mn_constants.DEFAULT_MOBJECT_TO_EDGE_BUFFER
 LABEL_BUFF = mn_constants.MED_SMALL_BUFF*.8
 LINE_LABEL_BUFF = 0.15
 POINT_LABEL_BUFF = mn_constants.MED_SMALL_BUFF*.75
+
+# Textbox
+PARAGRAPH_BUFFER = 0.5*(mn_constants.SMALL_BUFF+ mn_constants.MED_SMALL_BUFF)
 
 # showing parts
 LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
@@ -81,18 +84,8 @@ NOTICE_FRAC_SPEED = 0.5
 NOTICE_SCALE_FACTOR = 3
 NOTICE_COLOUR = mn_constants.RED
 
-# --------------------------------------------------------
-# default color scheme
-# --------------------------------------------------------
-STROKE_COLOUR = mn_constants.BLACK
-FILL_COLOUR = mn_constants.BLACK
-POINT_STROKE_COLOR = mn_constants.BLACK
-TEXT_REMOVAL_STROKE_COLOUR = mn_constants.BLUE
-E_BLUE = Colour.darken("#0000FF",5)
-E_GREEN = Colour.darken(mn_constants.GREEN,20)
-E_RED = Colour.darken(mn_constants.RED,20)
-BOOK_SCENE_GRID_OPACITY = 0.1
-TOC_HIGHLIGHT_BG = mn_constants.YELLOW
+# In math, what is the minimum luminosity of the letters if representing a square?
+MATH_SQUARE_MIN_LUMINOSITY = 0.5
 
 # --------------------------------------------------------
 # some default colours
@@ -102,6 +95,8 @@ LIME_GREEN = "#ccffcc"
 PALE_PINK = "#ffcce0"
 PALE_YELLOW = "#ffffcc"
 TURQUOISE = "#abefcd"
+PALE_GREEN = LIME_GREEN
+PALE_BLUE = SKY_BLUE
 GREEN = Colour.darken(LIME_GREEN, 5)
 BLUE = Colour.add(SKY_BLUE, SKY_BLUE)
 DARK_BLUE = Colour.add(BLUE, BLUE)
@@ -113,6 +108,19 @@ YELLOW = Colour.add(PALE_YELLOW, PALE_YELLOW)
 ORANGE = Colour.add(PALE_YELLOW, PALE_PINK)
 
 # --------------------------------------------------------
+# default color scheme
+# --------------------------------------------------------
+STROKE_COLOUR = mn_constants.BLACK
+FILL_COLOUR = mn_constants.BLACK
+POINT_STROKE_COLOR = mn_constants.BLACK
+TEXT_REMOVAL_STROKE_COLOUR = mn_constants.BLUE
+E_BLUE = Colour.darken("#0000FF",5)
+E_GREEN = Colour.darken(mn_constants.GREEN,20)
+E_RED = Colour.darken(mn_constants.RED,20)
+BOOK_SCENE_GRID_OPACITY = 0.1
+TOC_HIGHLIGHT_BG = PALE_YELLOW
+
+# --------------------------------------------------------
 # Fonts
 # --------------------------------------------------------
 if sys.platform == 'darwin':  # MAC CHECK
@@ -120,7 +128,7 @@ if sys.platform == 'darwin':  # MAC CHECK
     # Consolas, Arial, Gotu, Menlo, Lucida Grande, Monaco, Optima, Verdana, Avenir Next
     base_font = "Avenir Next"
     base_size=18
-    TITLE_FONT = dict(font_size=24, font=base_font, weight="BOLD")
+    TITLE_FONT = dict(font_size=24, font="Rockwell", weight = "BOLD")
     EXPLAIN_FONT = dict(font_size=base_size, font=base_font)
     EXPLAINM_FONT = dict(font_size=base_size, font=base_font)
     SIDENOTE_FONT = dict(font_size=base_size, font=base_font, slant='ITALIC')
