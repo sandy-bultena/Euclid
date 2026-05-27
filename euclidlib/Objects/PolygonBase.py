@@ -446,6 +446,7 @@ setattr(cls, 'p{i}', property(p))
                 if old is not None:
                     old.e_remove()
                 self.angles[i] = Angle.EAngle(l1, l2, size=size, label=name, scene=self.scene)
+        return self
 
     # for naming consistency
     def add_angles(self, *angles,  delay_anim=False, skip_anim=False):
@@ -535,6 +536,28 @@ setattr(cls, 'p{i}', property(p))
         for a in self.a:
             if a is not None:
                 a.e_remove()
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # remove line labels
+    # ----------------------------------------------------------------------------------------------------------------
+    def e_remove_line_labels(self):
+        self.remove_line_labels()
+
+    def remove_line_labels(self):
+        with self.scene.simultaneous():
+            for l in self.l:
+                l.e_remove_label()
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # remove point labels
+    # ----------------------------------------------------------------------------------------------------------------
+    def e_remove_point_labels(self):
+        self.remove_point_labels()
+
+    def remove_point_labels(self):
+        with self.scene.simultaneous():
+            for p in self.p:
+                p.e_remove_label()
 
     # ----------------------------------------------------------------------------------------------------------------
     # draw angles

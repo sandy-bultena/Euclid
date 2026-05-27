@@ -130,6 +130,7 @@ class EMObject(mn.VMobject):
         def white(self)-> EMObject: ...
         def grey(self)-> EMObject: ...
         def e_fade(self) -> EMObject: ...
+        def e_hide(self) -> EMObject: ...
         def e_normal(self)-> EMObject: ...
         def lift(self)-> EMObject: ...
         def notice(self,frac_speed=NOTICE_FRAC_SPEED, scale_factor=NOTICE_SCALE_FACTOR, color = NOTICE_COLOUR)-> EMObject: ...
@@ -217,7 +218,7 @@ class EMObject(mn.VMobject):
         # create new label
         new_label = self.init_label(*args, **label_args)
 
-        # if this object is currently visible, than animate
+        # if this object is currently visible, then animate
         if self.visible():
 
             # transform old label to new label if possible
@@ -273,6 +274,9 @@ class EMObject(mn.VMobject):
         self.e_label = None
 
         return self
+
+    def e_remove_label(self)->Self:
+        return self.remove_label()
 
     # -----------------------------------------------------------------------------------------------------------------
     # undraw a label

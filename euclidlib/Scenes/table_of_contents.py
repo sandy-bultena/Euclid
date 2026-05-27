@@ -106,12 +106,13 @@ class TOC:
     # draw the toc entry
     # -----------------------------------------------------------------------------------------------------------------
     def draw_toc_entry(self, entry, xpos, ypos) -> DrawnTOCEntry:
+        font_size=20
 
         drawn_entry = DrawnTOCEntry()
 
         # write the proposition number
         drawn_entry.prop_num = TextBox([xpos + 0.1, ypos, 0])
-        drawn_entry.prop_num.math(f"{entry.prop_num}.", font_size=18)
+        drawn_entry.prop_num.math(f"{entry.prop_num}.", font_size=font_size)
 
         # draw any required diagram
         drawn_entry.diagram = None
@@ -123,10 +124,10 @@ class TOC:
         # write any required text
         drawn_entry.text = TextBox([xpos + self.x_padding, ypos, 0], line_width=self.col_width - 1.5 * self.x_padding)
         if isinstance(entry.text, str):
-            drawn_entry.text.explainM(entry.text, font_size=18)
+            drawn_entry.text.explainM(entry.text, font_size=font_size)
         else:
             for t in entry.text:
-                drawn_entry.text.explainM(t, font_size=18)
+                drawn_entry.text.explainM(t, font_size=font_size)
 
         return drawn_entry
 

@@ -134,6 +134,16 @@ class EMObjectPlayer:
     # fade in or return to normal
     # ----------------------------------------------------------------------------------------------------------------
     @property
+    def e_hide(self):
+        if not self.eobj.is_frozen:
+            self.main_animate = self.label_animate = True
+            for method in self.o_animate_part:
+                getattr(self.anim, method)(opacity=0.0)
+            for method in self.l_animate_part:
+                getattr(self.label_anim, method)(opacity=0.0)
+        return self
+
+    @property
     def e_fade(self):
         if not self.eobj.is_frozen:
             self.main_animate = self.label_animate = True

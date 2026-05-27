@@ -77,7 +77,7 @@ class PropScene(mn.InteractiveScene):
     # -----------------------------------------------------------------------------------------------------------------
     def construct(self) -> None:
         try:
-            self.animationCountObject = mn.DecimalNumber(num_decimal_places=0).to_corner(mn.DR)
+            self.animationCountObject = mn.DecimalNumber(num_decimal_places=0, fill_color=RED).to_corner(mn.DR)
             if self.debug:
                 self.add(self.animationCountObject)
             self.run_full()
@@ -251,6 +251,7 @@ class PropScene(mn.InteractiveScene):
                 self.save_as_png()
         else:
             self.paused = True
+            print("\n\n", "-"*10, self.animationCountObject.get_value(), "-"*10)
             self.wait_until(lambda: not self.paused, 600)
         self.slide_number += 1
 
