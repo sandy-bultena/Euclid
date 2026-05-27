@@ -92,10 +92,11 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
 
         # colouring parts
         for index, colour in enumerate(ordered_colours):
-            self.get_parts_by_tex(r"\blacksquare")[index].set_color(colour)
+            self.get_parts_by_tex(r"\blacksquare")[index].set_color(Colour.on_top_of(colour, BACKGROUND_COLOUR,
+                                                                                     (1-E_FILL_OPACITY_FACTOR)))
 
 
-        if colours is not None and style is not "math":
+        if colours is not None and style != "math":
             for txt, colour in colours:
                 if Colour.luminosity(colour) > MATH_SQUARE_MIN_LUMINOSITY:
                     colour = Colour.set_luminosity(colour, MATH_SQUARE_MIN_LUMINOSITY)
@@ -108,7 +109,7 @@ class EStringObj(EGroupedObjects, mn.StringMobject, ABC):
         if colours is None:
             return self.text, []
         final_colours = []
-        squares = [(match.span(),match.group(1)) for match in re.finditer(r'\\square\s+(\S+)', self.text)]
+        squares = [(match.span(),match.group(1)) for match in re.finditer(r'\\square\s+([A-Za-z]+)', self.text)]
         new_text = ""
         pos = 0
         for square in squares:

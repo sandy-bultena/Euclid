@@ -200,7 +200,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
-                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim)
+                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim, colours=colours)
 
             # not delaying the animation...
             elif not delay_anim:
@@ -265,6 +265,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                           break_into_parts: Optional[tuple[str|tuple[str,dict], ...] | str],
                           delay_anim,
                           skip_anim,
+                          colours=None,
                           ):
         text_str: str = text_obj.text
 
@@ -278,7 +279,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         for part in break_into_parts:
             if isinstance(part, str):
                 text_kwargs.append((part,None))
-                parts.append(self.generate_text( part, text_obj.style, delay_anim=True, _is_a_part=True))
+                parts.append(self.generate_text( part, text_obj.style, colours = colours, delay_anim=True, _is_a_part=True))
 
             else:
                 part,kwargs = part[0:2]
