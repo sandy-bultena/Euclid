@@ -25,6 +25,24 @@ from . import Circle
 
 class ETriangle(Polygon.EPolygonBase):
 
+    def __init__(self, *args, **kwargs):
+        """
+        Create a polygon
+        :param points: coordinates or EPoint
+        :param speed: how fast to draw
+        :param point_labels: labels for the points
+        :param labels: labels for the lines
+        :param angles: labels for each angle
+        :param fill: what colour to fill the polygon, or colour, opacity
+        :param z_index: where is this (on top of all others, below, etc)
+        :param animate_part:
+        :param delay_anim:
+        :param skip_anim:
+        :param kwargs:
+        """
+
+        super().__init__(*args, **kwargs)
+
     # ---------------------------------------------------------------------------------------------------------------
     # length of / angle of --- helper functions
     # ---------------------------------------------------------------------------------------------------------------
