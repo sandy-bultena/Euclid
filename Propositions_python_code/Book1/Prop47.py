@@ -230,7 +230,7 @@ class Prop47(Book1Scene):
             t3.e_fade()
             t3.blue(0)
             t2.e_fade()
-        t2.math(r'\triangle FBC = \frac{1}{2} \square AB')
+        t2.math(r'\triangle FBC = (1/2) \square AB')
 
         self.next_page()
 
@@ -243,7 +243,7 @@ class Prop47(Book1Scene):
 
         t1.explain("The triangle ABD equals half the parallelogram BDL{nb}(I.41)")
         s['ABD'].e_normal()
-        s['BDL'] = EParallelogram(*self.points('BDL')).e_fill(BLUE_D)
+        s['BDL'] = EParallelogram(*self.points('BDL'), fill=BLUE_D)
 
         s['BDL'].l0.e_normal()
         with self.simultaneous():
@@ -257,7 +257,7 @@ class Prop47(Book1Scene):
             t3.e_fade()
             t2.e_fade()
             t2.e_normal(3)
-        t2.math(r'\triangle ABD = \frac{1}{2} \parallelogram BDL')
+        t2.math(r'\triangle ABD = (1/2) \parallelogram BDL')
 
         self.next_page()
 
@@ -324,7 +324,7 @@ class Prop47(Book1Scene):
             t3.e_fade()
             t3.e_normal(1)
 
-        t2.math(r'\triangle BCK = \frac{1}{2} \square AC')
+        t2.math(r'\triangle BCK = (1/2) \square AC')
 
         self.next_page()
 
@@ -340,8 +340,7 @@ class Prop47(Book1Scene):
             s['ECA'].e_normal()
             s['A'].e_fade()
 
-        s['CEL'] = EParallelogram(*self.points('CEL'), skip_anim=True)
-        s['CEL'].e_fill(GREEN)
+        s['CEL'] = EParallelogram(*self.points('CEL'), fill=GREEN, skip_anim=True)
 
         with self.simultaneous():
             s[1] = s['C'].l0.copy().dash().extend_and_prepend(mn_scale(300))
@@ -354,7 +353,7 @@ class Prop47(Book1Scene):
             t3.e_normal(2)
             t2.e_normal(3)
 
-        t2.math(r'\triangle ECA = \frac{1}{2} \parallelogram CEL')
+        t2.math(r'\triangle ECA = (1/2) \parallelogram CEL')
 
         self.next_page()
 
@@ -395,3 +394,4 @@ class Prop47(Book1Scene):
             t2.e_fade()
             t2.e_normal(7, 12, -1)
         t2.math(r'\square AB + \square AC = \square BC')
+        self.next_page()
