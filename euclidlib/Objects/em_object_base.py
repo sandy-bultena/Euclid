@@ -218,7 +218,7 @@ class EMObject(mn.VMobject):
         # create new label
         new_label = self.init_label(*args, **label_args)
 
-        # if this object is currently visible, than animate
+        # if this object is currently visible, then animate
         if self.visible():
 
             # transform old label to new label if possible
@@ -274,6 +274,9 @@ class EMObject(mn.VMobject):
         self.e_label = None
 
         return self
+
+    def e_remove_label(self)->Self:
+        return self.remove_label()
 
     # -----------------------------------------------------------------------------------------------------------------
     # undraw a label

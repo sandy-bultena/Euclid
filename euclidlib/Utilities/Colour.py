@@ -327,6 +327,26 @@ def add(c1: str, *c2s: str) -> str:
     return c1
 
 
+# --------------------------------------------------------
+# on top of
+# --------------------------------------------------------
+def on_top_of(c1: str, c2: str, alpha = 0.5) -> str:
+    """
+    Assumes one colour is on top of another colour
+
+    White (clear) covered by black will return grey
+
+    Black (opaque) covered by white will return grey
+
+    """
+    c1 = string(c1)
+    c2 = string(c2)
+
+    r1, g1, b1 = rgb(c1)
+    r2, g2, b2 = rgb(c2)
+    c1 = get_colour_string_from_rgb(r2*alpha + r1*(1-alpha), g2*alpha + g1*(1-alpha), b2*(alpha) + b1*(1-alpha))
+    return c1
+
 __colour_data = """
 199  21 133		medium violet red
 176 196 222		light steel blue

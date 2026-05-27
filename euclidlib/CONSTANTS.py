@@ -54,7 +54,7 @@ DEFAULT_FADE_OPACITY = 0.25
 DEFAULT_TEXT_FADE_OPACITY = 0.25
 
 # default 'max' opacity for fill colour
-E_FILL_OPACITY_FACTOR = .50
+E_FILL_OPACITY_FACTOR = .6
 
 # what is the default runtime for transformations
 DEFAULT_TRANSFORM_RUNTIME = 0.25
@@ -74,7 +74,7 @@ PARAGRAPH_BUFFER = 0.5*(mn_constants.SMALL_BUFF+ mn_constants.MED_SMALL_BUFF)
 LINE_SHOW_PARTS_BUFF = mn_constants.SMALL_BUFF * 0.7
 
 # default radius of angle indicator
-ANGLE_SIZE = coordinate_utilities.mn_scale(40)
+ANGLE_SIZE = coordinate_utilities.mn_scale(30)
 
 # default size of a point
 DEFAULT_POINT_SIZE = coordinate_utilities.mn_scale(3)
@@ -119,6 +119,8 @@ E_GREEN = Colour.darken(mn_constants.GREEN,20)
 E_RED = Colour.darken(mn_constants.RED,20)
 BOOK_SCENE_GRID_OPACITY = 0.1
 TOC_HIGHLIGHT_BG = PALE_YELLOW
+BACKGROUND_COLOUR = mn_constants.WHITE # this doesn't actually change the background colour, you need
+                                       # to set that in custom_config.yml
 
 # --------------------------------------------------------
 # Fonts
@@ -137,7 +139,7 @@ if sys.platform == 'darwin':  # MAC CHECK
     MATH_FONT = dict(font_size=20)
     FANCY_FONT =  dict(font_size=24, font='Charm')
     TITLE_SCREEN_FONT = dict(font_size=48, font='Bradley Hand')
-    LABEL_FONT_SIZE = 18
+    LABEL_FONT_SIZE = 20
 
 elif sys.platform == 'linux':
     TITLE_FONT = dict(font_size=30, font='Arimo', weight='BOLD')
