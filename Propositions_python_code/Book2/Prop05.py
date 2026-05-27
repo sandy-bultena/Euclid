@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.getcwd())
 
 from euclidlib.Scenes.book02 import Book2Scene
@@ -14,11 +15,11 @@ class Prop5(Book2Scene):
 
     def go(self):
 
-        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550))
-        t2 = TextBox(mn_coord(200, 500))
-        t3 = TextBox(mn_coord(200, 500))
+        t1 = TextBox(mn_coord(800, 150), line_width=mn_scale(550), name='explain')
+        t2 = TextBox(mn_coord(600, 420), name='aside')
+        t3 = TextBox(mn_coord(100, 420), name='math')
         t4 = TextBox(mn_coord(800, 150), line_width=mn_scale(480))
-        t5 = TextBox(mn_coord(820, 150), line_width=mn_scale(480))
+        t5 = TextBox(mn_coord(200, 650), name="summary")
 
         l: dict[str | int, ELine] = {}
         p: dict[str | int, EPoint] = {}
@@ -29,9 +30,26 @@ class Prop5(Book2Scene):
         eq: dict[str | int, EStringObj] = {}
         ex: dict[str | int, mn.Mobject] = {}
 
-        A = mn_coord(125, 200)
-        B = mn_coord(600, 200)
-        D = mn_coord(450, 200)
+        A = mn_coord(125, 170)
+        B = mn_coord(550, 170)
+        D = mn_coord(425, 170)
+
+        CH_colour = SKY_BLUE
+        HF_colour = ORANGE
+        AL_colour = YELLOW
+        DM_colour = GREEN
+        CM_colour = Colour.add(CH_colour,DM_colour)
+        DF_colour = Colour.add(DM_colour,HF_colour)
+        LG_colour = PINK
+        CF_colour = Colour.add(LG_colour, CH_colour, DM_colour, HF_colour)
+        AH_colour = Colour.add(AL_colour, CM_colour)
+        NOP_colour = Colour.add(CM_colour, DF_colour)
+        box_colours = ({'CH':CH_colour,'HF':HF_colour, 'AL':AL_colour,
+                        'DF':DF_colour, 'CM':CM_colour, 'DM':DM_colour,
+                        'LG':LG_colour, 'AH':AH_colour, 'NOP':NOP_colour,
+                        'CF':CF_colour})
+
+
 
         # -------------------------------------------------------------------------------------------------------------
         # In Other Words
@@ -39,97 +57,94 @@ class Prop5(Book2Scene):
         t4.title("In other words:")
         t4.explain("Let AB be a straight line, bisected at point C, "
                    "and cut at an arbitrary point D")
-        p['A'] = EPoint(A, label=('A', UP))
-        p['B'] = EPoint(B, label=('B', UP))
-        l['A'] = ELine(B,A)
-        p['C'] = l['A'].bisect()
-        C = p['C'].coords
-        p['C'].add_label('C', UP)
-        p['C'].e_draw()
-        p['D'] = EPoint(D, label=('D', UP))
 
-        t2.math(r'AC = CB,\quad AD = AC+AD,\quad DB = BC-CD').blue()
-        t3.next_to(t2, DOWN)
+        with self.simultaneous():
+            pA = EPoint(A, label=('A', UP))
+            pB = EPoint(B, label=('B', UP))
+            lA = ELine(B,A)
+
+            pC = EPoint(lA.bisect()).add_label("C",mn.UP)
+            C = pC.coords
+            pD = EPoint(D, label=('D', UP))
+
+            lx = ELine(A,C, label=('x', UP))
+            ly = ELine(C,D, label=('y', UP))
+            lxy = ELine(D,B, label=('x-y', UP))
+            lAC = lx
+            lCD = ly
+            lBD = lxy
+
+        with self.simultaneous():
+            t3.math(r'AC = CB,\quad AD = AC+AD,\quad DB = CB-CD', is_axiom=True)
+            t3.add_marker()
+            t2.math(r'AC = x, \quad CB = x, \quad CD = y')
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
+        t4.add_marker()
         t4.explain("The rectangle formed by the uneven segments "
                    "(AD and{nb}DB) added to the "
                    "square of the tiny segment CD, is equal to the half segment "
                    "(CB) all squared.")
-        with self.staggered_animation():
-            t2.math(r'AD \cdot DB + CD \cdot CD = CB \cdot CB')
-            t2.math(r'AD \cdot DB = CB \cdot CB - CD \cdot CD')
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
         with self.simultaneous():
-            l['x'] = ELine(A,C, label=('x', UP))
-            l['y'] = ELine(C,D, label=('y', UP))
-            l['xy'] = ELine(D,B, label=('x-y', UP))
-
-        t2.math(r'(x+y) \cdot (x-y) = x^2 - y^2')
+            t3.math(r'AD \cdot DB + CD^2 = CB^2')
+            t2.math(r'(x+y) \cdot (x-y) + y^2 = x^2')
 
         # -------------------------------------------------------------------------------------------------------------
         # Construction
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
+        t4.delete_until_last_marker()
+        t4.math(r'AD \cdot DB + CD^2 = CB^2', transform_from=t3[-1])
         with self.simultaneous():
-            for t in t2[1:]:
-                t.e_remove()
+            t2.delete_until_last_marker()
+            t3.delete_until_last_marker()
 
         t1.next_to(t4, DOWN, aligned_edge=LEFT)
         t1.down()
         t1.title("Construction:")
-        t1.explain("Draw a square CEFB on the line CB{nb}(I.46) "
-                   "and draw the diagonal BE")
+        t1.explain("Draw a square CEFB on the line CB{nb}(I.46) and draw the diagonal BE")
 
-        s["CF"] = ESquare(p["C"], p["B"], point_labels=["E", None, None, "F"])
-        F = p["F"] = s["CF"].p3
-        E = p["E"] = s["CF"].p0
-        l["BE"] = ELine(B,E)
+        sCF = ESquare(pC, pB, point_labels=["E", None, None, "F"])
+        F = pF = sCF.p3
+        E = pE = sCF.p0
+        lBE = ELine(B,E)
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
-        t1.explain("From point D, draw a line parallel to either CE of BF{nb}(I.31)")
+        t1.explain("From point D, draw a line parallel to either CE of BF (I.31)")
 
-        l["Dt"] = s["CF"].l2.parallel(p["D"])
-        G = p["G"] = EPoint(l["Dt"].intersect_line(s["CF"].l3)[0], label=("G", DOWN))
-        l["D"] = ELine(D,G)
-        H = p["H"] = EPoint(l["Dt"].intersect_line(l["BE"])[0], label=("H", UL))
-        l["Dt"].e_fade()
-        l["Dt"].e_remove()
+        with self.simultaneous():
+            lD = ly.perpendicular(D,length=lx.length+.01)
+            G = pG = EPoint(lD.intersect_line(sCF.l3)[0], label=("G", DOWN))
+            H = pH = EPoint(lD.intersect_line(lBE)[0], label=("H", UL))
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("From point H, draw a line parallel to either AB or EF{nb}(I.31)")
 
-        l["Ht"] = l["A"].parallel(p["H"])
-        p["M"] = EPoint(l["Ht"].intersect(s["CF"].l2)[0], label=("M", DR))
-        L=p["L"] = EPoint(l["Ht"].intersect(s["CF"].l0)[0], label=("L", DL))
-        l["Ht"].extend(mn_scale(150))
+        with self.simultaneous():
+            lHK = lD.perpendicular(pH, length = lAC.length + lCD.length)
+            lHM = lD.perpendicular(pH, length = lBD.length, side=LineLabelSide.INSIDE)
+            L=pL = EPoint(lHK.intersect(sCF.l0)[0], label=("L", DL))
+            M =pM = EPoint(lHM.intersect(sCF.l2)[0], label=("M", RIGHT))
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("From point A, draw a line parallel to either "
                    "CL or BM{nb}(I.31)")
 
-        l["Kt"] = s["CF"].l2.parallel(p["A"])
-        K = p['K'] = EPoint(l['Kt'].intersect((l['Ht']))[0], label=('K', DOWN))
-
-        self.wait(0.5, ignore_presenter_mode=True)
         with self.simultaneous():
-            l['Kt'].e_remove()
-            l['Ht'].e_remove()
-            M = p['M'].add_label('M', RIGHT)
+            lAK = lAC.perpendicular(pA, length=lBD.length)
+            K = pK = EPoint(lAK.intersect((lHK))[0], label=('K', DOWN))
 
-        self.wait(0.5, ignore_presenter_mode=True)
-        with self.simultaneous():
-            l['KL'] = ELine(K,H)
-            l['LM'] = ELine(H,M)
-            l['K'] = ELine(A,K)
-            l['y2'] = ELine(M,F, label=('y', RIGHT))
-            l['xy2'] = ELine(B,M, label=('x-y', RIGHT, dict(buff=0.3)))
+        lKL = ELine(K,H, skip_anim=True)
+        lLM = ELine(H,M, skip_anim=True)
+        lK = ELine(A,K, skip_anim=True)
+        ly2 = ELine(M,F, skip_anim=True)
+        lxy2 = ELine(B,M, skip_anim=True)
+        lHK.e_remove()
+        lHM.e_remove()
 
         # -------------------------------------------------------------------------------------------------------------
         # Proof
@@ -144,57 +159,109 @@ class Prop5(Book2Scene):
                    "and if we add the rectangle DM, "
                    "then the rectangles CM and DF are equal")
 
-        s['CH'] = EPolygon(C,L,H,D, skip_anim=True).e_fill(BLUE_E)
-        s['HF'] = EPolygon(H,G,F,M, skip_anim=True).e_fill(BLUE_E)
-        s['DM'] = EPolygon(D,H,M,B, skip_anim=True).e_fill(BLUE)
+        lBE.e_fade()
+        with self.simultaneous():
+            sCH = EPolygon(C,L,H,D, skip_anim=True).e_fill(CH_colour)
+            sHF = EPolygon(H,G,F,M, skip_anim=True).e_fill(HF_colour)
+        with self.simultaneous():
+            eq = t3.math(r'\square CH = \square HF', colours=box_colours)
+        self.next_page()
 
-        l['BE'].e_fade()
+        # -------------------------------------------------------------------------------------------------------------
+        sDM = EPolygon(D, H, M, B, skip_anim=True).e_fill(DM_colour)
+        with (self.simultaneous()):
+            sCH.e_normal()
+            lBE.e_hide()
+
+        t3.math(r'\square CH + \square DM = \square HF + \square DM', transform_from=eq,
+                transform_args=dict(key_map=
+                                    {r'\square CH':r'\square CH + \square DM',
+                                     r'\square HF':r'\square HF + \square DM'},
+                                    ),
+                 colours=box_colours)
+
+        self.next_page()
+
+        # -------------------------------------------------------------------------------------------------------------
+        sCH.e_normal()
+        sHF.e_normal()
+        t3.math(r':\quad\quad \therefore\  \square CM = \square DF',
+                transform_from=-1, colours=box_colours, same_line=True)
+        self.next_page()
+
+        # -------------------------------------------------------------------------------------------------------------
+        t1.explain("The rectangles CM and AL are equal (I.36)")
+        sAL = EPolygon(A,K,L,C, skip_anim=True)
+        sCM = EPolygon(pC, pL, pM, pB, skip_anim=True)
+        with self.simultaneous():
+            sHF.e_hide()
+            sAL.e_fill(AL_colour)
+            sCM.e_fill(CM_colour)
+            sHF.remove_label()
+            sCH.remove_label()
+            sDM.remove_label()
+            sDM.e_hide()
+            sCH.e_hide()
 
         with self.simultaneous():
             t3.e_fade()
-        t3.math(r'\quad\square CH = \square HF')
-        t3.math(r' \therefore\  \square CM = \square DF', align_str="=")
-
-        # -------------------------------------------------------------------------------------------------------------
-        self.next_page()
-        t1.explain("The rectangles CM and AL are equal{nb}(I.36)")
-        s['AL'] = EPolygon(A,K,L,C, skip_anim=True).e_fill(GREEN)
-        with self.simultaneous():
-            s['HF'].e_unfill()
-            s['DM'].e_fill(BLUE_E)
-            s['CH'].e_fill(BLUE_E)
-
-        t3.e_fade()
-        t3.math(r'\square AL = \square CM', align_str="=")
+            t3.e_normal(-1)
+            t3.math(r'\square AL = \square CM', colours=box_colours)
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("which means that AL and DF are also equal")
-        t3.e_normal(1)
-        t3.e_append(-1, r"= \square DF")
+        t3.e_append(-1, r"= \square DF", colours=box_colours)
+        sDF = EPolygon(pD, pG, pF, pB, skip_anim=True)
+
         with self.simultaneous():
-            l['D'].e_normal()
-            l['LM'].e_fade()
-            s['DM'].e_fill(BLUE_E)
-            s['HF'].e_fill(BLUE_E)
-            s['CH'].e_unfill()
+            lD.e_normal()
+            lLM.e_fade()
+            sDF.e_fill(DF_colour)
+            sCH.e_hide()
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
-        t1.explain("Let CH be added to each of AL and DF. "
-                   "Now AH is equal to gnomon NOP")
-        l['LH']=VirtualLine(L,H)
-        l['HG']=VirtualLine(H,G)
-        a['NOP'] = EAngle(l["LH"],l["HG"], size=mn_scale(60), label=(*'NOP',), gnomon=True)
-        s['CH'].e_fill(TEAL)
-        t3.math(r'\square AH = NOP', align_str="=")
+        t1.explain("Let CH be added to each of AL and DF. Now AH is equal to {nb:gnomon NOP}")
+        sCH.remove_label()
+        lLH=ELine(L,H, skip_anim=True).e_hide()
+        lHG=ELine(H,G, skip_anim=True).e_hide()
+        sAH = EPolygon(A,pK, pH, D, skip_anim=True)
+        sNOP = EPolygon(C, B, F, G, H, L, skip_anim=True)
+        t3.math(r'\square AL + \square CH = \square DF + \square CH',
+                colours=box_colours, transform_from=-1, transform_args=dict(
+                key_map={
+                    r'\square AL =': r'\square AL + \square CH =',
+                    r'\square DF': r'\square DF + \square CH'
+                }
+            ))
+
+        with self.simultaneous():
+            sAL.e_hide()
+            sCM.e_hide()
+            sDF.e_hide()
+            sAH.e_fill(AH_colour)
+            sNOP.e_fill(NOP_colour)
+
+
+        aNOP = EAngle(lLH,lHG, size=mn_scale(60), label=(*'NOP',), gnomon=True)
+
+        #sCH.e_fill(CH_colour)
+        t3.math(r'\square AH = \square NOP', align_str="=",
+                colours=box_colours)
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("For a proof showing that DM and LG are squares, see II.4 ")
         with self.simultaneous():
             t3.e_fade()
-        t3.math(r'DH = DB\ ,\ \square LG = \square CD')
+            lBM = sDM.l[2].e_normal()
+            lFM = sHF.l[2].e_normal()
+        with self.simultaneous():
+            sDM.add_line_labels('','',('x-y',dict(buff=1.5*LABEL_BUFF)),'')
+            sHF.add_line_labels('','','y','')
+        sLG = EPolygon(L,E,G,H, skip_anim=True).e_fill(PINK)
+        t3.math(r'DH = DB\ ,\ \square LG = CD^2', colours=box_colours)
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
@@ -203,34 +270,104 @@ class Prop5(Book2Scene):
                     "is equal to the gnomon $NOP$")
         with self.simultaneous():
             t3.e_fade()
+            sDM.e_remove_line_labels()
+            sHF.e_remove_line_labels()
             t3.e_normal(-1, -2)
-        t3.math(r'\square AH = AD \cdot DB = NOP', align_str="=")
+        t3.math(r'\square AH = AD \cdot DB = \square NOP', colours=box_colours, align_str="=")
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("LG is equal to the square on CD, add it "
                    "to both AH and NOP, retaining the equality")
 
-        s['LG'] = EPolygon(L,E,G,H, skip_anim=True).e_fill(PINK)
-
         with self.simultaneous():
             t3.e_fade()
-            t3.e_normal(-2)
-        t3.math(r"AD \cdot DB + CD \cdot CD = NOP + \square LG", align_str="=")
+            t3.e_normal(-1)
+        t3.math(r"AD \cdot DB + CD^2 = \square NOP + \square LG = \square CF", colours=box_colours,
+                transform_from=-1, transform_args=dict(key_map= {
+                r'\square AH = ':'',
+                r'AD \cdot DB =':r'AD \cdot DB + CD^2 =',
+                r'\square NOP':r'\square NOP + \square LG'
+            }))
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         t1.explain("But CF is equal to the square on CB, which is also equal "
                    "to the gnomon NOP added to the rectangle LG, "
-                   "we have demonstrated the proof for this postulate")
+                   "thus we have demonstrated the proof for this proposition")
 
         with self.simultaneous():
             t3.e_fade()
             t3.e_normal(-1)
-        t3.math(r"AD \cdot DB + CD \cdot CD = CB \cdot CB", align_str="=")
+        t3.math(r"AD \cdot DB + CD^2 = CB^2")
 
         # -------------------------------------------------------------------------------------------------------------
         self.next_page()
         with self.simultaneous():
             t3.e_fade()
+            t3.e_normal(0)
             t3.e_normal(-1)
+            #t3.math(r'(x+y) \cdot (x-y) + y^2 = x^2')
+        self.next_page()
+
+        # -------------------------------------------------------------------------------------------------------------
+        # pictorial
+        # -------------------------------------------------------------------------------------------------------------
+        t3.delete_all()
+        #sDF = EParallelogram(pD, pG, pF, pB, skip_anim=True)
+        with self.simultaneous():
+            pass
+            aNOP.remove_label()
+            pK.remove_label()
+            pL.remove_label()
+            pE.remove_label()
+            pG.remove_label()
+            lBE.e_remove()
+            sCF.e_hide()
+            aNOP.e_remove()
+            pH.remove_label()
+            pG.remove_label()
+            pF.remove_label()
+            pM.remove_label()
+            lBM.remove_label()
+            lFM.remove_label()
+            sDM.e_remove()
+            lLM.e_remove()
+            pM.e_remove()
+            sDF.e_hide()
+            sCH.e_hide()
+            lD.e_hide()
+
+        with self.simultaneous():
+            pass
+            sLG.add_label('y^2')
+            sLG.add_line_labels('y')
+
+            lBF = ELine(pF,pB,skip_anim=True).add_label('x')
+            lEF = ELine(pE,pF, skip_anim=True)
+
+        buffer = 0.5
+        y_delta = [0, -lAC.length - buffer , 0]
+        with self.simultaneous():
+            pass
+            lAKt = lKL.perpendicular(pK, length = 1.5*buffer + lBD.length + lCD.length, skip_anim=True).dash()
+            lDGt = lEF.perpendicular(pG, length = 1.5*buffer  + lBD.length, skip_anim=True).dash()
+            lBFt = lEF.perpendicular(pF, length = 1.5*buffer  + lBD.length, skip_anim=True).dash()
+
+            sNOP.add_label("(x+y)(x-y)")
+            sNOP.add_line_labels("","","","","",('x-y',dict(buff=2*LABEL_BUFF, side=LineLabelSide.INSIDE)))
+            sAH.add_label('(x+y)(x-y)')
+            sAH.add_line_labels(('x-y',dict(buff=2*LABEL_BUFF)),'','','x+y')
+        with self.simultaneous():
+            sAH.e_move(y_delta)(run_time=2)
+
+
+        t5.math(r"AD \cdot DB + CD^2 = CB^2")
+        t5.math(r'(x+y)(x-y) + y^2 = x^2', align_str="=", transform_from=-1,
+                transform_args=dict(key_map={
+                    'AD':'(x+y)', 'DB':'(x-y)', 'CD^2':'y^2', 'CB^2':'x^2'
+                }))
+
+
+
+        self.next_page()
