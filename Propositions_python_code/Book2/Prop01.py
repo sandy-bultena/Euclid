@@ -9,7 +9,7 @@ from euclidlib.Objects import *
 PPURPLE       = Colour.add( PURPLE,    PURPLE )
 REALLY_PURPLE = Colour.add( PPURPLE, PURPLE )
 
-class Prop5(Book2Scene):
+class Prop1(Book2Scene):
     title = ("If there be two straight lines, and of of them be cut into any number of segments whatever, "
         "the rectangle contained by the two straight lines is equal to the rectangles contained by "
         "the uncut straight line and each of the segments."

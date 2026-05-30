@@ -7,7 +7,7 @@ from euclidlib.Scenes.book02 import Book2Scene
 from euclidlib.Objects import *
 
 
-class Prop11(Book2Scene):
+class Prop12(Book2Scene):
     title = ("In obtuse-angled triangles the square on the side subtending the "
    "obtuse angle is greater than the squares on the sides containing the "
    "obtuse angle by twice the rectangle contained by one of the sides about "

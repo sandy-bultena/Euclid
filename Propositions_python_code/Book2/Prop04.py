@@ -8,7 +8,7 @@ from euclidlib.Objects import *
 PPURPLE       = Colour.add( PURPLE,    PURPLE )
 REALLY_PURPLE = Colour.add( PPURPLE, PURPLE )
 
-class Prop5(Book2Scene):
+class Prop4(Book2Scene):
     title =     "If a straight line be cut at random, the square on the whole is equal to " \
                 "the squares on the segments and twice the rectangle contained by the segments."
 

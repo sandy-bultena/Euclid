@@ -81,6 +81,7 @@ class PropScene(mn.InteractiveScene):
             if self.debug:
                 self.add(self.animationCountObject)
             self.run_full()
+            self.next_page()
         except Exception:
             traceback.print_exc()
 
@@ -248,6 +249,7 @@ class PropScene(mn.InteractiveScene):
         if WRITE_TO_MOVIE:
             self.wait(10)
             if os.environ.get("SAVE_MANIM_PDF", False):
+                print("Saving png for this page!")
                 self.save_as_png()
         else:
             self.paused = True
