@@ -33,6 +33,84 @@ class LineLabelSide(Enum):
     INSIDE = 0
     OUTSIDE = 1
 
+# =====================================================================================================================
+# Multiple Lines
+# =====================================================================================================================
+class MultipleLines:
+    """Manage drawing multiple lines by keeping track of lines that have already been drawn"""
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # constructor
+    # -----------------------------------------------------------------------------------------------------------------
+    def __init__(self, origin, scale, x_offset, y_offset):
+        self.origin = convert_to_coord(origin)
+        self.scale:float = scale
+        self.y_offset:float = y_offset
+        self.x_offset = x_offset
+        self.lines= {}
+        self.next_line = False
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # define the lines
+    # -----------------------------------------------------------------------------------------------------------------
+    def define_line_coordinates(self, label, length, next_line=True, after:Optional[list[str]] = None):
+        """Define location of lines based on previously drawn lines, so order of creation matters!!"""
+
+        # move the origin down if we want the next line (but first line never moves down!)
+        if next_line and self.next_line:
+            self.origin = self.origin + convert_to_coord([0, -self.y_offset, 0])
+        self.next_line = True
+
+        # keep track of which lines might be drawn later
+        after = [] if after is None else after
+        end = self.origin + convert_to_coord([length*self.scale, 0, 0])
+        self.lines[label] = {"coords":(self.origin, end),"after":after}
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # adjust the lines so that they go 'after' whichever lines they should
+    # -----------------------------------------------------------------------------------------------------------------
+    def adjust_lines(self):
+        """now that all the lines are defined, adjust the lines so that they are positioned as the 'after' option has specified"""
+        changes = True
+        while changes:
+            changes = False
+            for label in self.lines:
+                coords = self.lines[label]["coords"]
+                start,end = coords
+                for after_label in self.lines[label]["after"]:
+                    if after_label not in self.lines:
+                        continue
+                    if after_label == label:
+                        continue
+                    after_coord = self.lines[after_label]["coords"]
+                    _,begin_after = after_coord
+                    if start[0] < begin_after[0] + self.x_offset:
+                        xdiff = begin_after[0]+self.x_offset - start[0]
+                        changes = True
+                        self.lines[label]["coords"] = (start + convert_to_coord([xdiff,]),
+                                                       end + convert_to_coord([xdiff,]))
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # draw the lines
+    # -----------------------------------------------------------------------------------------------------------------
+    def draw_lines(self, labels)->tuple[ELine,]:
+        """draw the lines"""
+        self.adjust_lines()
+
+        line_objs = []
+        # cheating way to get the scene
+        x = VirtualLine([0,0],[0,0])
+        scene = x.scene
+        with scene.simultaneous():
+            for label in labels:
+                if label in self.lines:
+                    line_objs.append( ELine(*self.lines[label]["coords"]).add_label(label, direction=mn.LEFT, alpha=0) )
+                else:
+                    line_objs.append(None)
+        x.e_remove()
+        return line_objs
+
+
 
 # =====================================================================================================================
 # Line

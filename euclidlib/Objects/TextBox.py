@@ -343,6 +343,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
     # managing items
     # -----------------------------------------------------------------------------------------------------------------
     def e_remove(self, index = None):
+        """removes the content of the textbox, not the textbox itself"""
         if index is None:
             with self.scene.simultaneous():
                 for obj in self:

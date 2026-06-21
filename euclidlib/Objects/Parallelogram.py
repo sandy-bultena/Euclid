@@ -15,9 +15,9 @@ from . import Line
 class EParallelogram(Polygon.EPolygon):
     def __init__(self, *points: EMObject | mn.Vect3, **kwargs):
         if len(points) == 3:
-            x, y, z = map(convert_to_coord, points)
-            diff = y - x
-            points = ( x, y, z, z - diff)
+            p1, p2, p3 = map(convert_to_coord, points)
+            diff = p2 - p1
+            points = ( p1, p2, p3, p3 - diff)
 
         super().__init__(*points, **kwargs)
 
@@ -187,5 +187,4 @@ class EParallelogram(Polygon.EPolygon):
                 o.e_remove()
 
         return paral
-
 

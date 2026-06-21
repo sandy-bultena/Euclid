@@ -16,7 +16,7 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        hide()
+        rectangle2()
 
 
     def go(self):
@@ -29,6 +29,19 @@ def hide():
     poly1.e_hide()
     poly1.scene.wait(2)
     poly1.e_normal()
+
+def rectangle2():
+    p1 = mn_coord(150, 650)
+    p2 = mn_coord(550, 250)
+    r = ERectangle(p1,p2, fill=SKY_BLUE).e_remove_points()
+    for i in range(8):
+        pt = 0.5 * (p1+p2)
+        ERectangle(p1,pt,fill=YELLOW).e_remove_points()
+        ELine( [pt[0], p1[1], 0], [pt[0],p2[1],0])
+        ELine( [p1[0], pt[1], 0], [p2[0],pt[1],0])
+        p1 = pt
+
+
 
 def polygon():
 

@@ -107,9 +107,6 @@ class PropScene(mn.InteractiveScene):
                 if not self.debug:
                     self.title_page()
                     self.next_page()
-                    self.clear()
-                    self.draw_table_of_contents(self.prop)
-                    self.next_page()
             except NotImplementedError:
                 pass
 
@@ -119,8 +116,13 @@ class PropScene(mn.InteractiveScene):
 
             # denouement
             try:
-                self.clear_all()
-                self.last_page()
+                if not self.debug:
+                    self.clear_all()
+                    self.last_page()
+                    self.wait(10)
+                    self.clear()
+                    self.draw_table_of_contents(self.prop)
+                    self.next_page()
             except NotImplementedError:
                 pass
 

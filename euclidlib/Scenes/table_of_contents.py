@@ -43,7 +43,7 @@ def define_cols( num_cols):
 # TOC
 # ====================================================================================================================
 class TOC:
-    def __init__(self, title="", book="",*, x_padding=0.6, y_padding=0.25, next_page_func:Callable=lambda: None):
+    def __init__(self, title="", book="",*, x_padding=0.6, y_padding=0.25, column_padding = None, next_page_func:Callable=lambda: None):
         self.title = title
         self.book = book
         self.entries:list[TOCEntry] = []
@@ -53,6 +53,10 @@ class TOC:
         self.col_width = (M_RIGHT_BORDER - M_LEFT_BORDER)/3
         self.cols_xpos = define_cols(3)
         self.bottom_padding = 0.2
+        if column_padding is None:
+            self.column_padding = 1.5 * self.x_padding
+        else:
+            self.column_padding = column_padding
 
     def add_entry(self, entry:TOCEntry):
         self.entries.append(entry)
@@ -92,6 +96,7 @@ class TOC:
 
             # reset for next toc entry
             ypos = drawn_entry.text.get_bottom()[1] - self.y_padding
+        self.next_page_func()
 
     # -----------------------------------------------------------------------------------------------------------------
     # draw the header
@@ -122,7 +127,7 @@ class TOC:
             ypos = drawn_entry.diagram.get_bottom()[1] - self.y_padding / 2
 
         # write any required text
-        drawn_entry.text = TextBox([xpos + self.x_padding, ypos, 0], line_width=self.col_width - 1.5 * self.x_padding)
+        drawn_entry.text = TextBox([xpos + self.x_padding, ypos, 0], line_width=self.col_width - self.column_padding)
         if isinstance(entry.text, str):
             drawn_entry.text.explainM(entry.text, font_size=font_size)
         else:

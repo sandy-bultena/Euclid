@@ -528,8 +528,24 @@ setattr(cls, 'p{i}', property(p))
         return args
 
     # ----------------------------------------------------------------------------------------------------------------
+    # remove points
+    # ----------------------------------------------------------------------------------------------------------------
+    def e_remove_points(self):
+        return self.remove_points()
+
+    def remove_points(self):
+        """removes them from the scene, but they still exist!"""
+        for p in self.p:
+            if p is not None:
+                p.e_remove()
+        return self
+
+    # ----------------------------------------------------------------------------------------------------------------
     # remove angles
     # ----------------------------------------------------------------------------------------------------------------
+    def e_remove_angles(self):
+        self.remove_angles()
+
     def remove_angles(self):
         if self.a is None:
             return

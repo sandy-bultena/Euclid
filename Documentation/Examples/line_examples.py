@@ -1,9 +1,9 @@
 import sys
 import os
 
-from docutils.parsers.rst.directives.tables import align
-
 sys.path.append(os.getcwd())
+
+from euclidlib.Utilities.e_numbers import ENumbers
 
 from euclidlib.Scenes.PropScene import PropScene
 from euclidlib.Objects import *
@@ -13,10 +13,27 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        hide()
+        draw_multiple_lines()
 
     def go(self):
         pass
+
+def draw_multiple_lines():
+    origin = mn_coord(100, 160)
+    unit = mn_scale(10)
+    dy = mn_scale(30)
+    dx = mn_scale(50)
+    mls = MultipleLines(origin, unit, dx, dy)
+    n1, n2, n3 = ENumbers.find_continued_proportion(2, 3, 3)
+
+    mls.define_line_coordinates('A',2*n1)
+    mls.define_line_coordinates('B', 2*n2, after='A', next_line=False)
+    mls.define_line_coordinates('C', 2*n3)
+    mls.define_line_coordinates('D',n1)
+    mls.define_line_coordinates('E', n2, after='AD', next_line=False)
+    mls.define_line_coordinates('F', n3, after='C', next_line=False)
+    mls.draw_lines('ABCDEF')
+
 
 def hide():
     l = ELine(mn_coord(350,120),mn_coord(150,100)).blue()

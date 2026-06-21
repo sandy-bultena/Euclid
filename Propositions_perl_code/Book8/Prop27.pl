@@ -123,7 +123,7 @@ sub explanation {
     push @$steps, sub {
         $t2->allgrey;
         $t2->black([2,3]);
-        $t1->explain("Therefore the extremes E and H are cube (VII.2.Por)");
+        $t1->explain("Therefore the extremes E and H are cube (VIII.2.Por)");
         $t2->math("E = x\\{^3}");       # 4
         $t2->math("H = y\\{^3}");       # 5
     };

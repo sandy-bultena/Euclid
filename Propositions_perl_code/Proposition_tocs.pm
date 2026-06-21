@@ -634,7 +634,7 @@ sub toc7 {
         "Find the least common multiple of 3 numbers",
         "If A\\{nb}=\\{nb}p\\{dot}B, then A\\{nb}=\\{nb}q\\{dot}C "
           . "where C\\{nb}=\\{nb}p\\{dot}1",
-        "If A\\{nb}=\\{nb}(1/c)\\{dot}B and C\\{nb}=\\{nb}c\\{dot}1 "
+        "If B\\{nb}=\\{nb}(1/c)\\{dot}A and C\\{nb}=\\{nb}c\\{dot}1 "
           . "then A\\{nb}=\\{nb}n\\{dot}C",
         "Find the smallest number that has the fractions 1/a, 1/b, 1/c",
 

@@ -30,12 +30,14 @@ MARKUP_REPLACE = (
 )
 
 MATH_PREAMBLE = (
-    r'\usepackage{pifont}'
-    # r'\usepackage{unicode-math}'
-    r'\usepackage[normalem]{ulem}'
-    r'\usepackage{stix}'
+    r'\usepackage{pifont}',
+    # r'\usepackage{unicode-math}',
+    r'\usepackage[normalem]{ulem}',
+    r'\usepackage{stix}',
     r'\newcommand{\ecrossmark}{\textrm{\ding{55}}}',
-    r'\newcommand{\echeckmark}{\textrm{\ding{51}}}'
+    r'\newcommand{\echeckmark}{\textrm{\ding{51}}}',
+    r'\newcommand{\ratio}{{:}}',
+
 )
 
 TEX_REPLACE = (
