@@ -166,7 +166,7 @@ class PropScene(mn.InteractiveScene):
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         char = chr(symbol)
         super().on_key_press(symbol, modifiers)
-        if self.paused and char == "n":
+        if self.paused and (char == "n" or symbol==65363):
             self.paused = False
 
         if char == 'z':

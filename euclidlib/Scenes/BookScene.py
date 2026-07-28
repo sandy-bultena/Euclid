@@ -83,15 +83,6 @@ class BookScene(PropScene):
     def reset(self):
         self.clear()
 
-        # print the title
-        if self.title and self.prop:
-            t = TextBox(mn_coord(700, 50),
-                        line_width=mn_scale(1000),
-                        alignment='n'
-                        )
-            t.title(f"Proposition {self.prop} of Book {self.book}")
-            t.normal(self.title)
-
         # draw the grid
         line_options = dict(
             stroke_color=STROKE_COLOUR,
@@ -107,11 +98,23 @@ class BookScene(PropScene):
         grid.fix_in_frame()
         self.play(mn.FadeIn(grid))
 
-        t=TextBox(mn_coord(10,780))
-        t.sidenote(COPYRIGHT)
+        # draw the copyright
+        with self.skip_animations_for():
+            t=TextBox(mn_coord(10,780))
+            t.sidenote(COPYRIGHT)
+
+        # print the title
+        if self.title and self.prop:
+            t = TextBox(mn_coord(700, 50),
+                        line_width=mn_scale(1000),
+                        alignment='n'
+                        )
+            t.title(f"Proposition {self.prop} of Book {self.book}")
+            t.normal(self.title)
+
 
     # -----------------------------------------------------------------------------------------------------------------
-    # get proposition number from the file name (ie. Propposition_python/Book2/Prop05.py)
+    # get proposition number from the file name (ie. Proposition_python/Book2/Prop05.py)
     # -----------------------------------------------------------------------------------------------------------------
     @classmethod
     def get_prop_number(cls):

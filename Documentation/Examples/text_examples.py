@@ -10,10 +10,26 @@ class Book1Prop1(PropScene):
     steps = []
 
     def run_full(self):
-        parts()
+        transform_by_parts()
 
     def go(self):
         pass
+
+def transform_by_parts():
+    t1 = TextBox(mn_coord(20, 20))
+    t1.math(r"\text{one}\ a+b=c+d\ \text{two}", break_into_parts=[r"\text{one}",r"\ a+b=c+d",r"\ \text{two}"])
+    t1.math(r"\text{two}\ x+y=35\ \text{three}", break_into_parts=[r"\text{two}",r"\ x+y=35",r"\ \text{three}"],
+            transform_from=-1
+            )
+    t1.down()
+    eq1 = t1.math("a = x^x + y", break_into_parts=["a ","=", "x^x + y"])
+    eq2 = t1.math("a = 3z", break_into_parts=["a ","=", "3z"])
+    t1.math("x^x + y = 3z", break_into_parts=[
+        ("x^x + y",{"transform_from":eq1.parts[2]}),
+        "=",
+        ("3z",{"transform_from":eq2.parts[2]})] )
+
+
 
 def parts():
     t3 = TextBox(mn_coord(20, 20))

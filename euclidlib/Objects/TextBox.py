@@ -176,7 +176,6 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             # create the text and fix the text in frame (is always displayed at a fixed position on the screen)
             newline = text_class(text, colours = colours, **kwargs, scene=self.scene, delay_anim=True)
             newline.fix_in_frame()
-            print(f"{self.name}: ({len(self)}),  {style}({newline.text})")
 
             # place the text in the appropriate y position
             if same_line and len(self):
@@ -200,7 +199,8 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
             # break the text into parts (so that later we can use individual parts for animation)
             # and do no further processing
             if break_into_parts:
-                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim, colours=colours)
+                self._break_into_parts(newline, break_into_parts, delay_anim, skip_anim,
+                                       transform_from, colours=colours)
 
             # not delaying the animation...
             elif not delay_anim:
@@ -265,35 +265,49 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
                           break_into_parts: Optional[tuple[str|tuple[str,dict], ...] | str],
                           delay_anim,
                           skip_anim,
+                          transform_from: Text.EStringObj | int = None,
                           colours=None,
                           ):
         text_str: str = text_obj.text
+        transform_from = self[transform_from] if isinstance(transform_from, int) else transform_from
+        parts = []
 
         # if the break_into_parts is a string instead of an array, use that to break text into its parts
         if isinstance(break_into_parts, str):
             break_into_parts = text_str.split(break_into_parts)
 
-        # create the text objects for each part
-        parts = []
-        text_kwargs:list[tuple] = []
-        for part in break_into_parts:
-            if isinstance(part, str):
-                text_kwargs.append((part,None))
-                parts.append(self.generate_text( part, text_obj.style, colours = colours, delay_anim=True, _is_a_part=True))
+        # loop over each part
+        transform_done = False
+        for index,part in enumerate(break_into_parts):
 
-            else:
-                part,kwargs = part[0:2]
-                text_kwargs.append ((part,kwargs))
-                parts.append(self.generate_text(part, text_obj.style,delay_anim=True, _is_a_part=True, **kwargs))
+            kwargs = {}
+            if not isinstance(part, str):
+                part, kwargs = part[0:2]
 
-        # align the parts overtop of the main string
-        for p, t in zip(parts, text_kwargs):
-            text, kwargs = t
-            if kwargs is None:
-                p.next_to(text_obj[p.text], mn.ORIGIN, buff=0)
+            # if part is a string, but we want transformation, transform part by part
+            if transform_from is not None and not transform_done:
+                if len(transform_from.parts) == 0:
+                    kwargs["transform_from"] = transform_from
+                    transform_done = True
+                elif len(transform_from.parts) > index:
+                    kwargs["transform_from"] = transform_from.parts[index]
+                else:
+                    transform_done = True
 
+            # note that we are delaying animation here, so we have to draw later
+            text_part = self.generate_text( part, text_obj.style, colours = colours, delay_anim=True,
+                                                 _is_a_part=True, **kwargs)
+            parts.append(text_part)
+
+            # align the parts overtop of the main string (this overrides any alignment that the user might have specified)
+            text_part.next_to(text_obj[text_part.text], mn.ORIGIN, buff=0)
+
+            # draw the part
             if not delay_anim:
-                p.e_draw(skip_anim)
+                if "transform_from" in kwargs and kwargs["transform_from"] is not None:
+                    self.e_transform_to(text_part, transform_args=None, transform_from = kwargs["transform_from"])
+                else:
+                    text_part.e_draw(skip_anim)
 
         text_obj.parts = parts
 
@@ -306,7 +320,7 @@ class TextBox(EIndexedGroup[Text.EStringObj]):
         if isinstance(transform_from, int):
             transform_from = self[transform_from]
 
-        self.scene.play(mn.TransformMatchingStrings(
+        self.scene.play(mn.TransformMatchingTex(
             transform_from.copy(),
             text_obj,
             **transform_args,

@@ -58,13 +58,19 @@ class MultipleLines:
 
         # move the origin down if we want the next line (but first line never moves down!)
         if next_line and self.next_line:
-            self.origin = self.origin + convert_to_coord([0, -self.y_offset, 0])
+            self.origin = self.next_line_position()
         self.next_line = True
 
         # keep track of which lines might be drawn later
         after = [] if after is None else after
         end = self.origin + convert_to_coord([length*self.scale, 0, 0])
         self.lines[label] = {"coords":(self.origin, end),"after":after}
+
+    # -----------------------------------------------------------------------------------------------------------------
+    # get next line position
+    # -----------------------------------------------------------------------------------------------------------------
+    def next_line_position(self):
+        return self.origin + convert_to_coord([0, -self.y_offset, 0])
 
     # -----------------------------------------------------------------------------------------------------------------
     # adjust the lines so that they go 'after' whichever lines they should
